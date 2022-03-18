@@ -73,7 +73,7 @@ jobs:
           echo ========================== Destructive Changes Post ============================= 
           echo =================================================================================
           cat delta/convertmdapi/destructiveChangesPost.xml
-          sfdx force:auth:jwt:grant --clientid 3MVG9FG3dvS828gJ0Bjele5bHSk83f0gmEVbQNguGVcuxppeTeEd9Qzgw1DmysIjuudxEwam8bBtxGq4RfeGX --jwtkeyfile ./buildfiles/cert/server.key --username adrian.ioana@molsoncoors.com.spring21 --instanceurl https://test.salesforce.com
+          sfdx force:auth:jwt:grant --clientid ${{secrets.TESTsalesforceDevOrgClientId}} --jwtkeyfile ./.github/server.key --username ${{secrets.TESTsalesforceOrgUserName}} --instanceurl ${{secrets.testOrgInstanceURL}}
           sfdx force:mdapi:deploy -d delta/convertmdapi -l ${{secrets.TESTtestLevel}} -u ${{secrets.TESTsalesforceOrgUserName}} --ignorewarnings -w 60
 
       - name: Add new tag
@@ -91,4 +91,4 @@ jobs:
       #   run:
       #     sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.TESTsalesforceOrgUserName}}
 
-      # sfdx force:auth:jwt:grant --clientid 3MVG9FG3dvS828gJ0Bjele5bHSk83f0gmEVbQNguGVcuxppeTeEd9Qzgw1DmysIjuudxEwam8bBtxGq4RfeGX --jwtkeyfile ./buildfiles/cert/server.key --username adrian.ioana@molsoncoors.com.spring21 --instanceurl https://test.salesforce.com
+# sfdx force:auth:jwt:grant --clientid 3MVG9FG3dvS828gJ0Bjele5bHSk83f0gmEVbQNguGVcuxppeTeEd9Qzgw1DmysIjuudxEwam8bBtxGq4RfeGX --jwtkeyfile ./.github/server.key --username adrian.ioana@molsoncoors.com.spring21 --instanceurl https://test.salesforce.com
