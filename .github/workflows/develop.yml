@@ -28,6 +28,10 @@ jobs:
 #           npm install sfdx-cli --global
 #           echo 'y' | npx sfdx plugins:install sfpowerkit
 
+      - name: SFDX Version
+        run: |
+          sfdx --version
+
       - name: Delta package
         run: |
           git rev-parse --abbrev-ref HEAD
@@ -84,3 +88,5 @@ jobs:
       # - name: Retrieve the code coverage
       #   run:
       #     sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.TESTsalesforceOrgUserName}}
+
+# sfdx force:auth:jwt:grant --clientid 3MVG9FG3dvS828gJ0Bjele5bHSk83f0gmEVbQNguGVcuxppeTeEd9Qzgw1DmysIjuudxEwam8bBtxGq4RfeGX --jwtkeyfile ./deploy_scripts/server.key --username adrian.ioana@molsoncoors.com.spring21 --instanceurl https://test.salesforce.com

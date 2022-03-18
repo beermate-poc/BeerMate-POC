@@ -24,6 +24,10 @@ jobs:
       #     npm install sfdx-cli --global
       #     echo 'y' | npx sfdx plugins:install sfpowerkit
 
+      - name: SFDX Version
+        run: |
+          sfdx --version
+
       - name: Delta package
         run: |
           git rev-parse --abbrev-ref HEAD
