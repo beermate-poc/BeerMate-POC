@@ -32,6 +32,7 @@ jobs:
         run: |
           sfdx --version
           echo "${PWD##*/}"
+          ls -d $PWD/*
 
       - name: Delta package
         run: |
