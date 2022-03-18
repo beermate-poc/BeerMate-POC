@@ -67,8 +67,8 @@ jobs:
           echo ========================== Destructive Changes Post ============================= 
           echo =================================================================================
           cat delta/convertmdapi/destructiveChangesPost.xml
-          sfdx force:auth:jwt:grant --clientid ${{secrets.TESTsalesforceDevOrgClientId}} --jwtkeyfile ./buildfiles/cert/server.key --username ${{secrets.TESTsalesforceOrgUserName}} --instanceurl ${{secrets.prodOrgInstanceURL}}
-          sfdx force:mdapi:deploy -d delta/convertmdapi -l ${{secrets.testLevel}} -u ${{secrets.TESTsalesforceOrgUserName}} --ignorewarnings -w 60
+          sfdx force:auth:jwt:grant --clientid ${{secrets.TESTsalesforceDevOrgClientId}} --jwtkeyfile ./.github/server.key --username ${{secrets.TESTsalesforceOrgUserName}} --instanceurl ${{secrets.testOrgInstanceURL}}
+          sfdx force:mdapi:deploy -d delta/convertmdapi -l ${{secrets.TESTtestLevel}} -u ${{secrets.TESTsalesforceOrgUserName}} --ignorewarnings -w 60
 
       - name: Add new tag
         run: |
