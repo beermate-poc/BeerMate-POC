@@ -1,0 +1,169 @@
+<aura:component controller="C360_ObjectiveListController">
+	<aura:attribute name="objRec" type="Objective__c[]" />
+    <aura:attribute name="eventId" type="String"/>
+    <aura:attribute name="statusChangesMap" type="Map" />
+    <aura:attribute name="statusChangesList" type="List" />
+    <aura:attribute name="headerToDisplay" type="String" description="This is used to show the table header" />
+    <aura:attribute name="usObj" type="Boolean" description="This is used to for US obj" />
+    <aura:attribute name="options" type="List" access="PRIVATE"/>
+    <aura:attribute name="optionChanged" type="boolean" default="false" access="PRIVATE"/>
+    <aura:attribute name="ErrorMsg" type="String"/>
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }"/>
+    <aura:registerEvent name="OnClickEditPageEvent" type="c:OnClickEditPageEvent" />
+    <aura:registerEvent name="OnClickobjectivestory" type="c:NavigateToStoryLink" />
+    <aura:registerEvent name="OnClickShowFilesEvent" type="c:ShowRelatedFilesListEvent" />
+    <div class="error-Msg" aura:id="ErrorMsg">
+                    {!v.ErrorMsg}
+    </div>    
+    <lightning:card title="{! v.headerToDisplay}" aura:id="objtabl" class="bgcolor">
+        <div aura:id="ObjList" class="slds-scrollable slds-scrollable_x">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-scrollable" >
+                    <thead id="dataHeader">
+                        <tr class="slds-text-title_caps">
+                            <th scope="col">
+                                <div class="slds-truncate"  title="Edit" >{!$Label.c.C360_Edit}</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Name" >{!$Label.c.C360_ObjName}</div>
+                            </th>
+                            <th scope="col" style="width:80px">
+                                <div class="slds-truncate" title="Status">{!$Label.c.C360_Status}</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Execution Type">{!$Label.c.Objective_Type}</div>
+                            </th>
+                            
+                            <th scope="col">
+                                 <div class="slds-truncate" title="Start Date">{!$Label.c.Start_Date}</div>
+                            </th>
+                            
+                            <th scope="col">
+                                <div class="slds-truncate" title="EndDate">{!$Label.c.C360_EndDate}</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Mandatory">{!$Label.c.Mandatory}</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="MBObj">{!$Label.c.Managed_Business_Objective}</div>
+                            </th>
+                            <aura:if isTrue="{!v.usObj}">
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Selling Story"></div>
+                                </th>
+                            </aura:if>
+                            <th scope="col">
+                                  <div class="slds-truncate" title="Show_Files"></div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataContainer">
+                        <aura:iteration items="{!v.objRec}" var="obj">
+                            <tr class="{!obj.classValue}">
+                                <td scope="row" class="borderR">
+                                    <div class="slds-truncate">
+                                        
+                                        <a aura:id="editIds" onclick="{!c.editClick}" data-key="{!obj.Id}">{!$Label.c.C360_Edit}</a>
+                                    </div>
+                                </td>
+                                <td scope="row" class="borderR">
+                                    <div class="slds-truncate slds-cell-wrap" >
+                                        <span class="">{!obj.Name}</span>                           
+                                    </div>
+                                </td>
+                                <td scope="row" class="borderR">
+                                    <div  aura:id="{!obj.Id}">
+                                        <div class="slds-combobox_container">
+                                            <!--<lightning:select name="{!obj.Id }" aura:id="{!(v.headerToDisplay)}" onchange="{! c.onStatusChange }" > -->
+                                            <select name="{!obj.Id }" aura:id="statusVal" id="{!obj.Id }" onchange="{! c.onStatusChange }" class="slds-select selectBoxWidth" >
+                                                <aura:iteration items="{!v.options}" var="option">
+                                                     <option text="{!option.label}" value="{!option.value}" selected="{!(option.label == obj.Status__c?'true':'false')}"/>
+                                                </aura:iteration>
+                                            </select>
+                                            <!--</lightning:select>-->
+                                        </div>
+                                    </div>
+                                </td>
+                                <td scope="row" style="text-align: left;">
+                                    <div class="slds-truncate">
+                                        
+                                            <span class="">{!obj.Objective_type__c}</span>
+                                            
+                                    </div>
+                                </td>
+                                
+                                <td scope="row" style="text-align: left;">
+                                        <div class="slds-truncate">
+                                            <span class="">{!obj.Start__c}</span>
+                                                
+                                        </div>
+                                </td>
+                                
+                                <td scope="row" style="text-align: left;">
+                                    <div class="slds-truncate">
+                                        
+                                            <span class="">{!obj.End__c}</span>
+                                            
+                                    </div>
+                                </td>
+                                <td scope="row" style="text-align: center;">
+                                    <div class="slds-truncate">
+                                        <aura:if isTrue="{!obj.Objective__c}">
+                                            <span class="">
+                                                <lightning:input type="checkbox" name="mandate" checked="{!obj.Mandatory__c}" disabled="true"/>
+                                            </span>
+                                        <aura:set attribute="else">
+                                            <span class="">
+                                                <lightning:input type="checkbox" name="mandate" checked="false" disabled="true"/>
+                                            </span>
+                                        </aura:set>
+                                        </aura:if>    
+                                    </div>
+                                </td>
+                                <td scope="row" style="text-align: center;">
+                                    <div class="slds-truncate">
+                                        <aura:if isTrue="{!obj.Objective__c}">
+                                            <span class="">
+                                               <lightning:input type="checkbox" name="MBO" checked="{!obj.MBO__c}" disabled="true"/> 
+                                            </span>
+                                        <aura:set attribute="else">
+                                            <span class="">
+                                                <lightning:input type="checkbox" name="MBO" checked="false" disabled="true"/>
+                                            </span>
+                                        </aura:set>
+                                        </aura:if>   
+                                    </div>
+                                </td>
+                                <aura:if isTrue="{!v.usObj}">
+                                    <td scope="row" class="borderR">
+                                        <div class="slds-truncate">
+                                            <aura:if isTrue="{!obj.Smart_Objective__c}">
+                                             <!-- <lightning:formattedUrl value="{!$Label.c.GS_Selling_Story+obj.External_Key__c}" target="_blank" label="{!$Label.c.GS_Selling_Story_Label}"/>-->
+                                                       <lightning:button variant="base" label="{!$Label.c.GS_Selling_Story_Label}" title="Base action" value="{!obj.External_Key__c}" onclick="{!c.navigateTosellingstoryLink}"/>
+                                           
+                                            </aura:if>
+                                        </div>
+                                    </td> 
+                                </aura:if>
+                                
+                                <td scope="row" class="borderR">
+                                    <div class="slds-truncate">
+                                            
+                                        <lightning:button variant="base" label="{!$Label.c.Show_Files}" title="Base action" value="{!obj.Id}" onclick="{!c.navigateToFilesComponent}"/>
+                                           
+                                    </div>
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </div>
+        	<aura:if isTrue="{!v.optionChanged}">
+                
+                <footer class="slds-modal__footer" >
+                	<lightning:button label="{!$Label.c.CTS_Cancel}" onclick="{!c.handleCancel}" variant="neutral"/>
+                	<lightning:button aura:id="saveButton" variant="neutral" label="{!$Label.c.Save}" title="{!$Label.c.Save}" onclick="{!c.onSave}" disabled="false" />
+                </footer>            
+                
+        	</aura:if>
+        </lightning:card>
+</aura:component>

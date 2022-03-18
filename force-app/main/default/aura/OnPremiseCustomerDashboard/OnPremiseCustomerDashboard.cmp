@@ -1,0 +1,5 @@
+<aura:component implements="flexipage:availableForAllPageTypes" access="global" >
+    
+        <force:canvasApp developerName="On_Premise_Dashboard" scrolling="Yes" width="auto" height="auto"/>
+
+</aura:component>

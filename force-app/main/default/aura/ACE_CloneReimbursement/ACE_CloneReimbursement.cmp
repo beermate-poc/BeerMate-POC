@@ -1,0 +1,110 @@
+<aura:component controller="ACE_CloneReimburseController" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global" >
+	<ltng:require styles="{!$Resource.popupCSS}" />
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="request" type="SObject" />
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="newReimbursement" type="PartnerFundClaim" default="{	'sobjectType': 'PartnerFundClaim'}"/>
+    <aura:html tag="style">
+        .cuf-content{ 
+        padding: 0 0rem !important;
+        }
+        .slds-p-around--medium {
+        padding: 0rem !important;
+        }      
+        .slds-modal__content{
+        
+        height:unset !important;
+        max-height:unset !important;
+        overflow: hidden;
+    	overflow-y: auto;
+        } 
+        .slds-modal__container {
+    	max-width: 100% !important;
+    	width: 66% !important;
+		}
+    </aura:html>
+    <!--<div class="modal-container slds-modal__container">--> 
+    <div class="slds-modal__header " >
+        <h4 class="title slds-text-heading--medium" >New Reimbursement: Reimbursements App</h4>
+    </div>
+    <div class="modal-body scrollable slds-modal__content slds-p-around--medium" >
+    <div class="">
+       <h1 class="slds-p-left_xx-large slds-p-top_medium slds-text-heading_medium">Information</h1>
+    </div>
+    <div class="slds-grid slds-wrap slds-p-right_xx-large slds-p-left_xx-large ">
+       <div class="slds-col slds-size_1-of-2 slds-p-top_small">
+           <h1 class="slds-text-body_small slds-text-color_weak">Account (Ship To)</h1>
+           {!v.newReimbursement.Account_Ship_To__r.Name}
+           <!--<force:inputField value="{!v.newReimbursement.Account_Ship_To__c}" aura:id="ShipTo"/>-->
+           <!--<lightning:input label="Account (Ship To)" type="Search" value="{!v.newReimbursement.Account_Ship_To__r.Title}" aura:id="requestId" />-->
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-p-left_medium slds-p-top_small">
+            <h1 class="slds-text-body_small slds-text-color_weak">Channel Partner</h1> 
+            {!v.newReimbursement.ChannelPartner.Name}   
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-p-top_small">
+            <h1 class="slds-text-body_small slds-text-color_weak">Request</h1>
+            {!v.newReimbursement.Request.Title}
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-p-top_small slds-p-left_medium">
+            <h1 class="slds-text-body_small slds-text-color_weak">Reimbursement Status</h1>
+            Open
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-p-top_small">
+             <lightning:input type="text" label="Reimbursement" value="{!v.newReimbursement.Title}" aura:id="title" required="true"/>
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-p-top_small slds-p-left_medium">
+            <h1 class ="slds-text-body_small slds-text-color_weak">Distributors Contact Email</h1>
+            {!v.newReimbursement.ACE_Distributors_Contact_Email__c}
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-p-top_small">
+             <lightning:input type="date"  label="Invoice Date" value="{!v.newReimbursement.ACE_Invoice_Date__c}" aura:id="invDate"/>
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-p-top_small slds-p-left_medium">
+            <lightning:input type="number" formatter="currency"  label="Amount" value="{!v.newReimbursement.Amount}" aura:id="amount" required="true"/>
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-p-top_small">
+            <lightning:input type="text"  label="Invoice Description" value="{!v.newReimbursement.ACE_Invoice_Description__c}" aura:id="invdesc"/>
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-p-top_small slds-p-left_medium">
+            <lightning:input type="email" label="Additional Email 1" value="{!v.newReimbursement.ACE_Additional_Email_1__c}" aura:id="email1"/>
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-p-top_small">
+            <lightning:input type="number" formatter="currency"  label="Total Requested Reimbursement" value="{!v.newReimbursement.ACE_Total_Requested_Reimbursement_Read__c}" aura:id="amount" readonly="true"/>
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-p-top_small slds-p-left_medium">
+            <lightning:input type="email" label="Additional Email 2" value="{!v.newReimbursement.ACE_Additional_Email_2__c}" aura:id="email2"/>
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-p-top_small "> 
+            <h1 class ="slds-text-body_small slds-text-color_weak">Reimbursement Approver</h1>
+            {!v.newReimbursement.Reimbursement_Approver__r.Name}
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-p-top_small slds-p-left_medium">
+            <h1 class ="slds-text-body_small slds-text-color_weak">Owner Name</h1>
+            {!v.newReimbursement.Owner.Name}
+        </div>
+        
+        <div class="slds-col slds-size_1-of-2 slds-p-top_small">
+            <!--<lightning:helptext  content="This field is required prior to submitting a Reimbursement for Approval." />-->
+            <lightning:input class="hideLabel" type="text" label="Invoice Number" value="{!v.newReimbursement.ACE_Invoice_Number__c}" aura:id="email2"/>
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-p-top_small slds-p-left_medium">
+            <h1 class ="slds-text-body_small slds-text-color_weak ">Primary Contact Email</h1>
+            {!v.newReimbursement.ACE_Primary_Contact_Email__c} 
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-p-top_small">  
+            <lightning:input type="checkbox" aura:id="Debit" label="Debit"  
+                             name="Debit" disabled="false"
+                             checked="{!v.newReimbursement.ACE_Debit__c}"/>
+        </div>
+        
+    </div>
+    </div>
+    <div class="modal-footer slds-modal__footer ">
+        <lightning:button class="slds-button"  aura:id="Cancel" label="Cancel" onclick="{!c.cancelAction}" />
+    	<lightning:button class="slds-button" variant="brand" aura:id="save" label="Save" onclick="{!c.saveReimbursement}" />
+        
+   </div>  
+    
+	<!--</div>-->
+</aura:component>

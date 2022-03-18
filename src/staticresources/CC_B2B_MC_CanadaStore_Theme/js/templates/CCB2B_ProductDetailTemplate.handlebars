@@ -1,0 +1,327 @@
+<div class="panel panel-default product_detail_container product_type_standard phoneProductItem cc_panel cc_product_detail_container cc_product_type_standard">
+    <div class="panel-body product_detail cc_body cc_product_detail" >
+        <div class="messagingSection-Error" role="alert" style="display: none"></div>
+        <div class="messagingAction-Info" role="alert" style="display: none">
+            <button type="button" class="close cc_close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&#215;</span></button>
+        </div>
+        <div class="row">
+            <div class="col-md-5">
+                <div class="prod_media cc_prod_media">
+                    {{#if this.mediaWrappers.[SVG Interactive Diagram]}}
+                    {{#each this.mediaWrappers.[SVG Interactive Diagram]}}
+                    <div class="interactive cc_interactive">{{displaySVG this 'mainProdImage prodDetail img-responsive'}}</div>
+                    {{/each}}
+                    {{/if}}
+                    <div id="altImageModal" class="modal fade cc_alt_image_modal" tabindex="-1" role="dialog">
+                        <div class="modal-dialog cc_modal-dialg" role="document">
+                            <div class="modal-content cc_modal-content">
+                                <div class="modal-header cc_modal-header">
+                                    <button type="button" class="close cc_close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&#215;</span></button>
+                                    <h4 class="modal-title cc_modal-title" id="myModalLabel"></h4>
+                                </div>
+                                <div class="modal-body cc_modal-body">
+                                    <img class="modalImg cc_modal_img" src=""/>
+                                    <p class="modalText cc_modal_text"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{#if this.product.mediaWrapper }}
+                    <div class="cc_product_detail_photo_container" id="photoContainer">
+                        <div class="row product-image">
+                            <div class="col-md-12">
+                                <div class="cc_main_prod_image">
+                                    {{#if (isProductOOS this.product.prodBean.sku)}}
+                                        <div class="isOOSBadge">{{pageLabelMap 'CCB2B_OOS_Product_Badge'}}</div>
+                                    {{/if}}
+                                    {{displayImage this.product.mediaWrapper 'mainProdImage prodDetail img-responsive'}}
+                                </div>
+                            </div>
+                        </div>
+                        {{#if this.mediaWrappers.[Alternate Images]}}
+                        <div class="row alternate-images">
+                            {{#each this.mediaWrappers.[Product Image]}}
+                            <div class="col-xs-3">
+                                <img id="{{generateId 'ccb2b-pdp-main' @index '-img'}}" class="alternate cc_alternate img-responsive thumbnail" src="{{productImage this}}" data-id="{{this.uri}}"/>
+                            </div>
+                            {{/each}}
+                            {{#each this.mediaWrappers.[Alternate Images]}}
+                            <div class="col-xs-3">
+                                <img id="{{generateId 'ccb2b-pdp-thumbnail' @index '-img'}}" class="alternate cc_alternate img-responsive thumbnail" src="{{productImage this}}" data-id="{{this.uri}}"/>
+                            </div>
+                            {{/each}}
+                        </div>
+                        {{/if}}
+                    </div>
+                    {{else}}
+                    {{#if this.mediaWrappers.[SVG Interactive Diagram]}}
+                    {{else}}
+                    <div class="cc_product_detail_photo_container imgPlaceholder" id="photoContainer">
+                        <div class="row">
+                            <div class="col-md-12">
+                                {{displayPlaceholderImage this}}
+                            </div>
+                        </div>
+                    </div>
+                    {{/if}}
+                    {{/if}}
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="product_detail_item wishFinder cc_wish_finder" data-sku="{{this.product.prodBean.sku}}">
+
+                    <h4 id="ccb2b-pdp-productname-field" class="product_title cc_product_title">{{this.product.prodBean.name}}</h4>
+                    {{#ifDisplay 'PD.DsplSku'}}
+                    <div class="sku cc_sku">
+                        <span class="cc_label">{{pageLabelMap 'ProductDetailsInc_SKU'}}</span>
+                        <span id="ccb2b-pdp-productsku-field" class="value cc_value">{{this.product.prodBean.sku}}</span>
+                    </div>
+                    {{/ifDisplay}}
+                    {{#ifDisplay 'PD.DsplUPC'}}
+                        {{#if this.product.prodBean.CCB2BUPC}}
+                        <div class="upc cc_upc">
+                            <span class="cc_label">{{pageLabelMap 'CCB2B_CheckOut_ProductDetail_Upc_Label'}}</span>
+                            <span id="ccb2b-pdp-productupc-field" class="value cc_value">{{this.product.prodBean.CCB2BUPC}}</span>
+                        </div>
+                        {{/if}}
+                    {{/ifDisplay}}
+                    <div class="widgetSection"></div>
+                    {{#ifDisplay 'PD.DsplUOM'}}
+                    <div class="uom cc_uom">
+                        <span class="cc_label">{{pageLabelMap 'ProductDetails_UnitOfMeasure'}}</span>
+                        <span class="value cc_value">{{pageLabelPrefixMap 'UOM_' this.product.prodBean.UnitOfMeasure}}</span>
+                    </div>
+                    {{/ifDisplay}}
+                    {{#ifDisplay 'PD.DsplAvlb'}}
+                    <div class="inventory cc_inventory">
+                        <span class="cc_label">{{pageLabelMap 'ProductDetails_Availability'}}</span>
+                        {{#ifStoreSetting 'InventoryCheckFlag__c'}}
+                        <span class="value cc_value">{{{this.product.inventory}}}</span>
+                        {{else}}
+                        <span class="value cc_value">{{{pageLabelMap this.product.availMsg}}}</span>
+                        {{/ifStoreSetting}}
+                    </div>
+                    {{/ifDisplay}}
+                    {{#ifDisplay 'PR.Enabled'}}
+                    <div id="avgRating" class="rateit cc_rateit" data-rateit-value="{{this.product.avgRating}}" data-rateit-ispreset="true" data-rateit-readonly="true">
+                        <span class="cc_label">{{pageLabelMap 'NumberofReviews' this.numberOfReviews }}</span>
+                    </div>
+                    {{/ifDisplay}}
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{#if this.product.showPricing}}
+                            {{#ifDisplay 'PD.DsplPrc'}}
+                            {{#if this.product.price}}
+                            <div class="price_block cc_price_block">
+                                {{#ifDisplay 'PD.DsplListPrc'}}
+                                {{#if this.product.basePrice}}
+                                <p class="baseprice cc_baseprice">
+                                    <span class="cc_label">{{pageLabelMap 'ProductDetails_ListPrice'}}</span>
+                                    <span class="value cc_value">{{price this.product.basePrice}}</span>
+                                </p>
+                                {{/if}}
+                                {{/ifDisplay}}
+                                {{#if (checkContactDisplayPermissions 'pricing')}}
+                                    <p class="price cc_price">
+                                        <span id="ccb2b-pdp-productprice-field" class="value cc_value cc_price{{product.prodBean.id}}">
+                                        {{#if this.highAttrPrice}}
+                                         {{price this.lowAttrPrice}} - {{price this.highAttrPrice}}
+                                        {{else}}
+                                         {{price this.product.price}}
+                                        {{/if}}
+                                            {{#if (ifOriginalPrice this.product.prodBean.CCB2BOriginalPrice this.product.price)}}
+                                                <span class="originalPrice">{{price this.product.prodBean.CCB2BOriginalPrice}}</span>
+                                            {{/if}}
+                                        </span>
+                                    </p>
+                                {{/if}}
+                                <div class="price_disclaimer">
+                                    <p>{{pageLabelMap 'CCB2B_FinalPricing_Disclaimer_Info'}}</p>
+                                </div>
+                                <p class="cc_sold_by">
+                                    {{#if this.product.sellerID}}
+                                    <span class="soldbylabel cc_sold_by_label">{{pageLabelMap 'Prod_SoldBy'}}</span>
+                                    <span class="soldbyname cc_sold_by_name">{{pdp-seller-field 'sfdcName' this.product.sellerID this.sellers}}</span>
+                                    {{/if}}
+                                </p>
+                                {{#ifDisplay 'PD.DsplSvPrc'}}
+                                {{#if this.product.savings}}
+                                <p class="savings">
+                                    <span class="cc_label">{{pageLabelMap 'YouSave'}}</span>
+                                    <span class="value cc_value">{{price this.product.savings}}</span>
+                                </p>
+                                {{/if}}
+                                {{/ifDisplay}}
+                                {{#if this.isTierPriced}}
+                                <div class="cc_prt_tool_tip_div cc_prt_tool_tip_div_pdp">
+               <span class="cc_prt_tool_tip_text cc_prt_tool_tip_text_pdp" data-toggle="tooltip" title="{{pageLabelMap 'ProductPricingTiers_VolumeHover'}}">
+                {{pageLabelMap 'ProductPricingTiers_VolumePricing'}}
+               </span>
+                                </div>
+                                {{/if}}
+                            </div>
+                            {{/if}}
+                            {{/ifDisplay}}
+                            {{/if}}
+                        </div>
+                    </div>
+
+                    {{#if this.product.canAddtoCart}}
+                    {{#ifDisplay 'pd.tiersassec'}}
+                    {{else}}
+                    <div class="cc_product_pricing_tiers{{this.product.prodBean.sfid}}"></div>
+                    {{/ifDisplay}}
+
+                    {{#unless this.primaryAttr}}
+                    {{#if (checkContactDisplayPermissions 'create_cart')}}
+                    <div class="quantity_block gp_quantity_block cc_quantity_block">
+                        <div class="row cc_qty_control_row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="input-group cc_input_group">
+                                        {{#if (isProductOOS this.product.prodBean.sku)}}
+                                            <span class="input-group-btn cc_input_group_btn">
+                                                <input id="ccb2b-pdp-qtyminus-btn" type="button" value="{{pageLabelMap 'Prod_QtyDecrSingle'}}" class="btn btn-default btn-sm minus cc_minus disabled" disabled="disabled">
+                                            </span>
+                                            <input id="ccb2b-pdp-qty-input" name="quickadd[{{index}}].qty" value="0" class="qty entry form-control input-sm cc_entry disabled" disabled="disabled" maxlength="7" />
+                                            <span class="input-group-btn cc_input_group_btn">
+                                                <input id="ccb2b-pdp-qtyplus-btn" type="button" value="{{pageLabelMap 'Prod_QtyIncrSingle'}}" class="btn btn-default btn-sm plus cc_plus disabled" disabled="disabled">
+                                            </span>
+                                        {{else}}
+                                            <span class="input-group-btn cc_input_group_btn">
+                                                <input id="ccb2b-pdp-qtyminus-btn" type="button" value="{{pageLabelMap 'Prod_QtyDecrSingle'}}" class="btn btn-default btn-sm minus cc_minus">
+                                            </span>
+                                            <input id="ccb2b-pdp-qty-input" name="quickadd[{{index}}].qty" value="0" class="qty entry form-control input-sm cc_entry" maxlength="7" />
+                                            <span class="input-group-btn cc_input_group_btn">
+                                                <input id="ccb2b-pdp-qtyplus-btn" type="button" value="{{pageLabelMap 'Prod_QtyIncrSingle'}}" class="btn btn-default btn-sm plus cc_plus">
+                                            </span>
+                                        {{/if}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="qtyIncrement" value="{{this.product.qtySingleIncrement}}" class="item_qtyIncrement cc_item_qty_increment" />
+                        <input type="hidden" name="qtySkipIncrement" value="{{this.product.qtySkipIncrement}}" class="item_qtySkipIncrement cc_item_qty_skip_increment" />
+                    </div>
+                    {{/if}}
+                    {{#unless this.showNewSubscriptionSelection}}
+                    {{#if this.product.prodBean.showSubscriptionSelection}}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="cc_subscription_selection_div">
+                                <p class="subscription_selection cc_subscription_selection">
+                                    <span class="subscriptionLabel cc_subscription_label">{{pageLabelMap 'Subscribe_And_Save_Label'}}</span>
+                                    <select class="subscriptionFrequencySelection cc_subscription_frequency_selection" data-subscription="{{this.product.prodBean.sku}}">
+                                        {{#each this.product.prodBean.subscriptionFrequencies}}
+                                        <option value="{{safeQuote this}}">{{pageLabelMapMultiString 'Subscribe_And_Save_' this}}</option>
+                                        {{/each}}
+                                    </select>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {{/if}}
+                    {{#if (checkContactDisplayPermissions 'create_cart')}}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="action cc_action">
+                                    <button id="ccb2b-pdp-addtocart-btn" type="button" class="primary_button btn btn-default btn-sm addItem cc_add_item{{#if (isProductOOS this.product.prodBean.sku)}} disabled" disabled="disabled"{{else}}"{{/if}} data-sku="{{this.product.prodBean.sku}}" data-name="{{this.product.prodBean.name}}" data-seller="{{this.product.sellerID}}">{{pageLabelMap 'Component_MiniwishList_AddToCart'}}</button>
+                                </div>
+                            </div>
+                        </div>
+                    {{/if}}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="wishButtons plus_minus cc_plus_minus pull-right addToWishlist"></div>
+                        </div>
+                    </div>
+                    {{/unless}}
+                    {{/unless}}
+                    {{/if}}
+                </div>
+            </div>
+            <div class="col-md-12">
+                {{#ifDisplay 'PD.DsplSDesc'}}
+                    {{#if this.product.prodBean.shortDesc}}
+                    <p class="section_title">{{pageLabelMap 'CCB2B_ProductDetail_Description_Label'}}</p>
+                    <div class="shortDesc cc_short_desc">
+                        <p class="pblock cc_pblock">{{{this.product.prodBean.shortDesc}}}</p>
+                    </div>
+                    {{/if}}
+                {{/ifDisplay}}
+            </div>
+        </div>
+        {{#if this.primaryAttr}}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="cc_product_attributes"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="cc_product_attributes_batch_header">
+                </div>
+            </div>
+        </div>
+        {{/if}}
+        <div class="row">
+            <div class="col-md-7 col-md-offset-5">
+                {{#if this.showNewSubscriptionSelection}}
+                {{#if this.product.canAddtoCart}}
+                <div class="cc_subscription_selection_div">
+                    <h4>{{pageLabelMap 'Subscribe_And_Save_Label'}}</h4>
+                    {{#each this.subProdTerms}}
+                    {{#if this.CC_NO_SUBSCRIPTION}}
+                    <div class="cc_item_container">
+                        <div class="radio cc_radio">
+                            <label class="cc_radio_name">
+                                <input value="nosuboption" data-nme="nosuboption" type="radio" name="subOptionGuider{{this.productSKU}}" {{this.checked}}/>
+                                {{pageLabelMap 'Prod_NoSubscriptionOption' (price this.productPrice)}}</label>
+                        </div>
+                    </div>
+                    {{else}}
+                    <div class="cc_item_container">
+                        <div class="radio cc_radio">
+                            <label class="cc_radio_name">
+                                <input value="{{this.sfid}}" data-nme="{{this.name}}" type="radio" name="subOptionGuider{{this.productSKU}}" {{this.checked}}/>
+                                {{#if this.modifierSubscriptions}}
+                                {{insertTokens this.pdpDisplayName this.displayName (price this.productPrice) (price this.subscriptionPrice) (pageLabelPrefixMap 'Subscriptions_Frequency_' this.orderFrequencyUOM) (pageLabelPrefixMap 'Subscriptions_Frequency_' this.installmentFrequencyUOM) this.orderFrequency this.installmentFrequency this.installmentCount this.orderCount (price this.modifierSubscriptions.[0].productPrice) (price this.modifierSubscriptions.[0].subscriptionPrice) this.modifierSubscriptions.[0].orderCount this.modifierSubscriptions.[0].installmentCount}}
+                                {{else}}
+                                {{insertTokens this.pdpDisplayName this.displayName (price this.productPrice) (price this.subscriptionPrice) (pageLabelPrefixMap 'Subscriptions_Frequency_' this.orderFrequencyUOM) (pageLabelPrefixMap 'Subscriptions_Frequency_' this.installmentFrequencyUOM) this.orderFrequency this.installmentFrequency this.installmentCount this.orderCount}}
+                                {{/if}}
+                            </label>
+                        </div>
+                    </div>
+                    {{/if}}
+                    {{/each}}
+                    <div class="action pull-right cc_action" >
+                        <button type="button" class="btn btn-default btn-sm addItem cc_add_item" data-sku="{{this.product.prodBean.sku}}">{{pageLabelMap 'Component_MiniwishList_AddToCart'}}</button>
+                    </div>
+                </div>
+                {{/if}}
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="tabSection"></div>
+<div id="confirmLeavePage" class="modal fade cc_modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content cc_modal-content">
+            <div class="modal-body cc_modal_body text-center">
+                <h3>{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_Heading'}}</h3>
+                <p>{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_Content'}}</p>
+            </div>
+            <div class="modal-footer cc_modal_footer text-center">
+                <div>
+                    <input id="ccb2b-ma-favourites-confirm-leaving-page-no-button" type="button" class="{{#if (isLang 'FR')}}confirmModalFr{{/if}} btn closeModal" data-dismiss="modal" value="{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_GoBack'}}"/>
+                    <p>{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_GoBack_Info'}}</p>
+                </div>
+                <div>
+                    <input id="ccb2b-ma-favourites-confirm-leaving-page-yes-button" type="button" class="{{#if (isLang 'FR')}}confirmModalFr{{/if}} btn primary_button confirmLeaving" value="{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_Continue'}}"/>
+                    <p>{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_Continue_Info'}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

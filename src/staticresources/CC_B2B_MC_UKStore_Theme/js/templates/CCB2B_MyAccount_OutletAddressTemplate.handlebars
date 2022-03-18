@@ -1,0 +1,53 @@
+<div class="panel panel-default cc_panel cc_myaccount_profile">
+    <div class="cc_body cc_myaccount_content">
+        {{#ifEquals this.commerceType "B2B"}}
+        <div class="panel panel-default cc_panel cc_myaccount_information">
+            <div class="panel-heading cc_heading">
+                <h3 id="ccb2b-ma-contact-account-title" class="panel-title cc_title">{{pageLabelMap 'CCB2B_MyAccount_Overview_MyOutlet_address'}}</h3>
+            </div>
+            <div class="panel-body cc_body cc_myaccount_general">
+                <div class="row">
+                    <div class="col-sm-6 myAccOutletAddr cc_outlet_address">
+                        <label class="cc_profile_billing_label">{{pageLabelMap 'CheckOut_BillingAddress'}}</label>
+                        <span id="ccb2b-ma-contact-acc-billaddr-field" class="cc_profile_billing_value">
+                            <div class="address_selection_display">
+                                {{#ifDisplay 'SO.DsplAddrName'}}
+                                    {{#if this.accountBean.name }}
+                                        <p class="cc_addr_name">
+                                            <span>{{this.accountBean.name}}&#160;</span>
+                                        </p>
+                                    {{/if}}
+                                {{/ifDisplay}}
+                                {{#ifDisplay 'SO.DsplAddrCompany'}}
+                                    {{#if this.accountBean.billingAddress}}
+                                        <p class="cc_addr_billing">{{> addressDisplay (getBillingAddress this.accountBean.billingAddress)}}</p>
+                                    {{/if}}
+                                {{/ifDisplay}}
+                            </div>
+                        </span>
+                    </div>
+                    <div class="col-sm-6 myAccOutletAddr cc_shipping_address">
+                        <label class="cc_profile_shipping_label">{{pageLabelMap 'CheckOut_ShippingAddress'}}</label>
+                        <span id="ccb2b-ma-contact-acc-shippaddr-field" class="cc_profile_shipping_value">
+                            <div class="address_selection_display">
+                                {{#ifDisplay 'SO.DsplAddrName'}}
+                                    {{#if this.accountBean.name }}
+                                        <p class="cc_addr_name">
+                                            <span class="cc_firstname">{{this.accountBean.name}}&#160;</span>
+                                        </p>
+                                    {{/if}}
+                                {{/ifDisplay}}
+                                {{#ifDisplay 'SO.DsplAddrCompany'}}
+                                {{#if this.accountBean.shippingAddress}}
+                                    <span class="cc_addr_shipping">{{> addressDisplay this.accountBean.billingAddress}}</span><br/>
+                                {{/if}}
+                                {{/ifDisplay}}
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/ifEquals}}
+    </div>
+</div>

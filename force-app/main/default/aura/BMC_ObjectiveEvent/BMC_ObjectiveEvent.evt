@@ -1,0 +1,7 @@
+<aura:event type="APPLICATION" description="Event template">
+    <aura:attribute name="showCreateObj" type="Boolean"/>
+    <aura:attribute name="objectName" type="String"/>
+    <aura:attribute name="smartSkuOpp" type="SmartSKUs__c" />
+    <aura:attribute name="chainMandate" type="Chain_Mandate__c" />
+    <aura:attribute name="isOffPrem" type="Boolean"/>
+</aura:event>

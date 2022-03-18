@@ -1,0 +1,300 @@
+<div class="cc_order_details">
+    {{#if this.isConfirmation}}
+    <div class="row">
+        <div class="col-sm-offset-3 col-sm-6 col-sm-offset-3 col-sm-6 col-xs-offset-0 col-xs-12">
+            <ul class="nav nav-pills nav-justified checkoutNav hidden-print">
+                <li class="disabled  done  cc_checkoutStep0 cc_checkoutStep">
+                    <a><h4 class="list-group-item-heading">{{pageLabelMap 'CCB2B_Checkout_Shipping_Info_Step'}}</h4></a>
+                </li>
+                <li class="disabled done cc_checkoutStep1 cc_checkoutStep">
+                    <a><h4 class="list-group-item-heading">{{pageLabelMap 'CheckOut_ReviewStep'}}</h4></a>
+                </li>
+                <li class="disabled done cc_checkoutStepOrderConfirmation cc_checkoutStep">
+                    <a><h4 class="list-group-item-heading">{{pageLabelMap 'CheckOut_OrderConfirmationStep'}}</h4></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="panel panel-default cc_panel cc_order_confirmation">
+        <div class="panel-heading cc_heading">
+            <h3 class="panel-title cc_title">{{pageLabelMap 'CCB2B_OrderConfirmation_Title'}}</h3>
+        </div>
+        <div class="panel-body cc_body">
+            <div class="checkout_icon pull-right hidden-print">
+                <span class="icon-order-history-gray">
+                <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></span>
+            </div>
+            <p class="cc_order_number hidden">
+                <label class="cc_orderNumber_label">{{pageLabelMap 'CCB2B_CheckOut_OrderCCId_Label'}}&#160;</label>
+                <span class="cc_orderNumber">{{this.orderName}}</span>
+            </p>
+        </div>
+    </div>
+    {{else}}
+    <div class="panel panel-default cc_panel cc_order_information">
+        <div>
+            <h3 class="panel-title cc_title">{{pageLabelMap 'OrderInformation'}}</h3>
+        </div>
+    </div>
+    {{/if}}
+    <div class="cc_order_information">
+        {{#if this.isConfirmation}}
+        <h4 id="ccb2b-co-conf-generalinfo-label" class="cc_order_information_title cc_section_title">{{pageLabelMap 'CheckOut_GeneralInformation'}}</h4>
+        {{/if}}
+        <div class="row">
+            <div class="col-xs-12 col-md-6 shipping_info_sec">
+                {{#if this.isConfirmation}}
+                    {{#ifEmptyOrderName this.customOrderName}}
+                    <div class="cc_shipping_delivery_section">
+                        <label id="ccb2b-co-conf-ordername-label">{{pageLabelMap 'CCB2B_CheckOut_OrderName_Label'}}&#58;&#160;</label>
+                        <span id="ccb2b-co-conf-ordername-field">{{customOrderName}}</span>
+                    </div>
+                    {{/ifEmptyOrderName}}
+                    {{#if CCB2BSAPOrderID}}
+                    <div class="cc_shipping_order_sap_id">
+                        <label id="ccb2b-co-conf-ordersapid-label">{{pageLabelMap 'CCB2B_CheckOut_OrderSAPId_Label'}}&#58;&#160;</label>
+                        <span id="ccb2b-co-conf-ordersapid-field">{{CCB2BSAPOrderID}}</span>
+                    </div>
+                    {{/if}}
+                    {{#if this.orderName}}
+                        <div class="cc_order_information_number">
+                            <label class="cc_order_number">{{pageLabelMap 'CCB2B_CheckOut_OrderCCId_Label'}}&#58;&#160;</label>
+                            <span class="cc_order_name">{{this.orderName}}</span>
+                        </div>
+                    {{/if}}
+                {{else}}
+                    {{#ifEmptyOrderName this.customOrderName}}
+                    <div class="cc_shipping_delivery_section">
+                        <label id="ccb2b-ma-orderhistory-ordername-label">{{pageLabelMap 'CCB2B_CheckOut_OrderName_Label'}}&#58;&#160;</label>
+                        <span id="ccb2b-ma-orderhistory-ordername-field">{{customOrderName}}</span>
+                    </div>
+                    {{/ifEmptyOrderName}}
+                    {{#if CCB2BSAPOrderID}}
+                    <div class="cc_shipping_delivery_section">
+                        <label id="ccb2b-ma-orderdetail-ordersapid-label">{{pageLabelMap 'CCB2B_CheckOut_OrderSAPId_Label'}}&#58;&#160;</label>
+                        <span id="ccb2b-ma-orderdetail-ordersapid-field">{{CCB2BSAPOrderID}}</span>
+                    </div>
+                    {{/if}}
+                {{/if}}
+                {{#unless this.isConfirmation}}
+                <div class="cc_order_information_number">
+                    {{#if this.showOrderName}}
+                        <label class="cc_order_number">{{pageLabelMap 'CCB2B_CheckOut_OrderCCId_Label'}}&#58;&#160;</label>
+                        <span class="cc_order_name">{{this.orderName}}</span>
+                    {{/if}}
+                    {{#ifDisplay 'OD.DsplExtOrderNumber'}}
+                    <label class="cc_order_ext_number">{{pageLabelMap 'ExternalOrderID'}}&#58;&#160;</label>
+                    <span class="cc_order_ext_id">{{this.externalOrderId}}</span>
+                    {{/ifDisplay}}
+                </div>
+                <div class="cc_order_information_payments">
+                    {{#each this.payments}}
+                    {{#ifEquals paymentMethod "PO Number"}}
+                    <p class="cc_order_information_payment">{{pageLabelMap 'CheckOut_POGuidingText'}}</p>
+                    {{/ifEquals}}
+                    {{/each}}
+                </div>
+                {{#if this.status}}
+                    <div class="cc_order_status_section">
+                        <label id="ccb2b-co-conf-overallstatus-label">{{pageLabelMap 'CCB2B_OrderStatus_Overall'}}&#58;&#160;</label>
+                        <span id="ccb2b-co-conf-overallstatus-field">{{pageLabelPrefixMap 'CCB2B_OrderStatus_' (parseOrderStatus this.status)}}</span>
+                    </div>
+                {{/if}}
+                {{#if this.CCB2BDeliveryStatus}}
+                    <div class="cc_order_status_section">
+                        <label id="ccb2b-co-conf-deliverystatus-label">{{pageLabelMap 'CCB2B_OrderStatus_Delivery'}}&#58;&#160;</label>
+                        <span id="ccb2b-co-conf-deliverystatus-field">{{pageLabelPrefixMap 'CCB2B_OrderDeliveryStatus_' (parseOrderStatus this.CCB2BDeliveryStatus)}}</span>
+                    </div>
+                {{/if}}
+                {{#if this.CCB2BRejectionStatus}}
+                    <div class="cc_order_status_section">
+                        <label id="ccb2b-co-conf-rejectionstatus-label">{{pageLabelMap 'CCB2B_OrderStatus_Rejection'}}&#58;&#160;</label>
+                        <span id="ccb2b-co-conf-rejectionstatus-field">{{pageLabelPrefixMap 'CCB2B_OrderStatus_' (parseOrderStatus this.CCB2BRejectionStatus)}}</span>
+                    </div>
+                {{/if}}
+                {{/unless}}
+                <div class="cc_order_information_date">
+                    <label id="ccb2b-co-conf-orderdate-label" class="cc_order_date_label">{{pageLabelMap 'CCB2B_Order_Placed'}}&#58;&#160;</label>
+                    <span id="ccb2b-co-conf-orderdate-field" class="cc_order_date">{{orderDateStr}}</span>
+                </div>
+                {{#if this.requestedDateStr}}
+                <div class="cc_shipping_delivery_section">
+                    <label id="ccb2b-co-conf-deliverydate-label" class="cc_shipping_delivery_date_label">{{pageLabelMap 'CCB2B_CheckOut_ExpectedDeliveryDate_Label'}}&#58;&#160;</label>
+                    <span id="ccb2b-co-conf-deliverydate-field" class="cc_shipping_delivery_date">{{this.requestedDateStr}}</span>
+                </div>
+                {{/if}}
+                {{#if this.shippingMethod}}
+                <div class="cc_shipping_method_section">
+                    <label class="cc_shipping_method_label">{{pageLabelMap 'CheckOut_ShippingMethod'}}&#58;&#160;</label>
+                    <span class="cc_shipping_method">{{this.shippingMethod}}</span>
+                </div>
+                {{/if}}
+                {{#if this.shippingInst}}
+                <div class="cc_shipping_notes_section">
+                    <label id="ccb2b-co-conf-notes-label" class="cc_shipping_notes_label">{{pageLabelMap 'CheckOut_ShippingNotes'}}&#58;&#160;</label>
+                    <span id="ccb2b-co-conf-notes-field" class="cc_shipping_notes">{{this.shippingInst}}</span>
+                </div>
+                {{/if}}
+                {{#if (checkContactDisplayPermissions 'pricing')}}
+                <div class="cc_shipping_total_costs">
+                    <label class="cc_shipping_total_cost_label">{{pageLabelMap 'CCB2B_CheckOut_TotalCost_Label'}}&#58;&#160;</label>
+                    <span class="cc_shipping_total_cost">{{price CCB2BSAPTotalPrice}}</span>
+                </div>
+                {{/if}}
+                {{#unless this.isConfirmation}}
+                    {{#if orderSource}}
+                        <div>
+                            <label class="cc_order_source_label">{{pageLabelMap 'CCB2B_CheckOut_OrderSource_Label'}}&#58;&#160;</label>
+                            <span class="cc_order_source">{{pageLabelPrefixMap 'CCB2B_OrderSource_' (parseOrderSource orderSource)}}</span>
+                        </div>
+                    {{/if}}
+                {{/unless}}
+            </div>
+            {{#if this.hasCoupon}}
+            <div class="col-xs-12 col-md-4">
+                <h5 class="cc_coupon_label">{{pageLabelMap 'CartInc_AppliedCoupon'}}</h5>
+                <p class="cc_coupon_section">
+                    <span class="cc_coupon">{{this.couponName}}</span>
+                </p>
+            </div>
+            {{/if}}
+            <div class="col-xs-12 col-md-6">
+                <div class="cc_shipping_address">
+                    <div class="checkout_label" id="ccb2b-co-conf-deliveryinfo-label">{{pageLabelMap 'CCB2B_CheckOut_DeliveryAddress_Label'}}</div>
+                    {{#ifDisplay 'SO.DsplAddrName'}}
+                    <div class="form-group col-md-3 col-xs-6">
+                        <label>{{pageLabelMap 'CheckOut_FirstName'}}</label>
+                        <input readonly="true" id="firstName" type="text"
+                               class="form-readonly form-control {{classPrefix}}firstNameField {{classPrefix}}Field cc_contact_input_firstname"
+                               value="{{shippingAddress.firstName}}" name="{{classPrefix}}Address.firstName"/>
+                    </div>
+                    <div class="form-group col-md-3 col-xs-6">
+                        <label>{{pageLabelMap 'CheckOut_LastName'}}</label>
+                        <input readonly="true" id="lastName" type="text"
+                               class="form-readonly form-control {{classPrefix}}lastNameField {{classPrefix}}Field cc_contact_input_lastname"
+                               value="{{shippingAddress.lastName}}" name="{{classPrefix}}Address.lastName"/>
+                    </div>
+                    {{/ifDisplay}}
+                    {{#ifDisplay 'SO.DsplAddrCompany'}}
+                    <div data-orgid="companyName" id="ccb2b-co-conf-businessname-field"
+                         name="{{classPrefix}}Address.companyName">{{shippingAddress.companyName}}</div>
+                    {{/ifDisplay}}
+                    <div class="address-group">
+                        <span data-orgid="address1" id="ccb2b-co-conf-address1-field"
+                              name="{{classPrefix}}Address.address1">{{shippingAddress.address1}}</span>
+                        {{#if shippingAddress.address2}}
+                            <span data-orgid="address2" id="ccb2b-co-conf-address2-field"
+                                  name="{{classPrefix}}Address.address2">{{shippingAddress.address2}}</span>
+                        {{/if}}
+                        {{#if shippingAddress.address3}}
+                            <span data-orgid="address3" id="ccb2b-co-conf-address3-field"
+                                  name="{{classPrefix}}Address.address3">{{shippingAddress.address3}}</span>
+                        {{/if}}
+                    </div>
+                    <input type="hidden" class="{{classPrefix}}acctIdField {{classPrefix}}Field"
+                           name="{{classPrefix}}Address.partnerId" maxlength=100 value="{{shippingAddress.partnerId}}"/>
+                    <div>
+                        <span data-orgid="city" id="ccb2b-co-conf-city-field"
+                              name="{{classPrefix}}Address.city">{{shippingAddress.city}}</span>
+                        <span data-orgid="state" id="ccb2b-co-conf-province-field"
+                              name="{{classPrefix}}Address.state">{{shippingAddress.state}}</span>
+                        <span data-orgid="postalCode" id="ccb2b-co-conf-postalcode-field"
+                              name="{{classPrefix}}Address.postalCode">{{shippingAddress.postalCode}}</span>
+                    </div>
+                    <div data-orgid="country" id="ccb2b-co-conf-country-field"
+                         name="{{classPrefix}}Address.country">{{shippingAddress.country}}</div>
+                    <div class="form-group col-md-3 hidden">
+                        <label>{{pageLabelMap 'CCB2B_Checkout_Country_Label'}}</label>
+                        {{{selectGeo 'country' shippingAddress.countryList shippingAddress.countryCode 'countryListing
+                        form-control form-readonly' this.classPrefix}}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{#if this.isConfirmation}}
+    <div class="row">
+        <div class="col-md-12 price_disclaimer">
+            <p>{{pageLabelMap 'CCB2B_FinalPricing_Disclaimer_Info'}}</p>
+        </div>
+    </div>
+    {{/if}}
+    <div class="row confirmation_buttons_section hidden-print">
+        <input class="btn btn-default btn-sm printOrder" type="button" value="{{pageLabelMap 'CCB2B_OrderConfirmation_PrintOrder'}}" alt="{{pageLabelMap 'CCB2B_OrderConfirmation_PrintOrder'}}">
+        {{#if (checkContactDisplayPermissions 'order_history')}}
+        <input class="btn btn-default btn-sm cc_order_history orderHistory" type="button" value="{{pageLabelMap 'OrderConfirmation_OrderHistory'}}" alt="{{pageLabelMap 'OrderConfirmation_OrderHistory'}}">
+        {{/if}}
+        <input class="btn btn-default btn-sm goToAccount" type="button" value="{{pageLabelMap 'Header_MyAccount'}}" alt="{{pageLabelMap 'Header_MyAccount'}}">
+    </div>
+    {{> orderItemsDesktop}}
+    <div class="CCB2B_ConfirmReorderModalTarget"></div>
+    {{#if (checkContactDisplayPermissions 'pricing')}}
+        <div class="row">
+            <div class="col-md-3 col-sm-6 col-xs-8 pull-right items_summary">
+                <ul class="checkout list-unstyled cc_checkout  row">
+                    <li class="grand_total cc_grand_total">
+                        <span class="cc_label col-md-7 col-xs-6 text-right">{{pageLabelMap 'CartInc_Subtotal'}}</span>
+                        <span id="ccb2b-basket-subtotal-field" class="col-md-5 col-xs-6 cc_value text-right">{{{price CCB2B_SubtotalWithoutDepositPrice}}} </span>
+                    </li>
+                    <li class="deposit_summary">
+                        <span class="cc_label col-md-7 col-xs-6 text-right">{{pageLabelMap 'CCB2B_Taxable_Deposit'}}</span>
+                        <span id="ccb2b-basket-qst-field" class="text-right col-md-5 col-xs-6 cc_value">{{{price CCB2B_TaxableDepositPrice}}}</span>
+                    </li>
+                    <li class="deposit_summary">
+                        <span class="cc_label col-md-7 col-xs-6 text-right">{{pageLabelMap 'CCB2B_Nontaxable_Deposit'}}</span>
+                        <span id="ccb2b-basket-qst-field" class="text-right col-md-5 col-xs-6 cc_value">{{{price CCB2B_NonTaxableDepositPrice}}}</span>
+                    </li>
+                    <li class="taxes_summary">
+                        <span class="cc_label col-md-7 col-xs-6 text-right">{{pageLabelMap 'CCB2B_QST_Tax'}}</span>
+                        <span id="ccb2b-co-qst-field" class="text-right col-md-5 col-xs-6 cc_value">{{{price (calculateTax CCB2B_SubtotalPriceForTaxes 'qst')}}}</span>
+                    </li>
+                    <li class="taxes_summary">
+                        <span class="cc_label col-md-7 col-xs-6 text-right">{{pageLabelMap 'CCB2B_GST_Tax'}}</span>
+                        <span id="ccb2b-co-gst-field" class="cc_value col-md-5 col-xs-6 text-right">{{{price (calculateTax CCB2B_SubtotalPriceForTaxes 'gst')}}}</span>
+                    </li>
+                    <li class="cart_total_amount cc_cart_total_amount">
+                        <span class="cc_label col-md-7 col-xs-6 text-right">{{pageLabelMap 'CartInc_Total'}}</span>
+                        <span id="ccb2b-co-total-field" class="text-right col-md-5 col-xs-6 cc_value">{{price CCB2BSAPTotalPrice}}</span>
+                    </li>
+                    {{#if CCB2B_TotalSaving}}
+                    <li class="cart_total_saving cc_cart_total_saving">
+                        <span class="cc_label col-md-7 col-xs-6 text-right">{{pageLabelMap 'CCB2B_Total_saving'}}</span>
+                        <span id="ccb2b-co-saving-field" class="text-right col-md-5 col-xs-6 cc_value">{{price CCB2B_TotalSaving}}</span>
+                    </li>
+                    {{/if}}
+                    <li class="totalsmessagingSection cc_total_messaging_section"></li>
+                </ul>
+            </div>
+        </div>
+    {{/if}}
+    {{#if this.shipments}}
+    <table class="shopping_cart orderShipments cc_order_shipments_table">
+        <tr class="cc_tr">
+            <th class="cc_th_tracking_url">&#160;</th>
+            <th class="cc_th_date">{{pageLabelMap 'OrderShipment_ShipmentDate'}}</th>
+            <th class="cc_th_carrier">{{pageLabelMap 'OrderShipment_Carrier'}}</th>
+            <th class="cc_th_method">{{pageLabelMap 'OrderShipment_ShipmentMethod'}}</th>
+            <th class="cc_th_tracking_num">{{pageLabelMap 'OrderShipment_TrackingNumber'}}</th>
+            <th class="cc_th_deliver_date">{{pageLabelMap 'OrderShipment_DeliveryDate'}}</th>
+        </tr>
+        {{#each this.shipments}}
+        <tr class="cc_tr_values {{sfid}}">
+            <td class="cc_td_tracking_url"><a target="shiptracking" href="{{{trackingUrl}}}">{{pageLabelMap 'OrderShipment_Track'}}</a></td>
+            <td class="cc_td_date">{{shipmentDateStr}}</td>
+            <td class="cc_td_carrier">{{carrier}}</td>
+            <td class="cc_td_method">{{shippingMethod}}</td>
+            <td class="cc_td_tracking_num">{{trackingNo}}</td>
+            <td class="cc_td_deliver_date">{{deliveryDateStr}}</td>
+        </tr>
+        {{#each this.items}}
+        <tr class="cc_tr_details">
+            <td></td>
+            <td colspan="5" class="cc_td_detail_line {{sfid}}">
+                <span class="cc_sku_label">{{pageLabelMap 'CartInc_SKU'}}</span>&#58;&#160;<span class="cc_sku_value">{{sku}}</span>, <span class="cc_qty_label">{{pageLabelMap 'CartInc_Qty'}}</span>&#58;&#160;<span class="cc_qty">{{quantity}}</span>
+            </td>
+        </tr>
+        {{/each}}
+        {{/each}}
+    </table>
+    {{/if}}
+</div>

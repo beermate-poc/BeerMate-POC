@@ -1,0 +1,5 @@
+<aura:event type="COMPONENT" description="This event is fired from the parent cmp that holds ShowRelatedFilesList.cmp and from ShowRelatedFilesList.cmp itself for various actions" >
+	<aura:attribute name="typeOfEvent" type="String" />
+    <aura:attribute name="sobjectedId" type="String" />
+    <aura:attribute name="isFromShowRelatedFilesCMP" type="Boolean" default="false" />
+</aura:event>

@@ -1,0 +1,24 @@
+.THIS .tableSize {
+    width : 200px;
+    height : 150px;
+}
+.THIS .headerSize{
+    width : 200px;
+}
+.THIS .slds-modal__content {
+    overflow: hidden;
+    overflow-y: none;
+	}
+.THIS.slds-modal__container{
+       max-width: 70rem !important;
+       width:70% !important;
+ }
+
+.THIS.note-Msg{
+    color:black !important;
+    font-size:15px !important;
+    text-align:center !important;
+    background: #d6ecf9 !important;
+    overflow: auto;
+    font-weight: bold; 
+}

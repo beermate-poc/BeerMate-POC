@@ -1,0 +1,73 @@
+<div class="copyright">
+    <small>
+        {{displayFooterLogo}}
+    </small>
+    <span>{{pageLabelMap 'CCB2B_Footer_Copyright'}}</span>
+</div>
+<div class="foot-menu foot-terms">
+    <div class="foot-link">
+        <a id="{{generateId 'menu_foot_' 'terms_and_conditions'}}" href="{{pageLabelMap 'CCB2B_Terms_URI'}}" target="_blank">
+            {{pageLabelMap 'CCB2B_Terms_Label'}}
+        </a>
+    </div>
+    <div class="foot-link">
+        <p>|</p>
+    </div>
+    <div class="foot-link">
+        <a id="{{generateId 'menu_foot_' 'terms_and_conditions_sale'}}" href="{{pageLabelMap 'CCB2B_TermsSale_URI'}}" target="_blank">
+            {{pageLabelMap 'CCB2B_TermsSale_Label'}}
+        </a>
+    </div>
+</div>
+<div class="foot-menu">
+    <div class="foot-link">
+        <a id="{{generateId 'menu_foot_' 'privacy_policy'}}" href="{{pageLabelMap 'CCB2B_Policy_URI'}}" target="_blank">
+            {{pageLabelMap 'CCB2B_Policy_Label'}}
+        </a>
+    </div>
+    <div class="foot-link">
+        <p>|</p>
+    </div>
+    <div class="foot-link">
+        <a id="{{generateId 'menu_foot_' 'faq'}}" href="{{pageLabelMap 'CCB2B_FAQ_URI'}}" target="_blank">
+            {{pageLabelMap 'CCB2B_FAQ_Label'}}
+        </a>
+    </div>
+    <div class="foot-link">
+        <p>|</p>
+    </div>
+    <div class="foot-link">
+        <a id="{{generateId 'menu_foot_' 'beer_print'}}" href="{{pageLabelMap 'CCB2B_BeerPrint_URI'}}" target="_blank">
+            {{pageLabelMap 'CCB2B_BeerPrint_Label'}}
+        </a>
+    </div>
+    {{#if (ifNotPageDisplay 'ccrz__CCChangePassword')}}
+        {{#each menuItems}}
+            {{#ifEquals mType 'URL'}}
+                <div class="foot-list-item">
+                    <a id="{{generateId 'ccb2b-menu-foot-' displayName}}" data-href="{{linkURL}}" {{linkTarget openInNewWindow}}>
+                        {{displayName}}
+                    </a>
+                </div>
+            {{/ifEquals}}
+            {{#ifEquals mType 'FooterURL'}}
+                <div class="foot-list-item">
+                    <a id="{{generateId 'ccb2b-menu-foot-' displayName}}" data-href="{{linkURL}}" {{linkTarget openInNewWindow}}>
+                        {{displayName}}
+                    </a>
+                </div>
+            {{/ifEquals}}
+        {{/each}}
+    {{/if}}
+</div>
+<!--eligibleForPromotion-->
+<div style="display:none" id="eligibleForPromotion">
+    <span>{{pageLabelMap 'CCB2B_EligibleForPromotionMsg'}}</span>
+</div>
+<!--liveChat-->
+{{#ifDisplay 'SC.chat.enable'}}
+    <div class="chat" id="live-chat" onclick="ciscoBubbleChat.showChatWindow()" role="button">
+        <span class="chat_label">{{pageLabelMap 'CCB2B_Footer_LiveChat'}}</span>
+    </div>
+{{/ifDisplay}}
+<div id="teconsent"></div>

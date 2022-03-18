@@ -1,0 +1,74 @@
+{{#if rewardsError}}
+    <div class="alert_error errorMsg">
+        <span class="fa fa-warning"></span>
+        <span class="msg">{{#if rewardsError.messages}} {{rewardsError.messages}} {{else}} {{pageLabelMap 'CCB2B_RewardsErrorMsg'}} {{/if}}</span>
+    </div>
+{{else}}
+    {{#unless rewards.isAllDealsUsed}}
+    <div class="rewardSection row">
+        <div class="col-md-12">
+            <p class="title">{{pageLabelMap 'CCB2B_Reward_Title'}}</p>
+            <p class="subtitle">{{pageLabelMap 'CCB2B_Reward_Subtitle'}}</p>
+        </div>
+        <div class="col-md-12">
+            <div class="alert_error errorMsg errorAddToBasket" style="display:none">
+                <span class="fa fa-warning"></span>
+                <span class="msg">{{pageLabelMap 'CCB2B_RewardsAddToErrorMsg'}}</span>
+            </div>
+            {{#if rewards.dealRewardWrappers}}
+                {{#each rewards.dealRewardWrappers}}
+                    {{#if isAvailableDeal}}
+                        <div class="deal-section" data-limit="{{calculatedDealLimit}}">
+                            <div class="deal-description">{{{description}}}</div>
+                            <div class="row">
+                                <div class="flex reward-container">
+                                {{#each productRewardList}}
+                                <div class="col-sm-6 col-xs-12 reward-item" data-rewardid="{{dealRewardId}}" data-sku="{{productSKU}}">
+                                    <div class="row flex">
+                                        <div class="col-xs-5">
+                                             <div class="cc_cart_product_image text-center">
+                                                {{#if this.image}}
+                                                    <img src="{{this.image}}" alt="{{{productName}}}"/>
+                                                {{else}}
+                                                    {{displayPlaceholderImage this}}
+                                                {{/if}}
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-7 flex flex-quantity">
+                                            <p>{{{productName}}}</p>
+                                            <div class="quantity_block gp_quantity_block cc_quantity_block reward-qty">
+                                                <div class="form-group">
+                                                    <div class="input-group cc_input_group">
+                                                        <span class="input-group-btn cc_input_group_btn">
+                                                             <input id="{{generateId 'ccb2b-basket-reward-minus-' productSKU '-btn'}}" type="button" value="{{pageLabelMap 'Prod_QtyDecrSingle'}}" class="{{#unless isAvailableReward}}readonlyBtn {{/unless}}btn btn-default btn-sm reward-minus cc_minus">
+                                                        </span>
+                                                        <input type="text" name="qty" data-available={{isAvailableReward}} data-limit="{{#if defaultQuantity}}{{calculateProductLimit defaultQuantity this ../maxLimit}} {{else}} {{calculateProductLimit 'nolimit' this}} {{/if}}" id="entry_reward_{{dealRewardId}}" value="{{setDefaultRewardQty ../quantity ../calculatedDealLimit this ../highestPriceSKU ../isDefaultInRewards}}" class="{{#unless isAvailableReward}}readonlyBtn {{/unless}}input-text entry-reward plus_minus form-control input-sm cc_entry" maxlength="7" />
+                                                        <span class="input-group-btn cc_input_group_btn">
+                                                            <input id="{{generateId 'ccb2b-basket-reward-plus-' productSKU '-btn'}}" type="button" value="{{pageLabelMap 'Prod_QtyIncrSingle'}}" class=" {{#unless isAvailableReward}}readonlyBtn {{/unless}} btn btn-default btn-sm reward-plus cc_plus">
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {{/each}}
+                            </div>
+                                <div class="row">
+                                <div class="col-xs-12 action cc_action wishFinder">
+                                    <div style="display:none" class="limit-exceed-msg">{{pageLabelMap 'CCB2B_Reward_Limit_Exceed' maxLimit }}</div>
+                                    <div class="cc_add_to form-group">
+                                        <button class="add_deal_to_cart btn primary_button center-block cc_add_to_btn" data-id="{{dealId}}" role="button">{{pageLabelMap 'CCB2B_AddToBasket'}}</button>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    {{/if}}
+                {{/each}}
+            {{/if}}
+
+        </div>
+    </div>
+    {{/unless}}
+{{/if}}

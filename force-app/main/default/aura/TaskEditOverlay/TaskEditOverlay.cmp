@@ -1,0 +1,59 @@
+<aura:component controller="TaskEditOverlayController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+  <lightning:spinner aura:id="spinner" alternativeText="Loading Data..." class="slds-hide"/>
+  <aura:handler name="init" action="{!c.init}" value="{!this}" />
+  <aura:attribute name="id" type="Id" />
+  <aura:attribute name="showToDos" type="boolean" default="false"/>
+  <aura:attribute name="bodyString" type="String" />
+
+  <aura:if isTrue="{!or($Browser.isTablet, $Browser.isPhone)}">
+    <aura:if isTrue="{!v.showToDos == false}">
+    <div aura:id="overlay" class="slds-hide" style="height:350px;">
+        <div class="slds-p-bottom_large">
+            <div class=" modalStyle">
+                <div class="mobileView " >
+                    <h2 class="slds-text-heading--medium slds-truncate" title="{!$Label.c.Edit_To_Do}">{!$Label.c.Edit_To_Do}</h2>
+                </div>
+                    <div class="" >
+                        <h3 class="slds-section-title--divider">{!$Label.c.To_Do_Information}</h3>
+                        <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                                <lightning:textarea aura:id="subject" maxlength="255" label="{!$Label.c.Subject}" name="todo" required="true" messageWhenValueMissing="Subject is Required"/>
+                                <ui:inputDate aura:id="editDatepicker" displayDatePicker="false" class="slds-input" label="{!$Label.c.Due_Date}" format="M/D/YYYY"/>
+                        </div>
+                    </div>
+                <div class="slds-text-align_center">
+                    <lightning:button class="slds-button" variant="neutral" label="{!$Label.c.Cancel_Label}" onclick="{!c.hidePanel}" />
+                    <lightning:button class="slds-button" variant="brand" label="{!$Label.c.Save}" onclick="{!c.save}" />
+                </div>
+            </div>
+        </div>
+    </div>
+  </aura:if>
+    <aura:set attribute="else">
+  <div aura:id="overlay" class="slds-hide">
+        <div role="dialog" tabindex="-1" class=" slds-modal slds-fade-in-open ">
+            <div class="slds-modal__container modalStyle">
+                <div class="slds-modal__header mobileView " >
+                    <h2 class="slds-text-heading--medium slds-truncate" title="{!$Label.c.Edit_To_Do}">{!$Label.c.Edit_To_Do}</h2>
+                </div>
+                    <div class="slds-modal__content" >
+                        <h3 class="slds-section-title--divider">{!$Label.c.To_Do_Information}</h3>
+                        <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                                <lightning:textarea aura:id="subject" maxlength="255" label="{!$Label.c.Subject}" name="todo" required="true" messageWhenValueMissing="{!$Label.c.Title_Required}"/>
+                                <ui:inputDate aura:id="editDatepicker" displayDatePicker="false" class="slds-input" label="{!$Label.c.Due_Date}" format="M/D/YYYY"/>
+                        </div>
+                    </div>
+                <div class="slds-modal__footer">
+                    <lightning:button class="slds-button" variant="neutral" label="{!$Label.c.Cancel_Label}" onclick="{!c.hidePanel}" />
+                    <lightning:button class="slds-button" variant="brand" label="{!$Label.c.Save}" onclick="{!c.save}" />
+                </div>
+            </div>
+        </div>
+      <div class="slds-backdrop slds-backdrop--open"></div>
+    </div>
+      </aura:set>
+    </aura:if>
+  <aura:registerEvent name="TaskEditFinish" type="c:TaskEditFinish"/>
+  <aura:method name="open" action="{!c.showPanel}" access="PUBLIC" >
+    <aura:attribute name="recId" type="Id" />
+  </aura:method>
+</aura:component>

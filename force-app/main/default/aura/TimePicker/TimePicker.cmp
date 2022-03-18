@@ -1,0 +1,127 @@
+<aura:component >
+    <aura:handler name="change" value="{!v.date}" action="{!c.doInit}"/>
+    <aura:handler name="change" value="{!v.internalValue}" action="{!c.updateSelection}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <!-- Inputs -->
+    <aura:attribute name="value" type="Date" access="public" description="Pass in the date value you want modified. Make sure it's a bound reference." />
+    <aura:attribute name="useFifteenMinuteInterval" type="Boolean" default="false" access="public" description="Set whether you want to the user to select every minute or just 15 minute intervals." />
+
+    <!-- Internal Component Attributes - Data Storage -->
+    <aura:attribute name="internalValue" type="Date" access="public" />
+    <aura:attribute name="days" type="Object[]" access="private" />
+    <aura:attribute name="selectedHour" type="Integer" access="private" />
+    <aura:attribute name="selectedMinute" type="Integer" access="private" />
+    <!-- Internal Component Attributes - Show / Hides -->
+    <aura:attribute name="hideHours" type="Boolean" default="true" access="private" />
+    <aura:attribute name="hideMinutes" type="Boolean" default="true" access="private" />
+
+    <div class="{! 'outsideWrapper ' + (v.hideHours &amp;&amp; v.hideMinutes ? ' slds-hide' : '')}" onclick="{!c.closeWindow}"></div>
+    <div>
+    	<div style="position: relative;">
+         	<div class="slds-input time-output" style="cursor: pointer;" onclick="{!c.chooseTime}">
+                <lightning:icon iconName="utility:clock" size="small" class="inputIcon" />
+                <span class="{!v.value ? 'slds-hide' : ''}">Set a Time</span>
+                <lightning:formattedDateTime value="{!v.value}" hour12="true" minute="2-digit" hour="2-digit" />
+                <lightning:buttonIcon iconName="utility:close" variant="bare" alternativeText="Clear" name="Clear" class="clearIcon" />
+            </div>
+            <div class="{! 'slds-box slds-box--x-small dtPickBkCol ' + (v.hideHours ? 'slds-hide' : '')}" onclick="{!c.setHour}">
+                <p style="width: 100%">Set Hour <a href="javascript:void(0);" onclick="{!c.returnClear}" class="slds-show--inline-block">Clear</a></p>
+                <div class="{!v.selectedHour == 1 ? 'selected' : ''}">1</div>
+                <div class="{!v.selectedHour == 2 ? 'selected' : ''}">2</div>
+                <div class="{!v.selectedHour == 3 ? 'selected' : ''}">3</div>
+                <div class="{!v.selectedHour == 4 ? 'selected' : ''}">4</div>
+                <div class="{!v.selectedHour == 5 ? 'selected' : ''}">5</div>
+                <div class="{!v.selectedHour == 6 ? 'selected' : ''}">6</div>
+                <div class="{!v.selectedHour == 7 ? 'selected' : ''}">7</div>
+                <div class="{!v.selectedHour == 8 ? 'selected' : ''}">8</div>
+                <div class="{!v.selectedHour == 9 ? 'selected' : ''}">9</div>
+                <div class="{!v.selectedHour == 10 ? 'selected' : ''}">10</div>
+                <div class="{!v.selectedHour == 11 ? 'selected' : ''}">11</div>
+                <div class="{!v.selectedHour == 12 ? 'selected' : ''}">12</div>
+                <div class="{!v.selectedHour == 13 ? 'selected' : ''}">13</div>
+                <div class="{!v.selectedHour == 14 ? 'selected' : ''}">14</div>
+                <div class="{!v.selectedHour == 15 ? 'selected' : ''}">15</div>
+                <div class="{!v.selectedHour == 16 ? 'selected' : ''}">16</div>
+                <div class="{!v.selectedHour == 17 ? 'selected' : ''}">17</div>
+                <div class="{!v.selectedHour == 18 ? 'selected' : ''}">18</div>
+                <div class="{!v.selectedHour == 19 ? 'selected' : ''}">19</div>
+                <div class="{!v.selectedHour == 20 ? 'selected' : ''}">20</div>
+                <div class="{!v.selectedHour == 21 ? 'selected' : ''}">21</div>
+                <div class="{!v.selectedHour == 22 ? 'selected' : ''}">22</div>
+                <div class="{!v.selectedHour == 23 ? 'selected' : ''}">23</div>
+                <div class="{!v.selectedHour == 24 ? 'selected' : ''}">24</div>
+            </div>
+            <div class="{! 'slds-box slds-box--x-small dtPickBkCol ' + ((!v.hideMinutes) &amp;&amp; v.useFifteenMinuteInterval ? '' : 'slds-hide')}" onclick="{!c.setMinutes}">
+                <p style="width: 100%">Set Minutes <a href="javascript:void(0);" onclick="{!c.returnClear}" class="slds-show--inline-block">Clear</a></p>
+                <div class="{!v.selectedMinute == 0 ? 'selected' : ''}">0</div>
+                <div class="{!v.selectedMinute == 15 ? 'selected' : ''}">15</div>
+                <div class="{!v.selectedMinute == 30 ? 'selected' : ''}">30</div>
+                <div class="{!v.selectedMinute == 45 ? 'selected' : ''}">45</div>
+            </div>
+            <div class="{! 'slds-box slds-box--x-small dtPickBkCol ' + ((!v.hideMinutes) &amp;&amp; (!v.useFifteenMinuteInterval) ? '' : 'slds-hide')}"  onclick="{!c.setMinutes}">
+                <p style="width: 100%">Set Minutes <a href="javascript:void(0);" onclick="{!c.returnClear}" class="slds-show--inline-block">Clear</a></p>
+                <div class="{!v.selectedMinute == 0 ? 'selected' : ''}">0</div>
+                <div class="{!v.selectedMinute == 1 ? 'selected' : ''}">1</div>
+                <div class="{!v.selectedMinute == 2 ? 'selected' : ''}">2</div>
+                <div class="{!v.selectedMinute == 3 ? 'selected' : ''}">3</div>
+                <div class="{!v.selectedMinute == 4 ? 'selected' : ''}">4</div>
+                <div class="{!v.selectedMinute == 5 ? 'selected' : ''}">5</div>
+                <div class="{!v.selectedMinute == 6 ? 'selected' : ''}">6</div>
+                <div class="{!v.selectedMinute == 7 ? 'selected' : ''}">7</div>
+                <div class="{!v.selectedMinute == 8 ? 'selected' : ''}">8</div>
+                <div class="{!v.selectedMinute == 9 ? 'selected' : ''}">9</div>
+                <div class="{!v.selectedMinute == 10 ? 'selected' : ''}">10</div>
+                <div class="{!v.selectedMinute == 11 ? 'selected' : ''}">11</div>
+                <div class="{!v.selectedMinute == 12 ? 'selected' : ''}">12</div>
+                <div class="{!v.selectedMinute == 13 ? 'selected' : ''}">13</div>
+                <div class="{!v.selectedMinute == 14 ? 'selected' : ''}">14</div>
+                <div class="{!v.selectedMinute == 15 ? 'selected' : ''}">15</div>
+                <div class="{!v.selectedMinute == 16 ? 'selected' : ''}">16</div>
+                <div class="{!v.selectedMinute == 17 ? 'selected' : ''}">17</div>
+                <div class="{!v.selectedMinute == 18 ? 'selected' : ''}">18</div>
+                <div class="{!v.selectedMinute == 19 ? 'selected' : ''}">19</div>
+                <div class="{!v.selectedMinute == 20 ? 'selected' : ''}">20</div>
+                <div class="{!v.selectedMinute == 21 ? 'selected' : ''}">21</div>
+                <div class="{!v.selectedMinute == 22 ? 'selected' : ''}">22</div>
+                <div class="{!v.selectedMinute == 23 ? 'selected' : ''}">23</div>
+                <div class="{!v.selectedMinute == 24 ? 'selected' : ''}">24</div>
+                <div class="{!v.selectedMinute == 25 ? 'selected' : ''}">25</div>
+                <div class="{!v.selectedMinute == 26 ? 'selected' : ''}">26</div>
+                <div class="{!v.selectedMinute == 27 ? 'selected' : ''}">27</div>
+                <div class="{!v.selectedMinute == 28 ? 'selected' : ''}">28</div>
+                <div class="{!v.selectedMinute == 29 ? 'selected' : ''}">29</div>
+                <div class="{!v.selectedMinute == 30 ? 'selected' : ''}">30</div>
+                <div class="{!v.selectedMinute == 31 ? 'selected' : ''}">31</div>
+                <div class="{!v.selectedMinute == 32 ? 'selected' : ''}">32</div>
+                <div class="{!v.selectedMinute == 33 ? 'selected' : ''}">33</div>
+                <div class="{!v.selectedMinute == 34 ? 'selected' : ''}">34</div>
+                <div class="{!v.selectedMinute == 35 ? 'selected' : ''}">35</div>
+                <div class="{!v.selectedMinute == 36 ? 'selected' : ''}">36</div>
+                <div class="{!v.selectedMinute == 37 ? 'selected' : ''}">37</div>
+                <div class="{!v.selectedMinute == 38 ? 'selected' : ''}">38</div>
+                <div class="{!v.selectedMinute == 39 ? 'selected' : ''}">39</div>
+                <div class="{!v.selectedMinute == 40 ? 'selected' : ''}">40</div>
+                <div class="{!v.selectedMinute == 41 ? 'selected' : ''}">41</div>
+                <div class="{!v.selectedMinute == 42 ? 'selected' : ''}">42</div>
+                <div class="{!v.selectedMinute == 43 ? 'selected' : ''}">43</div>
+                <div class="{!v.selectedMinute == 44 ? 'selected' : ''}">44</div>
+                <div class="{!v.selectedMinute == 45 ? 'selected' : ''}">45</div>
+                <div class="{!v.selectedMinute == 46 ? 'selected' : ''}">46</div>
+                <div class="{!v.selectedMinute == 47 ? 'selected' : ''}">47</div>
+                <div class="{!v.selectedMinute == 48 ? 'selected' : ''}">48</div>
+                <div class="{!v.selectedMinute == 49 ? 'selected' : ''}">49</div>
+                <div class="{!v.selectedMinute == 50 ? 'selected' : ''}">50</div>
+                <div class="{!v.selectedMinute == 51 ? 'selected' : ''}">51</div>
+                <div class="{!v.selectedMinute == 52 ? 'selected' : ''}">52</div>
+                <div class="{!v.selectedMinute == 53 ? 'selected' : ''}">53</div>
+                <div class="{!v.selectedMinute == 54 ? 'selected' : ''}">54</div>
+                <div class="{!v.selectedMinute == 55 ? 'selected' : ''}">55</div>
+                <div class="{!v.selectedMinute == 56 ? 'selected' : ''}">56</div>
+                <div class="{!v.selectedMinute == 57 ? 'selected' : ''}">57</div>
+                <div class="{!v.selectedMinute == 58 ? 'selected' : ''}">58</div>
+                <div class="{!v.selectedMinute == 59 ? 'selected' : ''}">59</div>
+            </div>
+        </div>
+    </div>
+</aura:component>

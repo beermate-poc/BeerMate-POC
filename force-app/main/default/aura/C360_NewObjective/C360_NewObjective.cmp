@@ -1,0 +1,71 @@
+<aura:component  access="global" controller="C360_NewObjectiveController"
+                implements="flexipage:availableForRecordHome,force:hasRecordId,flexipage:availableForAllPageTypes,force:appHostable,force:lightningQuickActionWithoutHeader">
+    
+    <aura:attribute name="prdIds" type="string" default="test"/>
+    <aura:attribute name="conIds" type="string" default="test"/>
+    <aura:attribute name="varVal" type="Boolean" default="true"/>
+    <aura:attribute name ="optn" type="Object[]"/>
+    <aura:attribute name="recId" type="String" />
+    <aura:attribute name="accId" type="String" />
+    <aura:attribute name="newObj" type="Objective__c"/>
+    <aura:attribute name ="objLst" type="List"/>
+    <aura:attribute name="simpleNewObj" type="Objective__c" default="{'sobjectType' : 'Objective__c',
+                           'Name': 'Test'}"/>
+    <aura:attribute name="newObjError" type="String"/>
+    <aura:attribute name="savedisable" type="Boolean" default="false" />
+    <aura:attribute name="disabled" type ="String" />
+       
+    <aura:registerEvent name="ProductAppEvent" type="c:C360_ProdEvent"/>
+    
+    <aura:handler name="prdCmpEvent" event="c:C360_ProductEvent" action="{!c.handleComponentEvent}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <div style="height: 900px" >
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close" onclick="{! c.closeModel }" alternativeText="close" variant="bare-inverse" class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Sales_New_Objective}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+						<force:recordData aura:id="createDataId" layoutType="FULL" targetRecord="{!v.newContact}" targetFields="{!v.simpleNewContact}" targetError="{!v.newContactError}" />
+ 						<div>
+                        <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder test-id__section-header-container">
+                            <span class="test-id__section-header-title section-header-title slds-p-horizontal--small slds-truncate">{!$Label.c.Sales_Objective_Summary}</span>
+                        </h3>
+                            <lightning:card>
+                                <div class="slds-p-horizontal--small slds-grid slds-gutters">
+                                    <div class="slds-col">
+                                        <!--<ui:inputText aura:id="ObjAct" label="Account" />-->
+                                        <ui:inputText aura:id="ObjName" required="true" label="{!$Label.c.Sales_Objective_Name}" />
+										<ui:inputText aura:id="ObjDetails" required="true" label="{!$Label.c.Sales_Objective_Details}" />
+                                        <ui:inputSelect aura:id="ExecutionTypeId" required="true" label="{!$Label.c.C360_ExecutionType}" change="{!c.onPicklistChange}" />
+										<ui:inputDateTime aura:id="StrtTime" displayDatePicker="true" required="true" label="{!$Label.c.Sales_Start_Time}" />
+                                        <ui:inputDateTime aura:id="EndTime" displayDatePicker="true" required="true" label="{!$Label.c.Sales_End_Time}"/>   
+                                    </div>
+                                    <div class="slds-col"> 
+                                        <ui:inputSelect aura:id="CountryId" required="true" label="{!$Label.c.Sales_Country}" change="{!c.onPicklistChange}" />
+										{!$Label.c.Sales_Product}<c:C360_ProdLookup prodIds ="{!v.prdIds}" cntIds ="{!v.conIds}"/>
+                                        <!--ui:inputText aura:id="ObjOwnr" label="Owner"/-->
+										<ui:inputSelect aura:id="StatusId" required="true" label="{!$Label.c.Status}" change="{!c.onStatuslistChange}"/>
+                                        <aura:if isTrue="{!v.varVal}">
+                                        	<ui:inputSelect aura:id="RejTypeId" label="{!$Label.c.Objectives_Declined_Reason}" change="{!c.onPicklistChange}" disabled="true"/>
+                                            <aura:set attribute="else">
+                                                <ui:inputSelect aura:id="RejTypeId1" label="{!$Label.c.Objectives_Declined_Reason}" change="{!c.onPicklistChange}" disabled="false"/>
+                                            </aura:set>
+                                        </aura:if>	
+                                        
+                                    </div>
+                                    <br/>
+                                </div>
+                            </lightning:card>
+                        </div>
+                    </div>
+                    <footer class="slds-modal__footer slds-modal__footer_directional">
+                        <lightning:button variant="brand" label="{!$Label.c.C360_Save_and_Continue_Button}" title="Save" onclick="{! c.SavenClose }" disabled="{!v.savedisable}" />
+                        <lightning:button variant="neutral" label="{!$Label.c.Cancel_Label}" title="Cancel" onclick="{! c.closeModel }"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"/>
+    </div>
+</aura:component>

@@ -1,0 +1,72 @@
+<!--Lightning Component to create assigned objective  for users-->
+<aura:component controller="C360_ObjectiveDetails" implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionwithoutheader">
+   <!---Use Salesforce Lightning Design System CSS From Static resources-->   
+  <!-- <ltng:require styles="{!$Resource.slds222 + '/assets/styles/salesforce-lightning-design-system.css'}"/>-->
+   
+    <!--declare attributes-->
+    <aura:attribute name="number1" type="integer" default="1"/>
+    <aura:attribute name="isvalid" type="boolean" default="false"/>
+   <aura:attribute name="selectedRecord" type="User" default="{}" description="Use,for store SELECTED sObject Record"/>
+   <aura:attribute name="listOfSearchRecords" type="User[]" description="Use,for store the list of search records which returns from apex class"/>
+   <aura:attribute name="SearchKeyWord" type="string"/>
+   <aura:attribute name="Message" type="String" default="Search Result.."/>
+    
+   <!--declare events hendlers-->
+   <aura:handler event="force:refreshView" action="{!c.init}"/>
+   <aura:handler name="oSelectedUserEvent" event="c:C360_SelectedUserEvent" action="{!c.handleComponentEvent}"/>
+   <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+   <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    
+   <!-- https://www.lightningdesignsystem.com/components/lookups/ --> 
+   <div class="slds-form">
+   <div class="slds-modal__header">
+       <h2 class="slds-text-heading--medium">{!$Label.c.C360_Assign_Objectives}</h2>
+   </div> 
+   <div class="slds-m-around--medium">
+      <div aura:id="searchRes" class="slds-form-element slds-lookup slds-is-close" data-select="single">
+         <label class="slds-form-element__label  slds-is-required" for="lookup-348"> {!$Label.c.C360_Assigned_Owner} </label>
+         <!--This part is for display search bar for lookup-->  
+         <div class="slds-form-element__control">
+            <div class="slds-input-has-icon slds-input-has-icon--right" >
+               <c:SVG class="slds-input__icon slds-show" xlinkHref="{!$Resource.slds222 + '/assets/icons/utility-sprite/svg/symbols.svg#search'}" />
+               <!-- This markup is for when an record is selected -->
+               <div aura:id="lookup-pill" class="slds-pill-container slds-hide">
+                  <span class="slds-pill">
+                     <span class="slds-pill__label">
+                      {!v.selectedRecord.Name}
+                     </span>
+                     <button class="slds-button slds-button--icon slds-pill__remove" onclick="{!c.clear}">
+                        <c:SVG class="slds-button__icon" xlinkHref="{!$Resource.slds222 + '/assets/icons/utility-sprite/svg/symbols.svg#close'}" />
+                        <span class="slds-assistive-text">{!$Label.c.Remove}</span>
+                     </button>
+                  </span>
+               </div>
+              <div aura:id="lookupField" class="slds-show slds-is-required">
+                  <ui:inputText aura:id="lkp" updateOn="keyup" keyup="{!c.keyPressController}" class="slds-lookup__search-input slds-input slds-required" value="{!v.SearchKeyWord}" placeholder="{!$Label.c.C360_Search}" required="true"/>
+              </div>
+            </div>
+         </div>
+  
+        <!--This part is for Display typehead lookup result List-->  
+         <div class="slds-lookup__menu slds" id="lookup-348">
+            <div class="slds-lookup__item--label slds-text-body--small">{!v.Message}</div>
+            <center> <ui:spinner aura:id="spinner"/> </center>
+            <ul class="slds-lookup__list" role="listbox">
+               <aura:iteration items="{!v.listOfSearchRecords}" var="singleRec">
+                 <c:C360_CustomLookupResult oUser="{!singleRec}" />
+               </aura:iteration>
+            </ul>
+         </div>
+       </div>  <br/>
+        <div class="slds-form-element">
+            <lightning:input aura:id="num" name="targetassignment" type="number" label="Target Assignments For User" required="true" value="{!v.number1}" min="1" max="99"/>
+            </div><br/>
+       <div class="slds-form-element">
+       <lightning:button label="{!$Label.c.Save}" onclick="{!c.saveObjective}" name="Save" />
+       <lightning:button label="{!$Label.c.C360_SaveNew}" aura:id="SaveNew" name="SaveNew" onclick="{!c.saveObjective}"/>
+       <lightning:button label="{!$Label.c.Cancel_Label}" name="Cancel" onclick="{!c.cancelCreation}" />
+     </div> 
+   </div>
+
+    </div>
+</aura:component>

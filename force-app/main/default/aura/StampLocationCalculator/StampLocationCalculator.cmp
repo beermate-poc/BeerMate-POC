@@ -1,0 +1,14 @@
+<aura:component Controller='StampGeoCodesOnCalculation' implements="force:appHostable,lightning:isUrlAddressable,flexipage:availableForRecordHome,flexipage:availableForAllPageTypes,lightning:hasPageReference,force:hasRecordId,lightning:actionOverride">
+	
+	<aura:attribute name="recordId" type="Id" />
+	<aura:attribute name="geoCodes" type="String" />
+    <aura:attribute name="Message" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    
+    <lightning:card>
+        <p style="font-weight: bold;font-size: medium;">&ensp;&ensp;{!v.Message}</p>
+    </lightning:card>
+          
+    
+</aura:component>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Audience xmlns="http://soap.sforce.com/2006/04/metadata">
+    <audienceName>Admin users</audienceName>
+    <container>B2BManagement</container>
+    <criteria>
+        <criterion>
+            <criteriaNumber>1</criteriaNumber>
+            <criterionValue>
+                <entityField>Profile.Name</entityField>
+                <entityType>User</entityType>
+                <fieldValue>CloudCraze Customer Community Admin</fieldValue>
+            </criterionValue>
+            <operator>Equal</operator>
+            <type>FieldBased</type>
+        </criterion>
+        <criterion>
+            <criteriaNumber>2</criteriaNumber>
+            <criterionValue>
+                <entityField>Profile.Name</entityField>
+                <entityType>User</entityType>
+                <fieldValue>CloudCraze Head Office Community Admin</fieldValue>
+            </criterionValue>
+            <operator>Equal</operator>
+            <type>FieldBased</type>
+        </criterion>
+    </criteria>
+    <formulaFilterType>AnyCriterionMatches</formulaFilterType>
+    <isDefaultAudience>false</isDefaultAudience>
+    <targets>
+        <target>
+            <groupName>65b3ee13-3538-45dc-8398-ef70ee21dcfa$#$6d2aac88-5af5-4d9f-8035-f53b30cf935f</groupName>
+            <priority>1</priority>
+            <targetType>ExperienceVariation</targetType>
+            <targetValue>Contact_List_Record_List_Component</targetValue>
+        </target>
+        <target>
+            <groupName>a29fd549-fcfb-47bf-8978-afc0b6a77f94</groupName>
+            <priority>1</priority>
+            <targetType>ExperienceVariation</targetType>
+            <targetValue>Contact_Detail_Contact_Detail_Page</targetValue>
+        </target>
+        <target>
+            <groupName>4e5a47ee-46be-43a7-a3b0-3b9c794695fc</groupName>
+            <priority>1</priority>
+            <targetType>ExperienceVariation</targetType>
+            <targetValue>Contact_List_Contact_List_Page</targetValue>
+        </target>
+        <target>
+            <groupName>65b3ee13-3538-45dc-8398-ef70ee21dcfa$#$4616984b-7dc5-4d30-a96d-1c901b50b816</groupName>
+            <priority>1</priority>
+            <targetType>ExperienceVariation</targetType>
+            <targetValue>Contact_List_Visualforce_Page_Component</targetValue>
+        </target>
+        <target>
+            <groupName>65b3ee13-3538-45dc-8398-ef70ee21dcfa$#$53d9133b-af8a-4243-b5fc-a4b636f0b4fc</groupName>
+            <priority>1</priority>
+            <targetType>ExperienceVariation</targetType>
+            <targetValue>Contact_List_HTML_Editor_Component</targetValue>
+        </target>
+        <target>
+            <groupName>65b3ee13-3538-45dc-8398-ef70ee21dcfa$#$4db880db-9af1-4838-afc5-cdd6a96e3ebe</groupName>
+            <priority>1</priority>
+            <targetType>ExperienceVariation</targetType>
+            <targetValue>Contact_List_Visualforce_Page_1_Component</targetValue>
+        </target>
+    </targets>
+</Audience>

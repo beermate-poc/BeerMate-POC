@@ -1,0 +1,23 @@
+<aura:component >
+	<aura:attribute name="objRecAccActive" type="Objective__c[]" />
+    <aura:attribute name="objRecAccUpcoming" type="Objective__c[]" />
+    <aura:attribute name="objRecUsrActive" type="Objective__c[]" />
+    <aura:attribute name="objRecUsrUpcoming" type="Objective__c[]" />
+    <aura:attribute name="showUpcoming" type="Boolean" description="This is used when user clicks to view only upcoming from the entire table" />
+    <aura:attribute name="usObj" type="Boolean" description="This is used to for US obj" />
+    <aura:attribute name="eventId" type="String"/>
+    
+    <aura:if isTrue="{!v.showUpcoming}">
+    	<c:ObjectiveActionTable aura:id="objRecAccUpcomingT" objRec="{!v.objRecAccUpcoming}"  usObj="{!v.usObj}" headerToDisplay="{!$Label.c.Assigned_to_Account_Upcoming}" eventId="{!v.eventId}" ></c:ObjectiveActionTable>
+        <br></br><br></br>
+        <c:ObjectiveActionTable aura:id="objRecUsrUpcomingT" objRec="{!v.objRecUsrUpcoming}" usObj="{!v.usObj}" headerToDisplay="{!$Label.c.Assigned_to_me_Upcoming}" eventId="{!v.eventId}" ></c:ObjectiveActionTable>
+    <aura:set attribute="else">
+     	<c:ObjectiveActionTable aura:id="objRecAccActiveT" objRec="{!v.objRecAccActive}"  usObj="{!v.usObj}" headerToDisplay="{!$Label.c.Assigned_to_Account_Active}" eventId="{!v.eventId}" ></c:ObjectiveActionTable>
+        <br></br><br></br>
+        <c:ObjectiveActionTable aura:id="objRecUsrActiveT" objRec="{!v.objRecUsrActive}" usObj="{!v.usObj}" headerToDisplay="{!$Label.c.Assigned_to_me_Active}" eventId="{!v.eventId}" ></c:ObjectiveActionTable>
+    </aura:set>
+    
+    </aura:if>
+            
+            
+</aura:component>

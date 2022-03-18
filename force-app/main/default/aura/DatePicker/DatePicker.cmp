@@ -1,0 +1,113 @@
+<!--
+Company:        Slalom, LLC
+Description:    Component that allows a date in a calendat to be selected
+Attributes:     recordId – Id of the Call Plan
+
+History
+<Date>      <Authors Name>     <Brief Description of Change>
+-->
+<aura:component >
+   <aura:handler name="change" value="{!v.value}" action="{!c.doInit}" />
+   <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+   <!-- Inputs -->
+   <aura:attribute name="value" type="Date" access="public" description="Pass in the date value you want modified. Make sure it's a bound reference."
+      default="4/13/2017" />
+   <aura:attribute name="positionDate" type="String" default="" description="determines position of the calendar (optional)"
+      />
+   <aura:attribute name="id" type="Integer" />
+   <!-- Internal Component Attributes - Data Storage -->
+   <aura:attribute name="formattedDate" type="Date" access="private" />
+   <aura:attribute name="internalValue" type="Date" access="public" />
+   <aura:attribute name="days" type="Object[]" access="private" />
+   <aura:attribute name="label" type="String" />
+   <aura:attribute name="requiredAstrik" type="String" description="determines if we make this field required"/>
+   <!-- Used to select classes -->
+   <aura:attribute name="inputClass" type="String" description="determines if the date input should be visible"/>
+   <aura:attribute name="inputHasIcon" type="String" default="slds-input-has-icon"/>
+   <aura:attribute name="inputHasIconRight" type="String" default="slds-input-has-icon--right"/>
+   <aura:attribute name="inputIcon" type="String" default="slds-input__icon"/>
+   <aura:attribute name="showIcon" type="boolean" default="true"/>
+   <!-- Internal Component Attributes - Show / Hides -->
+   <aura:attribute name="hidePick" type="Boolean" default="true" access="private" />
+   <div class="{! 'outsideWrapper ' + (v.hidePick ? ' slds-hide' : '')}" onclick="{!c.closeWindow}"></div>
+   <div>
+      <div style="position: relative;">
+         <div class="slds-form-element" onclick="{!c.chooseDate}">
+            <label class="slds-form-element__label"><abbr class="slds-required" title="{!$Label.c.Required}">{!v.requiredAstrik}</abbr>{!v.label}</label>
+            <div class="{!v.inputClass + ' date-output ' + v.inputHasIcon + ' slds-form-element__control ' + v.inputHasIconRight }">
+               <lightning:icon iconName="utility:dayview" size="small" class="{!v.inputIcon + ' inputIcon'  }" />
+               <span class="{!v.value ? 'slds-hide' : ''}"></span>
+               <div class="{!v.showIcon ? '' : 'slds-hide'}">
+                  <!--<lightning:formattedDateTime value="{!v.formattedDate}" day="2-digit" month="numeric" aura:id="theDate" />-->
+                  <ui:outputDateTime value="{!v.formattedDate}" aura:id="theDate" format="MM/dd" />
+               </div>
+            </div>
+         </div>
+         <div class="{!v.positionDate  + (v.hidePick ? ' slds-hide' : '')}">
+            <div class="slds-datepicker slds-dropdown slds-dropdown--left" aria-hidden="false">
+               <div class="slds-datepicker__filter slds-grid">
+                  <div class="slds-datepicker__filter--month slds-grid slds-grid--align-spread slds-grow slds-m-around--x-small">
+                     <div class="slds-align-middle">
+                        <lightning:buttonIcon iconName="utility:left" variant="bare" onclick="{! c.changeMonths }" alternativeText="{!$Label.c.DatePicker_Prev_Month}"
+                           name="Previous" />
+                     </div>
+                     <h2 id="month" class="slds-align-middle" aria-live="assertive" aria-atomic="true">
+                        <!--<lightning:formattedDateTime value="{!v.internalValue}" />-->
+                        <ui:outputDateTime value="{!v.internalValue}" format="MM/dd/yyyy"/>
+                     </h2>
+                     <div class="slds-align-middle">
+                        <lightning:buttonIcon iconName="utility:right" variant="bare" onclick="{! c.changeMonths }" alternativeText="{!$Label.c.DatePicker_Next_Month}"
+                           name="Next" />
+                     </div>
+                  </div>
+               </div>
+               <table class="slds-datepicker__month" role="grid" aria-labelledby="month">
+                  <thead>
+                     <tr id="weekdays">
+                        <th id="Sunday" scope="col">
+                           <abbr title="{!$Label.c.Sunday}">{!$Label.c.Sun}</abbr>
+                        </th>
+                        <th id="Monday" scope="col">
+                           <abbr title="{!$Label.c.Monday}">{!$Label.c.Mon}</abbr>
+                        </th>
+                        <th id="Tuesday" scope="col">
+                           <abbr title="{!$Label.c.Tuesday}">{!$Label.c.Tue}</abbr>
+                        </th>
+                        <th id="Wednesday" scope="col">
+                           <abbr title="{!$Label.c.Wednesday}">{!$Label.c.Wed}</abbr>
+                        </th>
+                        <th id="Thursday" scope="col">
+                           <abbr title="{!$Label.c.Thursday}">{!$Label.c.Thu}</abbr>
+                        </th>
+                        <th id="Friday" scope="col">
+                           <abbr title="{!$Label.c.Friday}">{!$Label.c.Fri}</abbr>
+                        </th>
+                        <th id="Saturday" scope="col">
+                           <abbr title="{!$Label.c.Saturday}">{!$Label.c.Sat}</abbr>
+                        </th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <aura:iteration items="{!v.days}" var="w">
+                        <tr>
+                           <aura:iteration items="{!w}" var="day">
+                              <td id="{!day.day}" role="gridcell" aria-selected="{!day.selected}" aria-disabled="{!!day.sameMonth}" class="{!(day.selected ? 'slds-is-selected ' : '') + (day.sameMonth ? '': 'slds-disabled-text ')}"
+                                 onclick="{!c.handleDaySelect}">
+                                 <span class="slds-day">{!day.day}</span>
+                              </td>
+                           </aura:iteration>
+                        </tr>
+                     </aura:iteration>
+                     <tr>
+                        <td colspan="7" role="gridcell" class="quickLinks">
+                           <a href="javascript:void(0);" onclick="{!c.returnClear}" class="slds-show--inline-block">{!$Label.c.Clear}</a>
+                           <a href="javascript:void(0);" onclick="{!c.setToday}" class="slds-show--inline-block">{!$Label.c.Today}</a>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+         </div>
+      </div>
+   </div>
+</aura:component>

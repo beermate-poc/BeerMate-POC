@@ -1,0 +1,27 @@
+<aura:component controller="RefreshOrderController" implements="force:hasRecordId,force:lightningQuickActionwithoutheader,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome" access="global">
+    <!--use boolean attribute for Store true/false value,
+    make default to "false" so modal box are not display on the load of component. 
+    --> 
+    <!--<aura:attribute name="isLoading" type="boolean" default="false"/>-->
+    <aura:attribute name="norefreshopen" type="boolean" default="false"/>
+    <aura:attribute name="ErrorMsg" type="String"/>
+    <aura:attribute name="recordId" type="ID" />
+    <aura:handler name = "init" value="{!this}" Action="{!c.doInit}"/>
+    <ltng:require 
+    styles="{!$Resource.slds222 + '/assets/styles/lightning-design-system-ltng.css'}"/>
+    <!--Use "slds-m-around_xx-large" class to add standard X-Large padding to the component--> 
+		<aura:if isTrue="{!v.norefreshopen}">
+               <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                   <h2><b>{!v.ErrorMsg}</b></h2>
+				</div>
+               <div >
+                   <center>
+                     <lightning:button  variant="neutral" 
+                                          label="Close"
+                                          title="Cancel"
+                                          onclick="{!c.closeError}"/>
+                   </center>
+               </div>    
+		</aura:if>
+    
+</aura:component>

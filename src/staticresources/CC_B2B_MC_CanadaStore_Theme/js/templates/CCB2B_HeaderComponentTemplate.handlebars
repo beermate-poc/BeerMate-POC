@@ -1,0 +1,52 @@
+<div id='customOverlay' data-label="{{pageLabelMap 'CCB2B_Loading_Info'}}" class='modal-backdrop fade in'></div>
+<div class="navbar-inverse cc_navbar-inverse">
+    <div class="container">
+        <div class="row cc_navbar_row">
+            <small>
+                <div class="col-md-12 col-xs-12 cc_navbar_col_misc brandingSection">
+                    <img {{#isLogoClickable}}id="logoUrl"{{/isLogoClickable}} class="branding_logo" src="{{ imgSrcUrl 'header_logos.png' }}"/>
+                </div>
+                {{#if (ifNotPageDisplay 'ccrz__CCChangePassword')}}
+                    <div class="pull-left cc_col_search searchSection">
+                        <ul class="nav cc_nav">
+                            <li><div class="search_form cc_search_form" /></li>
+                        </ul>
+                    </div>
+                {{/if}}
+                <div class=" col-md-12 col-xs-12 cc_navbar_col_acct userSection">
+                    <p class="header-spacer visible-md-* cc_header_spacer"></p>
+                    {{#if (ifNotPageDisplay 'ccrz__CCChangePassword')}}
+                        {{#if (checkContactDisplayPermissions 'create_cart')}}
+                            <div class="cc_my_chead"><a href="#" id="cartHeader" class="chead cartHeaderLink"></a></div>
+                        {{/if}}
+                        <div class="navbar-header pull-right cc_navbar-header">
+                            <div class="navbar-nav userSectionBody">
+                                <div>
+                                    <p class="header-spacer visible-md-* cc_header_spacer"></p>
+                                    <div class="navbar-header pull-right cc_navbar-header">
+                                        <span class="misc-function cc_misc_function"></span>
+                                        <span class="lssec cc_lssec"></span>
+                                    </div>
+                                </div>
+                                <div class="effwigdiv"></div>
+                                <div class="hidden-xs">
+                                    <div class="userDropdown">
+                                        <button class="btn btn-secondary dropdown-toggle cc_my_account" type="button" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="icon-profile-filled"></span>
+                                            <span class="invitation"> {{user.FirstName}}</span>
+                                        </button> <span class="icon-arrow-down"></span>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item goToMyAccount" href="#"><span>{{pageLabelMap 'Header_MyAccount'}}</span></a>
+                                            <a id="headerDesktopLogout" class="dropdown-item loginoutsec cc_loginoutsec"></a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    {{/if}}
+                </div>
+            </small>
+        </div>
+    </div>
+</div>

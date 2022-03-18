@@ -1,0 +1,18 @@
+<aura:component controller="HomePageLinksController" implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" >
+	<aura:handler name="init" action="{!c.init}" value="{!this}" />
+	<aura:attribute name="userId" type="Id" default="" />
+	<aura:attribute name="SAMLID" type="String" default="" />
+
+	<aura:if isTrue="{!or($Browser.isIPad, $Browser.isIPhone)}">
+		<ui:scrollerWrapper class="scrollerSize">
+			<div class="slds-p-bottom--xx-large">
+				<iframe aura:id="iframe"  scrolling="no" height="1000px" width="100%" src="/apex/SRPlanningDashboard" frameborder="true"/>
+			</div>
+		</ui:scrollerWrapper>
+	<aura:set attribute="else">
+		<div class="slds-p-bottom--xx-large">
+			<iframe aura:id="iframe"  scrolling="no" height="1000px" width="100%" src="/apex/SRPlanningDashboard" frameborder="true"/>
+		</div>
+	</aura:set>
+	</aura:if>
+</aura:component>

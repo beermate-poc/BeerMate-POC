@@ -1,0 +1,144 @@
+<div class="container">
+    <div class="col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 col-xs-offset-0 col-xs-12">
+        <form id="newCustomerForm" forceSSL="true" class="form-horizontal">
+            <div class="panel panel-default cc_panel cc_new_customer_panel">
+                <div class="panel-heading cc_heading">
+                    <h3 class="panel-title cc_title text-center">{{pageLabelMap 'CCB2B_Header_Register'}}</h3>
+                </div>
+                {{#if registrationSuccess}}
+                    <div class="col-xs-12 text-center registerSuccess">
+                        <p class="title">{{pageLabelMap 'CCB2B_SiteRegister_Registration_Success_Title'}}</p>
+                        {{#if additionalAccountRequested}}
+                            <div>
+                                <p>{{pageLabelMap 'CCB2B_SiteRegister_MultipleAccountsRequestConfirmationPart1'}}</p>
+                                {{#ifEquals countryCode 'CA'}}
+                                    <p>{{pageLabelMap 'CCB2B_SiteRegister_WarningMessage'}}</p>
+                                {{/ifEquals}}
+                                <p>{{pageLabelMap 'CCB2B_SiteRegister_MultipleAccountsRequestConfirmationPart2'}}</p>
+                                {{#ifEquals countryCode 'CA'}}
+                                    <p>{{pageLabelMap 'CCB2B_SiteRegister_MultipleAccountsRequestConfirmationSupCA'}}</p>
+                                {{else}}
+                                    <p>{{pageLabelMap 'CCB2B_SiteRegister_MultipleAccountsRequestConfirmationSupUK'}}</p>
+                                {{/ifEquals}}
+                            </div>
+                        {{else}}
+                            <p>{{pageLabelMap 'CCB2B_SiteRegister_Registration_Success_Msg'}}</p>
+                            <p>{{pageLabelMap 'CCB2B_SiteRegister_Registration_Success_Desc'}}</p>
+                            {{#ifEquals countryCode 'CA'}}
+                                <p>{{pageLabelMap 'CCB2B_SiteRegister_WarningMessage'}}</p>
+                            {{/ifEquals}}
+                        </div>
+                        {{/if}}
+                        <div class="col-xs-12 text-center" {{#if additionalAccountRequested}}style="padding-bottom:60px"{{/if}}>
+                          <input name="" type="button" value="{{pageLabelMap 'CCB2B_SiteRegister_Registration_Homepage'}}" class="btn primary_button btn-sm goToLogin"/>
+                        </div>
+                {{else}}
+                <div class="panel-body cc_body">
+                    <div class="additionalErrorMsg" id="error_msg"></div>
+                    <div class="error_messages_section" style="display:none;"></div>
+                    <div class="form-section">
+                        <h4 class="contact-section">{{pageLabelMap 'CCB2B_SiteRegister_ContactSection'}}</h4>
+                        <hr/>
+                    </div>
+                    <div class="form-group col-sm-6 col-xs-12">
+                        <label for="firstName" class="cc_firstname_label">{{pageLabelMap 'CCB2B_SiteRegister_FirstName'}}<span class="requiredField"></span></label>
+                        <div class="form-elem"><input id="firstName" name="firstName" type="text" class="form-control cc_firstname toro" value="{{firstName}}" onfocus="myFocus(this);" onblur="myBlur(this);"></div>
+                    </div>
+                    <div class="form-group col-sm-6 col-xs-12">
+                        <label for="lastName" class="cc_lastname_label">{{pageLabelMap 'CCB2B_SiteRegister_LastName'}}<span class="requiredField"></span></label>
+                        <div class="form-elem"><input id="lastName" name="lastName" type="text" class="form-control cc_lastname toro" value="{{lastName}}" onfocus="myFocus(this);" onblur="myBlur(this);"></div>
+                    </div>
+                    <div class="form-group col-xs-12">
+                        <label for="country" class="cc_country_label">{{pageLabelMap 'CCB2B_SiteRegister_Country'}}<span class="requiredField"></span></label>
+                        <div id="country" name="country" class="form-elem" onfocus="myFocus(this);" onblur="myBlur(this);">{{{selectGeo 'country' this.countryList null 'shipping wide countryListing form-control' ''}}}</div>
+                    </div>
+                    <div class="form-group col-xs-12 phoneSection">
+                        <label for="phoneCountryCode" class="cc_phone_label">{{pageLabelMap 'CCB2B_SiteRegister_PhoneNumber'}}<span class="requiredField"></span></label>
+                        <div class="form-elem phoneCountryCodeElem">
+                            <select id="phoneCountryCode" name="phoneCountryCode" class="form-control Field country toro" onfocus="myFocus(this);" onblur="myBlur(this);" disabled="disabled"></select>
+                        </div>
+                        <div class="form-elem phoneElem"><input id="primaryPhoneROI" name="primaryPhoneROI" type="text" placeholder="{{pageLabelMap 'CCB2B_Register_Phone_Placeholder'}}" class="form-control cc_phone toro" value="{{primaryPhone}}" onfocus="myFocus(this);" onblur="myBlur(this);"></div>
+                        <div class="form-elem phoneElem"><input id="primaryPhoneUK" name="primaryPhoneUK" type="text" placeholder="{{pageLabelMap 'CCB2B_Register_Phone_Placeholder'}}" class="form-control cc_phone toro" value="{{primaryPhone}}" onfocus="myFocus(this);" onblur="myBlur(this);"></div>
+                        <div class="form-elem phoneElem"><input id="primaryPhoneCA" name="primaryPhoneCA" type="text" placeholder="{{pageLabelMap 'CCB2B_Register_Phone_Placeholder'}}" class="form-control cc_phone toro" value="{{primaryPhone}}" onfocus="myFocus(this);" onblur="myBlur(this);"></div>
+                        <div class="form-elem phoneElem"><input id="primaryPhoneDefault" name="primaryPhoneDefault" type="text" class="form-control cc_phone toro" value="{{primaryPhone}}" onfocus="myFocus(this);" onblur="myBlur(this);" disabled="disabled"></div>
+                        <div class="phoneInfo">{{pageLabelMap 'CCB2B_Register_Phone_Pattern_Info'}}</div>
+                        <input style="display:none" id="primaryPhone" name="primaryPhone" type="text"/>
+                    </div>
+                    <div class="form-group col-xs-12">
+                        <label for="username" class="cc_username_label">{{pageLabelMap 'CCB2B_SiteRegister_EmailAddress'}}<span class="requiredField"></span></label>
+                        <div class="form-elem">
+                            <input id="username" name="username" type="email" class="form-control cc_username toro" value="{{username}}" onfocus="myFocus(this);" onblur="myBlur(this);" aria-invalid="false" aria-describedby="username-error">
+                            <div id="username-email-error" class="error help-block" style="display: none;">{{pageLabelMap 'CCB2B_Login_InvalidEmail'}}</div>
+                        </div>
+                    </div>
+                    <div class="form-group col-xs-12">
+                         <label for="confirmUsername" class="cc_confirmUsername_label">{{pageLabelMap 'CCB2B_SiteRegister_ConfirmEmailAddress'}}<span class="requiredField"></span></label>
+                         <div class="form-elem">
+                             <input id="confirmUsername" name="confirmUsername" type="email" class="form-control cc_username toro" value="{{confirmUsername}}" onfocus="myFocus(this);" onblur="myBlur(this);">
+                             <div id="username-email-error" class="error help-block" style="display: none;">{{pageLabelMap 'CCB2B_Login_InvalidEmail'}}</div>
+                         </div>
+                    </div>
+                    <div class="form-section">
+                        <h4 class="account-section">{{pageLabelMap 'CCB2B_SiteRegister_AccountSection'}}</h4>
+                        <hr/>
+                    </div>
+                    <div class="form-group col-xs-12">
+                         <label for="postalCode" class="cc_checkoutpostalcode_label">{{pageLabelMap 'CCB2B_SiteRegister_PostCode'}}<span class="requiredField"></span></label>
+                         <div class="form-elem"><input id="postalCode" name="postalCode" type="text" class="form-control cc_checkoutpostalcode toro" value="{{shippingAddress.postalCode}}" onfocus="myFocus(this);" onblur="myBlur(this);"></div>
+                    </div>
+                    <div class="form-group col-xs-12">
+                         <label for="sapNumber" class="cc_checkoutpostalcode_label">{{pageLabelMap 'CCB2B_SiteRegister_SAPAccountNumber'}}<span class="requiredField"></span></label>
+                         <div class="form-elem">
+                            <input id="sapNumber" name="sapNumber" type="text" class="sapNumberInput form-control cc_checkoutSapNumber toro" value="{{sapNumber}}" onfocus="myFocus(this);" onblur="myBlur(this);">
+                            <div class="error-msg" style="display:none">{{pageLabelMap 'CCB2B_SiteRegister_SapNumber_Invalid'}}</div>
+                         </div>
+                    </div>
+<!-- additional account section -->
+                    <div class="additionalAccountSection  tohide">
+                        <div class="form-group col-xs-12 ">
+                            <div class="form-elem">
+                                <label for="ccb2b-register-additionalAccounts-checkbox" class="acceptLabel">{{pageLabelMap 'CCB2B_SiteRegister_HaveAdditionalAccounts'}}
+                                </label>
+                                <div class="additionalAccountAction">
+                                    <input type="button" value="{{pageLabelMap 'Yes'}}" class="btn btn-sm addAccCheck btn-default" />
+                                    <input type="button" value="{{pageLabelMap 'No'}}" class="btn btn-sm addAccCheck btn-default" />
+                                </div>
+                                <div class="error-msg additionalAccountRequestedError" style="display:none">{{pageLabelMap 'CCB2B_SiteRegister_MultipleAccountSelectError'}}</div>
+                            </div>
+                        </div>
+                        <div class="form-group col-xs-12 addAccountDiv">
+                            <label class="acceptLabel">{{pageLabelMap 'CCB2B_SiteRegister_AdditionalCustomerAccountNumber'}}
+                            </label>
+                            <div class="addedAccountsContainer">
+
+                            </div>
+                            <div class="" style="cursor: pointer">
+                               <a class="addAccountInput"> <b><span>+&nbsp;</span></b>{{pageLabelMap 'CCB2B_SiteRegister_AddAnotherAccountNumber'}}</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- additional account section end -->
+                    <div class="acceptSection  tohide">
+
+                        <div class="form-group col-xs-12 form-elem">
+                            <input id="ccb2b-register-termsAccept-checkbox" type="checkbox" name="termsAccept">
+                            <label for="ccb2b-register-termsAccept-checkbox" class="acceptLabel">{{pageLabelMap 'CCB2B_SiteRegister_AcceptInfo'}}
+                                <a href="{{pageLabelMap 'CCB2B_Terms_URI'}}" target="_blank">{{pageLabelMap 'CCB2B_Terms_LabelRegistration'}}</a>
+                            </label>
+                        </div>
+                        <div class="form-group col-xs-12 form-elem">
+                            <input id="ccb2b-register-privacyAccept-checkbox" type="checkbox" name="privacyAccept">
+                            <label for="ccb2b-register-privacyAccept-checkbox" class="acceptLabel">{{pageLabelMap 'CCB2B_SiteRegister_AcceptInfo'}}
+                                <a href="{{pageLabelMap 'CCB2B_Policy_URI'}}" target="_blank">{{pageLabelMap 'CCB2B_Policy_LabelRegistration'}}</a>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group col-xs-12 text-center tonovis">
+                        <input name="" type="button" value="{{pageLabelMap 'CCB2B_Header_Register'}}" class="btn btn-sm submit cc_submit"/>
+                    </div>
+                 </div>
+                 {{/if}}
+            </div>
+        </form>
+    </div>
+</div>

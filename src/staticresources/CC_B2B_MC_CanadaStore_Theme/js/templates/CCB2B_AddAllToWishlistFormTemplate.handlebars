@@ -1,0 +1,34 @@
+<div class="addAllToWishlistFormContainer dropdown form-group btn-group" style="z-index:1001;" >
+    <div class="panel" >
+        <h4 class="title" >{{pageLabelMap 'AddtoWishlist'}}</h4>
+        <h4 class="closeAddToWishlist" >X</h4>
+    </div>
+    <ul class="dropdown-menu addllToWishlistList"   aria-labelledby="dropWish" >
+        <li role="separator" class="divider"></li>
+        {{#each this.models}}
+            <li class="listItem" >
+                <span class="plusWishlistMarker" > + </span>
+                <a id="{{generateId 'ccb2b-plp-fav-' attributes.sfid '-select'}}" href="javascript:void(0);" class="pickWish" data-id="{{attributes.sfid}}">
+                    {{{attributes.name}}}
+                </a>
+                {{#if attributes.isActive}}
+                    <span class="defaultWishlistMarker" >{{pageLabelMap 'DefaultWishlist'}}</span>
+                {{/if}}
+            </li>
+            <li role="separator" class="divider"></li>
+        {{/each}}
+        <li>
+            <span class="plusWishlistMarker" > + </span>
+            <a id="ccb2b-plp-createnewfav-btn" href="javascript:void(0);" class="pickWish createNewWish" data-id="-1">{{pageLabelMap 'Action_CreateWishlist'}}</a>
+        </li>
+        <li>
+            <div class="row center-block">
+                <div class="col-xs-12">
+                    <label for="ccb2b-plp-newfavname-input" class="sr-only">{{pageLabelMap 'Wishlist_EnterName'}}</label>
+                    <input id="ccb2b-plp-newfavname-input" type="text" maxlength="255" class="newListName form-control" placeholder="{{pageLabelMap 'MyAccount_Name'}}"/>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+<div id="addToWishGlass" style="display:none;position:fixed;top:0;bottom:0;left:0;right:0;background-color:white;opacity:30%;z-index:5;"></div>

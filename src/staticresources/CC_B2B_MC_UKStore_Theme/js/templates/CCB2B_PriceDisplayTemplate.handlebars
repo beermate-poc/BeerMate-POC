@@ -1,0 +1,10 @@
+{{#if (checkContactDisplayPermissions 'pricing')}}
+<div class="cc_price price">
+    <span class="cc_label">{{pageLabelMap 'CartInc_Price'}}:</span>
+    <span class="price cc_price">{{price this.price}}</span>
+    {{#if this.CCB2BPricePerLiter}}
+        <span class="cc_label">{{pageLabelMap 'CCB2B_PricePerLiterLabel'}}:</span>
+        <span class="price cc_price pricePerLiter">{{price this.CCB2BPricePerLiter}}{{pageLabelMap 'CCB2B_PricePerLiter'}}</span>
+    {{/if}}
+</div>
+{{/if}}

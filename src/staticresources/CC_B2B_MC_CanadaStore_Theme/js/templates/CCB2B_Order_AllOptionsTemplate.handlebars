@@ -1,0 +1,79 @@
+<div class="top-container">
+
+    <div class="container cc_breadrumb_container" id="breadcrumb_desktop_container">
+        <ol class="breadcrumb cc_breadcrumb">
+
+            <li class="cc_breadcrumb_item">
+                <a href="/b2b/ccrz__HomePage?&amp;store=CanadaStore&amp;&amp;" title="{{pageLabelMap 'BreadCrumbInc_GoToHomePage'}}">{{pageLabelMap 'BreadCrumbInc_Home'}}</a>
+            </li>
+
+            <li class="cc_breadcrumb_item">
+                <a href="#">{{pageLabelMap 'CCB2B_AllOrdOpts_Bread_OrdProds'}}</a>
+            </li>
+
+            <li class="cc_breadcrumb_item">
+                <a href="#">{{pageLabelMap 'CCB2B_AllOrdOpts_Bread_AllOrdOpts'}}</a>
+            </li>
+
+        </ol>
+    </div>
+
+    <div class="overviewSection">
+    {{#if (checkContactDisplayPermissions 'order_history')}}
+
+        <h4> {{pageLabelMap 'CCB2B_AllOrdOpts_TopMsg'}}</h4>
+        <br>
+    {{/if}}
+        <div class="row">
+
+            <div class="col-md-6 tile" data-navigate="fast_order" >
+                <div class="image-container order-option-tile" title="{{pageLabelMap 'CCB2B_AllOrdOpts_Title_FastOrd'}}" data-toggle="tooltip" data-placement="top">
+                    {{displayAOOImage "fast_order"}}
+                </div>
+                <div class="text-container">
+                    <span style="text-align: center;" >
+                        {{pageLabelMap 'CCB2B_AllOrdOpts_Desc_FastOrd'}}
+                    </span>
+                </div>
+            </div>
+
+            <div class="col-md-6 tile" data-navigate="favourities">
+                <div class="image-container order-option-tile" title="{{pageLabelMap 'CCB2B_AllOrdOpts_Title_Fav'}}" data-toggle="tooltip" data-placement="top">
+                    {{displayAOOImage "favourities"}}
+                </div>
+                <div class="text-container">
+                    <span>
+                        {{pageLabelMap 'CCB2B_AllOrdOpts_Desc_Fav'}}
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+
+            <div class="col-md-6 tile" data-navigate="order_pad">
+                <div class="image-container order-option-tile" title="{{pageLabelMap 'CCB2B_AllOrdOpts_Title_OrdPad'}}" data-toggle="tooltip" data-placement="top">
+                    {{displayAOOImage "order_pad"}}
+                </div>
+                <div class="text-container">
+                    <span>
+                        {{pageLabelMap 'CCB2B_AllOrdOpts_Desc_OrdPad'}}
+                    </span>
+                </div>
+            </div>
+            {{#if (checkContactDisplayPermissions 'order_history')}}
+                <div class="col-md-6 tile" data-navigate="reorder">
+                    <div class="image-container order-option-tile" title="{{pageLabelMap 'CCB2B_AllOrdOpts_Title_Reord'}}" data-toggle="tooltip" data-placement="top">
+                        {{displayAOOImage "reorder"}}
+                    </div>
+                    <div class="text-container">
+                        <span>
+                            {{pageLabelMap 'CCB2B_AllOrdOpts_Desc_Reord'}}
+                        </span>
+                    </div>
+                </div>
+            {{/if}}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,91 @@
+<!--
+   @Author Accenture
+   @name BMC_CA_ProductSelection
+   @CreateDate  3/14/2019
+   @Description Component for creating Chain Execution Products.
+   @Version <1.0>
+  -->
+<aura:component controller="BMC_ChainActivityController" implements="force:lightningQuickActionWithoutHeader,force:hasRecordId" >
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="isoffprem" type="boolean" default="false"/>
+    <aura:attribute name="showerrortoast" type="boolean" default="false"/>
+    <aura:attribute name="toasttitle" type="String" />
+    <aura:attribute name="toastmsg" type="String" />
+    <aura:attribute name="toasttype" type="String" />
+    <aura:attribute name="showspinner" type="Boolean" default="false" />
+    <aura:attribute name="addproduct" type="Boolean" default="true" />
+    <aura:attribute name="addproductsgn" type="Boolean" default="false" />
+    <aura:attribute name="showseasonalbrandname" type="Boolean" default="false" />
+    <aura:attribute name="showbrand" type="Boolean" />
+    <aura:attribute name="sgnlist" type="String[]" />
+    <aura:attribute name="showPkg" type="Boolean" default="false" />
+    <aura:attribute name="isdisablepkg" type="Boolean" default="true" />
+    <aura:attribute name="packages" type="String[]" default=""/>
+    <aura:attribute name="selectedsgn" type="String" />
+    <aura:attribute name="selectedpkg" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>  
+    <div class="slds-text-align__center">
+        <aura:if isTrue="{!v.showerrortoast}">
+            <c:Toast toastTitle="{!v.toasttitle}" toastMsg="{!v.toastmsg}" toastType="{!v.toasttype}"/>
+        </aura:if>
+    </div>
+    <aura:if isTrue="{!v.addproduct}">      
+        <div>
+            <aura:if isTrue="{!v.showspinner}">
+                <lightning:spinner />
+            </aura:if> 
+            <div class="modal-header slds-modal__header mainHeader slds-p-around--small">
+                <h2 class="title slds-text-heading--medium">{!$Label.c.BMC_CAAddProduct}</h2> 
+            </div>
+            <aura:if isTrue="{!v.showseasonalbrandname}">
+                <lightning:select name="selectname" label="{!$Label.c.BMC_SeasonalBrandGroupName}" aura:id="seasonalGroupName" required="true"  value="{!v.selectedsgn}" onchange="{!c.onChangesgn}">
+                    <option value="">{!$Label.c.BMC_SelectSeasonalGroupName}</option>
+                    <aura:iteration items="{!v.sgnlist}" var="eachSGN">
+                        <option >{!eachSGN}</option>
+                    </aura:iteration>
+                </lightning:select>
+                <lightning:select name="select" label="{!$Label.c.BMC_Package}" aura:id="packageValue" required="true" disabled="{!v.isdisablepkg}" value="{!v.selectedpkg}" messageWhenValueMissing="{!$Label.c.Package_is_Required}">
+                    <option value="">{!$Label.c.Package_Select_Default_Value}</option>
+                    <aura:iteration items="{!v.packages}" var="pkg">
+                        <option >{!pkg}</option>
+                    </aura:iteration>
+                </lightning:select>
+                <br/> <br/>
+                <center>
+                    <!-- <lightning:button class="slds-wrap" variant="brand" name="{!$Label.c.BMC_AddAnother}"  label="{!$Label.c.BMC_AddAnother}" onclick="{!c.savecaProduct}"/> 
+                    --><lightning:button class="slds-wrap" variant="brand" name="{!$Label.c.BMC_Save_Close}"  label="{!$Label.c.BMC_Save_Close}" onclick="{!c.savecaProduct}"/> 
+                    <lightning:button class="slds-wrap" aura:id="cancelButton" variant="Neutral" type="{!$Label.c.BMC_CancelButton}" name="{!$Label.c.BMC_CancelButton}" label="{!$Label.c.BMC_CancelButton}" onclick="{!c.gobcktoRcrdpage}"/>
+                </center>
+            </aura:if>
+            <aura:if isTrue="{!v.showbrand}">
+                <c:ProductSearch requiredAstrik="*" label="" fromLabel="Brand" fromScreen="chainActivity" isRequired="false" aura:id="brandSearch" object="Product__c" field="TrademarkBrandLongNme__c" showPkg="true" isOffPremise="{!v.isoffprem}" />             
+                
+                <br/> <br/>
+                <center>
+                    <lightning:button class="slds-wrap" variant="brand" name="{!$Label.c.BMC_AddAnother}"  label="{!$Label.c.BMC_AddAnother}" onclick="{!c.saveProduct}"/> 
+                    <lightning:button class="slds-wrap" aura:id="saveClose" variant="brand" name="{!$Label.c.BMC_Save_Close}"  label="{!$Label.c.BMC_Save_Close}" onclick="{!c.saveProduct}"/> 
+                    <lightning:button class="slds-wrap" aura:id="cancelButton" variant="Neutral" type="{!$Label.c.BMC_CancelButton}" name="{!$Label.c.BMC_CancelButton}" label="{!$Label.c.BMC_CancelButton}" onclick="{!c.gobcktoRcrdpage}"/>
+                </center>
+            </aura:if>
+        </div>
+        <aura:set attribute="else">
+            <aura:if isTrue="{!v.addproductsgn}">
+                <center> 
+                    <div class="slds-text-heading_medium">{!$Label.c.BMC_CAConfirmProductReplacement}</div>
+                    <br/>
+                    <div class="slds-text-body_medium">{!$Label.c.BMC_CAProductListReplacement}<br/>
+                        Note: You may not add more than one Seasonal brand group and package to this mandate
+                    </div>
+                    <br/>
+                    <lightning:button class="slds-wrap" variant="brand" name="Confirm"  label="Confirm" onclick="{!c.productSelection}"/>
+                    <lightning:button class="slds-wrap" variant="brand" name="Cancel"  label="Cancel" onclick="{!c.gobcktoRcrdpage}"/> 
+                </center>
+                <aura:set attribute="else">
+                    <center> <div class="slds-text-heading_medium">{!$Label.c.BMC_CADisableProduct}</div> 
+                        <lightning:button class="slds-wrap" variant="brand" name="Ok"  label="Ok" onclick="{!c.gobcktoRcrdpage}"/> 
+                    </center>  
+                </aura:set>
+            </aura:if>
+        </aura:set>
+    </aura:if>
+</aura:component>

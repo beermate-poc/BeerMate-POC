@@ -1,0 +1,53 @@
+{{#if (checkContactDisplayPermissions 'create_cart')}}
+    <div class="cc_qty_control_row row">
+        <div>
+        {{#if (isProductOOS @root.SKU)}}
+          <span class="input-group-btn cc_input_group_btn form-group">
+              {{#ifEquals layout 'list'}}
+              <button id="{{generateId 'ccb2b-plp-list-qtypminus-' SKU '-btn'}}" data-sfid={{sfid}} type="button" class="btn btn-default minus cc_minus qty_btn disabled" disabled="disabled">{{pageLabelMap 'Prod_QtyDecrSingle'}}</button>
+              {{/ifEquals}}
+              {{#ifEquals layout 'grid'}}
+                <button id="{{generateId 'ccb2b-plp-grid-qtypminus-' SKU '-btn'}}" data-sfid={{sfid}} type="button" class="btn btn-default minus cc_minus qty_btn disabled" disabled="disabled">{{pageLabelMap 'Prod_QtyDecrSingle'}}</button>
+              {{/ifEquals}}
+          </span>
+            {{#ifEquals layout 'list'}}
+                <input data-sku="{{SKU}}" data-id="{{generateId 'ccb2b-plp-list-qty-' SKU '-btn'}}" type="text" id="{{sfid}}_qtyEntry" data-sfid={{sfid}} class="qty entry form-control cc_entry disabled" disabled="disabled" value="{{#if qty}}{{qty}}{{else}}0{{/if}}" maxlength="7" />
+            {{/ifEquals}}
+            {{#ifEquals layout 'grid'}}
+                <input data-sku="{{SKU}}" data-id="{{generateId 'ccb2b-plp-grid-qty-' SKU '-btn'}}" type="text" id="{{sfid}}_qtyEntry" data-sfid={{sfid}} class="qty entry form-control cc_entry disabled" disabled="disabled" value="{{#if qty}}{{qty}}{{else}}0{{/if}}" maxlength="7" />
+            {{/ifEquals}}
+            <span class="input-group-btn cc_input_group_btn">
+            {{#ifEquals layout 'list'}}
+                <button id="{{generateId 'ccb2b-plp-list-qtyplus-' SKU '-btn'}}" data-sfid={{sfid}} type="button" class="btn btn-default plus cc_plus qty_btn disabled" disabled="disabled">{{pageLabelMap 'Prod_QtyIncrSingle'}}</button>
+            {{/ifEquals}}
+            {{#ifEquals layout 'grid'}}
+                <button id="{{generateId 'ccb2b-plp-grid-qtyplus-' SKU '-btn'}}" data-sfid={{sfid}} type="button" class="btn btn-default plus cc_plus qty_btn disabled" disabled="disabled">{{pageLabelMap 'Prod_QtyIncrSingle'}}</button>
+            {{/ifEquals}}
+            </span>
+        {{else}}
+            <span class="input-group-btn cc_input_group_btn form-group">
+              {{#ifEquals layout 'list'}}
+              <button id="{{generateId 'ccb2b-plp-list-qtypminus-' SKU '-btn'}}" data-sfid={{sfid}} type="button" class="btn btn-default minus cc_minus qty_btn">{{pageLabelMap 'Prod_QtyDecrSingle'}}</button>
+              {{/ifEquals}}
+              {{#ifEquals layout 'grid'}}
+                <button id="{{generateId 'ccb2b-plp-grid-qtypminus-' SKU '-btn'}}" data-sfid={{sfid}} type="button" class="btn btn-default minus cc_minus qty_btn">{{pageLabelMap 'Prod_QtyDecrSingle'}}</button>
+              {{/ifEquals}}
+            </span>
+            {{#ifEquals layout 'list'}}
+                <input data-sku="{{SKU}}" data-id="{{generateId 'ccb2b-plp-list-qty-' SKU '-btn'}}" type="text" id="{{sfid}}_qtyEntry" data-sfid={{sfid}} class="qty entry form-control cc_entry" value="{{#if qty}}{{qty}}{{else}}0{{/if}}" maxlength="7" />
+            {{/ifEquals}}
+            {{#ifEquals layout 'grid'}}
+                <input data-sku="{{SKU}}" data-id="{{generateId 'ccb2b-plp-grid-qty-' SKU '-btn'}}" type="text" id="{{sfid}}_qtyEntry" data-sfid={{sfid}} class="qty entry form-control cc_entry" value="{{#if qty}}{{qty}}{{else}}0{{/if}}" maxlength="7" />
+            {{/ifEquals}}
+            <span class="input-group-btn cc_input_group_btn">
+            {{#ifEquals layout 'list'}}
+                <button id="{{generateId 'ccb2b-plp-list-qtyplus-' SKU '-btn'}}" data-sfid={{sfid}} type="button" class="btn btn-default plus cc_plus qty_btn">{{pageLabelMap 'Prod_QtyIncrSingle'}}</button>
+            {{/ifEquals}}
+            {{#ifEquals layout 'grid'}}
+                <button id="{{generateId 'ccb2b-plp-grid-qtyplus-' SKU '-btn'}}" data-sfid={{sfid}} type="button" class="btn btn-default plus cc_plus qty_btn">{{pageLabelMap 'Prod_QtyIncrSingle'}}</button>
+            {{/ifEquals}}
+            </span>
+        {{/if}}
+        </div>
+    </div>
+{{/if}}

@@ -1,0 +1,5 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
+    
+        <force:canvasApp developerName="The_Numbers_Dashboard" scrolling="Yes" width="auto" height="600" sublocation="mobile"/>
+
+</aura:component>

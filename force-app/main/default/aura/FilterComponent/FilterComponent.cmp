@@ -1,0 +1,60 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" controller="TargetCriteriaController">
+
+	<aura:attribute name="fields" type="Object[]" default=""/>
+	<aura:attribute name="fieldCount" type="Integer" default=""/>
+	<aura:attribute name="object" type="String" default=""/>
+	<aura:attribute name="operators" type="Object[]" default=""/>
+	<aura:attribute name="selectedField" type="String" default=""/>
+	<aura:attribute name="selectedOperator" type="String" default=""/>
+	<aura:attribute name="inputValue" type="String" default=""/>
+	<aura:handler name="init" action="{!c.init}" value="{!this}" />
+
+	<aura:registerEvent name="valueChanged" type="c:SearchValueChange"/>
+
+	<aura:if isTrue="{!$Browser.isPhone}">
+		<div class="slds-p-around--medium">
+			<div class="slds-form-element slds-size--1-of-1">
+				<lightning:select name="select" label="{!$Label.c.Field + ' ' + v.fieldCount}" aura:id="selectField" value="{!v.selectedField}" onchange="{!c.onValueChange}">
+					<option value="">{!$Label.c.Select_Field}</option>
+					<aura:iteration items="{!v.fields}" var="field">
+						<option value="{!field.apiName}" text="{!field.label}" selected="{!field.selected}"></option>
+					</aura:iteration>
+				</lightning:select>
+			</div>
+			<div class="slds-form-element slds-size--1-of-1">
+				<lightning:select name="select" label="{!$Label.c.Operator}" aura:id="selectOp" value="{!v.selectedOperator}" onchange="{!c.onValueChange}">
+					<option value="">{!$Label.c.Select_Operator}</option>
+					<aura:iteration items="{!v.operators}" var="ops">
+						<option value="{!ops.value}" text="{!ops.label}" selected="{!ops.selected}"></option>
+					</aura:iteration>
+				</lightning:select>
+			</div>
+			<div class="slds-form-element slds-size--1-of-1">
+				<lightning:input label="{!$Label.c.Value + ' ' + v.fieldCount}" aura:id="inputVal" name="filterValue" value="{!v.inputValue}" onchange="{!c.onValueChange}"/>
+			</div>
+		</div>
+		<aura:set attribute="else">
+			<div class="slds-form-element__row">
+				<div class="slds-form-element slds-size--1-of-3">
+					<lightning:select name="select" label="{!$Label.c.Field + ' ' + v.fieldCount}" aura:id="selectField" value="{!v.selectedField}" onchange="{!c.onValueChange}">
+						<option value="">{!$Label.c.Select_Field}</option>
+						<aura:iteration items="{!v.fields}" var="field">
+							<option value="{!field.apiName}" text="{!field.label}" selected="{!field.selected}"></option>
+						</aura:iteration>
+					</lightning:select>
+				</div>
+				<div class="slds-form-element slds-size--1-of-3">
+					<lightning:select name="select" label="{!$Label.c.Operator}" aura:id="selectOp" value="{!v.selectedOperator}" onchange="{!c.onValueChange}">
+						<option value="">{!$Label.c.Select_Operator}</option>
+						<aura:iteration items="{!v.operators}" var="ops">
+							<option value="{!ops.value}" text="{!ops.label}" selected="{!ops.selected}"></option>
+						</aura:iteration>
+					</lightning:select>
+				</div>
+				<div class="slds-form-element slds-size--1-of-3">
+					<lightning:input label="{!$Label.c.Value + ' ' + v.fieldCount}" aura:id="inputVal" name="filterValue" value="{!v.inputValue}" onchange="{!c.onValueChange}"/>
+				</div>
+			</div>
+		</aura:set>
+	</aura:if>
+</aura:component>

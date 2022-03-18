@@ -1,0 +1,113 @@
+<aura:component implements="force:appHostable" controller="AccountsNearMeApexController">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="userLatitude" type="String"/>
+    <aura:attribute name="userLongitude" type="String"/>
+    <aura:attribute name="tradeChennelValues" type="String[]"/>
+    <aura:attribute name="showAccountName" type="Boolean" default="true"/>
+    <aura:attribute name="showPremiseType" type="Boolean" default="false"/>
+    <aura:attribute name="showTradeChannel" type="Boolean" default="false"/>
+    <aura:attribute name="showWhereToHuntList" type="Boolean" default="false"/>
+    
+    <aura:attribute name="checkProfile" type="String" default="false"/>
+    <aura:attribute name="nonC360Profile" type="Boolean" default="false"/>
+    <aura:attribute name="userInfo" type="String" default="false"/>
+    <aura:attribute name="showCalledOnAcc" type="Boolean" default="false"/>
+    <aura:attribute name="showSalesChannelDes" type="Boolean" default="false"/>
+	<aura:attribute name="showAccountStatus" type="Boolean" default="false"/>
+	<aura:attribute name="showMyAccounts" type="Boolean" default="false"/>    
+   
+  
+    <!-- <div class="slds-filters__header slds-grid ">
+<h2 class="slds-align-middle slds-text-heading_small">{!$Label.c.Filter}</h2>
+<lightning:buttonIcon class="slds-button slds-button_icon slds-col_bump-left slds-button_icon slds-button_icon-small" iconName="utility:filterList" variant="bare" alternativeText="{!$Label.c.Accounts_Near_Me_Filter_List}" onclick="{!c.getWhereToHuntList}" />
+</div> -->
+    <div>
+    <lightning:spinner aura:id="spinner" class="slds-hide" alternativeText="Please wait..." />
+        <br></br>
+        
+      <h2 class="slds-page-header__title slds-align-middle slds-truncate"> &nbsp;{!$Label.c.BMC_FilterBy}</h2>
+	  <lightning:select aura:id="filteroptions" label="" onchange="{! c.showFilteroptions }">
+                   
+          			<option value="{!$Label.c.BMC_AccountName}">{!$Label.c.BMC_AccountName}</option>
+                    <option value="{!$Label.c.BMC_PremiseType}">{!$Label.c.BMC_PremiseType}</option>
+                    <option value="{!$Label.c.BMC_TradeChannel}">{!$Label.c.BMC_TradeChannel}</option>
+                    <option value="{!$Label.c.BMC_WhereToHunt}">{!$Label.c.BMC_WhereToHunt}</option>
+       
+                    <option value="{!$Label.c.C360_CalledOnAccounts}">{!$Label.c.C360_CalledOnAccounts}</option>
+                    <option value="{!$Label.c.C360_SalesChannelDescription}">{!$Label.c.C360_SalesChannelDescription}</option>
+                    <option value="{!$Label.c.C360_AccountStatus}">{!$Label.c.C360_AccountStatus}</option>
+                    <option value="{!$Label.c.C360_MyAccounts}">{!$Label.c.C360_MyAccounts}</option>
+        </lightning:select>        
+    <aura:if isTrue="{!v.showAccountName}">
+        <lightning:layout >
+            <lightning:layoutItem size="10">
+            <lightning:input aura:id="accountName" placeholder="search here..." /> 
+            </lightning:layoutItem>
+            <lightning:layoutItem size="2">
+     &nbsp;<lightning:icon iconName="utility:search" class="slds-m-top_large" size="small" onclick="{! c.searchAccount }" />
+            </lightning:layoutItem>
+        </lightning:layout>
+    </aura:if>
+    <aura:if isTrue="{!v.showPremiseType}">        
+        <lightning:select aura:id="premiseType" label="" onchange="{!c.selectedPremiseType}">
+            <option value="{!$Label.c.BMC_SelectPremiseType}">{!$Label.c.BMC_SelectPremiseType}</option>
+            <option value="{!$Label.c.BMC_ON}">{!$Label.c.BMC_ON}</option>
+            <option value="{!$Label.c.BMC_OFF}">{!$Label.c.BMC_OFF}</option>
+       </lightning:select>              
+    </aura:if>
+    <aura:if isTrue="{!v.showTradeChannel}">        
+        <lightning:select aura:id="tradeChannel" label="" onchange="{!c.selectedTradeChannel}">
+             <option value="{!$Label.c.BMC_SelectTradeChannel}">{!$Label.c.BMC_SelectTradeChannel}</option>
+            <aura:iteration items="{!v.tradeChennelValues}" var="option">
+            <option value="{!option}">{!option}</option>
+            </aura:iteration>
+       </lightning:select>              
+    </aura:if>
+    <aura:if isTrue="{!v.showWhereToHuntList}">
+        <c:WhereToHuntPickList aura:id="whereToHuntCmp"/>
+    </aura:if>  
+        <!--called on accounts -->
+        <aura:if isTrue="{!v.showCalledOnAcc}">        
+        <lightning:select aura:id="calledOnAcc" label="" onchange="{!c.selectedcallOnAcc}">
+            <option value="Select Called On Accounts">{!$Label.c.C360_Select}&nbsp;{!$Label.c.C360_CalledOnAccounts}</option>
+            <option value="Yes">{!$Label.c.C360_Yes}</option> <!-- need translation -->
+            <option value="No">{!$Label.c.C360_NO}</option>	<!-- need translation -->
+       </lightning:select>              
+    </aura:if>
+         <!--called on Sales Channel Description --> <!-- need translation -->
+        <aura:if isTrue="{!v.showSalesChannelDes}">        
+        <lightning:select aura:id="salesChannelDes" label="" onchange="{!c.selectedSalesChannelDes}">
+            <option value="Select Sales Channel Description">{!$Label.c.C360_Select}&nbsp;{!$Label.c.C360_SalesChannelDescription}</option>
+            <option value="ON-PREMISE">{!$Label.c.C360_ON_PREMISE}</option>
+            <option value="OFF-PREMISE">{!$Label.c.C360_OFF_PREMISE}</option>
+       </lightning:select>              
+    </aura:if>		
+        <!-- Accounts Status --> <!-- need translation -->
+         <aura:if isTrue="{!v.showAccountStatus}">        
+       <lightning:select aura:id="accStatus" label="" onchange="{!c.selectedAccountStatus}">
+            <option value="Select Account Status">{!$Label.c.C360_Select}&nbsp;{!$Label.c.C360_AccountStatus}</option>
+            <option value="TRADING">{!$Label.c.C360_TRADING}</option>
+            <option value="POST TRADING">{!$Label.c.C360_POST_TRADING}</option>
+			<option value="PROSPECT">{!$Label.c.C360_PROSPECT}</option>
+            <option value="ACTIVE">{!$Label.c.AcntStatus_ACTIVE}</option>
+            <option value="FUTURE">{!$Label.c.AcntStatus_FUTURE}</option>
+           	<option value="PRIMARY">{!$Label.c.AcntStatus_PRIMARY}</option>
+            <option value="SECONDARY">{!$Label.c.AcntStatus_SECONDARY}</option>
+       </lightning:select>  
+            
+    </aura:if> 
+       <!-- My Accounts -->	<!-- need translation -->
+         <aura:if isTrue="{!v.showMyAccounts}">     
+          
+        <lightning:select aura:id="myAcc" label="" onchange="{!c.selectedMyAccounts}">
+            <option value="Select My Accounts">{!$Label.c.C360_Select}&nbsp;{!$Label.c.C360_MyAccounts}</option>
+        </lightning:select>             
+    </aura:if>	
+            
+            <br></br>
+    <ui:scrollerWrapper class="wrapperClass">
+            <c:AccountList  profilename="{!v.checkProfile}"/>
+    </ui:scrollerWrapper>
+         </div>
+       
+</aura:component>

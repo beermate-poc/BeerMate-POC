@@ -1,0 +1,19 @@
+<aura:component >
+    <aura:attribute name="subTypeValues" type="String[]" default="[]"/>
+    <aura:attribute name="selectedSubType" type="String" />
+    <aura:attribute name="ObjectiveSubType" type="String" />
+    <aura:attribute name="objStatus" type="String" />
+    <aura:attribute name="id" type="Integer" />
+    <aura:handler name="init" action="{!c.init}" value="{!this}" />
+
+    <aura:if isTrue="{!v.subTypeValues.length > 0}">
+        <div class="slds-m-top--medium">
+            <lightning:select name="subTypeSelect" label="{!$Label.c.Sub_Type}" aura:id="subTypeSelect" value="{!v.selectedSubType}" required="{!(v.objStatus == 'Committed' || v.objStatus == 'Executed') ? true : false}" messageWhenValueMissing="{!$Label.c.Sub_Type_Error}">
+                <option value="">{!$Label.c.Sub_Type_Select}</option>
+                <aura:iteration items="{!v.subTypeValues}" var="sub">
+                    <option value="{!sub}" text="{!sub}" selected="{!sub == v.selectedSubType}"></option>
+                </aura:iteration>
+            </lightning:select>
+        </div>
+    </aura:if>
+</aura:component>

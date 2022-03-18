@@ -1,0 +1,94 @@
+{{#if (checkContactDisplayPermissions 'create_basket')}}
+<div class="panel panel-default cc_panel cc_panel_shopping_cart cc_cart2">
+    <div class="row">
+        <div class="col-md-9 col-xs-12">
+            <div class="panel-body cc_body">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h2 id="ccb2b-basket-title-label" class="title cc_title">{{pageLabelMap 'CartInc_ShoppingCart'}}</h2>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="alert_error rewardError errorMsg" style="display:none">
+                            <span class="fa fa-warning"></span>
+                            <span class="msg">{{pageLabelMap 'CCB2B_InventoryError_RewardError' }}</span>
+                        </div>
+                        <div class="alert_error minimumOrderWarning errorMsg" style="display:none">
+                            <span class="fa fa-warning"></span>
+                            <span class="msg">{{pageLabelMap 'CCB2B_MinimumOrderVal_Msg' (price (pageConfigMap 'sc.minorderval'))}}</span>
+                        </div>
+                        <div class="alert_error unavailableRewardItemWarning errorMsg" style="display:none">
+                            <span class="fa fa-warning"></span>
+                            <span class="msg">{{pageLabelMap 'CCB2B_UnavailableRewardItem_Msg' }}</span>
+                        </div>
+                        <div class="alert_error removeRewardMsg errorMsg" style="display:none">
+                            <span class="fa fa-warning"></span>
+                            <span class="msg">{{pageLabelMap 'CCB2B_DealRewardRemoveMessage_Label' }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="deal_spinner" id="deal-spinner-id">
+                    <p>{{pageLabelMap 'CCB2B_DealLoader_Label'}}</p>
+                    <div class="loading_deal"><div></div><div></div><div></div><div></div></div>
+                </div>
+                <div class="CCB2B_RewardsTarget"></div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        {{#ifEquals (totalVisibleItems ECartItemsS.models) 0}}
+                            <p class="emptyCart">{{pageLabelMap 'CCB2B_Basket_Empty_Msg'}}</p>
+                            <button id="ccb2b-basket-continueshopping-btn" class="btn btn-default btn-sm continueShoppingButton cc_continue_shopping_button" name="" type="button" >{{pageLabelMap 'CartInc_ContinueShopping'}}</button>
+                        {{else}}
+                            <div id="cart_items_container" class="cc_cart_item_container">
+                                {{> headerSection}}
+                                <div class="cart_item_list cc_cart_item_list">
+                                    {{#if this.ECartItemsSGrouped}}
+                                        {{#eachInMap this.ECartItemsSGrouped}}
+                                            <div class="categorySection">
+                                                <div class='productCategory'>{{{key}}}</div>
+                                                <div class="row cart_columns visible-md visible-lg">
+                                                    <div class="col-lg-5 col-md-4 col-sm-5 column">{{pageLabelMap 'CCB2B_Basket_Item_Column'}}</div>
+                                                    <div class="col-md-1 column text-center">{{pageLabelMap 'CCB2B_Basket_Price_Column'}}</div>
+                                                    <div class="col-lg-3 col-md-4 col-sm-3 column text-center">{{pageLabelMap 'CCB2B_Basket_Qty_Column'}}</div>
+                                                    <div class="col-md-2 column text-center">{{pageLabelMap 'CCB2B_Basket_Subtotal_Column'}}</div>
+                                                    <div class="col-md-1 column"></div>
+                                                </div>
+                                                {{#each value.items}}
+                                                <div class="cart_item {{this.attributes.sfid}} cc_cart_item" data-sku="{{this.attributes.product.SKU}}" data-sfid="{{this.attributes.sfid}}">
+                                                    {{> cartItemsDesktop}}
+                                                </div>
+                                                {{/each}}
+                                            </div>
+                                        {{/eachInMap}}
+                                    {{/if}}
+                                </div>
+                            </div>
+                            {{> emailModal}}
+                            {{> rfqModal}}
+                            {{> wishModal}}
+                            {{> actionsTotals}}
+                        {{/ifEquals}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="cartSummaryCol col-md-3 col-xs-12 hidden-print">
+            {{#ifNotEquals ECartItemsS.length 0}}
+                <div class="CCB2B_CartSummaryStickyComponent"></div>
+            {{/ifNotEquals}}
+        </div>
+    </div>
+    <div id="modalSec"></div>
+</div>
+<div id="higherSteppedTierModal" class="modal fade cc_modal" tabindex="-1" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="higherSteppedTierHeader">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content cc_modal_content">
+            <div class="modal-header cc_modal_header">
+                <h4 id="higherSteppedTierHeader" class="modal-title cc_modal_title">{{pageLabelMap 'CCB2B_HigherSteppedTier_Header'}}</h4>
+            </div>
+            <div id="higherSteppedTierBody" class="modal-body cc_modal_body">{{pageLabelMap 'CCB2B_HigherSteppedTier_Body'}}</div>
+            <div class="modal-footer cc_modal_footer">
+                <input type="button" class="primary_button btn btn-default btn-sm hideModal" data-dismiss="modal" value="{{pageLabelMap 'CCB2B_HigherSteppedTier_Button'}}"/>
+            </div>
+        </div>
+    </div>
+</div>
+{{/if}}

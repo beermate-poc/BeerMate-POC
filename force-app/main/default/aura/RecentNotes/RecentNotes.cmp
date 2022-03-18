@@ -1,0 +1,84 @@
+<aura:component controller="CallLogUtility">
+	<aura:handler name="init" action="{!c.init}" value="{!this}" />
+    <aura:handler name="NoteEditFinish" action="{!c.refresh}" event="c:NoteEditFinish" />
+	<aura:attribute name="recentNotes" type="ContentNote[]" />
+	<aura:attribute name="numOfNotes" type="Integer" />
+	<aura:attribute name="lastIndexCurrentlyShown" type="Integer" />
+	<aura:attribute name="accountId" type="Id" />
+	<aura:attribute name="showNotes" type="boolean" default="true"/>
+    <aura:method name="loadNotes" action="{!c.init}" />
+
+	<lightning:spinner aura:id="spinner" alternativeText="Loading Data..." />
+
+    <aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+    	<ui:scrollerWrapper class="scrollerSize">
+    	<c:EditOverlay aura:id="editOverlay" showNotes="{!v.showNotes}" />
+    	<aura:if isTrue="{!v.showNotes}">
+			<div class="slds">
+				<aura:iteration items="{!v.recentNotes}" var="currNote">
+					<div class="slds-p-around--medium">
+						<div class="slds-list--horizontal slds-wrap">
+							<div class="slds-item--label slds-text-color--weak slds-truncate" title="{!$Label.c.Note_Title}">{!$Label.c.Note_Title}:</div>
+							<div class="slds-item--detail slds-truncate">
+								<div data-record="{!currNote.Id}" onclick="{!c.edit}" style="text-align: left;">
+									<lightning:button class="slds-truncate" variant="base" label="{!currNote.Title}"/>
+								</div>
+							</div>
+							<div class="slds-item--label slds-text-color--weak slds-truncate" title="{!$Label.c.Created_Date}">{!$Label.c.Created_Date}:</div>
+							<div class="slds-item--detail slds-truncate">
+								<div><ui:outputDate value="{!currNote.CreatedDate}" format="EEEE"/></div>
+								<ui:outputDate value="{!currNote.CreatedDate}" format="MM/dd/yyyy"/>
+							</div>
+							<div class="slds-item--label slds-text-color--weak slds-truncate" title=""></div>
+							<div class="slds-item--detail slds-truncate">
+								<div data-record="{!currNote.Id}" onclick="{!c.deleteNote}">
+									<lightning:button variant="brand">{!$Label.c.Delete}</lightning:button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</aura:iteration>
+			</div>
+		</aura:if>
+		</ui:scrollerWrapper>
+	<aura:set attribute="else">
+		<c:EditOverlay aura:id="editOverlay" showNotes="{!v.showNotes}" />
+		<ui:scrollerWrapper class="scrollerSize">
+			<div class="slds">
+				<table class="slds-table slds-table--bordered slds-table--cell-buffer slds-max-medium-table--stacked-horizontal">
+					<thead>
+						<tr class="slds-text-heading--label">
+							<th scope="col" class="noBorderTop" title="{!$Label.c.Title}">
+								<div>{!$Label.c.Note_Title}</div>
+							</th>
+							<th scope="col" class="noBorderTop" title="{!$Label.c.Created_Date}">
+								<div> {!$Label.c.Created_Date}</div>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<aura:iteration items="{!v.recentNotes}" var="currNote">
+							<tr>
+								<td data-label="" title="{!$Label.c.Title}" class="title">
+									<div data-record="{!currNote.Id}" onclick="{!c.edit}" style="text-align: left;"><lightning:button variant="base" label="{!currNote.Title}"/></div>
+								</td>
+								<td data-label="Created Date" title="Created Date">
+									<div>
+										<div><ui:outputDate value="{!currNote.CreatedDate}" format="EEEE"/></div>
+										<ui:outputDate value="{!currNote.CreatedDate}" format="MM/dd/yyyy"/>
+									</div>
+								</td>
+								<td title="{!$Label.c.Delete}">
+									<div data-record="{!currNote.Id}" onclick="{!c.deleteNote}">
+										<lightning:button variant="brand">{!$Label.c.Delete}</lightning:button>
+									</div>
+								</td>
+							</tr>
+						</aura:iteration>
+					</tbody>
+				</table>
+			</div>
+		</ui:scrollerWrapper>
+	</aura:set>
+	</aura:if>
+</aura:component>

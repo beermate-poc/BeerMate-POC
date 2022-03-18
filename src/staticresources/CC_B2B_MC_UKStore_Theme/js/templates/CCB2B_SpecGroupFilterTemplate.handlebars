@@ -1,0 +1,38 @@
+
+<div class="cc_spec_grouping">
+    <h5 class=" cc_title cc_spec_header">
+        <a href="javascript:void(0)" class="cc_collapse_group"  data-target="#collapse{{sfid}}" aria-expanded="true" aria-controls="collapse{{sfid}}">
+            {{this.name}}
+            <span class="icon-plus-dark pull-right" aria-hidden="true"></span>
+        </a>
+    </h5>
+    <div id="collapse{{sfid}}" class="collapse cc_spec_values_container">
+        {{#ifEquals this.filterType 'Checkbox'}}
+        <ul class="list-group">
+            {{#each specValues.models}}
+            {{#with this.attributes}}
+            <li class="list-group-item cc_spec_filter_option {{#ifEquals enabled false}} disabled {{/ifEquals}}">
+                <div class="checkbox {{#ifEquals enabled false}}disabled{{/ifEquals}}">
+                    <label class="center-block">
+                        <input type="checkbox" class="cc_filter_checkbox cc_checkbox" {{#ifEquals enabled false}} disabled {{/ifEquals}} data-specid="{{../../this.sfid}}" data-spec="{{../../this.name}}" data-value="{{value}}" {{#if selected}} checked {{/if}} />
+                        {{#ifDisplay 'FF.ShowValueCount'}}
+                        <span class="badge pull-right cc_product_count">{{count}}</span>
+                        {{/ifDisplay}}
+                        <span class="cc_filter_value" data-spec="" data-id="">{{value}}</span>
+                    </label>
+                </div>
+            </li>
+            {{/with}}
+            {{/each}}
+        </ul>
+        {{/ifEquals}}
+        {{#ifEquals this.filterType 'Slider'}}
+        <div class="spec spec_slider_container col-md-12">
+            <p class="slider_{{this.sfid}} cc_slider"></p>
+            <p class="lowerDisp lower_{{this.sfid}} cc_lower_disp"></p>
+            <p class="upperDisp higher_{{this.sfid}} cc_upper_disp"></p>
+        </div>
+        <div class="clearfix"></div>
+        {{/ifEquals}}
+    </div>
+</div>

@@ -1,0 +1,73 @@
+{{#if (checkContactDisplayPermissions 'create_cart')}}
+    <div class="panel panel-default cc_panel cc_panel_shopping_cart cc_cart2">
+        <div class="panel-body cc_body">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h2 id="ccb2b-basket-title-label" class="title cc_title">{{pageLabelMap 'CartInc_ShoppingCart'}}</h2>
+                </div>
+                <div class="col-xs-12">
+                    <div class="alert_error minimumOrderWarning errorMsg" style="display:none">
+                        <span class="fa fa-warning"></span>
+                        <span class="msg">{{pageLabelMap 'CCB2B_MinimumOrderVal_Msg'}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    {{#ifEquals ECartItemsS.length 0}}
+                        <p class="emptyCart">{{pageLabelMap 'CCB2B_Basket_Empty_Msg'}}</p>
+                        <button id="ccb2b-basket-continueshopping-btn" class="primary_button btn btn-default btn-sm continueShoppingButton cc_continue_shopping_button" name="" type="button" >{{pageLabelMap 'CartInc_ContinueShopping'}}</button>
+                    {{else}}
+                        <div id="cart_items_container" class="cc_cart_item_container">
+                            {{> headerSection}}
+                            <div class="cart_item_list cc_cart_item_list">
+                                {{#if this.ECartItemsS}}
+                                    <div class="row cart_columns visible-md visible-lg">
+                                        <div class="col-md-5 column">{{pageLabelMap 'CCB2B_Basket_Item_Column'}}</div>
+                                        <div class="col-md-1 column text-center">{{pageLabelMap 'CCB2B_Basket_Price_Column'}}</div>
+                                        <div class="col-md-3 column text-center">{{pageLabelMap 'CCB2B_Basket_Qty_Column'}}</div>
+                                        <div class="col-md-2 column text-center">{{pageLabelMap 'CCB2B_Basket_Subtotal_Column'}}</div>
+                                        <div class="col-md-1 column"></div>
+                                    </div>
+                                    {{sortCartItemsOrder this.ECartItemsS.models}}
+                                    {{#each this.ECartItemsS.models}}
+                                    <div class="cart_item {{this.attributes.sfid}} cc_cart_item" data-sku="{{this.attributes.product.SKU}}">
+                                        {{> cartItemsDesktop}}
+                                    </div>
+                                    {{/each}}
+                                {{/if}}
+                            </div>
+                        </div>
+                        {{> emailModal}}
+                        {{> rfqModal}}
+                        {{> wishModal}}
+                        {{> actionsTotals}}
+                    {{/ifEquals}}
+                </div>
+            </div>
+        </div>
+        <div id="modalSec"></div>
+    </div>
+    <div id="oosErrorModal" class="modal fade cc_modal" tabindex="-1" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="oosErrorHeader">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content cc_modal_content">
+                <div class="modal-header cc_modal_header">
+                    <strong><h4 id="oosErrorHeader" class="modal-title cc_modal_title">{{pageLabelMap 'CCB2B_OOS_Error_Header'}}</h4></strong>
+                </div>
+                
+                <div id="oosErrorBody" class="modal-body cc_modal_body">
+                    <p>{{pageLabelMap 'CCB2B_OOS_Error_Body_DelistedOutOfStock'}}</p>
+                    <div id="removedSkus" class="modal-body cc_modal_body">
+                        {{#each removedSkus}}
+                            <p>{{this}}</p>
+                        {{/each}}
+                    </div>
+                </div>
+                
+                <div class="modal-footer cc_modal_footer">
+                    <input type="button" class="primary_button btn btn-default btn-sm hideModal" data-dismiss="modal" value="{{pageLabelMap 'CCB2B_OOS_Error_Button'}}"/>
+                </div>
+            </div>
+        </div>
+    </div>
+{{/if}}

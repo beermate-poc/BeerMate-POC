@@ -1,0 +1,48 @@
+<div class="panel panel-default cc_panel cc_myaccount_nav hidden-print">
+    <div class="visible-sm visible-xs">
+        <a href="#" class="openAccountMenu">{{pageLabelMap "CCB2B_MyAccount_Menu_Label"}}
+            <span class="icon-arrow-down pull-right"></span>
+        </a>
+    </div>
+    <ul class=" side_navigation_dropdown list-group cc_myaccount_nav_list" id="side_nav">
+        {{#each this}}
+            {{#if (checkMyAccountNav this.title (pageLabelMap 'MyAccount_OrderHistory'))}}
+                {{#if (checkContactDisplayPermissions 'order_history')}}
+                    <li class="acctStep{{this.index}} acctStepNav list-group-item cc_acc_step_nav">
+                        <a id="ccb2b-ma-nav-{{getSubViewName this.index}}" href="#" class="gotoSection cc_goto_section" data-index="{{this.index}}">{{{pageLabelMap this.title}}}
+                        </a>
+                    </li>
+                {{/if}}
+            {{else if (checkMyAccountNav this.title (pageLabelMap 'CCB2B_MyAccount_Overview_MyOrders_documents'))}}
+                {{#if (checkContactDisplayPermissions 'financial_documents')}}
+                    <li class="acctStep{{this.index}} acctStepNav list-group-item cc_acc_step_nav">
+                        <a id="ccb2b-ma-nav-{{getSubViewName this.index}}" href="#" class="gotoSection cc_goto_section" data-index="{{this.index}}">{{{pageLabelMap this.title}}}
+                        </a>
+                    </li>
+                {{/if}}
+            {{else if (checkMyAccountNav this.title (pageLabelMap 'MyAccount_MyCarts'))}}
+                <li class="acctStep{{this.index}} acctStepNav list-group-item cc_acc_step_nav showForSpecificProfile">
+                    <a id="ccb2b-ma-nav-{{getSubViewName this.index}}" href="#" class="gotoSection cc_goto_section" data-index="{{this.index}}">{{{pageLabelMap this.title}}}
+                    </a>
+                </li>
+            {{else}}
+                <li class="acctStep{{this.index}} acctStepNav list-group-item cc_acc_step_nav" {{hideFromMyAccountNav this.title}}>
+                    <a id="ccb2b-ma-nav-{{getSubViewName this.index}}" href="#" class="gotoSection cc_goto_section" data-index="{{this.index}}">{{{pageLabelMap this.title}}}
+                    </a>
+                </li> 
+            {{/if}}
+        {{/each}}
+        <li class="acctStepNav list-group-item cc_acc_step_nav" {{hideFromMyAccountNav (pageLabelMap 'CCB2B_MyAccount_Overview_MySupport_helpDesk')}}>
+            <a id="ccb2b-ma-nav-helpdesk" href="{{pageConfigMap 'sc.helpdeskpath'}}">{{pageLabelMap 'CCB2B_MyAccount_Overview_MySupport_helpDesk'}}
+            </a>
+        </li>
+        {{#if (checkContactDisplayPermissions 'create_edit_users')}}
+            {{#if (checkAdminProfile)}}
+            <li class="acctStepNav list-group-item cc_acc_step_nav">
+                <a id="ccb2b-ma-nav-management" href="{{pageConfigMap 'sc.managementpath'}}" target="_blank">{{pageLabelMap 'CCB2B_MyAccount_Menu_Management'}}
+                </a>
+            </li>
+            {{/if}}
+        {{/if}}
+    </ul>
+</div>

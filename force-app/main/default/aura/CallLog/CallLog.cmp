@@ -1,0 +1,738 @@
+<!--
+Author:         Bryant Daniels
+Company:        Slalom, LLC
+Description:    Component to used to track information about a call.  This handles the creation of objectives, notes, 					todos, and also scheduling the next call log.
+Attributes:     onPremiseOutletDashboard - holds the on premise outlet dashboard link
+				offPremiseOutletDashboard � holds the off premise outlet dashboard link
+				consumerDashboard - holds the consumer dashboard link
+				accountRec - holds the current account record
+				contactRec - holds the selected contact record for the next scheduled meeting
+				callLogRec - holds the current call log record
+				recordId - holds the account Id
+				isOffPrem - boolean flag whether the account is on or off premise
+				callLogId - holds the call log Id
+				contactId - holds the contact Id for the next scheduled meeting
+				keyContactName - holds the key contact name
+				keyContactFirstName - holds the key contact first name
+				contactMeetingRec - holds the key contact meeting record
+				showMeetingDate - boolean flag to show meeting information
+				showMore - boolean flag to show additional icon components on the page
+				callDate - date of next scheduled meeting
+				formattedDate - formatted date of next scheduled meeting
+				showNewFeature - show feature modal on desktop
+				showNewEngagement - show engagement modal on desktop
+				showNewPlacement - show placement modal on desktop
+				showNewSpace - show space modal on desktop
+				showNewMerchandise - show merchandise modal on desktop
+				showNewDisplay - show display modal on desktop
+				showNewToDo - show todo modal on desktop
+				showNewNote - show note modal on desktop
+				showContact - show select contact modal/section on all devices
+				callLogs - holds call logs to display for the recent call log screen before starting the call log
+				isDisabled - boolean flag to disable the start call button
+				showCallLog - boolean flag to show or hide the call log section of the component
+				showNewFeatureAIF - show feature section on mobile
+				showNewDisplayAIF - show display section on mobile
+				showNewToDoAIF - show todo section on mobile
+				showNewNoteAIF - show note section on mobile
+				showNewPlacementAIF - show placement section on mobile
+				showNewMerchandiseAIF - show merchandise section on mobile
+				showNewEngagementAIF - show engagement section on mobile
+				showNewSpaceAIF - show space section on mobile
+				showObjView - show main page of call log
+				featureCopy - holds copy of feature objective when clicking the copy button under a feature objective
+				engagementCopy - holds copy of engagement objective when clicking the copy button under an engagement 					 objective
+				plannedobjId - holds id of planned objective
+				showToast - show mobile toast message
+				showToastObjective - show mobile toast message from the Objectives component
+				toastTitle - holds mobile toast title
+				toastMsg - holds mobile toast message
+				toastType - holds type of mobile toast
+				newRecord - holds name of objective or record created to be used in the mobile toast message
+				mcProd - holds product Id when copying a feature to populate the package in the feature modal/section
+				loadObjectives - boolean flag to call Objectives method to reload the objectives
+				loadNotes - boolean flag to call RecentNotes method to reload the notes
+				loadToDos - boolean flag to call RecentToDos method to reload the todos
+				desktopCall - boolean flag to determine if the call log is on desktop
+Event Handlers: init � sets up the initial account and call log information
+				copyRecord - calls method to pass objective information the the feature and engagement modals/sections
+				doneLoading - event calls method to stop spinner when objectives are done loading
+				change value="{!v.callDate}" - on change of callDate, the date is formatted
+				change value="{!v.contactId}" - on change of contactId, the contactMeetingRec is set with the new contact
+				change value="{!v.formattedDate}" - on change of formatted date, the contactMeetingRec is set
+				change value="{!v.showObjView}" - on change of showObjView, show the spinner if the page needs to load
+				change value="{!v.loadObjectives}" - on change of loadObjectives, the objectives are reloaded if needed 
+				change value="{!v.loadNotes}" - on change of loadNotes, the notes are reloaded if needed
+				change value="{!v.loadToDos}" - on change of todos, the todos are reloaded if needed
+				change value="{!v.showToast}" - shows mobile toast message
+				change value="{!v.showToastObjective}" - shows mobile toast message relating to the Objectives component
+Method Handler: closeFeature
+History
+<Date>      <Authors Name>     <Brief Description of Change>
+5/12/2017    Bryant Daniels      Initial Creation
+10/16/2017   Dan Zebrowski       removed navigateToComponent event
+11/1/2017    Nick Serafin        removed desktop only css classes and rebuilt functionality without using the navigateToComponent event
+-->
+<aura:component controller="CallLogUtility" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader"
+	access="global">
+	<!-- Dashboard Attrs -->
+	<aura:attribute name="onPremiseOutletDashboard" type="String" />
+	<aura:attribute name="offPremiseOutletDashboard" type="String" />
+    <aura:attribute name="consumerDashboard" type="String" />
+	<aura:attribute name="smpFlag" type="String" />
+	<!-- Records -->
+	<aura:attribute name="accountRec" type="Account" />
+	<aura:attribute name="contactRec" type="Contact" />
+	<aura:attribute name="callLogRec" type="Call_Log__c" />
+	<aura:attribute name="objectiveRecordsToCompare" type="Objective__c[]" />
+	<!-- Other -->
+	<aura:attribute name="recordId" type="Id" />
+	<aura:attribute name="isOffPrem" type="Boolean" default="false" />
+	<aura:attribute name="callLogId" type="Id" />
+	<aura:attribute name="contactId" type="Id" />
+	<aura:attribute name="keyContactName" type="String" />
+	<aura:attribute name="keyContactFirstName" type="String" />
+	<aura:attribute name="contactMeetingRec" type="String" />
+	<aura:attribute name="showMeetingDate" type="boolean" default="false"/>
+	<aura:attribute name="showMore" type="boolean" default="false"/>
+	<aura:attribute name="userRole" type="String" default=''/>
+	<!--Date-->
+	<aura:attribute name="callDate" type="Date" />
+	<aura:attribute name="formattedDate" type="Date" />
+	<!-- MISC -->
+	<aura:attribute name="showNewFeature" type="boolean" default="false" />
+	<aura:attribute name="showNewEngagement" type="boolean" default="false" />
+	<aura:attribute name="showNewPlacement" type="boolean" default="false" />
+	<aura:attribute name="showNewSpace" type="boolean" default="false" />
+    <aura:attribute name="showNewSampling" type="boolean" default="false" />
+	<aura:attribute name="showNewMerchandise" type="boolean" default="false" />
+	<aura:attribute name="showNewDisplay" type="boolean" default="false" />
+	<aura:attribute name="showNewToDo" type="boolean" default="false" />
+	<aura:attribute name="showNewNote" type="boolean" default="false" />
+	<aura:attribute name="showContact" type="boolean" default="false" />
+	<aura:attribute name="callLogs" type="Call_Log__c[]"/>
+    <aura:attribute name="callLogsforUser" type="Call_Log__c"/>
+	<aura:attribute name="isDisabled" type="boolean" default="false" />
+	<aura:attribute name="showCallLog" type="boolean" default="false"/>
+	<aura:attribute name="showNewFeatureAIF" type="boolean" default="false"/>
+	<aura:attribute name="showNewDisplayAIF" type="boolean" default="false"/>
+	<aura:attribute name="showNewToDoAIF" type="boolean" default="false"/>
+	<aura:attribute name="showNewNoteAIF" type="boolean" default="false"/>
+	<aura:attribute name="showNewPlacementAIF" type="boolean" default="false"/>
+	<aura:attribute name="showNewMerchandiseAIF" type="boolean" default="false"/>
+	<aura:attribute name="showNewEngagementAIF" type="boolean" default="false"/>
+    <aura:attribute name="showNewSamplingAIF" type="boolean" default="false"/>
+	<aura:attribute name="showNewSpaceAIF" type="boolean" default="false"/>
+	<aura:attribute name="showObjView" type="boolean" default="false"/>
+	<aura:attribute name="featureCopy" type="Objective__c" default="{'sobjectType': 'Objective__c'}"/>
+	<aura:attribute name="engagementCopy" type="Objective__c" default="{'sobjectType': 'Objective__c'}"/>
+    <aura:attribute name="samplingCopy" type="Objective__c" default="{'sobjectType': 'Objective__c'}"/>
+	<aura:attribute name="merchandiseCopy" type="Objective__c" default="{'sobjectType': 'Objective__c'}"/>
+	<aura:attribute name="plannedobjId" type="String" />
+	<aura:attribute name="showToast" type="boolean" default="false"/>
+    <aura:attribute name="showOverallsummary" type="boolean" default="false"/>
+	<aura:attribute name="showToastObjective" type="boolean" default="false"/>
+	<aura:attribute name="toastTitle" type="String" />
+	<aura:attribute name="toastMsg" type="String" />
+	<aura:attribute name="toastType" type="String" />
+	<aura:attribute name="newRecord" type="String" />
+	<aura:attribute name="mcProd" type="String" />
+	<aura:attribute name="loadObjectives" type="boolean" />
+	<aura:attribute name="loadNotes" type="boolean" />
+	<aura:attribute name="loadToDos" type="boolean" />
+	<aura:attribute name="desktopCall" type="boolean" default="false" />
+	<aura:attribute name="subTypeValues" type="String[]" default="[]"/>
+	<aura:attribute name="selectedSubType" type="String" />
+    <aura:attribute name="subType" type="String"/>
+    <aura:attribute name="callLogFromGS" type="boolean" default="false"/>
+    <aura:attribute name="showSaveButton" type="boolean" default="false"/>
+    <aura:attribute name="showCallLogMob" type="boolean"/>
+    <aura:attribute name="engagementType" type="String"/>
+    
+	<!-- Handlers -->
+	<aura:handler name="init" action="{!c.init}" value="{!this}" />
+	<aura:handler name="copyRecord" event="c:CopyRecord" action="{!c.copyRecord}" />
+	<aura:handler name="change" value="{!v.callDate}" action="{!c.setFormat}" />
+	<aura:handler name="change" value="{!v.contactId}" action="{!c.saveMeetingInfo}"/>
+	<aura:handler name="change" value="{!v.formattedDate}" action="{!c.saveMeetingInfo}"/>
+	<aura:handler name="change" value="{!v.showObjView}" action="{!c.showSpinner}"/>
+	<aura:handler name="doneLoading" event="c:DoneLoading" action="{!c.stopSpinner}"/>
+	<aura:handler name="change" value="{!v.loadObjectives}" action="{!c.loadObjectives}" />
+	<aura:handler name="change" value="{!v.loadNotes}" action="{!c.loadNotes}" />
+	<aura:handler name="change" value="{!v.loadToDos}" action="{!c.loadToDos}" />
+	<aura:handler name="change" value="{!v.showToast}" action="{!c.createToast}" />
+	<aura:handler name="change" value="{!v.showToastObjective}" action="{!c.createToast}" />
+	<!-- Methods -->
+	<aura:method name="closeFeature" action="{!c.updateRecord}" />
+	<!-- Spinner -->
+	<lightning:spinner aura:id="spinner" class="slds-hide" alternativeText="Please wait..." size="medium" />
+	<div class="slds-text-align__center">
+		<aura:if isTrue="{!v.showToast}">
+			<c:Toast toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}"/>
+		</aura:if>
+	</div>
+	<div>
+		<aura:if isTrue="{!v.showCallLog}">
+			<!-- Start Mobile View -->
+			<aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+				<aura:if isTrue="{!v.showContact}">
+					<c:ListOfAvailableContactsModal recordId="{!v.recordId}" selectedContact="{!v.contactMeetingRec}" nextMeetingContactId="{!v.contactId}" showObjView="{!v.showObjView}" showContact="{!v.showContact}"/>
+				</aura:if>
+				<aura:if isTrue="{!v.showNewFeatureAIF}">
+					<c:NewFeature featIsOffPremise="{!v.isOffPrem}" accountId="{!v.recordId}" callLogId="{!v.callLogId}" showNewFeatureAIF="{!v.showNewFeatureAIF}" showObjView="{!v.showObjView}" newObjective="{!v.featureCopy}" plannedObjectiveId="{!v.plannedobjId}" mcProd="{!v.mcProd}" mobile="true" showToast="{!v.showToast}" newRecord="{!v.newRecord}" subTypeValues="{!v.subTypeValues}" subType="{!v.subType}"/>
+				</aura:if>
+				<aura:if isTrue="{!v.showNewDisplayAIF}">
+					<c:NewDisplay accountId="{!v.recordId}" callLogId="{!v.callLogId}" showNewDisplayAIF="{!v.showNewDisplayAIF}" showObjView="{!v.showObjView}" dispIsOffPremise="{!v.isOffPrem}" showToast="{!v.showToast}" newRecord="{!v.newRecord}" subTypeValues="{!v.subTypeValues}" subType="{!v.subType}" />
+				</aura:if>
+				<aura:if isTrue="{!v.showNewToDoAIF}">
+					<c:NewToDo accountId="{!v.recordId}" callLogId="{!v.callLogId}" showNewToDoAIF="{!v.showNewToDoAIF}" showObjView="{!v.showObjView}" showToast="{!v.showToast}" newRecord="{!v.newRecord}" />
+				</aura:if>
+				<aura:if isTrue="{!v.showNewNoteAIF}">
+					<c:NewNote accountId="{!v.recordId}" callLogId="{!v.callLogId}" showNewNoteAIF="{!v.showNewNoteAIF}" showObjView="{!v.showObjView}" showToast="{!v.showToast}" newRecord="{!v.newRecord}" />
+				</aura:if>
+				<aura:if isTrue="{!v.showNewPlacementAIF}">
+					<c:NewPlacement accountId="{!v.recordId}" callLogId="{!v.callLogId}" showNewPlacementAIF="{!v.showNewPlacementAIF}" showObjView="{!v.showObjView}" placeIsOffPremise="{!v.isOffPrem}" showToast="{!v.showToast}" newRecord="{!v.newRecord}" subTypeValues="{!v.subTypeValues}" subType="{!v.subType}" />
+				</aura:if>
+				<aura:if isTrue="{!v.showNewMerchandiseAIF}">
+					<c:NewMerchandiseCmp accountId="{!v.recordId}" callLogId="{!v.callLogId}" showNewMerchandiseAIF="{!v.showNewMerchandiseAIF}" showObjView="{!v.showObjView}" showToast="{!v.showToast}" newRecord="{!v.newRecord}"  subTypeValues="{!v.subTypeValues}" subType="{!v.subType}" newObjective="{!v.merchandiseCopy}" />
+				</aura:if>
+				<aura:if isTrue="{!v.showNewEngagementAIF}">
+					<c:NewEngagement accountId="{!v.recordId}" callLogId="{!v.callLogId}" showNewEngagementAIF="{!v.showNewEngagementAIF}" showObjView="{!v.showObjView}" newObjective="{!v.engagementCopy}" plannedObjectiveId="{!v.plannedobjId}" showToast="{!v.showToast}" newRecord="{!v.newRecord}" mobile="true" subTypeValues="{!v.subTypeValues}" subType="{!v.subType}" />
+				</aura:if>
+				<aura:if isTrue="{!v.showNewSpaceAIF}">
+					<c:NewSpaceCmp accountId="{!v.recordId}" callLogId="{!v.callLogId}" showNewSpaceAIF="{!v.showNewSpaceAIF}" showObjView="{!v.showObjView}" showToast="{!v.showToast}" newRecord="{!v.newRecord}" />
+				</aura:if>
+                <!-- Removed Sampling from Dropdown ofr New Objectives - GB-7530-->
+               <!-- <aura:if isTrue="{!v.showNewSamplingAIF}">
+					<c:NewSampling accountId="{!v.recordId}" callLogId="{!v.callLogId}" showNewSamplingAIF="{!v.showNewSamplingAIF}" showObjView="{!v.showObjView}" newObjective="{!v.samplingCopy}" plannedObjectiveId="{!v.plannedobjId}" showToast="{!v.showToast}" newRecord="{!v.newRecord}" mobile="true" subTypeValues="{!v.subTypeValues}" subType="{!v.subType}" />
+				</aura:if>-->
+				<aura:if isTrue="{!v.showObjView}">
+                    <aura:if isTrue="{!or($Browser.isPhone)}">
+                            <div>
+                                <lightning:card>
+                                    <div class="slds-grid">
+                                        <div class="action slds-col" style = "text-align:center;" onclick="{!c.navigateToNewPlacementM}" >
+										<lightning:icon iconName="custom:custom98" size="medium" alternativeText="Navigate to New Placement" class="mBuuton"/>
+										<span class="label bBody truncate mLable" dir="ltr">{!$Label.c.Placement}</span> <span class="assistiveText"></span>
+									</div>
+									<div class="action slds-col" style = "text-align:center;" onclick="{!c.navigateToNewEngagementM}" >
+										<lightning:icon iconName="custom:custom15" size="medium" alternativeText="Navigate to New Engagement" class="mBuuton"/>
+										<span class="label bBody truncate mLable" dir="ltr">{!$Label.c.Engagement}</span> <span class="assistiveText"></span>
+									</div>
+									<aura:if isTrue="{!v.isOffPrem}" >
+										<div class="action slds-col" style = "text-align:center;" onclick="{!c.navigateToNewDisplayM}" >
+											<lightning:icon iconName="custom:custom57" size="medium" alternativeText="Navigate to New Display" class="mBuuton"/>
+											<span class="label bBody truncate mLable" dir="ltr">{!$Label.c.Display}</span> <span class="assistiveText"></span>
+										</div>
+									</aura:if>
+									<div class="action slds-col" style = "text-align:center;" onclick="{!c.navigateToNewFeatureM}" >
+										<lightning:icon iconName="custom:custom17" size="medium" alternativeText="Navigate to New Feature" class="mBuuton"/>
+										<span class="label bBody truncate mLable" dir="ltr">{!$Label.c.Feature}</span> <span class="assistiveText"></span>
+									</div>
+                                    <!--<div class="action slds-col" style = "text-align:center;" onclick="{!c.navigateToNewSamplingM}" >
+										<lightning:icon iconName="standard:user" size="medium" alternativeText="Navigate to New Sampling" class="mBuuton"/>
+										<span class="label bBody truncate mLable" dir="ltr">Sampling</span> <span class="assistiveText"></span>
+									</div>-->
+									<!--A lightning:icon does not exist for the use case, need to create a custom button -->
+									<div class="action slds-col" style = "text-align:center;" onclick="{!c.showMore}">
+										<button class="actionButton slds-button slds-button--icon uiButton" aria-live="off" type="button">
+											<span class=" slds-icon_container slds-icon_container_circle" style="background-color:#1589EE;"><span><img src="{!$Resource.showMore}" class="slds-icon slds-icon--x-small" alt="Show More" title="{!$Label.c.Show_More}"/></span></span>
+											<span class="label bBody truncate mLable" dir="ltr">{!$Label.c.Show_More}</span> <span class="assistiveText"></span>
+										</button>
+									</div>
+                                    </div>
+                                </lightning:card>
+                            </div>
+                        <aura:if isTrue="{!v.showMore}">
+							<div role="dialog" tabindex="-1" aria-labelledby="header43" class="showMoreWindow" aura:id="newToDoModal">
+								<div class="showMoreHeader">
+                                    			<lightning:button variant="neutral" label="{!$Label.c.Cancel_Label}" onclick="{!c.cancelShowMore}" class="cancelShowMore" />
+								
+									<div class="showMoreDisplay ">
+                                        
+								<aura:if isTrue="{!v.isOffPrem}" >
+					                	<div class="action" onclick="{!c.navigateToNewSpaceM}" >
+					                        <lightning:icon iconName="custom:custom50" size="medium" alternativeText="Navigate to New Space" class="mBuuton slds-m-right--medium"/>
+					                        <span class="label bBody mLableShowMore" dir="ltr">{!$Label.c.Space}</span> <span class="assistiveText"></span>
+					                    </div>
+					                </aura:if>
+									<div class="action" onclick="{!c.navigateToNewMerchandiseM}" >
+										<lightning:icon iconName="custom:custom93" size="medium" alternativeText="Navigate to New Merchandise" class="mBuuton slds-m-right--medium"/>
+										<span class="label bBody mLableShowMore" dir="ltr">{!$Label.c.Merchandise}</span> <span class="assistiveText"></span>
+									</div>
+									<div class="action" onclick="{!c.navigateToNewToDoM}" >
+										<lightning:icon iconName="custom:custom18" size="medium" alternativeText="Navigate to New To Do" class="mBuuton slds-m-right--medium"/>
+										<span class="label bBody mLableShowMore" dir="ltr">{!$Label.c.To_Dos}</span> <span class="assistiveText"></span>
+									</div>
+									<div class="action" onclick="{!c.navigateToNewNoteM}" >
+										<lightning:icon iconName="standard:note" size="medium" alternativeText="Navigate to New Note" class="mBuuton slds-m-right--medium"/>
+										<span class="label bBody mLableShowMore" dir="ltr">{!$Label.c.Notes}</span> <span class="assistiveText"></span>
+									</div>
+									</div>
+								</div>
+							</div>
+							<div class="backdrop"></div>
+						</aura:if>
+	
+                            </aura:if>
+                            
+					<div aura:id="parentDiv">
+						<!-- Call Log Header -->
+						<div>
+							<lightning:card >
+								<aura:set attribute="title">
+									<div class="slds-media slds-no-space slds-grow">
+										<div class="slds-media__figure">
+											<lightning:icon iconName="custom:custom14" alternativeText="{!$Label.c.My_Objectives}" />
+										</div>
+										<div class="slds-media__body">
+											<p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.Call_Log_Header}</p>
+											<h1 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate">
+												<ui:outputURL value="" label="{!v.accountRec.Name}" click="{!c.navigateToAccount}" />
+											</h1>
+										</div>
+									</div>
+								</aura:set>
+								<aura:set attribute="actions">
+									<div class="btnStyle">
+										<div class="slds-x-small-show saveButtonLarge">
+											<lightning:button variant="brand" label="{!$Label.c.Save}" onclick="{!c.saveEndCallLog}" />
+										</div>
+									</div>
+								</aura:set>
+								<p class="slds-p-horizontal--small slds-medium-show">
+									<ul class="slds-grid slds-page-header__detail-row cardStyle">
+										<li class="slds-page-header__detail-block">
+											<p class="slds-text-title  slds-m-bottom--xx-small" >{!$Label.c.Meeting_With}</p>
+											<p class="slds-text-body--regular">
+												{!v.keyContactName}
+											</p>
+										</li>
+										<li class="slds-page-header__detail-block">
+											<p class="slds-text-title  slds-m-bottom--xx-small" >{!$Label.c.Access_Building_With_Beer}</p>
+											<p class="slds-text-body--regular">
+												<div class="uiOutputRichText" linkify="true" onclick="{!c.bwbClicked}">
+													<aura:unescapedHtml value="{!v.callLogRec.Access_Building_with_Beer__c}"/>
+												</div>
+											</p>
+										</li>
+										<li class= "{!v.showMeetingDate ? 'slds-page-header__detail-block' : 'slds-hide'}">
+											<p class="slds-text-title  slds-m-bottom--xx-small" >{!$Label.c.Next_Meeting_With}</p>
+											<p>
+												<ui:outputURL value="" label="{!v.contactMeetingRec == null ? $Label.c.Select : v.contactMeetingRec}" click="{!c.changeContact}" />
+												&nbsp;{!$Label.c.Next_Meeting_on}&nbsp;{!v.formattedDate}
+											</p>
+										</li>
+										<div class="{!v.showMeetingDate ? 'meetingDate' : 'slds-hide '}">
+											<c:DatePicker aura:id="hDate" value="{!v.callDate}" showIcon="false" positionDate="datePickerRight" />
+										</div>
+									</ul>
+								</p>
+								<p class="slds-p-horizontal--small slds-x-small-show-only ">
+									<div class="slds-tile">
+										<div class="slds-tile__detail slds-text-body--small">
+											<dl class="slds-list--horizontal slds-wrap slds-grid">
+												<dt class="slds-item--label slds-text-color--weak slds-truncate">{!$Label.c.Meeting_With}:</dt>
+												<dd class="slds-item--detail slds-truncate">{!v.keyContactName}</dd>
+												<dt class="slds-item--label slds-text-color--weak slds-truncate">{!$Label.c.Call_Log_Dashboard_Header}:</dt>
+                                                <dd class="slds-item--detail slds-truncate">
+												</dd>
+												<dt class="slds-item--label slds-text-color--weak slds-truncate">{!$Label.c.Access_Building_With_Beer}:</dt>
+												<dd class="slds-item--detail slds-truncate">
+													<div class="uiOutputRichText" linkify="true" onclick="{!c.bwbClicked}">
+														<aura:unescapedHtml value="{!v.callLogRec.Access_Building_with_Beer__c}"/>
+													</div>
+												</dd>
+												<dt class="{!v.showMeetingDate ? 'slds-item--label ' + ' slds-text-color--weak slds-truncate' : 'slds-hide '}">{!$Label.c.Next_Meeting_With}:</dt>
+												<dd class="{!v.showMeetingDate ? 'slds-item--detail ' + ' slds-truncate' : 'slds-hide '}"  >
+													<ui:outputURL value="" label="{!v.contactMeetingRec == null ? $Label.c.Select : v.contactMeetingRec}" click="{!c.changeContact}" />
+													&nbsp;{!$Label.c.Next_Meeting_on}&nbsp;{!v.formattedDate}
+												</dd>
+											</dl>
+											<div class="{!v.showMeetingDate ? 'meetingDateMobile slds-p-bottom_x-large' : 'slds-hide '}">
+												<c:DatePicker aura:id="hDatem" value="{!v.callDate}" showIcon="false" positionDate="datePickerLeftAdjustment" inputClass=" " />
+											</div>
+										</div>
+									</div>
+								</p>
+							</lightning:card>
+						</div>
+						<!-- Tab -->
+						<div class="tabsetStyle">
+							<lightning:tabset variant="default" >
+								<lightning:tab onactive="" label="{!$Label.c.Objectives}" id="objectives"  >
+									<c:Objectives aura:id="obj" accountId="{!v.recordId}" callLogId="{!v.callLogId}" accountIsOffPremise="{!v.isOffPrem}" showToastObjective="{!v.showToastObjective}" toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}" userRole="{!v.userRole}"/>
+								</lightning:tab>
+								<lightning:tab onactive="" label="{!$Label.c.To_Dos}" id="todo" >
+									<c:RecentToDos aura:id="todo" accountId="{!v.recordId}"  />
+								</lightning:tab>
+								<lightning:tab onactive="" label="{!$Label.c.Notes}" id="note" >
+									<c:RecentNotes aura:id="note" accountId="{!v.recordId}" />
+								</lightning:tab>
+								<lightning:tab label="{!$Label.c.Summary}" id="Summary" aura:id="summary" >
+									<lightning:textarea name="Summary Notes" value="{!v.callLogRec.Call_Summary__c}" label="{!$Label.c.Summary_Notes}" maxlength="1000"  aura:id="summaryText" class="sumTab"  />
+									<lightning:button variant="brand" label="{!$Label.c.Save}" onclick="{!c.saveSummary}" class="sumTab"  />
+								</lightning:tab>
+							</lightning:tabset>
+						</div>
+                        <aura:if isTrue="{!or($Browser.isIPad)}">
+                   
+						<div class="mobileView ">
+                             
+							<footer class="actionButtons oneActionBar oneCenterStage  " >
+								<div class="actionButtonsWrapper">
+									<div class="action" onclick="{!c.navigateToNewPlacementM}" >
+										<lightning:icon iconName="custom:custom98" size="medium" alternativeText="Navigate to New Placement" class="mBuuton"/>
+										<span class="label bBody truncate mLable" dir="ltr">{!$Label.c.Placement}</span> <span class="assistiveText"></span>
+									</div>
+									<div class="action" onclick="{!c.navigateToNewEngagementM}" >
+										<lightning:icon iconName="custom:custom15" size="medium" alternativeText="Navigate to New Engagement" class="mBuuton"/>
+										<span class="label bBody truncate mLable" dir="ltr">{!$Label.c.Engagement}</span> <span class="assistiveText"></span>
+									</div>
+									<aura:if isTrue="{!v.isOffPrem}" >
+										<div class="action" onclick="{!c.navigateToNewDisplayM}" >
+											<lightning:icon iconName="custom:custom57" size="medium" alternativeText="Navigate to New Display" class="mBuuton"/>
+											<span class="label bBody truncate mLable" dir="ltr">{!$Label.c.Display}</span> <span class="assistiveText"></span>
+										</div>
+									</aura:if>
+									<div class="action" onclick="{!c.navigateToNewFeatureM}" >
+										<lightning:icon iconName="custom:custom17" size="medium" alternativeText="Navigate to New Feature" class="mBuuton"/>
+										<span class="label bBody truncate mLable" dir="ltr">{!$Label.c.Feature}</span> <span class="assistiveText"></span>
+									</div>
+                                    <!--<div class="action" onclick="{!c.navigateToNewSamplingM}" >
+										<lightning:icon iconName="standard:user" size="medium" alternativeText="Navigate to New Sampling" class="mBuuton"/>
+										<span class="label bBody truncate mLable" dir="ltr">Sampling</span> <span class="assistiveText"></span>
+									</div>-->
+									<!--A lightning:icon does not exist for the use case, need to create a custom button -->
+									<div class="action" onclick="{!c.showMore}">
+										<button class="actionButton slds-button slds-button--icon more uiButton" aria-live="off" type="button">
+											<span class="actionIcon slds-icon_container slds-icon_container--circle" style="background-color:#1589EE;"><span><img src="{!$Resource.showMore}" class="slds-icon slds-icon--x-small" alt="Show More" title="{!$Label.c.Show_More}"/></span></span>
+											<span class="label bBody truncate mLable" dir="ltr">{!$Label.c.Show_More}</span> <span class="assistiveText"></span>
+										</button>
+									</div>
+                                
+								</div>
+							</footer>
+                           
+						</div>
+						<aura:if isTrue="{!v.showMore}">
+							<div role="dialog" tabindex="-1" aria-labelledby="header43" class="showMoreWindow" aura:id="newToDoModal">
+								<div class="showMoreFooter">
+									<div class="showMoreDisplay ">
+										<aura:if isTrue="{!v.isOffPrem}" >
+					                	<div class="action" onclick="{!c.navigateToNewSpaceM}" >
+					                        <lightning:icon iconName="custom:custom50" size="medium" alternativeText="Navigate to New Space" class="mBuuton slds-m-right--medium"/>
+					                        <span class="label bBody mLableShowMore" dir="ltr">{!$Label.c.Space}</span> <span class="assistiveText"></span>
+					                    </div>
+					                </aura:if>
+									<div class="action" onclick="{!c.navigateToNewMerchandiseM}" >
+										<lightning:icon iconName="custom:custom93" size="medium" alternativeText="Navigate to New Merchandise" class="mBuuton slds-m-right--medium"/>
+										<span class="label bBody mLableShowMore" dir="ltr">{!$Label.c.Merchandise}</span> <span class="assistiveText"></span>
+									</div>
+									<div class="action" onclick="{!c.navigateToNewToDoM}" >
+										<lightning:icon iconName="custom:custom18" size="medium" alternativeText="Navigate to New To Do" class="mBuuton slds-m-right--medium"/>
+										<span class="label bBody mLableShowMore" dir="ltr">{!$Label.c.To_Dos}</span> <span class="assistiveText"></span>
+									</div>
+									<div class="action" onclick="{!c.navigateToNewNoteM}" >
+										<lightning:icon iconName="standard:note" size="medium" alternativeText="Navigate to New Note" class="mBuuton slds-m-right--medium"/>
+										<span class="label bBody mLableShowMore" dir="ltr">{!$Label.c.Notes}</span> <span class="assistiveText"></span>
+									</div>
+									</div>
+									<lightning:button variant="neutral" label="{!$Label.c.Cancel_Label}" onclick="{!c.cancelShowMore}" class="cancelShowMore" />
+								</div>
+							</div>
+							<div class="backdrop"></div>
+						</aura:if>
+                             </aura:if>
+					</div>
+				</aura:if>
+				<!-- End Mobile View -->
+				<aura:set attribute="else">
+					<!-- Start Desktop View -->
+					<!-- Call Log Header -->
+					<div>
+						<lightning:card >
+							<aura:set attribute="title">
+								<div class="slds-media slds-no-space slds-grow">
+									<div class="slds-media__figure">
+										<lightning:icon iconName="custom:custom14" alternativeText="{!$Label.c.My_Objectives}" />
+									</div>
+									<div class="slds-media__body">
+										<p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.Call_Log_Header}</p>
+										<h1 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate">
+											<ui:outputURL value="" label="{!v.accountRec.Name}" click="{!c.navigateToAccount}" />
+										</h1>
+									</div>
+								</div>
+							</aura:set>
+							<aura:set attribute="actions">
+								<div class="btnStyle">
+									<div class="slds-large-show mobileViewButtons">
+										<div class="slds-dropdown-trigger slds-dropdown-trigger_click" aura:id="dropdownMenu">
+											<lightning:button variant="neutral" label="{!$Label.c.New_Objective}" iconName="utility:down" iconPosition="right" onclick="{!c.handleObjectiveMenuClick}"  />
+											<div class="slds-dropdown slds-dropdown_left slds-dropdown_actions">
+												<ul class="slds-dropdown__list" role="menu">
+													<aura:if isTrue="{!v.isOffPrem}" >
+														<li class="slds-dropdown__item" role="display">
+															<a onclick="{!c.newDisplay}" role="menuitem" tabindex="-1">
+																<span class="slds-truncate" title="{!$Label.c.Add_Display}">{!$Label.c.Display}</span>
+															</a>
+														</li>
+													</aura:if>
+													<li class="slds-dropdown__item" role="presentation">
+														<a onclick="{!c.newEngagement}" role="menuitem" tabindex="-1">
+															<span class="slds-truncate" title="{!$Label.c.Add_Engagement}">{!$Label.c.Engagement}</span>
+														</a>
+													</li>
+													<li class="slds-dropdown__item" role="presentation">
+														<a onclick="{!c.newFeature}" role="menuitem" tabindex="0">
+															<span class="slds-truncate" title="{!$Label.c.Add_Feature}">{!$Label.c.Feature}</span>
+														</a>
+													</li>
+													<li class="slds-dropdown__item" role="presentation">
+														<a onclick="{!c.newMerchandise}" role="menuitem" tabindex="-1">
+															<span class="slds-truncate" title="{!$Label.c.Add_Merchandise}">{!$Label.c.Merchandise}</span>
+														</a>
+													</li>
+													<li class="slds-dropdown__item" role="presentation">
+														<a onclick="{!c.newPlacement}" role="menuitem" tabindex="-1">
+															<span class="slds-truncate" title="{!$Label.c.Add_Placement}">{!$Label.c.Placement}</span>
+														</a>
+													</li>
+													<aura:if isTrue="{!v.isOffPrem}" >
+														<li class="slds-dropdown__item" role="presentation">
+															<a onclick="{!c.newSpace}" role="menuitem" tabindex="-1">
+																<span class="slds-truncate" title="{!$Label.c.Add_Space}">{!$Label.c.Space}</span>
+															</a>
+														</li>
+													</aura:if>
+                                                    <!-- GB-7530-->
+                                                   <!-- <aura:if isTrue="{!!v.isOffPrem}" >
+                                                    <li class="slds-dropdown__item" role="presentation">
+														<a onclick="{!c.newSampling}" role="menuitem" tabindex="-1">
+															<span class="slds-truncate" title="{!$Label.c.Add_Sampling}">{!$Label.c.Sampling}</span>
+														</a>
+													</li>
+                                                    </aura:if>-->
+												</ul>
+											</div>
+										</div>
+										<lightning:button class="slds-m-left_xx-small" variant="neutral" label="{!$Label.c.New_To_Do}" onclick="{!c.newToDo}" />
+										<lightning:button variant="neutral" label="{!$Label.c.New_Note}" onclick="{!c.newNote}" />
+									</div>
+									<div class="slds-x-small-show saveButtonLarge">
+										<lightning:button variant="brand" label="{!$Label.c.Save}" onclick="{!c.saveEndCallLog}" />
+									</div>
+								</div>
+							</aura:set>
+							<p class="slds-p-horizontal--small slds-medium-show">
+								<ul class="slds-grid slds-page-header__detail-row cardStyle">
+									<li class="slds-page-header__detail-block">
+										<p class="slds-text-title  slds-m-bottom--xx-small">{!$Label.c.Meeting_With}</p>
+										<p class="slds-text-body--regular ">
+											{!v.keyContactName}
+										</p>
+									</li>
+									<li class="slds-page-header__detail-block">
+										<p class="slds-text-title  slds-m-bottom--xx-small">{!$Label.c.Access_Building_With_Beer}</p>
+										<p class="slds-text-body--regular">
+											<div class="uiOutputRichText" linkify="true" onclick="{!c.bwbClicked}">
+												<aura:unescapedHtml value="{!v.callLogRec.Access_Building_with_Beer__c}"/>
+											</div>
+										</p>
+									</li>
+									<li class= "{!v.showMeetingDate ? 'slds-page-header__detail-block' : 'slds-hide'}">
+										<p class="slds-text-title  slds-m-bottom--xx-small">{!$Label.c.Next_Meeting_With}</p>
+										<p>
+											<ui:outputURL value="" label="{!v.contactMeetingRec == null ? $Label.c.Select : v.contactMeetingRec}" click="{!c.changeContact}" />
+											&nbsp;{!$Label.c.Next_Meeting_on}&nbsp;{!v.formattedDate}
+										</p>
+									</li>
+									<div class="{!v.showMeetingDate ? 'meetingDate' : 'slds-hide '}">
+										<c:DatePicker aura:id="hDate" value="{!v.callDate}" showIcon="false" positionDate="datePickerRight" />
+									</div>
+								</ul>
+							</p>
+							<p class="slds-p-horizontal--small slds-x-small-show-only ">
+								<div class="slds-tile">
+									<div class="slds-tile__detail slds-text-body--small">
+										<dl class="slds-list--horizontal slds-wrap slds-grid">
+											<dt class="slds-item--label slds-text-color--weak slds-truncate">{!$Label.c.Meeting_With}:</dt>
+											<dd class="slds-item--detail slds-truncate">{!v.keyContactName}</dd>
+											<dt class="slds-item--label slds-text-color--weak slds-truncate">{!$Label.c.Call_Log_Dashboard_Header}:</dt>
+											<dd class="slds-item--detail slds-truncate">
+											</dd>
+											<dt class="slds-item--label slds-text-color--weak slds-truncate">{!$Label.c.Access_Building_With_Beer}:</dt>
+											<dd class="slds-item--detail slds-truncate">
+												<div class="uiOutputRichText" linkify="true" onclick="{!c.bwbClicked}">
+													<aura:unescapedHtml value="{!v.callLogRec.Access_Building_with_Beer__c}"/>
+												</div>
+											</dd>
+											<dt class="{!v.showMeetingDate ? 'slds-item--label ' + ' slds-text-color--weak slds-truncate' : 'slds-hide '}">{!$Label.c.Next_Meeting_With}:</dt>
+											<dd class="{!v.showMeetingDate ? 'slds-item--detail ' + ' slds-truncate' : 'slds-hide '}"  >
+												<ui:outputURL value="" label="{!v.contactMeetingRec == null ? $Label.c.Select : v.contactMeetingRec}" click="{!c.changeContact}" />
+												&nbsp;{!$Label.c.Next_Meeting_on}&nbsp;{!v.formattedDate}
+											</dd>
+										</dl>
+										<div class="{!v.showMeetingDate ? 'meetingDateMobile' : 'slds-hide '}">
+											<c:DatePicker aura:id="hDatem" value="{!v.callDate}" showIcon="false" positionDate="datePickerLeftAdjustment" inputClass=" " />
+										</div>
+									</div>
+								</div>
+							</p>
+						</lightning:card>
+					</div>
+					<!-- Contact Search Modal -->
+					<aura:if isTrue="{!v.showContact}">
+						<c:ListOfAvailableContactsModal recordId="{!v.recordId}" selectedContact="{!v.contactMeetingRec}" nextMeetingContactId="{!v.contactId}" showContact="{!v.showContact}"/>
+					</aura:if>
+					<!-- New Feature Modal Input Works -->
+					<aura:if isTrue="{!v.showNewFeature}">
+						<div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open modalHeight " aura:id="newFeatureModal">
+							<div class="slds-modal__container ">
+								<div class="slds-modal__content slds-p-around--medium">
+									<c:NewFeature featIsOffPremise="{!v.isOffPrem}" accountId="{!v.recordId}" callLogId="{!v.callLogId}" showNewFeature="{!v.showNewFeature}" newObjective="{!v.featureCopy}" plannedObjectiveId="{!v.plannedobjId}" mcProd="{!v.mcProd}" loadObjectives="{!v.loadObjectives}" subTypeValues="{!v.subTypeValues}"  subType="{!v.subType}" />
+								</div>
+							</div>
+						</div>
+						<div class="slds-backdrop slds-backdrop--open"></div>
+					</aura:if>
+					<!-- New Engagement Modal Input Works -->
+					<aura:if isTrue="{!v.showNewEngagement}">
+						<div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open modalHeight " aura:id="newEngagementModal">
+							<div class="slds-modal__container ">
+								<div class="slds-modal__content slds-p-around--medium">
+									<c:NewEngagement accountId="{!v.recordId}" callLogId="{!v.callLogId}" showNewEngagement="{!v.showNewEngagement}" newObjective="{!v.engagementCopy}" plannedObjectiveId="{!v.plannedobjId}" loadObjectives="{!v.loadObjectives}" subTypeValues="{!v.subTypeValues}" selectedSubType="{!v.selectedSubType}"  subType="{!v.subType}" />
+								</div>
+							</div>
+						</div>
+						<div class="slds-backdrop slds-backdrop--open"></div>
+					</aura:if>
+					<!-- New Space Modal Input Works -->
+					<aura:if isTrue="{!v.showNewSpace}">
+						<div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open modalHeight " aura:id="newSpaceModal">
+							<div class="slds-modal__container ">
+								<div class="slds-modal__content slds-p-around--medium">
+									<c:NewSpaceCmp accountId="{!v.recordId}" callLogId="{!v.callLogId}" showNewSpace="{!v.showNewSpace}" loadObjectives="{!v.loadObjectives}"/>
+								</div>
+							</div>
+						</div>
+						<div class="slds-backdrop slds-backdrop--open"></div>
+					</aura:if>
+					<!-- New Merchandise Modal Input Works -->
+					<aura:if isTrue="{!v.showNewMerchandise}">
+						<div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open modalHeight " aura:id="newMerchandiseModal">
+							<div class="slds-modal__container ">
+								<div class="slds-modal__content slds-p-around--medium">
+									<c:NewMerchandiseCmp accountId="{!v.recordId}" callLogId="{!v.callLogId}" showNewMerchandise="{!v.showNewMerchandise}" loadObjectives="{!v.loadObjectives}" newObjective="{!v.merchandiseCopy}" subTypeValues="{!v.subTypeValues}" subType="{!v.subType}" />
+								</div>
+							</div>
+						</div>
+						<div class="slds-backdrop slds-backdrop--open"></div>
+					</aura:if>
+					<!-- New Placement Modal Input Works -->
+					<aura:if isTrue="{!v.showNewPlacement}">
+						<div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open modalHeight " aura:id="newPlacementModal">
+							<div class="slds-modal__container ">
+								<div class="slds-modal__content slds-p-around--medium">
+									<c:NewPlacement accountId="{!v.recordId}"  callLogId="{!v.callLogId}" showNewPlacement="{!v.showNewPlacement}" placeIsOffPremise="{!v.isOffPrem}" loadObjectives="{!v.loadObjectives}" />
+								</div>
+							</div>
+						</div>
+						<div class="slds-backdrop slds-backdrop--open"></div>
+					</aura:if>
+					<!-- New Display Modal Input Works -->
+					<aura:if isTrue="{!v.showNewDisplay}">
+						<div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open modalHeight " aura:id="newDisplayModal">
+							<div class="slds-modal__container ">
+								<div class="slds-modal__content slds-p-around--medium">
+									<c:NewDisplay accountId="{!v.recordId}" callLogId="{!v.callLogId}" showNewDisplay="{!v.showNewDisplay}" dispIsOffPremise="{!v.isOffPrem}" loadObjectives="{!v.loadObjectives}" subTypeValues="{!v.subTypeValues}" selectedSubType="{!v.selectedSubType}" subType="{!v.subType}" />
+								</div>
+							</div>
+						</div>
+						<div class="slds-backdrop slds-backdrop--open"></div>
+					</aura:if>
+                    <aura:if isTrue="{!v.showNewSampling}">
+						<div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open modalHeight " aura:id="newSamplingModal">
+							<div class="slds-modal__container ">
+								<div class="slds-modal__content slds-p-around--medium">
+									<c:NewSampling accountId="{!v.recordId}" callLogId="{!v.callLogId}" showNewSampling="{!v.showNewSampling}" newObjective="{!v.samplingCopy}" plannedObjectiveId="{!v.plannedobjId}" loadObjectives="{!v.loadObjectives}" subTypeValues="{!v.subTypeValues}" selectedSubType="{!v.selectedSubType}"  subType="{!v.subType}"  />
+								</div>
+							</div>
+						</div>
+						<div class="slds-backdrop slds-backdrop--open"></div>
+					</aura:if>
+					<!-- New Note Modal Input Works -->
+					<aura:if isTrue="{!v.showNewNote}">
+						<div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open modalHeight " aura:id="newNoteModal">
+							<div class="slds-modal__container ">
+								<div class="slds-modal__content slds-p-around--medium">
+									<c:NewNote accountId="{!v.recordId}" callLogId="{!v.callLogId}" showNewNote="{!v.showNewNote}" loadNotes="{!v.loadNotes}"/>
+								</div>
+							</div>
+						</div>
+						<div class="slds-backdrop slds-backdrop--open"></div>
+					</aura:if>
+					<!-- New ToDo Modal Input Works -->
+					<aura:if isTrue="{!v.showNewToDo}">
+						<div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open modalHeight " aura:id="newToDoModal">
+							<div class="slds-modal__container ">
+								<div class="slds-modal__content slds-p-around--medium">
+									<c:NewToDo accountId="{!v.recordId}" callLogId="{!v.callLogId}" showNewToDo="{!v.showNewToDo}" loadToDos="{!v.loadToDos}"/>
+								</div>
+							</div>
+						</div>
+						<div class="slds-backdrop slds-backdrop--open"></div>
+					</aura:if>
+					<!-- Tab -->
+					<div class="tabsetStyle">
+						<lightning:tabset variant="default" >
+							<lightning:tab onactive="" label="{!$Label.c.Objectives}" id="objectives"  >
+								<c:Objectives aura:id="obj" accountId="{!v.recordId}"  callLogId="{!v.callLogId}" accountIsOffPremise="{!v.isOffPrem}" userRole="{!v.userRole}"/>
+							</lightning:tab>
+							<lightning:tab onactive="" label="{!$Label.c.To_Dos}" id="todo" >
+								<c:RecentToDos aura:id="todo" accountId="{!v.recordId}"  />
+							</lightning:tab>
+							<lightning:tab onactive="" label="{!$Label.c.Notes}" id="note" >
+								<c:RecentNotes aura:id="note" accountId="{!v.recordId}"  />
+							</lightning:tab>
+							<lightning:tab label="{!$Label.c.Summary}" id="Summary" aura:id="summary" >
+								<lightning:textarea name="Summary Notes" value="{!v.callLogRec.Call_Summary__c}" label="{!$Label.c.Summary_Notes}" maxlength="1000"  aura:id="summaryText" class="sumTab"  />
+								<lightning:button variant="brand" label="{!$Label.c.Save}" onclick="{!c.saveSummary}" class="sumTab"  />
+							</lightning:tab>
+						</lightning:tabset>
+					</div>
+					<!-- Footer for Mobile view -->
+				</aura:set>
+			</aura:if>
+			<!-- End Desktop View -->
+			<aura:set attribute="else">
+				<aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+					<!-- Meeting Summary List -->
+					<aura:set attribute="else">
+					<div style="background:white;">
+						<div class="modal-header slds-modal__header mainHeader slds-p-around--small" style="background:#FAFAF9;">
+							<h2 class="title slds-text-heading--medium">{!$Label.c.Call_Log_Summary}</h2>
+						</div>
+						<aura:if isTrue="{! empty(v.callLogs)}">
+							<c:NoRecordsFound object="{!v.callLogs}" message="{!$Label.c.NoCalls}" />
+							<aura:set attribute="else">
+								<ul class="slds-p-around--small">
+									<aura:iteration items="{!v.callLogs}" var="callLog">
+										<c:RecentMeetingSummaryListItem callLog="{!callLog}" />
+									</aura:iteration>
+								</ul>
+							</aura:set>
+						</aura:if>
+						<div class="slds-modal__footer" style="text-align: center;">							
+                                    <lightning:button class="slds-button" variant="brand" label="{!$Label.c.BMC_GSCheckIn}" disabled="{!v.isDisabled}" onclick="{!c.startCall}" aura:id="startCallButton" />
+							<lightning:button class="slds-button" variant="brand" label="{!$Label.c.Cancel_Label}" disabled="{!v.isDisabled}" onclick="{!c.cancelCall}" aura:id="startCallButton" />
+                             
+						</div>
+					</div>
+					</aura:set>
+					</aura:if>
+				</aura:set>
+			</aura:if>
+	</div>
+</aura:component>

@@ -1,0 +1,23 @@
+{{#if this.Splash}}
+    <div id="splashBannerCarousel">
+        {{#each this.Splash}}
+            <div class="item">
+               {{#if this.sku}}
+                   {{productLink this 'center-block' image=(displayImage this 'center-block' alt=this.altMsg)}}
+                   <!--**********************************-->
+               {{else}}{{#if this.categoryId}}
+                   {{categoryLink this 'center-block' image=(displayImage this 'center-block' alt=this.altMsg)}}
+                   <!--***************************************-->
+               {{else}}{{#if this.externalLink}}
+               <a href="{{decodeHTML this.externalLink}}" {{#if this.isNewWindow}}target="_blank"{{/if}}>
+                    <img src="{{this.fullImageURL}}" alt="{{this.name}}" class="center-block" />
+               </a>
+               <!--***************************************-->
+               {{else}}{{#if this.noLink }}
+                    <img src="{{this.fullImageURL}}" alt="{{this.name}}" class="center-block" />
+               {{/if}}{{/if}}{{/if}}{{/if}}
+            </div>
+        {{/each}}
+    </div>
+{{/if}}
+        

@@ -1,0 +1,91 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" description="CTS_ServiceTicket">
+    <aura:attribute name="showModal" type="Boolean" default="false"
+                    description="Flag to launch modal to start Case flow" access="private"/>
+    <aura:attribute name="showTable" type="Boolean" default="true"
+                    description="Flag informing about visibility of table with Cases" access="private"/>
+    <aura:attribute name="spinnerSpinning" type="Boolean" default="true"
+                    description="Determines if the spinner is shown" access="private"/>
+    <aura:attribute name="effectiveAccountId" type="String"
+                    description="Effective Account Id from URL address" access="private"/>
+    <aura:handler name="ModalCloseEvent" event="c:CTS_ServiceTicketModalCloseEvent" action="{!c.closeModal}"/>
+    <aura:handler name="init" action="{!c.init}" value="{!this}"/>
+
+    <lightning:layout horizontalAlign="spread" multipleRows="true" class="slds-card slds-p-around--small">
+
+        <aura:if isTrue="{!v.spinnerSpinning}">
+            <lightning:spinner class="slds-is-fixed" size="large" variant="brand" alternativeText="Loading"/>
+        </aura:if>
+
+        <lightning:layoutItem flexibility="grow" size="12">
+            <lightning:layoutItem class="slds-align_absolute-center slds-p-bottom--small">
+                <img src="{!$Resource.CC_B2B_MC_DefaultStore_Theme + '/images/mmc_logo_dark_blue_on_white.png'}" width="319"/>
+            </lightning:layoutItem>
+            <lightning:layoutItem class="headerBar"/>
+        </lightning:layoutItem>
+
+        <lightning:layoutItem flexibility="grow" size="12">
+            <lightning:layout horizontalAlign="spread" multipleRows="true">
+                <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="4" largeDeviceSize="4" class="slds-p-around--small slds-clearfix alignCTSHeader">
+                    <div style="font-weight:bold;font-size:large">{!$Label.c.CCB2B_CTS_Header}</div>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="4" largeDeviceSize="4" class="slds-p-around--small">
+                        <lightning:layout horizontalAlign="spread" multipleRows="true">
+                        <lightning:layoutItem flexibility="grow" size="12" class="slds-p-bottom--small slds-align_absolute-center">
+                            <img src="{!$Resource.CC_B2B_MC_UKStore_Theme + '/images/cts_log_ticket_icon.png'}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem flexibility="grow" size="12" class="slds-align_absolute-center">
+                            <lightning:buttonGroup>
+                                <lightning:button variant="brand" aura:id="logNewTicketId" label="{!$Label.c.CCB2B_CTS_New_Ticket_Button}"
+                                                  onclick="{!c.showModal}" class="orangeButton"/>
+                            </lightning:buttonGroup>
+                        </lightning:layoutItem>
+                        </lightning:layout>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="4" largeDeviceSize="4" class="slds-clearfix slds-p-left--small slds-p-top--small slds-p-bottom--small">
+                    <img src="{!$Resource.CC_B2B_MC_UKStore_Theme + '/images/cts_logo_new.png'}" style="height:150px" class="alignTSLogo"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </lightning:layoutItem>
+
+        <lightning:layoutItem flexibility="grow" size="12" class="slds-p-around--small slds-border_bottom"/>
+        <lightning:layoutItem flexibility="grow" size="12" class="slds-p-around--small slds-border--top borderStyle"/>
+
+        <aura:if isTrue="{!v.showTable}">
+            <lightning:layoutItem flexibility="grow" size="12" class="slds-p-around--small slds-p-right_small listItem">
+                <lightning:listView aura:id="listView"
+                                    objectApiName="Case"
+                                    enableInlineEdit="false"
+                                    listName="CTS_ServiceTicketHistory"
+                                    rows="5"
+                                    showSearchBar="true"
+                                    showActionBar="false"
+                                    showRowLevelActions="false"
+                />
+            </lightning:layoutItem>
+        </aura:if>
+
+        <lightning:layoutItem flexibility="grow" size="12" class="slds-p-around--small slds-border--bottom borderStyle"/>
+        <lightning:layoutItem flexibility="grow" size="12" class="slds-docked-form-footer slds-m-top_small footerTicket">
+            <div>{!$Label.c.CCB2B_CTS_Copyright}</div>
+        </lightning:layoutItem>
+
+        <aura:if isTrue="{!v.showModal}">
+            <div class="slds mainModal">
+                <div aura:id="modalId" class="{!'slds-modal '+((v.showModal)?'slds-fade-in-open':'slds-fade-in-close')}" aria-hidden="true" role="dialog">
+                    <div class="slds-modal__container">
+                        <div class="{!'slds-modal__header slds-theme--alert-texture slds-theme--info'}">
+                            <h2 class="slds-text-heading--medium">{!$Label.c.CCB2B_CTS_New_Ticket}</h2>
+                        </div>
+                        <div class="slds-modal__content slds-p-around--medium">
+                            <div class="slds-text-align--left">
+                                <lightning:flow aura:id="flowData"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div aura:id="backdropId" class="{!'slds-backdrop '+((v.showModal)?'slds-backdrop--open':'slds-backdrop--close')}"/>
+            </div>
+        </aura:if>
+
+    </lightning:layout>
+</aura:component>

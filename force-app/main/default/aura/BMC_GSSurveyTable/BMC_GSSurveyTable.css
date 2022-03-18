@@ -1,0 +1,20 @@
+@media (max-width: 1025px){
+ 	.THIS.scrollerSize{
+    	height: 460px;
+	}
+}
+@media (max-width: 769px){
+	.THIS.scrollerSize{
+    	height: 650px;
+	}
+}
+@media (max-width: 416px){
+ 	.THIS.scrollerSize{
+    	height: 380px;
+	}
+}
+@media (max-width: 376px){
+ 	.THIS.scrollerSize{
+    	height: 320px;
+	}
+}

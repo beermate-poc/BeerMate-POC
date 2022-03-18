@@ -1,0 +1,54 @@
+.THIS{
+    height: 100%;
+}
+.THIS .addAnObjective {
+    background-color: #f5b324;
+    border: none;
+    color: black;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+.THIS .applyObjectiveToAccount {
+    background-color: #D3D3D3;
+    border: none;
+    color: black;
+    padding: 5px 5px;
+    
+}
+.THIS .scrollerSize {
+    width:100%;
+    height:300px;
+}
+
+.THIS .slds-tabs--default__content {
+    position: relative;
+    padding: 0rem 0;
+}
+.THIS .noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: pointer;
+}
+.THIS .objeciveSpacing {
+    height:50px;
+}
+.THIS .mobileStyling th {
+    height: 2rem !important;
+    padding-left: 5px !important;
+    border-bottom: 1px solid rgb(221, 219, 218);
+    background-color: rgb(250, 250, 249);
+}
+.THIS .mobileStyling td {
+    padding-left: 5px !important;
+    border-bottom: 1px solid rgb(221, 219, 218);
+}
+.THIS .tableStyling{
+  table-layout:fixed !important;
+}

@@ -1,0 +1,51 @@
+@media (max-width: 1024px){
+ .THIS.scrollerSize{
+    height: 650px;
+}
+
+}
+
+@media (max-width: 768px){
+ .THIS.scrollerSize{
+    height: 900px;
+}
+
+}
+
+@media (max-width: 736px){
+ .THIS.scrollerSize{
+    height: 275px;
+}
+
+}
+
+@media (max-width: 415px){
+ .THIS.scrollerSize{
+    height: 600px;
+}
+
+}
+
+@media (max-width: 413px){
+ .THIS.scrollerSize{
+    height: 305px;
+}
+
+}
+
+@media (max-width: 376px){
+ .THIS.scrollerSize{
+    height: 550px;
+}
+
+}
+
+@media (max-width: 321px){
+ .THIS.scrollerSize{
+    height: 400px;
+}
+
+}
+.THIS.slds-button--neutral{
+        margin:-185px 20px 0 0;
+    }

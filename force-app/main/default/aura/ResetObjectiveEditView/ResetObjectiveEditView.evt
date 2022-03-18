@@ -1,0 +1,5 @@
+<aura:event type="COMPONENT" description="Sample Component Event">
+    <aura:attribute name="ResetEditPage" type="Boolean" default="false" />
+    <aura:attribute name="savedObjective" type="Objective__c" />
+    <aura:attribute name="isCreate" type="boolean" default="false"/>
+</aura:event>

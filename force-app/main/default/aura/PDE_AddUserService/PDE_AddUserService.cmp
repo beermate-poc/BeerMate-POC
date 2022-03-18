@@ -1,0 +1,73 @@
+<aura:component controller ="PDE_PassportUserSevices" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction">
+	<aura:attribute name="userExist" type="Boolean" default= "false"/>
+    <aura:attribute name="recordId" type="ID" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="data" type="Object[]"/>
+    <aura:attribute name="selectedData" type="Object"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="sortedBy" type="String" default="Name"/>
+    <aura:attribute name="message" type="String"/>
+    <aura:attribute name="isUserAccess" type="Boolean" default = "false" />
+    <aura:attribute name="isLoading" type="Boolean" default = "false"/>
+    <aura:attribute name="filterService" type="String" />
+    <aura:attribute name="sortedDirection" type="String" default="asc"/>
+   <aura:attribute name="maxRowSelection" type="Integer" default="200"/>
+    <div class="c-container">
+    <aura:if isTrue = "{!v.isUserAccess}">
+    <lightning:layout >
+            <lightning:layoutItem padding="around-small">
+                    <header class="slds-modal__header">
+                        
+                    <h2 id="User Access" class="slds-text-heading_medium slds-hyphenate">User Access</h2>
+                    </header>
+                    <div class="slds-scrollable" style="height:25rem;width:24rem">
+        			<table class="slds-table slds-table_cell-buffer slds-table_fixed-layout slds-max-medium-table_stacked-horizontal slds-table_bordered">
+                        <thead>
+                            <tr class="slds-text-title_caps slds-box slds-theme_shade" scope="col">
+                                <th class="slds-cell-wrap slds-size_7-of-12 slds-truncate" scope="col">
+                                    <div class="slds-truncate" title="Service Name">Service Name</div>
+                                </th>
+                                <th class="slds-cell-wrap slds-size_2-of-12 slds-truncate" scope="col">
+                                    <div class="slds-truncate" title="Action"></div>
+                                </th>
+                                <th class="slds-cell-wrap slds-size_3-of-12 slds-truncate" scope="col">
+                                    <div class="slds-truncate" title="Action">Action</div>
+                                </th>
+                                <!--<th class="" scope="col">
+                                    <div class="slds-truncate" title="Loading">Loading</div>
+                                </th>-->
+                            </tr>
+                            </thead>
+                            <tbody>
+            			<aura:iteration items="{!v.data}" var="service" indexVar="idx">
+                        <tr scope="row" class="slds-hint-parent" style="height:1rem;">
+                            <td scope="row" class="slds-cell-wrap slds-size_7-of-12 slds-truncate">
+                                <div class="slds-truncate slds-cell-wrap">{!service.serviceName}
+                                </div></td>
+                                <td scope="row" class="slds-cell-wrap slds-size_2-of-12 slds-truncate">
+                                <aura:if isTrue="{!service.descripLabel!=null}">
+                                        <lightning:helptext content="{!service.descripLabel}"/>
+                                       </aura:if>
+                                </td>            
+                                <td scope="row" class="slds-cell-wrap slds-size_3-of-12 slds-truncate">
+                                <lightning:input type="toggle"  aura:id="checkbox" onchange="{!c.AddOrDelete}" name="{!idx}" checked="{!service.action}" value ="{!service.serviceName}"/>
+                                </td>
+                            
+                       	</tr>
+                    	</aura:iteration>
+                        
+        				</tbody>
+                    </table>   
+                </div>
+        </lightning:layoutItem>
+        </lightning:layout>
+        
+       <aura:if isTrue ="{!v.isLoading}">
+   <div class="">
+    <lightning:spinner class="spins" aura:id="Spinner" alternativeText="Loading" size="medium" variant="brand" />
+
+  </div>
+</aura:if>  
+</aura:if>
+</div>
+</aura:component>

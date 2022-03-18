@@ -1,0 +1,24 @@
+<aura:component access="global" implements="lightning:availableForFlowScreens">
+
+    <!-- Determine which actions are available -->
+    <aura:attribute name="canNext" type="Boolean" />
+    <aura:attribute name="canFinish" type="Boolean" />
+    <aura:registerEvent name="ModalCloseEvent" type="c:CTS_ServiceTicketModalCloseEvent"
+                        description="Indicates that Close or Cancel button is clicked"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+
+    <div aura:id="actionButtonBar" class="slds-clearfix slds-p-top_medium">
+        <div class="slds-float_right">
+            <aura:if isTrue="{!v.canNext}">
+                <lightning:button label="{!$Label.c.CCB2B_CTS_Cancel_Button}"
+                                  variant="neutral" onclick="{!c.onButtonCancelPressed}" />
+                <lightning:button aura:id="NEXT" label="{!$Label.c.CCB2B_CTS_Submit_Button}"
+                                  variant="brand" onclick="{!c.onButtonSubmitPressed}" />
+            </aura:if>
+            <aura:if isTrue="{!v.canFinish}">
+                <lightning:button label="{!$Label.c.CCB2B_CTS_Close_Button}"
+                                  variant="brand" onclick="{!c.onButtonClosePressed}" />
+            </aura:if>
+        </div>
+    </div>
+</aura:component>

@@ -1,0 +1,12 @@
+.THIS .leftPaddingClass {
+    padding-left: 2rem;
+}
+ 
+.THIS .pillSize{
+ width:95%;
+}
+
+.THIS .scan-field{
+    opacity:0;
+    filter:alpha(opacity=0);
+}

@@ -1,0 +1,76 @@
+<!--
+ - Created by alexandria.sanborn on 1/3/2019.
+ -->
+
+<aura:documentation>
+    <aura:description>Documentation for custom lookup</aura:description>
+    <aura:description >
+        Originally modified from Appiphony's Strike Lookup component.
+        Overview of changes:
+        -Apex method accepts comma-delineated string of fields via aura attribute searchField
+        -Displays records via table. Column headers are generated dynamically from searchField
+    </aura:description>
+
+
+    <aura:description>
+        -When user selects a record, component has the potential to gather other field values besides
+        just the record id and set the values on parent component attributes.
+        <!--
+        Just FYI, this has already been added to the child lookup markup
+         <aura:registerEvent name="selectRecord" type="c:strike_evt" description="Fires an event that notifies when a record is selected" />
+
+        Parent component markup:
+        <aura:attribute name="currentFieldSelected" type="String" />
+        <aura:attribute name="currentRowSelected" type="String" />
+        <aura:handler name="selectRecord" event="c:strike_evt" action="{!c.updateRow}" />
+
+        Parent JS Controller
+        updateRow : function(component, event, helper){
+        var currentRow = component.get("v.currentRowSelected");
+        var currentField = component.get("v.currentFieldSelected");
+        var records = component.get("v.records");
+
+        var record = event.getParams().data
+
+        if(currentField == "Internal_Order__c"){
+            var id = helper.findAndReturnField(record, 'id');
+            var ioNumber = helper.findAndReturnField(record, 'Internal Order Number');
+            var brand = helper.findAndReturnField(record, 'Brand');
+
+            records[currentRow].line.Internal_Order__c = id.value;
+            records[currentRow].internalOrderNumber = ioNumber.value;
+            records[currentRow].brand = brand.value;
+        } else if (currentField == "ACE_Profit_Center__c"){
+              var brandWC = helper.findAndReturnField(record, 'Profit Center ID');
+              records[currentRow].brandWC= brandWC.value;
+        }
+
+        var modal = component.find(currentField + "-modal");
+        modal.set("v.showModal", false);
+        component.set("v.records", records);
+    }
+
+    Parent JS Helper
+    findAndReturnField : function(record, fieldName){
+        record.find(function(field){
+            return field.fieldName === fieldName;
+        });
+    }
+        -->
+    </aura:description>
+
+    <aura:example name="strike_lookup" ref="strike_lookup" label="strike_lookup">
+        <!--
+        <c:strike_lookup
+                aura:id="ACE_Internal_Order__c"
+                label="Internal Order"
+                object="ACE_Internal_Order__c"
+                searchField="ACE_Internal_Order_Nbr__c,ACE_Internal_Order_Desc__c,ACE_Applicant_IO_Owner__c,ACE_Internal_Order_Type__c,ACE_Budget_Owner__c"
+                placeholder="Search Internal Orders"
+                order="ACE_Internal_Order_Nbr__c"
+                limit="25"
+                loadingMessage="Loading..."
+                errorMessage="Invalid input" />
+                -->
+    </aura:example>
+</aura:documentation>

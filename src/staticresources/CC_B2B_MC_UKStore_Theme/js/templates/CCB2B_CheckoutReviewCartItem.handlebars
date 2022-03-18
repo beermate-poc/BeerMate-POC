@@ -1,0 +1,228 @@
+<h3 id="ccb2b-co-review-reviewCart-label" class="reviewSectionLabel">
+    {{pageLabelMap 'CCB2B_SummaryAndPaymentSummary'}}
+</h3>
+<div id="review_cart_items_container" class="reviewSection">
+    <div class="cart_item_list">
+        {{#eachInMap this.ECartItemsSGrouped}}
+        <div class="categorySection">
+            <div class='productCategory'>{{{key}}}</div>
+            <div class="row checkout_columns hidden-xs hidden-sm">
+                <div class="col-xs-6 column">{{pageLabelMap 'CCB2B_Basket_Item_Column'}}</div>
+                {{#if (checkContactDisplayPermissions 'pricing')}}
+                    <div class="col-xs-2 column text-center">{{pageLabelMap 'CCB2B_Basket_Price_Column'}}</div>
+                {{/if}}
+                {{#if (checkContactDisplayPermissions 'pricing')}}
+                    <div class="col-xs-2 column text-center">{{pageLabelMap 'CCB2B_Basket_Qty_Column'}}</div>
+                {{else}}
+                    <div class="col-xs-6 column text-center">{{pageLabelMap 'CCB2B_Basket_Qty_Column'}}</div>
+                {{/if}}
+                {{#if (checkContactDisplayPermissions 'pricing')}}
+                    <div class="col-xs-2 column text-center">{{pageLabelMap 'CCB2B_Basket_Subtotal_Column'}}</div>
+                {{/if}}
+            </div>
+            {{#each value.items}}
+                <div class="cart_item row">
+                    {{#ifNotEquals this.cartItemType 'Coupon'}}
+                    <div class="col-md-1 col-sm-2 col-xs-2">
+                        {{#if this.mediaWrapper}}
+                        {{{displayImage this.mediaWrapper 'orderReview img-responsive'}}}
+                        {{else}}
+                        {{displayPlaceholderImage this}}
+                        {{/if}}
+                    </div>
+                    <div class="col-md-5 col-sm-10 col-xs-10">
+                        <p  id="{{generateId 'ccb2b-co-review-name-' this.mockProduct.sku '-field'}}" class="cc_item_title">
+                            {{#ifEquals this.pricingType 'external'}}
+                            {{#if this.extName}}
+                            {{productLink this.mockProduct 'cc_prod_link' text=(displayProductName 'Aggregate_Display' this.translatedParentProductName this.extName)}}
+                            {{else}}
+                            {{#if this.itemLabel}}
+                            {{productLink this.mockProduct 'cc_prod_link' text=(displayProductName 'Aggregate_Display' this.translatedParentProductName this.itemLabel)}}
+                            {{else}}
+                            {{productLink this.mockProduct 'cc_prod_link' text=(displayProductName 'Aggregate_Display' this.translatedParentProductName this.translatedProductName)}}
+                            {{/if}}
+                            {{/if}}
+                            {{else}}
+                            {{#if this.itemLabel}}
+                            {{productLink this.mockProduct 'cc_prod_link' text=(displayProductName 'Aggregate_Display' this.translatedParentProductName this.itemLabel)}}
+                            {{else}}
+                            {{productLink this.mockProduct 'cc_prod_link' text=(displayProductName 'Aggregate_Display' this.translatedParentProductName this.translatedProductName)}}
+                            {{/if}}
+                            {{/ifEquals}}
+                            {{#ifContains this.pricingModifierTypes 'tiered'}}
+                        <div class="cc_prt_tool_tip_div cc_prt_tool_tip_div_od" data-toggle="tooltip" title="{{pageLabelMap 'ProductPricingTiers_VolumeHover'}}">
+                            <span class="cc_prt_tool_tip_text cc_prt_tool_tip_text_od">{{pageLabelMap 'ProductPricingTiers_VolumePricingApplied'}}</span>
+                        </div>
+                        {{/ifContains}}
+                        </p>
+                        <p class="cc_external">
+                            {{#ifEquals this.pricingType 'external'}}
+                            {{#if this.extName}}
+                            <span class="cc_ext_sku_label">{{pageLabelMap 'CCB2B_Basket_Product_Number_Label'}}&#160;</span>
+                            <span class="cc_ext_sku">{{this.extSKU}}</span>
+                            {{else}}
+                            <span class="cc_checkout_sku_label">{{pageLabelMap 'CCB2B_Basket_Product_Number_Label'}}&#160;</span>
+                            <span id="{{generateId 'ccb2b-co-review-sku-' this.mockProduct.sku '-field'}}" class="cc_checkout_sku">{{this.mockProduct.sku}}</span>
+                            {{/if}}
+                            {{else}}
+                            <span class="cc_checkout_sku_label">{{pageLabelMap 'CCB2B_Basket_Product_Number_Label'}}&#160;</span>
+                            <span id="{{generateId 'ccb2b-co-review-sku-' this.mockProduct.sku '-field'}}" class="cc_checkout_sku">{{this.mockProduct.sku}}</span>
+                            {{/ifEquals}}
+                        </p>
+                        {{#ifContains this.pricingModifierTypes 'tiered'}}
+                        <div class="cc_prt_tool_tip_div cc_prt_tool_tip_div_or" data-toggle="tooltip" title="{{pageLabelMap 'ProductPricingTiers_VolumeHover'}}">
+                            <span class="cc_prt_tool_tip_text cc_prt_tool_tip_text_or">{{pageLabelMap 'ProductPricingTiers_VolumePricingApplied'}}</span>
+                        </div>
+                        {{/ifContains}}
+                    </div>
+
+                    <div class="col-md-offset-0 col-md-2 col-sm-offset-0 col-sm-3 col-xs-offset-0 col-xs-3">
+                        <div class="price cc_price text-center">
+                            {{#ifNotEquals this.cartItemType 'Coupon'}}
+                            {{#if (checkContactDisplayPermissions 'pricing')}}
+                            <p class="cc_item_price">
+                                {{#if this.price}}
+                                <span class="visible-xs visible-sm cc_price_label">{{pageLabelMap 'CartInc_Price'}}&#58;&#160;</span>
+                                <span id="{{generateId 'ccb2b-co-review-price-' this.mockProduct.sku '-field'}}" class="cc_price">
+                                            {{#if this.CCB2BUnitPrice}}
+                                                {{price this.CCB2BUnitPrice}}
+                                            {{else}}
+                                                {{price this.price}}
+                                            {{/if}}
+                                        {{/if}}
+                                        {{#if this.absoluteDiscount}}
+                                            {{#ifGreater this.absoluteDiscount 0}}
+                                                <span class="visible-xs visible-sm cc_price_label">{{pageLabelMap 'Checkout_YouSave'}}&#58;&#160;</span>
+                                                <span id="{{generateId 'ccb2b-co-review-discounted-' this.mockProduct.sku '-field'}}" class="cc_price">{{price this.absoluteDiscount}}</span>
+                                            {{/ifGreater}}
+                                            {{#ifLessThan this.absoluteDiscount 0}}
+                                                <span class="visible-xs visible-sm cc_price_label">{{pageLabelMap 'CartInc_Surcharge'}}&#58;&#160;</span>
+                                                <span id="{{generateId 'ccb2b-co-review-disounted-' this.mockProduct.sku '-field'}}" class="cc_price">{{priceAbs this.absoluteDiscount}}</span>
+                                            {{/ifLessThan}}
+                                        {{/if}}
+                                </span>
+                            </p>
+                            {{/if}}
+                            {{/ifNotEquals}}
+                        </div>
+                    </div>
+
+                    <div class="col-md-offset-0 col-md-2 col-sm-offset-2 col-sm-3 col-xs-offset-2 col-xs-3">
+                        <div class="price cc_price">
+                            {{#ifNotEquals this.cartItemType 'Coupon'}}
+                                <p class="cc_order_quantity text-center">
+                                    <span class="visible-xs visible-sm cc_quantity_label">{{pageLabelMap 'CartInc_Qty'}}&#58;&#160;</span>
+                                    <span id="{{generateId 'ccb2b-co-review-qty-' this.mockProduct.sku '-field'}}" class="cc_quantity">{{this.quantity}}</span>
+                                </p>
+                            {{/ifNotEquals}}
+                        </div>
+                    </div>
+
+                    <div class="col-md-offset-0 col-md-2 col-sm-offset-0 col-sm-3 col-xs-offset-0 col-xs-3">
+                        <div class="price cc_price text-center">
+                        {{#if (checkContactDisplayPermissions 'pricing')}}
+                            <p class="cc_item_total">
+                                <span class="visible-xs visible-sm cc_total_label">{{pageLabelMap 'CartInc_Total'}}&#58;&#160;</span>
+                                <span id="{{generateId 'ccb2b-co-review-total-' this.mockProduct.sku '-field'}}" class="cc_total">
+                                        {{#if CCB2BSubtotalPrice}}
+                                            {{price CCB2BSubtotalPrice}}
+                                        {{else}}
+                                            {{price itemTotal}}
+                                        {{/if}}
+                                    </span>
+                            </p>
+                        {{/if}}
+                            {{#if sellerName}}
+                            <p class="cc_seller">
+                                <span class="cc_soldby_label">{{pageLabelMap 'Prod_SoldBy'}}&#58;&#160;</span>
+                                <span class="cc_soldby">{{sellerName}}</span>
+                            </p>
+                            {{/if}}
+                            {{#if this.isSubscription}}
+                            <p class="cc_subscription_summary">
+                                {{subscriptionSummary 'Order_Subscription_' this.subscriptionFrequency mockProduct.sku itemTotal}}
+                            </p>
+                            <p class="cc_subscription_next_date">
+                                {{pageLabelMap 'Order_Subscription_Next_Payment'}} {{this.nextSubscriptionDateStr}}
+                            </p>
+                            {{#if this.isLimitedSubscription}}
+                            <p class="cc_subscription_summary">
+                                {{pageLabelMap 'Order_Subscription_End_Date'}} {{this.subscriptionEndDateStr}}
+                            </p>
+                            {{/if}}
+                            {{/if}}
+                            {{#each minorLines}}
+                            {{#if this.isSubscription}}
+                            <p class="cc_subscription_summary">
+                                {{subscriptionSummary 'Order_Subscription_' this.subscriptionFrequency mockProduct.sku itemTotal}}
+                            </p>
+                            <p class="cc_subscription_next_date">
+                                {{pageLabelMap 'Order_Subscription_Next_Payment'}} {{this.nextSubscriptionDateStr}}
+                            </p>
+                            {{#if this.isLimitedSubscription}}
+                            <p class="cc_subscription_end_date">
+                                {{pageLabelMap 'Order_Subscription_End_Date'}} {{this.subscriptionEndDateStr}}
+                            </p>
+                            {{/if}}
+                            {{/if}}
+                            {{/each}}
+                            {{#if this.minorLines}}
+                            {{#ifNotEquals this.pricingType "attrGroup"}}
+                            <p class="cc_included_items">
+                                <a href="#included_items{{this.itemID}}" id="includedItemsLink" data-toggle="modal" data-id="{{this.itemID}}">{{pageLabelMap 'CheckOut_IncludedItems'}}</a>
+                            </p>
+                            {{> includedDisplay}}
+                            {{/ifNotEquals}}
+                            {{/if}}
+                            {{#if this.minorLines}}
+                            {{#ifEquals this.pricingType "attrGroup" }}
+                            <p class="cc_cart_attribute_items">
+                                <a href="#order_attribute_items{{this.itemID}}" id="orderAttributeItemsLink" data-toggle="modal" data-id="{{this.itemID}}">{{pageLabelMap 'CheckOut_AttributeItems'}}</a>
+                            </p>
+                            {{> orderAttributesDisplay}}
+                            {{/ifEquals}}
+                            {{/if}}
+                        </div>
+                    </div>
+
+                    {{/ifNotEquals}}
+                    {{#ifEquals this.cartItemType 'Coupon'}}
+                    <p class="item_title coupon_title">
+                        {{{this.mockProduct.name}}}
+                    </p>
+                    {{/ifEquals}}
+                </div>
+            {{/each}}
+        </div>
+        {{/eachInMap}}
+    </div>
+    {{#if (checkContactDisplayPermissions 'pricing')}}
+    <div class="checkoutItemsSummary">
+        <div class="items_summary col-md-4 col-sm-6 col-xs-8 pull-right row">
+            <div class="col-xs-6 items_summary_col">
+                <div class="cartSummaryLine cc_label">
+                    <div class="cc_label">{{pageLabelMap 'CCB2B_Basket_Subtotal_Column'}}</div>
+                    <span class="cc_label additionalInfo detail">{{pageLabelMap 'CCB2B_ExclTax'}}</span>
+                </div>
+                <div class="cartSummaryLine cc_label">{{pageLabelMap 'CCB2B_Tax'}}</div>
+            </div>
+            <div class="col-xs-6 items_summary_col text-right">
+                <div class="cartSummaryLine amountToRight">{{{price subTotal}}}</div>
+                <div class="cartSummaryLine amountToRight">{{price (calculateTax subTotal 'uk')}}</div>
+            </div>
+            <div class="cartSummarySeparator"></div>
+            <div class="col-xs-6 items_summary_col">
+                <div class="cartSummaryLine">
+                    <div class="cc_label cc_cart_total_amount">{{pageLabelMap 'CartInc_Total'}}</div>
+                    <span class="cc_label additionalInfo detail">{{pageLabelMap 'CCB2B_InclTax'}}</span>
+                </div>
+                <div class="cartSummaryLine cc_label">{{pageLabelMap 'CCB2B_Total_saving'}}</div>
+            </div>
+            <div class="col-xs-6 items_summary_col text-right">
+                <div class="cartSummaryLine cc_cart_total_amount amountToRight">{{price (getPriceWithTaxes subTotal 'uk')}}</div>
+                <div class="cartSummaryLine amountToRight">{{price totalSavings}}</div>
+            </div>
+        </div>
+    </div>
+    {{/if}}
+</div>

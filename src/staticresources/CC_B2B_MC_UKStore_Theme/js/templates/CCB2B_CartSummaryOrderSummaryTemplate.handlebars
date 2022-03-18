@@ -1,0 +1,56 @@
+{{#if (checkContactDisplayPermissions 'pricing')}}
+    <div class="row cartSummaryContainer">
+    <div class="col-xs-12 cartSummaryTitle cc_label text-right">{{pageLabelMap 'CCB2B_OrderSummaryTitle'}}</div>
+    <div class="cartSummarySeparator"></div>
+    <div class="col-xs-6">
+        <div class="cartSummaryLine">
+            <span class="icon-cart-circle cartIcon">
+                <span class="path1"></span>
+                <span class="path2"></span>
+            </span>
+        </div>
+        <div class="cartSummaryLine cc_label">
+            <div class="cc_label">{{pageLabelMap 'CCB2B_Basket_Subtotal_Column'}}</div>
+            <span class="cc_label additionalInfo detail">{{pageLabelMap 'CCB2B_ExclTax'}}</span>
+        </div>
+        <div class="cartSummaryLine cc_label">{{pageLabelMap 'CCB2B_Tax'}}</div>
+    </div>
+    <div class="col-xs-6 text-right">
+        <div class="cartSummaryLine cc_label">
+            <span class="detail items">{{totalItems}} {{#ifGreater totalItems 1}} {{pageLabelMap 'Component_MiniCart_Items'}} {{else}} {{pageLabelMap 'Component_MiniCart_Item'}} {{/ifGreater}}</span>
+        </div>
+        <div class="cartSummaryLine amountToRight">{{{price subtotal}}}</div>
+        <div class="cartSummaryLine amountToRight">{{price (calculateTax subtotal 'uk')}}</div>
+    </div>
+    <div class="cartSummarySeparator"></div>
+    <div class="col-xs-6">
+        <div class="cartSummaryLine">
+            <div class="cc_label cc_cart_total_amount">{{pageLabelMap 'CartInc_Total'}}</div>
+            <span class="cc_label additionalInfo detail">{{pageLabelMap 'CCB2B_InclTax'}}</span>
+        </div>
+        <div class="cartSummaryLine cc_label">{{pageLabelMap 'CCB2B_Total_saving'}}</div>
+    </div>
+    <div class="col-xs-6 text-right">
+        <div class="cartSummaryLine cc_cart_total_amount amountToRight">{{price (getPriceWithTaxes subtotal 'uk')}}</div>
+        <div class="cartSummaryLine amountToRight">{{price totalSavings}}</div>
+    </div>
+</div>
+{{else}}
+<div class="row cartSummaryContainer">
+    <div class="col-xs-12 cartSummaryTitle cc_label text-right">{{pageLabelMap 'CCB2B_OrderSummaryTitle'}}</div>
+    <div class="cartSummarySeparator"></div>
+    <div class="col-xs-6">
+        <div class="cartSummaryLine">
+            <span class="icon-cart-circle cartIcon">
+                <span class="path1"></span>
+                <span class="path2"></span>
+            </span>
+        </div>
+    </div>
+    <div class="col-xs-6 text-right">
+        <div class="cartSummaryLine cc_label">
+            <span class="detail items">{{totalItems}} {{#ifGreater totalItems 1}} {{pageLabelMap 'Component_MiniCart_Items'}} {{else}} {{pageLabelMap 'Component_MiniCart_Item'}} {{/ifGreater}}</span>
+        </div>
+    </div>
+</div>
+{{/if}}

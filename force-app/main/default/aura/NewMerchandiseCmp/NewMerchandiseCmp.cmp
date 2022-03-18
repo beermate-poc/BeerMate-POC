@@ -1,0 +1,191 @@
+<aura:component controller="CallLogUtility" implements="force:lightningQuickAction,force:appHostable">
+	<aura:attribute name="newObjective" type="Objective__c" default="{'sobjectType': 'Objective__c'}" />
+	<aura:attribute name="plannedObjectiveId" type="String" default="" />
+	<aura:attribute name="recordTypeName" type="String" />
+	<aura:attribute name="accountId" type="Id" />
+	<aura:attribute name="callLogId" type="Id" />
+	<aura:attribute name="mobileCSS" type="String" default="slds-modal--form" />
+	<aura:attribute name="showNewMerchandise" type="boolean" />
+	<aura:attribute name="disableSaveButton" type="boolean" default="false"/>
+	<aura:attribute name="showObjView" type="boolean"/>
+	<aura:attribute name="showToast" type="boolean" />
+	<aura:attribute name="showErrorToast" type="boolean" default="false"/>
+    <aura:attribute name="toastTitle" type="String" />
+    <aura:attribute name="toastMsg" type="String" />
+    <aura:attribute name="toastType" type="String" />
+	<aura:attribute name="newRecord" type="String" />
+	<aura:attribute name="loadObjectives" type="boolean" />
+	<aura:attribute name="showNewMerchandiseAIF" type="boolean"/>
+	<!-- MC:1701- Subtypes should be added on objectives instead of planned objectives -->
+    <aura:attribute name="subType" type="String"/>
+	<aura:attribute name="subTypeValues" type="String[]" default="[]"/>
+    <aura:attribute name="selectedSubType" type="String" />
+    <aura:handler name="change" value="{!v.newObjective}" action="{!c.setPlannedObjective}" />
+    <aura:handler name="plannedObjChanged" event="c:PlannedObjectiveSelected"
+    action="{!c.plannedObjectiveChanged}"/>
+	<lightning:spinner aura:id="spinner" class="slds-hide" alternativeText="Please wait..." />
+	<div class="slds-text-align__center">
+        <aura:if isTrue="{!v.showErrorToast}">
+            <c:Toast toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}"/>
+        </aura:if>
+    </div>
+
+	<aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+	<div class="" style="height:640px;">
+		<div class="">
+			<div class="modalStyle">
+				<div class="mobileView ">
+					<div class="slds-float_left">
+						<lightning:button class="slds-button" variant="neutral" onclick="{!c.closeNewMerchandiseModalMobile}" label="{!$Label.c.Cancel_Label}" />
+					</div>
+					<div class="slds-float_right ipadStyle">
+						<lightning:button class="slds-button" variant="brand" onclick="{!c.createNewObjective}" label="{!$Label.c.Save}" />
+					</div>
+					<h2 class="slds-text-heading--medium slds-truncate" title="{!$Label.c.Create_Merchandise}">{!$Label.c.Create_Merchandise}</h2>
+				</div>
+				<ui:scrollerWrapper class="scrollerSize">
+					<div class="formContent">
+						<h3 class="slds-section-title--divider">{!$Label.c.Merchandise_Information}</h3>
+						<div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+							<div class="slds-form-element">
+								<lightning:select name="selectItem" label="{!$Label.c.Status}" required="true" value="{!v.newObjective.Status__c}" aura:id="statusSelectOptions">
+                                        <option value="Not Started">{!$Label.c.Not_Started}</option>
+                                        <option value="In Progress">{!$Label.c.In_Progress}</option>
+                                        <option value="Committed">{!$Label.c.Committed}</option>
+                                        <option value="Executed">{!$Label.c.Executed}</option>
+                                        <option value="Declined">{!$Label.c.Declined}</option>
+                                        <option value="Not Applicable">{!$Label.c.Not_Applicable}</option>
+								</lightning:select>
+							</div>
+							<div class="slds-m-top--medium">
+								<c:MboComponent aura:id="plannedObjective" objectiveType="Merchandise" selectedObjective="{!v.plannedObjectiveId}" />
+							</div>
+							<aura:if isTrue="{!v.subTypeValues.length > 0}">
+                                <div class="slds-m-top--medium">
+                                    <lightning:select name="subTypeSelect" label="{!$Label.c.Sub_Type}" aura:id="subTypeSelect" value="{!v.selectedSubType}" required="{!(v.newObjective.Status__c == 'Committed' || v.newObjective.Status__c == 'Executed') ? true : false}">
+                                        <option value="">{!$Label.c.Default_Picklist_Select}</option>
+                                        <aura:iteration items="{!v.subTypeValues}" var="sub">
+                                            <option value="{!sub}" text="{!sub}" selected="{!sub == v.selectedSubType}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>
+                            </aura:if>
+							<div class="slds-m-top--medium">
+								<lightning:input messageWhenValueMissing="{!$Label.c.Name_is_required}" label="{!$Label.c.Name_Of_Merchandise}" name="MerchandiseName" required="true"
+									value="{!v.newObjective.Name}" aura:id="merchandiseName" />
+							</div>
+                            <div class="slds-m-top--medium" data-select="multi" data-scope="single" data-typeahead="true">
+                                <div class="slds-form-element">
+                                    <c:ProductSearch aura:id="brandSearch" object="Product__c" field="TrademarkBrandLongNme__c"  searchValue="{!v.newObjective.Brands__c}" />
+
+                                </div>
+                            </div>
+							<div class="slds-m-top--medium">
+								<lightning:textarea name="myTextArea" label="{!$Label.c.Create_Objectives_Merchandise_Details}" maxlength="255" value="{!v.newObjective.Description__c}" aura:id="merchandiseDetail"
+									/>
+							</div>
+						</div>
+						<div class="{!(v.newObjective.Status__c != 'Committed' &amp;&amp; v.newObjective.Status__c != 'Executed') ? 'slds-hide': 'slds-show'}">
+							<h3 class="slds-section-title--divider">{!$Label.c.For_Your_Distributor_Label}</h3>
+							<div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                                <div class="slds-form-element">
+                                <c:DatePicker aura:id="dt" value="{!v.newObjective.Supporting_Materials_Delivery_Date__c}" label="{!$Label.c.Objectives_Supporting_Materials_Date}"
+                                    inputClass="slds-input"  positionDate="datePickerRight"/>
+                            </div>
+								<div class="slds-form-element">
+									<lightning:textarea aura:id="requestMaterial" name="materialTextArea" label="{!$Label.c.Objectives_Notes_Distributors}" maxlength="300" value="{!v.newObjective.Notes_for_Distributor__c}"
+										/>
+								</div>
+							</div>
+						</div>
+						<h3 class="slds-section-title--divider">{!$Label.c.Add_to_Dos}</h3>
+						<div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+							<div class="slds-form-element">
+								<c:AddToDos aura:id="addToDoSection" datePickerPosition="datePickerRightAdjustment"/>
+							</div>
+						</div>
+					</div>
+				</ui:scrollerWrapper>
+			</div>
+		</div>
+	</div>
+	<aura:set attribute="else">
+	<div class="" style="height:640px;">
+		<div role="dialog" tabindex="-1" class="{!v.mobileCSS + ' slds-modal ' + ' slds-fade-in-open '}">
+			<div class="slds-modal__container modalStyle">
+				<div class="slds-modal__header">
+					<h2 class="slds-text-heading--medium slds-truncate" title="New Contact">Create Merchandise</h2>
+				</div>
+				<ui:scrollerWrapper class="scrollerSize">
+					<div class="slds-modal__content">
+						<h3 class="slds-section-title--divider">{!$Label.c.Merchandise_Information}</h3>
+						<div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+							<div class="slds-form-element">
+								<lightning:select name="selectItem" label="{!$Label.c.Status}" required="true" value="{!v.newObjective.Status__c}" aura:id="statusSelectOptions">
+                                        <option value="Not Started">{!$Label.c.Not_Started}</option>
+                                        <option value="In Progress">{!$Label.c.In_Progress}</option>
+                                        <option value="Committed">{!$Label.c.Committed}</option>
+                                        <option value="Executed">{!$Label.c.Executed}</option>
+                                        <option value="Declined">{!$Label.c.Declined}</option>
+                                        <option value="Not Applicable">{!$Label.c.Not_Applicable}</option>
+								</lightning:select>
+							</div>
+							<div class="slds-m-top--medium">
+								<c:MboComponent aura:id="plannedObjective" objectiveType="Merchandise" selectedObjective="{!v.plannedObjectiveId}" />
+							</div>
+							<aura:if isTrue="{!v.subTypeValues.length > 0}">
+                                <div class="slds-m-top--medium">
+                                    <lightning:select name="subTypeSelect" label="{!$Label.c.Sub_Type}" aura:id="subTypeSelect" value="{!v.selectedSubType}" required="{!(v.newObjective.Status__c == 'Committed' || v.newObjective.Status__c == 'Executed') ? true : false}">
+                                       <option value="">{!$Label.c.Default_Picklist_Select}</option>
+                                       <aura:iteration items="{!v.subTypeValues}" var="sub">
+                                           <option value="{!sub}" text="{!sub}" selected="{!sub == v.selectedSubType}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>
+                            </aura:if>
+							<div class="slds-m-top--medium">
+								<lightning:input messageWhenValueMissing="{!$Label.c.Name_is_required}" label="{!$Label.c.Name_Of_Merchandise}" name="MerchandiseName" required="true"
+									value="{!v.newObjective.Name}" aura:id="merchandiseName" />
+							</div>
+                            <div class="slds-m-top--medium" data-select="multi" data-scope="single" data-typeahead="true">
+                                <div class="slds-form-element">
+                                    <c:ProductSearch aura:id="brandSearch" object="Product__c" field="TrademarkBrandLongNme__c" searchValue="{!v.newObjective.Brands__c}" />
+
+                                </div>
+                            </div>
+							<div class="slds-m-top--medium">
+								<lightning:textarea name="myTextArea" label="{!$Label.c.Create_Objectives_Merchandise_Details}" maxlength="255" value="{!v.newObjective.Description__c}" aura:id="merchandiseDetail"
+									/>
+							</div>
+						</div>
+						<div class="{!(v.newObjective.Status__c != 'Committed' &amp;&amp; v.newObjective.Status__c != 'Executed') ? 'slds-hide': 'slds-show'}">
+							<h3 class="slds-section-title--divider">{!$Label.c.For_Your_Distributor_Label}</h3>
+							<div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                                <div class="slds-form-element">
+                                <c:DatePicker aura:id="dt" value="{!v.newObjective.Supporting_Materials_Delivery_Date__c}" label="{!$Label.c.Objectives_Supporting_Materials_Date}"
+                                    inputClass="slds-input"  positionDate="datePickerRight"/>
+                            </div>
+								<div class="slds-form-element">
+									<lightning:textarea aura:id="requestMaterial" name="materialTextArea" label="{!$Label.c.Objectives_Notes_Distributors}" maxlength="300" value="{!v.newObjective.Notes_for_Distributor__c}"
+										/>
+								</div>
+							</div>
+						</div>
+						<h3 class="slds-section-title--divider">{!$Label.c.Add_to_Dos}</h3>
+						<div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+							<div class="slds-form-element">
+								<c:AddToDos aura:id="addToDoSection" datePickerPosition="datePickerRightAdjustment"/>
+							</div>
+						</div>
+					</div>
+				</ui:scrollerWrapper>
+				<div class="slds-modal__footer mobileViewHeader">
+					<lightning:button class="slds-button" variant="neutral" label="{!$Label.c.Cancel_Label}" onclick="{!c.closeNewMerchandiseModal}" />
+					<lightning:button class="slds-button" variant="brand" label="{!$Label.c.Save}" onclick="{!c.createNewObjective}" disabled="{!v.disableSaveButton}"/>
+				</div>
+			</div>
+		</div>
+	</div>
+	</aura:set>
+	</aura:if>
+</aura:component>

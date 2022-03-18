@@ -1,0 +1,106 @@
+<div class="overviewSection">
+    <div class="panel-heading cc_heading">
+        <h3 id="ccb2b-ma-overview-title" class="panel-title cc_title">{{pageLabelMap 'CCB2B_MyAccount_Overview_Name'}}</h3>
+    </div>
+    {{#if deliveryInfo}}
+        <div class="col-md-12">
+            <div class="section-delivery-info">
+                <div class="container-delivery-info">
+                    <div class="img-delivery-info">
+                        <span class="icon-delivery-circle">
+                            <span class="icon-delivery1"></span>
+                        </span>
+                    </div>
+                    <div class="text-delivery-info">
+                        <span>{{pageLabelMap 'CCB2B_DeliveryInfo_OrderPart'}}</span>
+                        <span class="delivery-info-highlight">{{deliveryInfo.cutOffTime}} {{pageLabelPrefixMap 'CCB2B_Day_' deliveryInfo.orderDate.dayInWeek}} {{deliveryInfo.orderDate.day}}</span>
+                        <span>{{pageLabelMap 'CCB2B_DeliveryInfo_DeliveryPart'}}</span>
+                        <span>{{pageLabelPrefixMap 'CCB2B_Day_' deliveryInfo.deliveryDate.dayInWeek}} {{deliveryInfo.deliveryDate.day}} {{pageLabelPrefixMap 'CCB2B_Month_' deliveryInfo.deliveryDate.month}}.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{/if}}
+        <div class="col-md-6 col-sm-12">
+            <div class="section">
+                <div class="overviewTitle">
+                    {{pageLabelMap 'CCB2B_MyAccount_Overview_MyOutlet'}}
+                    <div class="line"></div>
+                    <span class="overviewIcon">
+                        <span class="icon-account-settings-white">
+                            <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span>
+                        </span>
+                    </span>
+                </div>
+                <div>
+                    <ul class="overviewLinks">
+                        <li><span class="icon-arrow-right"></span><a data-id="ccb2b-ma-nav-contactInfoView" class="goToInternalSection" href="#">{{pageLabelMap 'MyAccount_Profile_Contact_Information'}}</a></li>
+                        <li><span class="icon-arrow-right"></span><a data-id="ccb2b-ma-nav-CCB2B_MyOutletView" class="goToInternalSection" href="#">{{pageLabelMap 'CCB2B_MyAccount_Overview_MyOutlet_overview'}}</a></li>
+                        <li><span class="icon-arrow-right"></span><a data-id="ccb2b-ma-nav-CCB2B_OutletAddressView" class="goToInternalSection" href="#">{{pageLabelMap 'CCB2B_MyAccount_Overview_MyOutlet_address'}}</a></li>
+                        <li><span class="icon-arrow-right"></span><a data-id="ccb2b-ma-nav-changePasswordView" class="goToInternalSection" href="#">{{pageLabelMap 'CCB2B_MyAccount_Overview_MyOutlet_changePass'}}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12">
+            <div class="section">
+                <div class="overviewTitle">
+                    {{pageLabelMap 'CCB2B_MyAccount_Overview_MyOrders'}}
+                    <div class="line"></div>
+                    <span class="overviewIcon">
+                        <span class="icon-order-history-white">
+                            <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span>
+                        </span>
+                    </span>
+                </div>
+                <div>
+                    <ul class="overviewLinks">
+                        {{#if (checkContactDisplayPermissions 'order_history')}}
+                        <li><span class="icon-arrow-right"></span><a data-id="ccb2b-ma-nav-myOrdersView" class="goToInternalSection" href="#">{{pageLabelMap 'CCB2B_MyAccount_Overview_MyOrders_history'}}</a></li>
+                        {{/if}}
+                        {{#if (checkContactDisplayPermissions 'financial_documents')}}
+                        <li><span class="icon-arrow-right"></span><a data-id="ccb2b-ma-nav-CCB2B_DocumentsView" class="goToInternalSection" href="#">{{pageLabelMap 'CCB2B_MyAccount_MyDocuments_Section_Menu'}}</a></li>
+                        {{/if}}
+                        <li><span class="icon-arrow-right"></span><a data-id="ccb2b-ma-nav-CCB2B_MARemindersView" class="goToInternalSection" href="#">{{pageLabelMap 'CCB2B_MyAccount_Overview_MyOrders_reminders'}}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12">
+            <div class="section">
+                <div class="overviewTitle">
+                    {{pageLabelMap 'CCB2B_MyAccount_Overview_MyServices'}}
+                    <div class="line"></div>
+                    <span class="overviewIcon">
+                        <span class="icon-favourites-section">
+                            <span class="path1"></span><span class="path2"></span>
+                        </span>
+                    </span>
+                </div>
+                <div>
+                    <ul class="overviewLinks">
+                        <li><span class="icon-arrow-right"></span><a data-id="ccb2b-ma-nav-myWishlistsView" class="goToInternalSection" href="#">{{pageLabelMap 'CCB2B_MyAccount_Overview_MyServices_fav'}}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-sm-12">
+            <div class="section">
+                <div class="overviewTitle">
+                    {{pageLabelMap 'CCB2B_MyAccount_Overview_MySupport'}}
+                    <div class="line"></div>
+                    <span class="overviewIcon">
+                        <span class="icon-support">
+                            <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span><span class="path7"></span><span class="path8"></span><span class="path9"></span><span class="path10"></span><span class="path11"></span>
+                        </span>
+                    </span>
+                </div>
+                <div>
+                    <ul class="overviewLinks">
+                        <li><span class="icon-arrow-right"></span><a href="{{pageConfigMap 'sc.helpdeskpath'}}">{{pageLabelMap 'CCB2B_MyAccount_Overview_MySupport_helpDesk'}}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>

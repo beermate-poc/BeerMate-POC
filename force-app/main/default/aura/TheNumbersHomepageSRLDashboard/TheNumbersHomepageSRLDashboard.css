@@ -1,0 +1,25 @@
+.THIS .maxHeight{
+    height:750px;
+}
+/* Android */
+@media (max-device-width : 374px) and (min-device-width : 320px) {
+    .THIS.hideMobile {
+        display: none;
+    }
+}
+
+/* IPhone 7 */
+@media (max-device-width : 667px) and (min-device-width : 375px) {
+    .THIS.hideMobile {
+        display: none;
+    }
+}
+
+
+
+/* IPhone 7 plus */
+@media (max-device-width : 736px) and (min-device-width : 414px) {
+    .THIS.hideMobile {
+        display: none;
+    }
+}

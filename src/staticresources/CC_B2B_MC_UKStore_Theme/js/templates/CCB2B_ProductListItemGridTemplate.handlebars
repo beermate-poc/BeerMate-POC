@@ -1,0 +1,138 @@
+<div class="cc_product_item cc_grid_item">
+    <div>
+        <div class="cc_grid_image_container col-md-12 col-xs-12">
+            {{#if (isProductInPromo this.sfid)}}
+                    <div class="isPromoBadge" data-category="{{promoCategory this.sfid}}">{{pageLabelMap 'CCB2B_Product_ViewOffer_Badge'}}</div>
+            {{/if}}
+            <input id="{{generateId 'ccb2b-plp-add-to-' SKU '-checkbox'}}" class="addToWishlistCheckbox" type="checkbox" data-id="{{SKU}}" {{#if checked}}checked{{/if}} data-sfid={{sfid}}>
+            <label class="prod_list_check_label" for="{{generateId 'ccb2b-plp-add-to-' SKU '-checkbox'}}"></label>
+            {{#if EProductMediasS.[0]}}
+            {{productLink this 'cc_product_name_img' image=(displayImage this 'img-responsive center-block' src=(displayEProductMedia this.EProductMediasS.[0]) alt=this.sfdcName dataId=this.SKU)}}
+            {{else}}
+                {{productLink this 'cc_product_name' image=(displayPlaceholderImage this)}}
+            {{/if}}
+        </div>
+        <div class="product_container">
+            <div class="cc_grid_product_info caption">
+                <h5 id="{{generateId 'ccb2b-plp-grid-productname-' SKU '-field'}}"  class="cc_product_link">
+                    {{#if this.alternateName}}
+                    {{productLink this 'cc_product_name' text=this.alternateName}}
+                    {{else}}
+                    {{productLink this 'cc_product_name' text=this.sfdcName}}
+                    {{/if}}
+                </h5>
+                {{#ifDisplay 'PL.DsplSku'}}
+                <p class="cc_product_sku">
+                    <span class="cc_label">{{pageLabelMap 'CCB2B_Basket_Product_Number_Label'}}</span>
+                    <span id="{{generateId 'ccb2b-plp-grid-productsku-' SKU '-field'}}" class="cc_product_sku">{{this.SKU}}</span>
+                </p>
+                {{/ifDisplay}}
+                {{#ifDisplay 'PL.DsplShortDesc'}}
+                <p class="description cc_desc">{{unescape shortDesc}}</p>
+                {{/ifDisplay}}
+                {{#ifDisplay 'PL.DsplAddtInfo'}}
+                <a class="included_items cc_included_items" href="#additional_info{{this.sfid}}" id="additionalInfoLink" data-toggle="modal">{{pageLabelMap 'ProductList_AdditionalInfo'}}</a>
+                <div id="additional_info{{this.sfid}}" class="modal fade cc_modal" tabindex="-1" role="dialog" aria-labelledby="ProductListItemLabel" aria-hidden="true">
+                    <div class="modal-dialog cc_modal-dialog" role="document">
+                        <div class="modal-content cc_modal-content">
+                            <div class="modal-header cc_modal-header">
+                                <button type="button" class="close cc_close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&#215;</span></button>
+                                <h3 class="cc_prod_list_item_label" id="ProductListItemLabel">
+                                    {{#if this.alternateName}}
+                                    {{this.alternateName}}
+                                    {{else}}
+                                    {{this.sfdcName}}
+                                    {{/if}}
+                                    {{pageLabelMap 'ProductList_MiscDetails'}}
+                                </h3>
+                            </div>
+                            <div class="modal-body cc_body">
+                                {{#if this.miscDetails}}
+                                <span class="cc_misc_details">{{unescape this.miscDetails}}</span>
+                                {{/if}}
+                                {{#ifDisplay 'PL.DsplAddtlSku'}}
+                                <span class="cc_sku">{{pageLabelMap 'ProductList_SKU'}}:</span>&#160;{{this.SKU}}<br/><br/>
+                                {{/ifDisplay}}
+                                {{#ifDisplay 'PL.DsplAddtlShortDesc'}}
+                                <p class="cc_desc">{{unescape this.shortDesc}}</p>
+                                {{/ifDisplay}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{/ifDisplay}}
+                {{#ifDisplay 'PL.DsplUOM'}}
+                <div class="cc_product_uom">
+                    <span class="cc_label">{{pageLabelMap 'ProductList_UOM'}}</span>
+                    <span class="cc_product_uom">{{pageLabelPrefixMap 'UOM_' this.unitOfMeasure}}</span>
+                </div>
+                {{/ifDisplay}}
+            </div>
+            <div id="{{generateId 'ccb2b-plp-grid-productprice-' SKU '-field'}}"  class="cc_price_container cc_grid_price_info caption">
+                {{>priceDisplay}}
+            </div>
+            <div class="cc_product_grid_actions">
+                <div class="messagingSection-Warning-{{this.sfid}} invalid_qty_msg" style="display: none"></div>
+                <div class="messagingSection-Info-{{this.sfid}}" style="display: none"></div>
+                <div class="messagingSection-Error-{{this.sfid}}" style="display: none"></div>
+                {{#ifDisplay 'PL.DsplAddCart'}}
+                {{#unless this.showNewSubscriptionSelection}}
+                {{#if this.canAddtoCart}}
+                {{> productQuantityControls}}
+                {{#if (checkContactDisplayPermissions 'create_basket')}}
+                <div class="action cc_action wishFinder">
+                    <div class="cc_add_to form-group">
+                        {{#if (isProductInPromo this.sfid)}}<button id="{{generateId 'ccb2b-plp-grid-offer-' SKU '-button'}}" data-category="{{promoCategory this.sfid}}" class="btn btn-default goToOffer center-block" role="button">{{pageLabelMap 'CCB2B_Product_ViewOffer'}}</button>{{/if}}
+                        <button id="{{generateId 'ccb2b-plp-grid-add-' SKU '-button'}}" class="btn primary_button {{#if (isProductInPromo this.sfid)}}isOffer{{/if}} center-block cc_add_to_btn cc_add_to_btn_{{this.sfid}}" role="button">{{pageLabelMap 'ProductList_AddToCart'}}</button>
+                    </div>
+                </div>
+                {{/if}}
+                {{/if}}
+                {{/unless}}
+                {{/ifDisplay}}
+                {{#ifDisplay 'PCP.Enabled'}}
+                {{#ifEquals this.productType 'Product'}}
+                <div class="hidden-xs cc_compare form-group">
+                    <button type="button" class="btn btn-default btn-sm btn-block add_to_compare_desktop_button cc_addto_compare {{#if inCompareTray}}active{{else}}{{#if compareTrayFull}}disabled{{/if}}{{/if}}">
+                        {{#if inCompareTray}}
+                        {{pageLabelMap 'ProductCompare_RemoveFromCompare'}}
+                        {{else}}
+                        {{pageLabelMap 'ProductCompare_AddToCompare'}}
+                        {{/if}}
+                    </button>
+                </div>
+                {{/ifEquals}}
+                {{/ifDisplay}}
+                {{#ifNotEquals this.productType 'Aggregated'}}
+                {{#unless this.showNewSubscriptionSelection}}
+                <div class="cc_wishlist">
+                    <div class="wishFinder addToWishlist" data-sku="{{this.SKU}}">
+                        <div id="{{generateId 'ccb2b-plp-grid-addfav-' SKU '-btn'}}"  class="wishButtons"></div>
+                    </div>
+                </div>
+                {{/unless}}
+                {{/ifNotEquals}}
+            </div>
+        </div>
+    </div>
+</div>
+<div id="confirmLeavePage" class="modal fade cc_modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content cc_modal-content">
+            <div class="modal-body cc_modal_body text-center">
+                <h3>{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_Heading'}}</h3>
+                <p>{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_Content'}}</p>
+            </div>
+            <div class="modal-footer cc_modal_footer text-center">
+                    <div>
+                        <input id="ccb2b-ma-favourites-confirm-leaving-page-no-button" type="button" class="btn closeModal" data-dismiss="modal" value="{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_GoBack'}}"/>
+                        <p>{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_GoBack_Info'}}</p>
+                    </div>
+                    <div>
+                        <input id="ccb2b-ma-favourites-confirm-leaving-page-yes-button" type="button" class="btn primary_button confirmLeaving" value="{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_Continue'}}"/>
+                        <p>{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_Continue_Info'}}</p>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>

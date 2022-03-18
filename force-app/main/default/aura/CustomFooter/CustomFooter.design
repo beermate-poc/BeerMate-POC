@@ -1,0 +1,42 @@
+<design:component >
+    <design:attribute name="OpportunityID" label="Opportunity ID" description="Enter OpportunityID" />
+    <design:attribute name="recordId" label="Opportunity Rec ID" description="Enter OpportunityID" />
+    
+    <sfdc:objects>
+        <sfdc:object>Opportunity</sfdc:object>
+    </sfdc:objects>
+    <design:attribute name="nextButtonLabel1" label="Next Button Label 1" default="Next"/>
+    <design:attribute name="nextButtonLabel2" label="Next Button Label 2" default="Next"/>
+    <design:attribute name="nextButtonLabel3" label="Next Button Label 3" default="Next"/>
+    <design:attribute name="nextButtonLabel4" label="Next Button Label 4" default="Next"/>
+    <design:attribute name="nextButtonLabel5" label="Next Button Label 5" default="Next"/>
+
+    <design:attribute name="nextButtonClass1" label="Next Button Class 1" default="slds-button_brand"/>
+    <design:attribute name="nextButtonClass2" label="Next Button Class 2" default="slds-button_brand"/>
+    <design:attribute name="nextButtonClass3" label="Next Button Class 3" default="slds-button_brand"/>
+    <design:attribute name="nextButtonClass4" label="Next Button Class 4" default="slds-button_brand"/>
+    <design:attribute name="nextButtonClass5" label="Next Button Class 5" default="slds-button_brand"/>
+    
+    <design:attribute name="showNextButton1" label="Show Next Button 1?" default="true"/>
+    <design:attribute name="showNextButton2" label="Show Next Button 2?" default="false"/>
+    <design:attribute name="showNextButton3" label="Show Next Button 3?" default="false"/>
+    <design:attribute name="showNextButton4" label="Show Next Button 4?" default="false"/>
+    <design:attribute name="showNextButton5" label="Show Next Button 5?" default="false"/>
+
+    <design:attribute name="disableNextButton1" label="Disable Next Button 1?" default="false"/>
+    <design:attribute name="disableNextButton2" label="Disable Next Button 2?" default="false"/>
+    <design:attribute name="disableNextButton3" label="Disable Next Button 3?" default="false"/>
+    <design:attribute name="disableNextButton4" label="Disable Next Button 4?" default="false"/>
+    <design:attribute name="disableNextButton5" label="Disable Next Button 5?" default="false"/>
+    
+    <design:attribute name="previousButtonLabel" label="Previous Button Label" default="Previous"/>
+    <design:attribute name="previousButtonClass" label="Previous Button Class" default="slds-button_neutral"/>
+    <design:attribute name="showPreviousButton" label="Show Previous Button?" default="false"/>
+    
+    <design:attribute name="buttonLocation" label="Button Location? (left, middle, right)" default="right"/>
+    <design:attribute name="buttonClick" label="Button Click (for output use only)" />
+    <design:attribute name="onFinalPage" label="On Final Page?" default="false"/>
+    
+   
+
+</design:component>

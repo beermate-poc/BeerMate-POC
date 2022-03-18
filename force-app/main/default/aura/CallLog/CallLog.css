@@ -1,0 +1,136 @@
+.THIS .modalHeight{
+    position: absolute;
+}
+.THIS .btnStyle{
+    display: flex;
+}
+.THIS .saveButtonLarge{
+    margin-left: 5px;
+}
+.THIS.mobileView{
+    display:none;
+}
+.THIS.mobileViewButtons{
+    display:none;
+}
+.THIS .slds-modal__container{
+    width:100%;
+}
+.THIS .showMoreWindow{
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(150, 148, 146, 0.8);
+    z-index: 9001;
+}
+.THIS .backdrop{
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(150, 148, 146, 0.8);
+    z-index: 9000;
+}
+.THIS .showMore{
+    width: 32px;
+    height: 32px;
+    background-color: #1589EE;
+}
+.THIS .showMoreDisplay {
+    background: white;
+    padding: .5rem .75rem 0 .75rem;
+}
+.THIS .showMoreDisplay .action {
+    border-bottom: 1px solid rgb(244, 246, 249);
+    padding: .5rem .75rem 0 .75rem;
+}
+.THIS .showMoreFooter {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+.THIS .showMoreHeader {
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+.THIS .cancelShowMore{
+    width: 100%;
+    height: 56px;
+}
+.THIS .meetingDate{
+    margin-top:12px;
+}
+.THIS .meetingDateMobile{
+    width:20px;
+    height: 20px;
+    margin-left: 5px;
+}
+.THIS .mBuuton{
+    display: inline-block;
+    border-radius: 60px;
+    box-shadow: 0px 0px 2px #FFF;
+}
+.THIS .mLable{
+    color: rgb(84, 105, 141);
+    display: block;
+    font-size: .625rem;
+    font-weight: 400;
+    font-weight: 400;
+    margin-top: .125rem;
+}
+.THIS .sumTab{
+    margin: 10px;
+}
+.THIS.tabsetStyle{
+    background:white;
+}
+.THIS .slds-card{
+    border:none;
+}
+.THIS .cardStyle{
+    margin: .75rem 0rem -1rem;
+}
+.THIS .actionButtons {
+    width: 100% !important;
+    margin-left: -15px;
+}
+.THIS .slds-icon_container--circle{
+    width: 38% !important;
+}
+@media (max-width: 1024px) and (min-width: 320px){
+    .THIS.mobileView {
+        display: block;
+    }
+}
+@media (max-width: 1024px) and (min-width: 320px){
+    .THIS .mobileViewButtons {
+        display: none;
+    }
+}
+@media (max-device-width : 1024px)
+    and (min-device-width : 768px)
+    and (orientation: landscape)  {
+    .THIS .showMoreDisplay {
+        background: white;
+        width: 50%;
+        margin-left: 258px;
+        padding: .5rem .75rem 0 .75rem;
+    }
+}
+@media (max-device-width : 1024px)
+    and (min-device-width : 768px)
+    and (orientation: portrait){
+    .THIS .showMoreDisplay {
+        background: white;
+        width: 50%;
+        margin-left: 187px;
+        padding: .5rem .75rem 0 .75rem;
+    }
+}

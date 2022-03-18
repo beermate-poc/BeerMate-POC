@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AuraDefinitionBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>40.0</apiVersion>
+    <description>A modal that allows you to pick from a dropdown of available contacts to have your next meeting with from the call log.</description>
+</AuraDefinitionBundle>

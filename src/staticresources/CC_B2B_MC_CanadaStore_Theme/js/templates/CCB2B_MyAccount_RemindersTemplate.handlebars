@@ -1,0 +1,31 @@
+<div class="remindersSection">
+    <div class="panel-heading cc_heading">
+        <h3 id="ccb2b-ma-reminders-title" class="panel-title cc_title">{{pageLabelMap 'CCB2B_MyAccount_Reminders_Name'}}</h3>
+        <p class="reminder-desc">{{pageLabelMap 'CCB2B_MyAccount_Reminders_Desc'}}</p>
+    </div>
+    <form id="remindersForm" class="form-horizontal" novalidate="novalidate">
+        <div class="panel panel-default cc_panel cc_reminders_panel">
+            <div class="panel-body cc_body">
+                <div class="additionalErrorMsg" style="display:none;"></div>
+                <div class="remindersSection">
+                    <div class="form-group col-xs-12 form-elem">
+                        <input class="check-option" id="ccb2b-ma-reminders-one-before-cut-off" type="checkbox" {{#if reminders.one-before-cut-off}} checked value="true" {{else}} value="false"{{/if}} name="one-before-cut-off">
+                        <label for="ccb2b-ma-reminders-one-before-cut-off" class="acceptLabel">{{pageLabelMap 'CCB2B_MyAccount_Reminders_Email_Option_1'}}</label>
+                    </div>
+                    <div class="form-group col-xs-12 form-elem" style="display:none;">
+                        <input class="check-option" id="ccb2b-ma-reminders-twelve-before-cut-off" type="checkbox" value="false" name="twelve-before-cut-off">
+                        <label for="ccb2b-ma-reminders-twelve-before-cut-off" class="acceptLabel">{{pageLabelMap 'CCB2B_MyAccount_Reminders_Email_Option_2'}}</label>
+                    </div>
+                    <div class="form-group col-xs-12 form-elem">
+                        <input class="check-option" id="ccb2b-ma-reminders-two-days-before-cut-off" type="checkbox" {{#if reminders.two-days-before-cut-off}} checked value="true" {{else}} value="false"{{/if}} name="two-days-before-cut-off">
+                        <label for="ccb2b-ma-reminders-two-days-before-cut-off" class="acceptLabel">{{pageLabelMap 'CCB2B_MyAccount_Reminders_Email_Option_3'}}</label>
+                    </div>
+                </div>
+                <div class="form-group col-xs-12">
+                    <input name="" type="button" value="{{pageLabelMap 'Save'}}" class="btn primary_button btn-sm saveReminders" disabled >
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{{> confirmRemindersModal}}

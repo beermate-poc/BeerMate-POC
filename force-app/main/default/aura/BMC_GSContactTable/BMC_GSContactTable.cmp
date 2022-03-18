@@ -1,0 +1,102 @@
+<aura:component controller="GuidedSellingController">
+     <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="distributiondata" type="Object"/>
+    <aura:attribute name="distributioncolumns" type="List"/>
+    <aura:attribute name="mcContactdata" type="Object"/>
+    <aura:attribute name="mcContactcolumns" type="List"/>
+    <aura:attribute name="refershContacts" type="boolean"/>
+    <aura:attribute name="showCreateContact" type="boolean" />
+    <aura:attribute name="contactToEdit" type="Contact" />
+    <aura:attribute name="tableStyle" type="boolean" default="false"/>
+    <lightning:flow aura:id="flowData" onstatuschange="{!c.refresh}"/>
+    <ui:scrollerWrapper class="scrollerSize">
+    <table class="slds-table slds-table_bordered">
+        <thead>
+            <aura:iteration items="{!v.columns}" var="cols">
+                    <th scope="col">
+                        <div class="slds-truncate" title="">{!cols.label}</div>
+                    </th>
+            </aura:iteration>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.data}" var="acctContact">
+            <tr>
+                <td>
+                    <div class="slds-truncate slds-cell-wrap"  title="Name">{!acctContact.Name}</div>
+                </td>
+                 <td>
+                    <div class="slds-truncate slds-cell-wrap" title="RecordType">{!acctContact.PositionLabel}</div>
+                </td>
+                 <td>
+                    <div class="slds-truncate slds-cell-wrap" title="Statud">{!acctContact.Email}</div>
+                </td>
+                <td>
+                    <div class="slds-truncate slds-cell-wrap" title="RecordType">{!acctContact.Phone}</div>
+                </td>
+                <td >
+                    <lightning:buttonMenu name ="test" aura:id="menu" onselect="{!c.handleSelect}" alternativeText="Show menu" iconSize="x-small" menuAlignment="right">
+                        <lightning:menuItem value="{!join(',', acctContact.Id, 'Edit')}" label="{!$Label.c.BMC_GSEdit}"/>
+                        <lightning:menuItem value="{!join(',', acctContact.Id, 'Delete')}" label="{!$Label.c.BMC_GSDelete}"/>
+                    </lightning:buttonMenu>
+                </td>
+            </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+    </ui:scrollerWrapper>
+    <!-- Distribution Sales Rep Table -->
+    <!--<div style="height:200px;" class="slds-scrollable_y">-->
+   <table class="slds-table slds-table_bordered">
+        <thead>
+            <aura:iteration items="{!v.distributioncolumns}" var="distcols">
+                    <th scope="col">
+                        <div class="slds-truncate" title="">{!distcols.label}</div>
+                    </th>
+            </aura:iteration>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.distributiondata}" var="distContact">
+            <tr>
+                <td>
+                    <div class="slds-truncate slds-cell-wrap" title="Name">{!distContact.PrimaryDistrSalesPersonNme__c}</div>
+                </td>
+                 <td>
+                    <div class="slds-truncate slds-cell-wrap" title="RecordType">{!distContact.DistributorAccount__r.Name}</div>
+                </td>
+            </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+    <!--</div>-->
+     <!-- Millercoors Contact Table -->
+    <ui:scrollerWrapper class="scrollerSize">
+   <table class="slds-table slds-table_bordered">
+        <thead>
+            <aura:iteration items="{!v.mcContactcolumns}" var="mccols">
+                    <th scope="col">
+                        <div class="slds-truncate" title="">{!mccols.label}</div>
+                    </th>
+            </aura:iteration>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.mcContactdata}" var="mcContact">
+            <tr>
+                <td>
+                    <div class="slds-truncate slds-cell-wrap" title="Name">{!mcContact.OwnerName}</div>
+                </td>
+                 <td>
+                    <div class="slds-truncate slds-cell-wrap" title="RecordType">{!mcContact.OwnerTitle}</div>
+                </td>
+                 <td>
+                    <div class="slds-truncate slds-cell-wrap" title="RecordType">{!mcContact.OwnerEmail}</div>
+                </td>
+                 <td>
+                    <div class="slds-truncate slds-cell-wrap" title="RecordType">{!mcContact.OwnerPhone}</div>
+                </td>
+            </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+    </ui:scrollerWrapper>
+</aura:component>

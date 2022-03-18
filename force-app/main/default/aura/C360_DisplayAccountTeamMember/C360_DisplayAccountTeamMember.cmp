@@ -1,0 +1,36 @@
+<!--Component to display Account team members associated With Account-->
+<aura:component controller="C360_DisplayAccountTeamMembers" implements="flexipage:availableForRecordHome,force:hasRecordId,flexipage:availableForAllPageTypes,force:appHostable,force:lightningQuickAction" access="global">
+    <!--force: lightningQuickActionWithoutHeader-->
+    <aura:attribute name="mydata" type="AccountTeamMember[]"/>
+   <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+   <table class="slds-table slds-table_bordered slds-table_cell-buffer font style">
+   	<thead>
+		<tr class="slds-text-title_caps">
+		  <th scope="col">
+              <div class="slds-truncate font" title="Team Member">{!$Label.c.C360_TeamMember}</div>
+		  </th>
+		  <th scope="col">
+			<div class="slds-truncate font" title="Team Role">{!$Label.c.C360_TeamRole}</div>
+		  </th>
+            <th scope="col">
+			<div class="slds-truncate font" title="Email Address">{!$Label.c.C360_Email}</div>
+		  </th>
+		</tr>
+	</thead>
+   <tbody>
+     <aura:iteration var="team" items="{!v.mydata}">
+	   <tr>
+	     <td data-label="Team Member">
+           <div class="slds-truncate font">{!team.User.Name}</div>
+         </td>
+	     <td data-label="Team Role">
+           <div class="slds-truncate font">{!team.TeamMemberRole}</div>
+         </td>
+         <td data-label="Team Role">
+           <div class="slds-truncate font">{!team.User.Email}</div>
+         </td>
+	   </tr>
+     </aura:iteration>
+	</tbody>
+ </table> 
+</aura:component>

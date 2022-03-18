@@ -1,0 +1,55 @@
+{{#ifEquals pricingType 'external'}}
+<div class="row cc_qty_control_row">
+    {{#if primaryAttr}}
+    <div class="col-md-12">
+        {{else}}
+        <div class="col-md-3 col-md-offset-9">
+            {{/if}}
+            <div class="form-group">
+                <p class="cc_order_quantity">
+                    <span class="cc_quantity_label">{{pageLabelMap 'CartInc_Qty'}}&#58;&#160;</span>
+                    <span class="cc_quantity">{{quantity}}</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    {{else}}
+    {{#ifNotEquals pricingType "attrGroup" }}
+    {{#ifEquals qtyIncrement 1}}
+    <div class="row cc_qty_control_row">
+        {{#if primaryAttr}}
+        <div class="col-md-12">
+            {{else}}
+            <div class="col-md-offset-1 col-md-10">
+                {{/if}}
+                <div class="form-group">
+                    <div class="input-group cc_input_group">
+                        <span class="input-group-btn cc_input_group_btn">
+                             <input id="{{generateId 'ccb2b-basket-minus-' product.SKU '-btn'}}" type="button" value="{{pageLabelMap 'Prod_QtyDecrSingle'}}" class="{{#ifEquals quantity 1}} readonlyBtn{{/ifEquals}} {{#unless pricingFromSap}}readonlyBtn{{/unless}} btn btn-default btn-sm minus cc_minus">
+                        </span>
+                        <input data-id="{{generateId 'ccb2b-basket-qty-' product.SKU '-input'}}" id="entry_{{sfid}}" type="text" name="qty" value="{{quantity}}" class="{{#unless pricingFromSap}}readonlyBtn{{/unless}} input-text entry plus_minus form-control input-sm cc_entry" maxlength="7" />
+                        <span class="input-group-btn cc_input_group_btn">
+                              <input id="{{generateId 'ccb2b-basket-plus-' product.SKU '-btn'}}" type="button" value="{{pageLabelMap 'Prod_QtyIncrSingle'}}" class="{{#unless pricingFromSap}}readonlyBtn{{/unless}} btn btn-default btn-sm plus cc_plus">
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/ifEquals}}
+        <input type="hidden" name="qtyIncrement" value="{{qtyIncrement}}" class="item_qtyIncrement" />
+        <input type="hidden" name="qtySkipIncrement" value="{{qtySkipIncrement}}" class="item_qtySkipIncrement" />
+        {{else}}
+        {{#ifEquals pricingType 'attrGroup'}}
+        <div class="row cc_qty_control_row">
+            <div class="col-md-3 col-md-offset-9">
+                <div class="form-group">
+                    <p class="cc_order_quantity">
+                        <span class="cc_quantity_label">{{pageLabelMap 'CartInc_Qty'}}&#58;&#160;</span>
+                        <span class="cc_quantity">{{quantity}}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        {{/ifEquals}}
+    {{/ifNotEquals}}
+{{/ifEquals}}

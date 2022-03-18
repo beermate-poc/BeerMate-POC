@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="Error on Parts Save">
+    <aura:attribute name="ErrorMsg" type="String"/>
+</aura:event>

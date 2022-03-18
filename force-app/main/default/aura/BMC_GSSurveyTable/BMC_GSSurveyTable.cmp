@@ -1,0 +1,89 @@
+<aura:component controller="GuidedSellingController" implements="force:hasRecordId,flexipage:availableForAllPageTypes" access="global">
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="surveycolumns" type="List"/>
+    <aura:attribute name="surveydata" type="object"/>
+    <aura:attribute name="mobileSurveyLink" type="String"/>
+    <aura:attribute name="showiFrame" type="boolean"/>
+    <aura:attribute name="showSurveyTable" type="boolean" default="true"/>
+    <aura:attribute name="refresh" type="boolean"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <ui:scrollerWrapper class="scrollerSize">
+        <aura:if isTrue="{!v.showSurveyTable}">
+            <!--<lightning:button label="Refresh list View"  variant="brand" iconPosition="right" title="Refresh" onclick="{!c.refreshSurvey}"/> -->
+            <lightning:accordion aura:id="surveyLaunch" activeSectionName="surveyLaunch">
+                <lightning:accordionSection name="surveyLaunch" label="Survey Launch" >
+                    <aura:set attribute="body">
+                        <table class="slds-table slds-table_bordered">
+                            <thead>
+                                <aura:iteration items="{!v.columns}" var="cols">
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="">{!cols.label}</div>
+                                    </th>
+                                </aura:iteration>
+                            </thead>
+                            <tbody>
+                                <aura:iteration items="{!v.data}" var="survey">
+                                    <tr>
+                                        <td>
+                                            <div class="slds-truncate slds-cell-wrap" title="Name">{!survey.Name}</div>
+                                        </td>
+                                        <td>
+                                            <aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+                                                <div data-record="{!survey.launchUrlmobile}" onclick="{!c.navigateToSurveyPage}">
+                                                    <ui:outputURL label="{!survey.surveylabel}" />
+                                                </div>
+                                                <aura:set attribute="else">
+                                                    <a href="" data-record="{!survey.launchUrl}" onclick="{!c.navigateToSurveyPage}">
+                                                        <div class="slds-truncate" title="SurveyLink">{!survey.surveylabel}</div>
+                                                    </a>
+                                                </aura:set>
+                                            </aura:if> 
+                                        </td>
+                                    </tr>
+                                </aura:iteration>
+                            </tbody>
+                        </table>
+                    </aura:set>
+                </lightning:accordionSection>
+            </lightning:accordion>
+            <lightning:accordion aura:id="survey Taken" activeSectionName="survey Taken">
+                <lightning:accordionSection name="survey Taken" label="Survey Taken" >
+                    <aura:set attribute="body">
+                        <table class="slds-table slds-table_bordered">
+                            <thead>
+                                <aura:iteration items="{!v.surveycolumns}" var="cols">
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="">{!cols.label}</div>
+                                    </th>
+                                </aura:iteration>
+                            </thead>
+                            <tbody>
+                                <aura:iteration items="{!v.surveydata}" var="survey">
+                                    <tr>
+                                        <td>
+                                            <div class="slds-truncate slds-cell-wrap" title="Name">{!survey.Survey_Name__c}</div>
+                                        </td>
+                                        <td>
+                                            <div class="slds-truncate slds-cell-wrap" title="Execution Date">
+                                                <lightning:formattedDateTime value="{!survey.LastModifiedDate}"/></div>  
+                                        </td>
+                                        <td>
+                                            <div class="slds-truncate slds-cell-wrap" title="Executed By">{!survey.userName}</div>  
+                                        </td>
+                                    </tr>
+                                </aura:iteration>
+                            </tbody>
+                        </table>
+                    </aura:set>
+                </lightning:accordionSection>
+            </lightning:accordion>
+        </aura:if>   
+        <div class="iframeClass">
+            <aura:if isTrue="{!v.showiFrame}">
+                <iframe aura:id="vfFrame" height="650px" width="100%" src="{!v.mobileSurveyLink}" />    
+            </aura:if>
+        </div>
+    </ui:scrollerWrapper>       
+</aura:component>

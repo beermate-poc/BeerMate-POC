@@ -1,0 +1,172 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" controller="C360_Case_Survey_Creation_Controller">
+   
+    <aura:attribute name="record" type="Object" description="The Case record object"/>
+    <aura:attribute name="caseRecord" type="Object" description="Records from Case Object"/>
+    <aura:attribute name="recordError" type="String" description="An error message bound to force:recordData"/>
+
+    <aura:attribute name="questions" type="Object[]" description="Question that are shown in survey"/>
+    <aura:attribute name="initialAnswers" type="Object[]" description="Initial Question that are shown in survey"/>
+    <aura:attribute name="answers" type="Object[]" description="Put the answers from the question"/>
+    <aura:attribute name="selectedOptions" type="String" default="" description=""/>
+    
+    <aura:attribute name="questionTypes" type="Object" default="{}" description="Object to save type of questions"/>
+
+    <aura:attribute name="selectedRecord" type="sObject" default="{}" description="Use,for store SELECTED sObject Record"/>
+    <aura:attribute name="listOfSearchRecords" type="List" description="Use,for store the list of search records which returns from apex class"/>
+    <aura:attribute name="SearchKeyWord" type="string"/>
+    <aura:attribute name="Message" type="String" default=""/>
+    <aura:attribute name="MessageAlertExtraCost" type="String" default=""/> 
+    <aura:attribute name="QuestionWithExtraCost" type="String" default="Number of copies required"/> 
+
+    <aura:attribute name="isVisible" type="Boolean" default="false"/>
+
+    <force:recordData aura:id="recordLoader"
+                      layoutType="FULL"
+                      recordId="{!v.recordId}"
+                      targetError="{!v.recordError}"
+                      targetRecord="{!v.record}"
+                      targetFields="{!v.caseRecord }"
+                      recordUpdated="{!c.doInit}"
+                      />
+    
+    <aura:if isTrue="{!v.isVisible}">
+        <lightning:card>
+            <div class="slds-p-horizontal_medium slds-p-vertical_medium">
+                <div class="slds-text-heading_medium slds-text-align_center"><b>Case Creation Survey</b></div>
+                <aura:iteration items="{!v.questions}" var="question" indexVar="i">
+                    <div class="slds-text-body_regular">{!question.Name}</div>
+                    <aura:if isTrue="{!v.questionTypes.text == question.Type_of_Answer__c}">
+                        <div class="slds-size_8-of-12">
+                            <lightning:input aura:id="{!i}" type="text" name="{!i}"  onchange="{!c.onChangeValue}"/>
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!v.questionTypes.date == question.Type_of_Answer__c}">
+                        <div class="slds-combobox_container slds-size_small">
+                            <lightning:input aura:id="{!i}" type="date" name="{!i}" onchange="{!c.onChangeDateValue}"/>
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!v.questionTypes.time == question.Type_of_Answer__c}">
+                        <div class="slds-combobox_container slds-size_small">
+                            <lightning:input aura:id="{!i}" type="time" name="{!i}" onchange="{!c.onChangeTimeValue}"/>
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!v.questionTypes.dateTime == question.Type_of_Answer__c}">
+                        <lightning:input aura:id="{!i}" type="datetime" name="{!i}" onchange="{!c.onChangeDateTimeValue}"/>
+                    </aura:if>
+                    <aura:if isTrue="{!v.questionTypes.checkbox == question.Type_of_Answer__c}">
+                        <lightning:input aura:id="{!i}" type="checkbox" name="{!i}" checked="false" onchange="{!c.onChangeCheckbox}"/>
+                    </aura:if>
+                    <aura:if isTrue="{!v.questionTypes.currency == question.Type_of_Answer__c}">
+                        <div class="slds-size_small">
+                            <lightning:input aura:id="{!i}" type="number" name="{!i}" onchange="{!c.onChangeValue}" formatter="currency" step="0.01"/>
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!v.questionTypes.numeric == question.Type_of_Answer__c}">
+                        <div class="slds-combobox_container slds-size_small">
+                            <lightning:input aura:id="{!i}" type="number" name="{!i}" onchange="{!c.onChangeValue}" />
+                        </div>
+                        <aura:if isTrue="{!v.QuestionWithExtraCost == question.Name}">
+                            <div class="slds-text-color_error">
+                                {!v.MessageAlertExtraCost}
+                            </div>
+                        </aura:if>
+                    </aura:if>
+                    <aura:if isTrue="{!v.questionTypes.picklist == question.Type_of_Answer__c}">
+                        <div class="slds-combobox_container slds-size_small">
+                            <lightning:select aura:id="{!i}" name="{!i}" onchange="{!c.onChangeValue}">
+                                <aura:iteration items="{!question.Answer__c}" var="answer">
+                                        <option value="{!answer}"> {!answer} </option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!v.questionTypes.multiPicklist == question.Type_of_Answer__c}">
+                            
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <div class="slds-combobox_container slds-size_small">
+                                    <div aura:id="dropdown" onclick="{!c.openDropdown}" onmouseleave="{!c.closeDropDown}"  class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-close" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                            <input type="text" class="slds-input slds-combobox__input slds-combobox__input-value"
+                                            placeholder="Select one or more Options" readonly="true" onfocus="{!c.openDropdown}" value="{!v.selectedOptions}"/>
+                                            <span class="slds-icon_container slds-icon-utility-down slds-input__icon slds-input__icon_right" title="Down icon">
+                                                <lightning:icon iconName="utility:down" size="xx-small" class="slds-icon-text-default"/>
+                                                <span class="slds-assistive-text">Down icon</span>
+                                            </span>
+                                        </div>
+                                        <div id="listbox-unique-id" role="listbox">
+                                            <ul class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid" role="presentation">
+                                                <aura:iteration items="{!question.Answer__c}" var="item" indexVar="ind">
+                                                    <li onclick="{!c.selectOption}" id="{!item.label+'#BP#'+item.isChecked+'#BP#'+i}" role="presentation" class="slds-listbox__item">
+                                                        <div id="{!'listbox-option-unique-id-'+(ind+1)}" class="{!item.isChecked==true?'slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center slds-is-selected':'slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center '}" role="option">
+                                                            <span class="slds-media__figure">
+                                                                <lightning:icon iconName="utility:check" size="xx-small" class="slds-listbox__icon-selected"/>
+                                                            </span>
+                                                            <span class="slds-media__body">
+                                                                <span class="slds-truncate" title="{!item.label}"> {!item.label}</span>
+                                                            </span>
+                                                        </div>
+                                                    </li>
+                                                </aura:iteration>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!v.questionTypes.lookup == question.Type_of_Answer__c}">
+                        <div onmouseleave="{!c.onblur}" aura:id="searchRes" class="slds-form-element slds-lookup slds-is-close" data-select="single">
+                            <!--This part is for display search bar for lookup-->  
+                            <div class="slds-form-element__control">
+                                
+                                <div class="slds-input-has-icon slds-input-has-icon--right">
+                                    <!-- This markup is for when an record is selected -->
+                                    <div aura:id="lookup-pill" class="slds-pill-container slds-hide">
+                                        <lightning:pill class="pillSize" label="{!v.selectedRecord.Name}" name="{!v.selectedRecord.Name}" onremove="{!c.clear}">
+                                            <aura:set attribute="media">
+                                                <lightning:icon iconName="standard:product" size="x-small" alternativeText="standard:product"/>
+                                            </aura:set>
+                                        </lightning:pill>
+                                    </div>
+                                    <div aura:id="lookupField" class="slds-show">
+                                        <lightning:icon class="slds-input__icon slds-show" iconName="utility:search" size="x-small" alternativeText="search"/>
+                                        <span class="slds-icon_container  slds-combobox__input-entity-icon" title="record">
+                                            <lightning:icon class="slds-icon slds-icon slds-icon_small slds-icon-text-default" iconName="standard:product" size="x-small" alternativeText="icon"/>
+                                            <span class="slds-assistive-text"></span>
+                                        </span>
+                                        <ui:inputText click="{!c.onfocus}" updateOn="keyup" keyup="{!c.keyPressController}" class="slds-lookup__search-input slds-input leftPaddingClass" value="{!v.SearchKeyWord}" placeholder="search.."/>
+                                    </div>   
+                                </div>
+                            </div>
+                            <!--This part is for Display typehead lookup result List-->  
+                            <ul style="min-height:40px;margin-top:0px !important" class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-lookup__menu slds" role="listbox">
+                                <lightning:spinner class="slds-hide" variant="brand" size="small" aura:id="mySpinner"/>
+                                <center> {!v.Message}</center>
+                                <aura:iteration items="{!v.listOfSearchRecords}" var="singleRec">
+                                    <li role="presentation" class="slds-listbox__item" onclick="{!c.selectRecord}" id="{!singleRec.Name+'#BP#'+singleRec.C360_Product_ID_SKU__c+'#BP#'+singleRec.C360_Brand_Owner_Description__c+'#BP#'+i}">
+                                        <span id="listbox-option-unique-id-01" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                            <span class="slds-media__figure">
+                                                <span class="slds-icon_container" title="Description of icon when needed">
+                                                    <lightning:icon iconName="standard:product" class="slds-icon slds-icon_small" size="small" alternativeText="icon"/>
+                                                    <span class="slds-assistive-text">Description of icon</span>
+                                                </span>
+                                            </span>    
+                                            <span class="slds-media__body">
+                                                <span class="slds-listbox__option-text slds-listbox__option-text_entity">{!singleRec.Name}</span>
+                                                <span class="slds-listbox__option-text slds-listbox__option-text_entity">{!singleRec.C360_Product_ID_SKU__c}</span>
+                                                <span class="slds-listbox__option-text slds-listbox__option-text_entity">{!singleRec.C360_Brand_Owner_Description__c}</span>
+                                            </span>
+                                        </span>
+                                    </li>
+                                </aura:iteration>
+                            </ul>
+                        </div>
+                    </aura:if>
+                    <br></br>
+                </aura:iteration>
+                <lightning:button variant="success" label="Save" title="Success" onclick="{!c.handleSave}"/> 
+            </div>
+        </lightning:card>
+    </aura:if>
+</aura:component>

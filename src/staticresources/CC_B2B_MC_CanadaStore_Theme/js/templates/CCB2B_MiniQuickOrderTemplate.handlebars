@@ -1,0 +1,23 @@
+{{#if (checkContactDisplayPermissions 'create_cart')}}
+    <div class="panel panel-default cc_panel cc_mini_quick_order">
+        <div class="panel-heading cc_heading">
+            <h3 class="panel-title cc_title text-center">{{pageLabelMap 'QuickOrder'}}</h3>
+        </div>
+        <div id="collapseMiniQuickOrder" class="panel-collapse collapse in">
+            <div class="panel-body cc_body">
+                <div id="quick_order" class="quick_order cc_quick_order"></div>
+                <p class="cc_caption">{{pageLabelMap 'QuickOrder_QuickOrderBoxCaption'}}</p>
+                <form id="skuQtyForm" class="form-horizontal cc_form_sku_qty">
+                    <div class="quickOrderRow cc_quick_order_row row">
+                    </div>
+                </form>
+            </div>
+            <div class="panel-footer cc_footer">
+                <div class="form-group text-right cc_form_group">
+                    <button class="btn primary_button btn-sm addToCart cc_addtocart" type="submit">{{pageLabelMap 'QuickOrder_AddToCart'}}</button>
+                    <button class="btn btn-default btn-sm addMore cc_addmore" type="submit">{{pageLabelMap 'QuickOrder_AddMore'}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{{/if}}

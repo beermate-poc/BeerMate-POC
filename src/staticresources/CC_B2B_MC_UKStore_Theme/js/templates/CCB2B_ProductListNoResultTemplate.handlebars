@@ -1,0 +1,33 @@
+  <div class="cc_no_results col-md-12">
+   <div class="panel panel-default cc_panel">
+    <div class="panel-body cc_body">
+    {{#if (or (eq category.CCB2BPromoType "Deal") (eq category.CCB2BPromoType "Event Price"))}}
+        <h4 class="cc_category_name">{{category.sfdcName}}</h4>
+        <h3 class="dealNotFound">
+        {{#if noResults}}
+            {{pageLabelMap 'CCB2B_No_Results_Deal_Page_Msg'}}
+        {{else}}
+            {{pageLabelMap 'CCB2B_Not_Eligible_For_Promotion_Msg'}}
+        {{/if}}
+        </h3>
+    {{else}}
+         <h3 class="cc_header">
+            {{pageLabelMap 'Productlist_SearchNoResults'}}
+         </h3>
+         <hr />
+         {{#if this.prodFilters}}
+              <p>{{pageLabelMap 'ProductList_SearchNoResultsBody' (concatFilters this.prodFilters)}}</p>
+              <button type="button" class="btn btn-default btn-sm center-block cc_remove_filters">
+               {{pageLabelMap 'ProductCompare_ClearAllFilters'}}
+              </button>
+         {{else}}
+              {{#if this.isSearch}}
+                <p>{{pageLabelMap 'ProductList_SearchNoResultsBody' this.searchString}}</p>
+              {{else}}
+                <p>{{pageLabelMap 'ProductList_NoResultsGeneric'}}</p>
+              {{/if}}
+         {{/if}}
+     {{/if}}
+    </div>
+   </div>
+  </div>

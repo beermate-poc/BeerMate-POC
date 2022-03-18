@@ -1,0 +1,20 @@
+<!--
+ - Created by alexandria.sanborn on 1/8/2019.
+ -->
+
+<aura:component description="ACE_ReimbursementRecall" controller="ACEReimbursementApproval" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:availableForFlowScreens">
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="success" type="boolean" default="false" />
+    <aura:attribute name="error" type="boolean" default="false" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <aura:if isTrue="{!v.success}">
+        <ui:message title="Success" severity="confirm" closable="false">
+            Reimbursement was recalled.
+        </ui:message>
+    </aura:if>
+
+    <aura:if isTrue="{!v.error}">
+        <ui:message title="Error" severity="error" closable="false" aura:id="errorMsg"/>
+    </aura:if>
+</aura:component>

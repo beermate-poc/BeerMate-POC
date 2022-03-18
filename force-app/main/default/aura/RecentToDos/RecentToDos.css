@@ -1,0 +1,30 @@
+.THIS .overdue {
+    color: red;
+}
+.THIS tr{
+    border-top: 5px solid rgb(216, 221, 230);
+}
+.THIS .subject{
+    font-weight: bold;
+    word-break: break-all;
+}
+@media (max-width: 1025px){
+ 	.THIS.scrollerSize{
+    	height: 650px;
+	}
+}
+@media (max-width: 769px){
+	.THIS.scrollerSize{
+    	height: 440px;
+	}
+}
+@media (max-width: 416px){
+ 	.THIS.scrollerSize{
+    	height: 170px;
+	}
+}
+@media (max-width: 376px){
+ 	.THIS.scrollerSize{
+    	height: 100px;
+	}
+}

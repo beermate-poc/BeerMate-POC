@@ -1,0 +1,8 @@
+<aura:component controller="TableauDashboardsHandler" implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="ifmsrc" type="String"/>
+    <div class='hideMobile'>
+    <iframe aura:id="iframe"  scrolling="no" height="300px" width="100%" src="{!v.ifmsrc}" frameborder="true"/>
+	</div>
+</aura:component>

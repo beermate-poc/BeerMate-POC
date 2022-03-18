@@ -1,0 +1,17 @@
+<aura:component >
+	<aura:attribute name="callLog" type="Call_Log__c" />
+	<div class="slds-section">
+		<h3 class="slds-section__title">
+			<div class="slds-button slds-section__title-action" onclick="{!c.toggleSection}">
+				<lightning:icon class="slds-hide" aura:id="summaryContent" iconName="utility:chevrondown" size="x-small" alternativeText="Indicates show"/>
+				<lightning:icon class="slds-show" aura:id="summaryContent" iconName="utility:chevronright" size="x-small" alternativeText="Indicates add"/>
+				<span class="slds-truncate slds-p-left_small" title="Section Title">
+				   <ui:outputDate value="{!v.callLog.Call_Start_Date__c}" format="EEEE, MMM dd"/> &nbsp; {!v.callLog.Started_By__r.Name}
+				</span>
+			</div>
+		</h3>
+		<div class=" slds-hide slds-p-around--medium" aura:id="summaryContent">
+			<lightning:textarea disabled="true" value="{!v.callLog.Call_Summary__c}" label=" "/>
+		</div>
+	</div>
+</aura:component>

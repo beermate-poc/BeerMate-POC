@@ -1,0 +1,75 @@
+<aura:component controller="CallLogUtility" implements="force:lightningQuickAction,force:appHostable">
+    <aura:registerEvent name="setAttribute" type="c:AttributeHandler"/>
+    <aura:attribute name="accountId" type="Id" />
+    <aura:attribute name="callLogId" type="Id" />
+    <aura:attribute name="newNote" type="ContentNote" default="{'sobjectType': 'ContentNote'}"/>
+    <aura:attribute name="mobileCSS" type="String" default="slds-modal--form" />
+    <aura:attribute name="showNewNote" type="boolean" />
+    <aura:attribute name="showObjView" type="boolean"/>
+    <aura:attribute name="showToast" type="boolean" />
+    <aura:attribute name="showErrorToast" type="boolean" default="false"/>
+    <aura:attribute name="toastTitle" type="String" />
+    <aura:attribute name="toastMsg" type="String" />
+    <aura:attribute name="toastType" type="String" />
+    <aura:attribute name="newRecord" type="String" />
+    <aura:attribute name="loadNotes" type="boolean" />
+    <aura:attribute name="showNewNoteAIF" type="boolean"/>
+
+    <lightning:spinner aura:id="spinner" class="slds-hide" alternativeText="Please wait..." />
+
+    <div class="slds-text-align__center">
+        <aura:if isTrue="{!v.showErrorToast}">
+            <c:Toast toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}"/>
+        </aura:if>
+    </div>
+    
+    <aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+    <div class="newNoteModal ">
+        <div class="">
+            <div class="modalStyle">
+                <div class="mobileView " >
+                    <div class="slds-float_left">
+                        <lightning:button class="slds-button" variant="neutral" onclick="{!c.closeNewNoteModalMobile}" label="{!$Label.c.Cancel_Label}" />
+                    </div>
+                    <div class="slds-float_right ipadStyle">
+                        <lightning:button class="slds-button" variant="brand" onclick="{!c.addNote}" label="{!$Label.c.Save}" />
+                    </div>
+                    <h2 class="slds-text-heading--medium slds-truncate" title="{!$Label.c.Add_Notes}">{!$Label.c.Add_Notes}</h2>
+                </div>
+                <div class="formContent" >
+                        <h3 class="slds-section-title--divider">{!$Label.c.Note_Information}</h3>
+                        <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                                <lightning:input label="{!$Label.c.Note_Title}"  name="note" aura:id="noteTitle" required="true" maxlength="50" messageWhenValueMissing="{!$Label.c.Title_Required}"  />
+                                <lightning:textarea name="noteBody" label="{!$Label.c.Description}" required="true" maxlength="300"  aura:id="noteBody" />
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+    <aura:set attribute="else">
+    <div class="newNoteModal ">
+        <div role="dialog" tabindex="-1" class="{!v.mobileCSS + ' slds-modal ' + ' slds-fade-in-open '}">
+            <div class="slds-modal__container modalStyle">
+                <div class="slds-modal__header">
+                    <h2 class="slds-text-heading--medium slds-truncate" title="New Contact">Add Notes</h2>
+                </div>
+                    <div class="slds-modal__content" >
+                        <h3 class="slds-section-title--divider">{!$Label.c.Note_Information}</h3>
+                        <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                                <lightning:input label="{!$Label.c.Title}"  name="note" aura:id="noteTitle" required="true" messageWhenValueMissing="{!$Label.c.Title_Required}"  maxlength="50"/>
+                                <lightning:textarea name="noteBody" required="true" label="{!$Label.c.Description}" maxlength="300"  aura:id="noteBody" />
+                        </div>
+                    </div>
+                <div class="slds-modal__footer mobileViewHeader">
+                    <lightning:button class="slds-button" variant="neutral" label="{!$Label.c.Cancel_Label}" onclick="{!c.closeNewNoteModal}" />
+                    <lightning:button class="slds-button" variant="brand" label="{!$Label.c.Save}" onclick="{!c.addNote}" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</aura:set>
+        </aura:if>
+
+</aura:component>

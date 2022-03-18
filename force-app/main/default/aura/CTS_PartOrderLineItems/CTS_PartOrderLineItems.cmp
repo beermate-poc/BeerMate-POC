@@ -1,0 +1,125 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="CTS_ConsolidatePartOrderController">
+	<!-- attributes -->
+    <aura:attribute name="data" type="Product2[]" default="[]"/>
+    <aura:attribute name="selectedCount" type="integer" default="0"/>
+    <aura:attribute name="modalPromise" type="Aura.Action"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="errorMsg" type="String"/>
+    <aura:attribute name="errors" type="Object" default="[]"/>
+    <aura:attribute name="draftValues" type="Object" default="[]"/>
+    <aura:attribute name="parentRecordId" type="String" default=""/>
+	<aura:attribute name="searchResult" type="List" description="use for store and display account list return from server"/>
+    <aura:attribute name="searchKeyword" type="String" description="use for store user search input"/>
+    <aura:attribute name="Message" type="boolean" default="false" description="use for display no record found message"/>
+    <aura:attribute name="TotalNumberOfRecord" type="integer" default="0" description="use for display Number of records"/>
+    <aura:attribute name="quantity" type="integer" default="0" description="use for display Number of quantity"/>
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }"/>
+    <!-- SHOW LOADING SPINNER--> 
+    <lightning:spinner variant="brand" size="large" aura:id="Id_spinner" class="slds-hide" />
+    
+    <div class="slds-m-around_medium">
+       <header class="slds-modal__header">
+                    
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Add Part Order Lines:</h2>
+                </header>
+       
+       <!-- SEARCH INPUT AND SEARCH BUTTON--> 
+        <lightning:layout>
+            <lightning:layoutItem flexibility="auto" >
+                <lightning:input value="{!v.searchKeyword}"
+                                 required="true"
+                                 type="search"
+                                 placeholder="Enter Product Name"
+                                 aura:id="searchField"
+                                 variant="label-hidden"
+                                 />
+                
+            </lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto" >
+                <lightning:button onclick="{!c.Search}"
+                                  variant="brand"
+                                  label="Search"
+                                  iconName="utility:search"/> 
+            </lightning:layoutItem>
+        </lightning:layout>
+       
+        <!-- TOTAL RECORDS BADGES--> 
+        <div class="slds-m-around_x-small">
+            <lightning:badge label="{!v.TotalNumberOfRecord}" />
+        </div>
+        
+        <!-- ERROR MESSAGE IF NOT RECORDS FOUND--> 
+        <aura:if isTrue="{!v.Message}">
+            <div class="slds-notify_container slds-is-relative">
+                <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                    <div class="slds-notify__content">
+                        <h2 class="slds-text-heading_small">{!v.errorMsg}</h2>
+                    </div>
+                </div>
+            </div>
+        </aura:if>
+        
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+            <thead>
+                <tr class="slds-text-title_caps">
+                    
+                    <th scope="col">
+                        <div class="slds-truncate" title="S.no">S.no</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Select">Select</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Product Name">Name</div>
+                    </th>
+                     <th scope="col">
+                        <div class="slds-truncate" title="Quantity">Quantity</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody> 
+                <!--### display all records of searchResult attribute by aura:iteration ###-->
+                <aura:iteration items="{!v.searchResult}" var="product" indexVar="count">
+                    <tr>
+                        <td scope="row">
+                            <div class="slds-truncate">{!count + 1}</div>
+                        </td>
+                        
+                        <td scope="row" class="slds-text-align--right" style="width:3.25rem;">
+                  			<lightning:input type="checkbox" aura:id="selectedProduct" name="{!product.Id}" onchange="{!c.checkboxSelect}"/>
+                             <!--       
+                            <div class="slds-form-element">
+                     			<div class="slds-form-element__control">
+                                    <label class="slds-checkbox">
+                                        <ui:inputCheckbox text="{!product.Id}" aura:id="selectedProduct" value="" change="{!c.checkboxSelect}"/>
+                                        <span class="slds-checkbox-
+                                                     -faux"></span>
+                                        <span class="slds-form-element__label text"></span>
+                                    </label>
+                     			</div>
+                  			</div>-->
+               			</td>
+                        <td scope="row">
+                            <div class="slds-truncate">{!product.Name}</div>
+                        </td>
+                        
+                        <td scope="row">
+                            <div class="slds-truncate">
+                            <!--lightning:buttonIcon  onclick="{!c.handleCancel}" variant="neutral" iconName="utility:add"/>
+                                {!v.quantity}
+                                <lightning:buttonIcon  onclick="{!c.handleCancel}" variant="neutral" iconName="utility:dash"/-->
+                            <!--lightning:inputField type="Number" value="{!v.quantity}"/-->
+                            <lightning:input aura:id="Quant" name="{!product.Id}" type="number" min="1"/>
+                            </div>
+                        </td>
+                     </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+        	<div aura:id="saveButton" class="slds-docked-form-footer slds-hide" style="position: unset;background: none;box-shadow: none;">
+            	<lightning:buttonGroup class="slds-float_right">
+                	<lightning:button label="{!$Label.c.CTS_Save}" onclick="{!c.getSelectedProducts}" variant="neutral"/>
+                </lightning:buttonGroup>             
+           </div> 
+    </div>
+ </aura:component>

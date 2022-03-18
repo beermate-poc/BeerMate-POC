@@ -1,0 +1,22 @@
+.THIS .slds-table td {
+    padding-top: 0rem;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+    padding-bottom: 0rem;
+   
+}
+
+.THIS textarea {
+    border-radius: 0.25rem;
+    border-color: rgb(212,212,212);
+}
+
+.THIS .slds-rich-text-area__content {
+    min-height: 0rem;
+    padding: .5rem
+   
+}
+
+.THIS .slds-text-heading_small {
+    font-size:.75rem;
+}

@@ -1,0 +1,16 @@
+.THIS .slds-listbox__item {
+	padding-top: 1px !important;
+	padding-left: 1px !important;
+}
+.THIS .slds-pill {
+	background-color: rgb(205, 221, 245) !important;
+    border-color: rgb(205, 221, 245) !important;
+}
+.THIS .containerPills {
+	display:block; 
+	width:auto; 
+	overflow:display;
+}
+.THIS .selectedPills {
+	display:inline-block !important;
+}

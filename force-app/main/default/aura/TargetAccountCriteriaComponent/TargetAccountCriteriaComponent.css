@@ -1,0 +1,29 @@
+.THIS .slds-modal__header{
+  border-bottom: 0px !important;
+}
+.THIS .slds-modal__footer{
+  border-top: 0px !important;
+}
+.THIS .slds-modal__container{
+  width:85% !important;
+  padding-top: 135px !important;
+}
+.THIS .buttonPadding{
+  padding-top: 23px;
+}
+.THIS .scrollerSizeExisting{
+    height: 200px;
+}
+@media screen and (min-width: 0px) and (max-width: 768px) {
+  .THIS #normalExistingList {
+    display: none;
+  }
+  .THIS .scrollerSizeAdd{
+    height: 300px;
+}
+}
+@media screen and (min-width: 769px) and (max-width: 2000px) {
+  .THIS #mobileExistingList {
+    display: none;
+  }
+}

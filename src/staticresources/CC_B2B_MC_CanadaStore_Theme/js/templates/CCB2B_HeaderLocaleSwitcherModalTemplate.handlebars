@@ -1,0 +1,26 @@
+<div class="modal fade cc_modal cc_change_locale_modal" id="switcherMod" tabindex="-1" role="dialog" aria-labelledby="Locale picker">
+    <div class="modal-dialog modal-sm cc_modal_dialog" role="document">
+        <div class="modal-content cc_modal_content">
+            <div class="modal-header cc_modal_header">
+                <button type="button" class="close cc_close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&#215;</span></button>
+                <h4 class="modal-title cc_modal_title" id="myModalLabel">{{pageLabelMap 'LocaleSwitcher_Modal_Title'}}</h4>
+            </div>
+            <div class="modal-body cc_modal_body">
+                <p>{{pageLabelMap 'LocaleSwitcher_Modal_Label'}}</p>
+                <p class="note">{{pageLabelMap 'LocaleSwitcher_Modal_Note'}}</p>
+                <table class="localeModalTable table table-hover table-bordered cc_locale_modal_table" id="available_locales">
+                    {{#each availableLocales}}
+                    <tr class="cc_tr_locale {{#ifEquals this ../locale}} active{{/ifEquals}}" data-id={{this}}>
+                        <td class="cc_td_locale">{{pageLabelPrefixMap 'Loc_' this}}</td>
+                    </tr>
+                    {{/each}}
+                </table>
+            </div>
+            <div class="modal-footer cc_modal_footer">
+                <input type="button" id="setLocale" class="btn btn-default btn-sm primary_button setLocale cc_set_locale" data-id="{{sfid}}" data-mode="{{mode}}" value="{{pageLabelMap 'LocaleSwitcher_Change'}}"/>
+                <input type="button" id="cancelLocale" class="btn btn-default btn-sm closeModal cc_close_modal" data-dismiss="modal" data-id="{{sfid}}" value="{{pageLabelMap 'LocaleSwitcher_Cancel'}}" />
+            </div>
+        </div>
+    </div>
+</div>
+  

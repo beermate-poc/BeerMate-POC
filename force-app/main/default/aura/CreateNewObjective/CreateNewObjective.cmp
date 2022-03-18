@@ -1,0 +1,16 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+<aura:attribute name="recordId" type="String" default=""/>
+<aura:attribute name="saveState" type="String" default="UNSAVED" />
+<aura:handler name="onSaveSuccess" event="force:recordSaveSuccess" action="{!c.handleSaveSuccess}"/>
+<aura:registerEvent name="EditObjectiveSucess" type="c:EditObjectiveSucess" />
+
+     <lightning:layout >
+         <lightning:layoutItem  flexibility="auto" class="item_contianer" padding="around-small">
+        <force:recordEdit aura:id="edit" recordId="{!v.recordId}" />
+        
+       <lightning:button aura:id="saveEditButton" variant="neutral" label="{!$Label.c.Save}" title="{!$Label.c.Save}" onclick="{!c.save}" disabled="false" />
+             <lightning:button aura:id="cancelEditButton" variant="neutral" label="{!$Label.c.CTS_Cancel}" title="{!$Label.c.CTS_Cancel}" onclick="{!c.cancel}" disabled="false" />
+        
+         </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

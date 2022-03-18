@@ -1,0 +1,897 @@
+<aura:component controller="CallLogUtility" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global">
+<aura:handler name="init" action="{!c.init}" value="{!this}" />
+<!-- Objectives -->
+<aura:attribute name="objectives" type="Objective__c[]" />
+<!--Ids-->
+<aura:attribute name="accountId" type="Id" default="" />
+<aura:attribute name="callLogId" type="Id" default="" />
+<!--Other--> 
+<aura:attribute name="callDate" type="Date" />
+<aura:attribute name="declinedVals" type="String[]" default="[]"/>
+<aura:attribute name="accountIsOffPremise" type="boolean" default="false" />
+<aura:attribute name="showNoRecords" type="boolean" default="false" />
+
+<aura:attribute name="showToastObjective" type="boolean" default="false"/>
+<aura:attribute name="toastTitle" type="String" />
+<aura:attribute name="toastMsg" type="String" />
+<aura:attribute name="toastType" type="String" />
+<aura:attribute name="userRole" type="String" default=''/>
+<aura:attribute name="statusDeclined" type="boolean" default="false"/>
+      <aura:attribute name="ObjectivesFields" type="Object" />
+      <aura:attribute name="fields" type="String[]" default="!$Label.c.GS_Selling_Story"/>
+<!--Handlers-->
+<aura:handler name="change" value="{!v.callLogId}" action="{!c.init}" />
+<aura:handler name="change" value="{!v.callDate}" action="{!c.setFormat}" />
+<!--Methods-->
+<aura:method name="loadObjectives" action="{!c.init}" />
+<aura:method name="updateObjectiveMethod" action="{!c.updateRecord}" />
+<aura:registerEvent name="copyRecord" type="c:CopyRecord"/>
+<aura:registerEvent name="doneLoading" type="c:DoneLoading"/>
+
+<ui:scrollerWrapper class="scrollerSize">
+    <c:NoRecordsFound object="{!v.objectives}" message="{!$Label.c.NoObjectives}" />
+    <aura:iteration items="{!v.objectives}" var="obj" aura:id="placementIteration" indexVar="idx">
+        <!-- Placement -->
+        <aura:if isTrue="{!obj.RecordType.Name == 'Placement'}">
+            <!--Header-->
+            <div class="slds-page-header slds-m-bottom--x-large">
+                <div class="slds-grid">
+                    <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2">
+                        <div class="slds-col slds-has-flexi-truncate">
+                            <div class="slds-media slds-no-space slds-grow">
+                                <div class="slds-media__figure">
+                                    <lightning:icon iconName="custom:custom98" alternativeText="{!$Label.c.My_Objectives}" />
+                                </div>
+                                <div class="slds-media__body">
+                                    <span class="slds-text-align--left slds-text-title--caps">{!$Label.c.Placement}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <aura:if isTrue="{!obj.Planned_Objective__c}">
+                        <aura:if isTrue="{!and(obj.Planned_Objective__r.CreatedBy.UserRole.Name == 'Sales Administrator', obj.Planned_Objective__r.Planned_Objective_Type__c != 'Personal')}">
+                            <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                <!-- Name to the right -->
+                                <span class="slds-text-align--right slds-text-title--caps">{!$Label.c.COE_Objective_Type}&nbsp;-&nbsp;{!obj.Planned_Objective__r.Name} </span>
+                            </div>
+                            <aura:set attribute="else">
+                                <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                    <!-- Name to the right -->
+                                    <span class="slds-text-align--right slds-text-title--caps">{!obj.Planned_Objective__r.CreatedBy.Name}&nbsp; - {!obj.Planned_Objective__r.Name} </span>
+                                </div>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">
+                            <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                <!-- Name to the right -->
+                                <span class="slds-text-align--right slds-text-title--caps">{!obj.CreatedBy.Name}&nbsp;-&nbsp;{!obj.Name} </span>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                </div>
+            </div>
+            <!-- Placement Details -->
+            <div class="slds-container slds-grid slds-media--responsive slds-m-bottom--x-large">
+                <div class="slds-col slds-p-horizontal--small ">
+                    <div data-record="{!idx}" onchange="{!c.statusChange}">
+                        <lightning:select name="selectItem" label="{!$Label.c.Objectives_Status}" value="{!obj.Status__c}" aura:id="placementSelectOptions" >
+                            <option value="Not Started">{!$Label.c.Not_Started}</option>
+                            <option value="In Progress">{!$Label.c.In_Progress}</option>
+                            <option value="Committed">{!$Label.c.Committed}</option>
+                            <option value="Declined">{!$Label.c.Declined}</option>
+                            <option value="Not Applicable">{!$Label.c.Not_Applicable}</option>
+                        </lightning:select>
+                    </div>
+                        <c:SubType aura:id="subType" id="{!idx}" objStatus="{!obj.Status__c}" selectedSubType="{!obj.Sub_Type_Selection__c}" ObjectiveSubType="{!obj.Sub_Type__r.Sub_Type_Values__c}"/>
+                    <div aura:id="declinedList" data-record="{!idx}" class="{!obj.Status__c != 'Declined' ? 'slds-hide': 'slds-show' + ' declineReason'}" onchange="{!c.setDeclinedVal}">
+                        <lightning:select name="declinedList" required="true" label="{!$Label.c.Objectives_Declined_Reason}" aura:id="declineOptions" value="{!obj.Declined_Reason__c}" onchange="{!c.updateRecord}">
+                            <option value="None">{!$Label.c.Objectives_None}</option>
+                            <aura:iteration items="{!v.declinedVals}" var="val">
+                                <option value="{!val}" selected="{!val == obj.Declined_Reason__c}">{!val}</option>
+                            </aura:iteration>
+                        </lightning:select>
+                    </div>
+                    <div aura:id="declineOther" class="{!if(and(obj.Status__c == 'Declined', obj.Declined_Reason__c == 'Other'), 'slds-show', 'slds-hide') + ' slds-form-element slds-m-top--medium'}">
+                        <lightning:input label="{!$Label.c.Objectives_Other}" required="false" name="Declined Reason" value="{!obj.Other_Reason__c}"  />
+                    </div>
+                    <div class="{!(obj.Status__c != 'Executed') ? 'slds-hide': 'slds-show'}">                        
+                        <label class="slds-form-element__label">{!$Label.c.Objectives_Num_Engaged}</label>
+                        <ui:inputNumber value="{!obj.Number_of_People_Engaged__c}"/>
+                    </div>
+                    <div class="{!(obj.Status__c != 'Committed' &amp;&amp; obj.Status__c != 'Executed') ? 'slds-hide': 'slds-show'}">
+                        <div class="placementDetails">
+                            <lightning:textarea aura:id="note" name="myTextArea"  label="{!$Label.c.Objectives_Placement_Detail}" maxlength="300"
+                                value="{!obj.Notes_for_Distributor__c}"  />
+                        </div>
+                        <div>
+                            <div class="slds-grid">
+                                <c:DatePicker aura:id="placementdt" value="{!obj.Delivery_Date__c}" id="{!idx}" label="{!$Label.c.Suggested_Date_Label}" inputClass="slds-input" requiredAstrik="*" positionDate="datePickerLeftDatePosition"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-col slds-p-horizontal--small  divStyleClass ">
+                    <div>
+                      <!--  <c:ProductSearch aura:id="brandSearch" searchValue="{!obj.Brands__c}" object="Product__c" field="TrademarkBrandLongNme__c"
+                        showPkg="true" isDisablePkg="false" selectedPkgId="{!obj.MC_Product__c}" isOffPremise="{!v.accountIsOffPremise}" /> -->
+                        
+                        <aura:if isTrue="{!obj.BMC_Product_Level__c ==$Label.c.BMC_Objectives_Brand}">
+                             <c:ProductSearch aura:id="brandSearch" label="{!$Label.c.Brand}" searchValue="{!obj.Brands__c}" object="Product__c" field="TrademarkBrandLongNme__c"
+                             showPkg="false" isDisabled="true" isDisablePkg="true" selectedPkgId="{!obj.MC_Product__c}" isOffPremise="{!v.accountIsOffPremise}" />                   
+                        </aura:if>
+                        <aura:if isTrue="{!obj.BMC_Product_Level__c ==$Label.c.BMC_Objectives_BrandPackage}">
+                            <c:ProductSearch aura:id="brandSearch" label="{!$Label.c.Brand}" searchValue="{!obj.Brands__c}" object="Product__c" field="TrademarkBrandLongNme__c"
+                                             showPkg="true" isDisablePkg="false" selectedPkgId="{!obj.MC_Product__c}" isOffPremise="{!v.accountIsOffPremise}" />
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!obj.BMC_Product_Level__c ==$Label.c.BMC_Objectives_BrandGroup}">
+                            <c:ProductSearch aura:id="brandSearch" label="{!$Label.c.BMC_Objectives_BrandGroup}" searchValue="{!obj.BMC_Brand_Group__c}" object="Product__c" field="CmrclPlanningBrandGroupNme__c"
+                                             showPkg="false" isDisabled="true" isDisablePkg="true"  selectedPkgId="{!obj.MC_Product__c}" isOffPremise="{!v.accountIsOffPremise}" />
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!obj.BMC_Product_Level__c ==$Label.c.BMC_Objectives_BrandGroupPackage}">
+                            <c:ProductSearch aura:id="brandSearch" label="{!$Label.c.BMC_Objectives_BrandGroup}" searchValue="{!obj.BMC_Brand_Group__c}" object="Product__c" field="CmrclPlanningBrandGroupNme__c"
+                                             showPkg="true" isDisabled="true" isDisablePkg="true"  selectedPkgId="{!obj.MC_Product__c}" isOffPremise="{!v.accountIsOffPremise}" />
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!obj.BMC_Product_Level__c ==$Label.c.BMC_Brand_Family_Package}">
+                            <c:ProductSearch aura:id="brandSearch" label="{!$Label.c.BMC_Brand_Family_Package}" searchValue="{!obj.BMC_Brand_Family__c}" object="Product__c" field="TrademarkBrandFamilyNme__c"
+                                             showPkg="true" isDisabled="true" isDisablePkg="true"  selectedPkgId="{!obj.MC_Product__c}" isOffPremise="{!v.accountIsOffPremise}" />
+                        </aura:if>                 
+                        
+                        <aura:if isTrue="{!or((obj.Status__c == 'Declined' ? 'true': 'false'), (v.statusDeclined))}">
+                            <lightning:input type="number"  class="qty" label="{!$Label.c.Objectives_Initial_Quantity}" name="quantityInput" required="false" disabled="true"
+                                             value="0" aura:id="auraQtyD"  />
+                            
+                            
+                            <aura:set attribute="else">
+                                
+                                <lightning:input type="number" default="1"  min="1" class="qty" label="{!$Label.c.Objectives_Initial_Quantity}" name="quantityInput" required="false"
+                                                 value="{!obj.Product_Quantity__c}" aura:id="auraQty" messageWhenRangeUnderflow="{!$Label.c.Objectives_Initial_Quantity_Error}" />
+                                
+                            </aura:set>
+                        </aura:if> 
+                        
+                    </div>
+                </div>
+            </div>
+        </aura:if>
+        <!-- engagement -->
+        <aura:if isTrue="{!obj.RecordType.Name == 'Engagement'}">
+            <!-- Header -->
+            <div class="slds-page-header slds-m-bottom--x-large">
+                <div class="slds-grid">
+                    <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2">
+                        <div class="slds-col slds-has-flexi-truncate">
+                            <div class="slds-media slds-no-space slds-grow">
+                                <div class="slds-media__figure">
+                                    <lightning:icon iconName="custom:custom15" alternativeText="{!$Label.c.My_Objectives}" />
+                                </div>
+                                <div class="slds-media__body">
+                                    <span class="slds-text-align--left slds-text-title--caps"> {!$Label.c.Engagement}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <aura:if isTrue="{!obj.Planned_Objective__c}">
+                        <aura:if isTrue="{!and(obj.Planned_Objective__r.CreatedBy.UserRole.Name == 'Sales Administrator', obj.Planned_Objective__r.Planned_Objective_Type__c != 'Personal')}">
+                            <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                <!-- Name to the right -->
+                                <span class="slds-text-align--right slds-text-title--caps">{!$Label.c.COE_Objective_Type}&nbsp;-&nbsp;{!obj.Planned_Objective__r.Name} </span>
+                            </div>
+                            <aura:set attribute="else">
+                                <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                    <!-- Name to the right -->
+                                    <span class="slds-text-align--right slds-text-title--caps">{!obj.Planned_Objective__r.CreatedBy.Name}&nbsp; - {!obj.Planned_Objective__r.Name} </span>
+                                </div>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">
+                            <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                <!-- Name to the right -->
+                                <span class="slds-text-align--right slds-text-title--caps">{!obj.CreatedBy.Name}&nbsp;-&nbsp;{!obj.Name} </span>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                </div>
+            </div>
+            <!-- engagement Details -->
+            <div class="slds-container slds-grid slds-media--responsive slds-m-bottom--x-large ">
+                <div class="slds-col slds-p-horizontal--small slds-m-bottom--large">
+                    <div>
+                        <lightning:input label="{!$Label.c.Objectives_Name_Engagement}" name="engagementName"  required="true" value="{!obj.Name}" messageWhenValueMissing="{!$Label.c.Objectives_Engagement_Name_Error}"
+                            aura:id="egageName"  />
+                    </div>
+                    <div class="selectOption">
+                        <lightning:select name="selectItem" label="{!$Label.c.Status}" value="{!obj.Status__c}" aura:id="selectOptions" onchange="{!c.checkStatusChange}" class="{!'engStatus'+idx}">
+                            <option value="Not Started">{!$Label.c.Not_Started}</option>
+                            <option value="In Progress">{!$Label.c.In_Progress}</option>
+                            <option value="Committed">{!$Label.c.Committed}</option>
+                            <option value="Executed">{!$Label.c.Executed}</option>
+                            <option value="Declined">{!$Label.c.Declined}</option>
+                            <option value="Not Applicable">{!$Label.c.Not_Applicable}</option>
+                        </lightning:select>
+                    </div>
+					
+
+                        <!-- MC:1701- Subtypes should be added on objectives instead of planned objectives -->
+                        <c:SubType aura:id="subType" id="{!idx}" objStatus="{!obj.Status__c}" selectedSubType="{!obj.Sub_Type_Selection__c}" ObjectiveSubType="{!obj.Sub_Type__r.Sub_Type_Values__c }" />
+                    <div class="declinedStyle">
+                        <div aura:id="declinedList" data-record="{!idx}" class="{!obj.Status__c != 'Declined' ? 'slds-hide': 'slds-show'}" onchange="{!c.setDeclinedVal}">
+                            <lightning:select name="declinedList" required="true" label="{!$Label.c.Objectives_Declined_Reason}" aura:id="declineOptions" value="{!obj.Declined_Reason__c}" onchange="{!c.updateRecord}">
+                                <option value="None">{!$Label.c.Objectives_None}</option>
+                                <aura:iteration items="{!v.declinedVals}" var="val">
+                                    <option value="{!val}" selected="{!val == obj.Declined_Reason__c}">{!val}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                        <div aura:id="declineOther" class="{!if(and(obj.Status__c == 'Declined', obj.Declined_Reason__c == 'Other'), 'slds-show', 'slds-hide') + ' slds-form-element slds-m-top--medium'}">
+                            <lightning:input label="{!$Label.c.Objectives_Other}" required="false" name="Declined Reason"  value="{!obj.Other_Reason__c}" onchange="{!c.updateRecord}" />
+                        </div>
+                    </div>
+                     <div class="{!(obj.Status__c != 'Executed') ? 'slds-hide': 'slds-show slds-m-top--medium'}">
+                                    <label class="slds-form-element__label">{!$Label.c.Objectives_Num_Engaged}</label>
+                                    <ui:inputNumber  value="{!obj.Number_of_People_Engaged__c}"/>
+                                </div>
+                    
+                    <div class="{!(obj.Status__c != 'Committed' &amp;&amp; obj.Status__c != 'Executed') ? 'slds-hide': 'slds-show' + ' engageDistrib'}">
+                        <div>
+                            <div>
+                                <lightning:textarea aura:id="note" name="myTextArea" label="{!$Label.c.Objectives_Notes_Distributors}" maxlength="300" value="{!obj.Notes_for_Distributor__c}" onchange="{!c.updateRecord}"/>
+                            </div>
+                            <div>
+                                <c:DatePicker aura:id="dt" value="{!obj.Supporting_Materials_Delivery_Date__c}" label="{!$Label.c.Objectives_Supporting_Materials_Date}" inputClass="slds-input" positionDate="datePickerLeft"/>
+                            </div>  
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-col slds-p-horizontal--medium  divStyleClass">
+                    <div>
+                        <!-- GB-7530-->
+                        <c:ProductSearch aura:id="brandSearch" searchValue="{!obj.Brands__c}" object="Product__c" field="TrademarkBrandLongNme__c" showPkg="false" isRequired="{!(obj.Status__c == 'Committed' || obj.Status__c == 'Executed') ? True: false}"
+                            />
+                    </div>
+                    <div class="slds-p-horizontal--medium engagmentDatePicker">
+                        <c:DatePicker aura:id="engageDt" id="{!idx}" value="{!obj.Date__c}" label="{!$Label.c.Objectives_Engagement_Date}"
+                            inputClass="slds-input" requiredAstrik="{!(obj.Status__c == 'Committed' || obj.Status__c == 'Executed') ? '*': ' '}" positionDate="datePickerLeftEngageDatePosition"/>
+                    </div>
+                    <div class="dateTime-inputTime form-element form-element__control">
+                     <div class="input-has-icon input-has-icon--right" >
+                                <lightning:input type="time" name="timer" class="slds-timepicker" aura:id="timepick"  value="{!obj.Currenttime}"/>
+                     </div></div>   
+                    <div class="slds-form-element slds-m-top--medium">
+                        <fieldset class="slds-form-element slds-m-top--medium">
+                            <legend class="slds-form-element__legend slds-form-element__label">
+                                <aura:if isTrue="{!((obj.Status__c == 'Executed') || (obj.Status__c == 'Committed'))}">
+                                    <abbr class="slds-required" title="{!$Label.c.Required}">*</abbr>
+                                </aura:if>
+                                {!$Label.c.Objectives_Engagement_Type}
+                            </legend>
+                            <div class="slds-form-element__control slds-grid slds-m-left--none">
+                                  <div class="slds-col">
+                                      <!-- Add Sampling as Engagment type - GB-7530-->
+                                    <aura:if isTrue="{!obj.Consumer_or_Waitstaff__c == 'Sampling'}">
+                                        <div class="slds-list_horizontal" >
+                                        <lightning:input aura:id="objsSamplingRadio" type="radio" label="{!$Label.c.Objectives_Sampling}" name="{!'engagementType'+idx}" checked="true" onchange="{!c.toggleEngagementType}"/>
+                                        <lightning:helptext iconName="utility:info" content="{!$Label.c.Sampling_HelpText}" class="tooltip"/>
+                                        </div>
+                                            <aura:set attribute="else">
+                                                <div class="slds-list_horizontal" >
+                                            <lightning:input aura:id="objsSamplingRadio" type="radio" label="{!$Label.c.Objectives_Sampling}" name="{!'engagementType'+idx}"   onchange="{!c.toggleEngagementType}"
+                                                />
+                                            <lightning:helptext iconName="utility:info" content="{!$Label.c.Sampling_HelpText}" class="tooltip"/>
+                                                </div>
+                                                </aura:set>
+                                    </aura:if>
+                                </div>
+                                <div class="slds-col">
+                                    <!-- the following use of aura:if/else is a workaround for lightning issue where the "checked"
+                                        attribute of lightning:input type=radio results in a race condiition if a controller
+                                        method is invoked onchange -->
+                                    <aura:if isTrue="{!obj.Consumer_or_Waitstaff__c == 'Consumer'}"> 
+                                        <div class="slds-list_horizontal" >
+                                        <lightning:input aura:id="objsConsumerRadio" type="radio" label="{!$Label.c.Objectives_Consumer}" name="{!'engagementType'+idx}" checked="true" onchange="{!c.toggleEngagementType}"  />
+                                        <lightning:helptext iconName="utility:info" content="{!$Label.c.Consumer_HelpText}" class="tooltip"/>
+                                        </div>
+                                            <aura:set attribute="else"> 
+                                                <div class="slds-list_horizontal" >
+                                            <lightning:input aura:id="objsConsumerRadio" type="radio" label="{!$Label.c.Objectives_Consumer}" name="{!'engagementType'+idx}"  onchange="{!c.toggleEngagementType}"  />
+                                            <lightning:helptext iconName="utility:info" content="{!$Label.c.Consumer_HelpText}" class="tooltip"/>
+                                                </div>
+                                                </aura:set>
+                                    </aura:if>
+                                </div>
+                                <div class="slds-col">
+                                    <aura:if isTrue="{!obj.Consumer_or_Waitstaff__c == 'Waitstaff'}">
+                                        <lightning:input aura:id="objsWaitstaffRadio" type="radio" label="{!$Label.c.Objectives_Waitstaff}" name="{!'engagementType'+idx}" checked="true" onchange="{!c.toggleEngagementType}"/>                                         
+                                        <aura:set attribute="else">
+                                            <lightning:input aura:id="objsWaitstaffRadio" type="radio" label="{!$Label.c.Objectives_Waitstaff}" name="{!'engagementType'+idx}"   onchange="{!c.toggleEngagementType}"  />  
+                                        </aura:set>
+                                    </aura:if>
+                                </div>                               
+                            </div>
+                        </fieldset>
+                    </div>
+                    <!-- On selecting Sampling from Engagement type , two new fields
+						will get diplayed - GB-7530-->
+                   
+                     				<aura:if isTrue="{!(obj.Status__c == 'Executed' &amp;&amp; obj.Consumer_or_Waitstaff__c == 'Sampling')}">
+                                    <div class="slds-form-element slds-m-top--medium">
+                                         <fieldset class="slds-form-element slds-m-top--medium">
+                                             <legend class="slds-form-element__legend slds-form-element__label">
+                                                   <aura:if isTrue="{!(obj.Status__c == 'Executed' )}">	
+                                                       <aura:if isTrue="{!obj.Consumer_or_Waitstaff__c == 'Sampling'}">
+                                                  <abbr class="slds-required" title="{!$Label.c.Required}">*</abbr>	
+                                                           </aura:if>                                                       
+												  </aura:if>
+                                             </legend>
+                                             <div>
+                                                  <lightning:input aura:id="noOfConsumerSamp" type="number" label="{!$Label.c.Objectives_NoOfConsumer}" value="{!obj.Number_of_Consumers_Sampled__c}" name="sampling"/>
+                                             </div>
+                                              <legend class="slds-form-element__legend slds-form-element__label">
+                                                     <aura:if isTrue="{!(obj.Status__c == 'Executed')}">	
+                                                       <aura:if isTrue="{!obj.Consumer_or_Waitstaff__c == 'Sampling'}">
+                                                  <abbr class="slds-required" title="{!$Label.c.Required}">*</abbr>	
+                                                           </aura:if>
+												  </aura:if>
+                                             </legend>
+                                             <div>
+                                                  <lightning:input aura:id="dollarsSpent" type="number" formatter="currency" label="{!$Label.c.Objectives_DollarsSpent}" value="{!obj.Sampling__c}" name="sampling"/>
+                                             </div>
+                                        </fieldset>
+                                    </div>
+                    </aura:if>
+                    <aura:if isTrue="{!obj.Status__c == 'Executed'}">
+                        <div class="slds-form-element slds-m-top--medium">
+                            <fieldset class="slds-form-element slds-m-top--medium">
+                                <legend class="slds-form-element__legend slds-form-element__label">
+                                    <abbr class="slds-required" title="{!$Label.c.Required}">*</abbr>
+                                        {!$Label.c.Objectives_Executed_By}
+                                </legend>
+                                <div class="slds-form-element__control slds-grid slds-m-left--none">
+                                    <div class="slds-col">
+                                        <aura:if isTrue="{!obj.Executed_By__c == 'Individual'}">
+                                            <lightning:input aura:id="individualRadio" type="radio" label="{!$Label.c.Objectives_Individual}" name="{!'executedBy'+idx}" onchange="{!c.toggleExecutedBy}" checked="true"/>
+                                            <aura:set attribute="else">
+                                                <lightning:input aura:id="individualRadio" type="radio" label="{!$Label.c.Objectives_Individual}" name="{!'executedBy'+idx}" onchange="{!c.toggleExecutedBy}" checked="true"/>
+                                            </aura:set>
+                                        </aura:if>
+                                    </div>
+                                    <div class="slds-col">
+                                        <aura:if isTrue="{!obj.Executed_By__c == 'Agency'}">
+                                            <lightning:input aura:id="agencyRadio" type="radio" label="{!$Label.c.Objectives_Agency}" name="{!'executedBy'+idx}" onchange="{!c.toggleExecutedBy}" checked="true"/>
+                                            <aura:set attribute="else">
+                                                <lightning:input aura:id="agencyRadio" type="radio" label="{!$Label.c.Objectives_Agency}" name="{!'executedBy'+idx}" onchange="{!c.toggleExecutedBy}"/>
+                                            </aura:set>
+                                        </aura:if>
+                                    </div>
+                                    <div class="slds-col">
+                                        <aura:if isTrue="{!obj.Executed_By__c == 'Both'}">
+                                            <lightning:input aura:id="bothRadio" type="radio" label="{!$Label.c.Objectives_Both}" name="{!'executedBy'+idx}" onchange="{!c.toggleExecutedBy}" checked="true"/>
+                                            <aura:set attribute="else">
+                                                <lightning:input aura:id="bothRadio" type="radio" label="{!$Label.c.Objectives_Both}" name="{!'executedBy'+idx}" onchange="{!c.toggleExecutedBy}"/>
+                                            </aura:set>
+                                        </aura:if>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </aura:if>
+                        
+                    <div class="engagementDetails">
+                        <lightning:textarea aura:id="note" name="myTextArea"  label="{!$Label.c.Engagement_Details}" maxlength="300" value="{!obj.Description__c}"
+                            />
+                    </div>
+                     
+                    <div class="slds-text-align--right">
+                        <button class="slds-button slds-button--brand" data-record="{!obj.Id + 'engagement'}" onclick="{!c.copyObjective}">{!$Label.c.Objectives_Copy}</button>
+                    </div>
+                </div>
+            </div>
+        </aura:if>
+        <!-- Feature -->
+        <aura:if isTrue="{!obj.RecordType.Name == 'Feature'}">
+            <!--Header-->
+            <div class="slds-page-header slds-m-bottom--x-large">
+                <div class="slds-grid">
+                    <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2">
+                        <div class="slds-col slds-has-flexi-truncate">
+                            <div class="slds-media slds-no-space slds-grow">
+                                <div class="slds-media__figure">
+                                    <lightning:icon iconName="custom:custom17" alternativeText="{!$Label.c.My_Objectives}" />
+                                </div>
+                                <div class="slds-media__body">
+                                    <span class="slds-text-align--left slds-text-title--caps">{!$Label.c.Feature}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <aura:if isTrue="{!obj.Planned_Objective__c}">
+                        <aura:if isTrue="{!and(obj.Planned_Objective__r.CreatedBy.UserRole.Name == 'Sales Administrator', obj.Planned_Objective__r.Planned_Objective_Type__c != 'Personal')}">
+                            <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                <!-- Name to the right -->
+                                <span class="slds-text-align--right slds-text-title--caps">{!$Label.c.COE_Objective_Type}&nbsp;-&nbsp;{!obj.Planned_Objective__r.Name} </span>
+                            </div>
+                            <aura:set attribute="else">
+                                <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                    <!-- Name to the right -->
+                                    <span class="slds-text-align--right slds-text-title--caps">{!obj.Planned_Objective__r.CreatedBy.Name}&nbsp; - {!obj.Planned_Objective__r.Name} </span>
+                                </div>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">
+                            <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                <!-- Name to the right -->
+                                <span class="slds-text-align--right slds-text-title--caps">{!obj.CreatedBy.Name}&nbsp;-&nbsp;{!obj.Name} </span>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                </div>
+            </div>
+            <!-- Feature Details -->
+            <div class="slds-container slds-grid slds-media--responsive slds-m-bottom--x-large  " >
+                <div class="slds-col slds-p-horizontal--small  slds-m-bottom--large">
+                    <div>
+                        <lightning:input label="{!$Label.c.Objectives_Feature_Name}" name="placementInput" required="true" value="{!obj.Name}" messageWhenValueMissing="{!$Label.c.Objectives_Feature_Name_Error}"
+                            aura:id="featName" />
+                    </div>
+                    <div style="margin-top:20px;">
+                        <lightning:select name="selectItem" label="{!$Label.c.Status}" value="{!obj.Status__c}" aura:id="selectOptions">
+                            <option value="Not Started">{!$Label.c.Not_Started}</option>
+                            <option value="In Progress">{!$Label.c.In_Progress}</option>
+                            <option value="Committed">{!$Label.c.Committed}</option>
+                            <option value="Executed">{!$Label.c.Executed}</option>
+                            <option value="Declined">{!$Label.c.Declined}</option>
+                            <option value="Not Applicable">{!$Label.c.Not_Applicable}</option>
+                        </lightning:select>
+                    </div>
+                        <c:SubType aura:id="subType" id="{!idx}" objStatus="{!obj.Status__c}" selectedSubType="{!obj.Sub_Type_Selection__c}" ObjectiveSubType="{!obj.Sub_Type__r.Sub_Type_Values__c}" />
+                    <div>
+                        <div aura:id="declinedList" data-record="{!idx}" class="{!obj.Status__c != 'Declined' ? 'slds-hide declinedStyle': 'slds-show declinedStyle'}" onchange="{!c.setDeclinedVal}">
+                            <lightning:select name="declinedList" required="true" label="{!$Label.c.Objectives_Declined_Reason}" aura:id="declineOptions" value="{!obj.Declined_Reason__c}" onchange="{!c.updateRecord}">
+                                <option value="None">{!$Label.c.Objectives_None}</option>
+                                <aura:iteration items="{!v.declinedVals}" var="val">
+                                    <option value="{!val}" selected="{!val == obj.Declined_Reason__c}">{!val}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                        <div aura:id="declineOther" class="{!if(and(obj.Status__c == 'Declined', obj.Declined_Reason__c == 'Other'), 'slds-show', 'slds-hide') + ' declinedStyle slds-form-element slds-m-top--medium'}">
+                            <lightning:input label="{!$Label.c.Objectives_Other}" required="false" name="Declined Reason"  value="{!obj.Other_Reason__c}"/>
+                        </div>
+                    </div>
+                                <div>
+                                    <c:DatePicker aura:id="dtSTFeature" value="{!obj.Start_Time__c}" label="Start Date"
+                                        inputClass="slds-input" requiredAstrik="{!(obj.Status__c == 'Committed' || obj.Status__c == 'Executed') ? '*': ' '}" positionDate="datePickerRight"/>
+                                </div>
+                                <div>
+                                    <c:DatePicker aura:id="dtEDFeature" value="{!obj.End_Time__c}" label="End Date"
+                                        inputClass="slds-input" requiredAstrik="{!(obj.Status__c == 'Committed' || obj.Status__c == 'Executed') ? '*': ' '}" positionDate="datePickerRight"/>
+                                </div>
+                    <div class="{!(obj.Status__c != 'Committed' &amp;&amp; obj.Status__c != 'Executed') ? 'slds-hide': 'slds-show'}">
+                        <div class="featureDistrib">
+                            <lightning:textarea aura:id="note" name="myTextArea"
+                                label="{!$Label.c.Objectives_Notes_Distributors}" maxlength="300" value="{!obj.Notes_for_Distributor__c}"/>
+                            <c:DatePicker aura:id="dt" value="{!obj.Supporting_Materials_Delivery_Date__c}" label="{!$Label.c.Objectives_Supporting_Materials_Date}"
+                                inputClass="slds-input" requiredAstrik="" positionDate="datePickerLeft"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-col slds-p-horizontal--small divStyleClass">
+                    <aura:if isTrue="{!v.accountIsOffPremise}">
+                        <c:ProductSearch aura:id="brandSearch" searchValue="{!obj.Brands__c}" object="Product__c" showPkg="true" isDisablePkg="false" isOffPremise="true" field="TrademarkBrandLongNme__c" selectedPkgId="{!obj.MC_Product__c}"/>
+                        <aura:set attribute="else">
+                            <div>
+                                <c:ProductSearch aura:id="brandSearch" searchValue="{!obj.Brands__c}" object="Product__c" field="TrademarkBrandLongNme__c"/>
+                            </div>
+                            <fieldset class="slds-form-element">
+                                <legend class="slds-form-element__legend slds-form-element__label"><abbr class="slds-required" title="{!$Label.c.Required}">*</abbr>{!$Label.c.Packaging_Required}</legend>
+                                <div class="slds-form-element__control slds-grid slds-m-left--xx-large">
+                                    <div class="slds-col">
+                                        <lightning:input aura:id="draftCbox" type="checkbox" label="{!$Label.c.Draft_Checkbox_Label}" name="draft" checked="{!obj.Draft_Package__c}"
+                                                         />
+                                        <lightning:input aura:id="canCbox" type="checkbox" label="{!$Label.c.Can_Checkbox_Label}" name="can" class="slds-m-top--medium"
+                                                         checked="{!obj.Can_Package__c}" />
+                                    </div>
+                                    <div class="slds-col">
+                                        <lightning:input aura:id="glassCbox" type="checkbox" label="{!$Label.c.Bottle_Checkbox_Label}" name="glassBottle" checked="{!obj.Bottle_Package__c}"
+                                                         />
+                                        <lightning:input aura:id="alumCbox" type="checkbox" label="{!$Label.c.Aluminum_Bottle_Checkbox_Label}" name="aluminumBottle"
+                                                         class="slds-m-top--medium" checked="{!obj.Aluminium_Pint_Package__c}" />
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </aura:set>
+                    </aura:if>
+                    <div class="featureDetails">
+                        <lightning:textarea aura:id="note" name="myTextArea" label="{!$Label.c.Objectives_Feature_Details}" maxlength="300"
+                            value="{!obj.Description__c}" />
+                    </div>
+                      
+                    <div class="slds-p-top--x-small slds-text-align--right">
+                        <button class="slds-button slds-button--brand" data-record="{!obj.Id + 'feature'}" onclick="{!c.copyObjective}">{!$Label.c.Objectives_Copy}</button>
+                    </div>                  
+                </div>
+            </div>
+        </aura:if>
+        <!-- Space -->
+        <aura:if isTrue="{!obj.RecordType.Name == 'Space'}">
+            <!--Header-->
+            <div class="slds-page-header slds-m-bottom--x-large">
+                <div class="slds-grid">
+                    <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2">
+                        <div class="slds-col slds-has-flexi-truncate">
+                            <div class="slds-media slds-no-space slds-grow">
+                                <div class="slds-media__figure">
+                                    <lightning:icon iconName="custom:custom50" alternativeText="{!$Label.c.My_Objectives}" />
+                                </div>
+                                <div class="slds-media__body">
+                                    <span class="slds-text-align--left slds-text-title--caps">{!$Label.c.Space}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <aura:if isTrue="{!obj.Planned_Objective__c}">
+                    <aura:if isTrue="{!and(obj.Planned_Objective__r.CreatedBy.UserRole.Name == 'Sales Administrator', obj.Planned_Objective__r.Planned_Objective_Type__c != 'Personal')}">
+                        <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                            <!-- Name to the right -->
+                            <span class="slds-text-align--right slds-text-title--caps">{!$Label.c.COE_Objective_Type}&nbsp;-&nbsp;{!obj.Planned_Objective__r.Name} </span>
+                        </div>
+                        <aura:set attribute="else">
+                            <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                <!-- Name to the right -->
+                                <span class="slds-text-align--right slds-text-title--caps">{!obj.Planned_Objective__r.CreatedBy.Name}&nbsp; - {!obj.Planned_Objective__r.Name} </span>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                    <aura:set attribute="else">
+                        <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                <!-- Name to the right -->
+                                <span class="slds-text-align--right slds-text-title--caps">{!obj.CreatedBy.Name}&nbsp;-&nbsp;{!obj.Name} </span>
+                            </div>
+                    </aura:set>
+                    </aura:if>
+                </div>
+            </div>
+            <!-- Space Details -->
+            <div class="slds-container slds-grid slds-media--responsive slds-m-bottom--x-large  " >
+                <div class="slds-col slds-p-horizontal--small slds-m-bottom--large">
+                    <div>
+                        <lightning:input label="{!$Label.c.Objectives_Name_Space}" name="spaceInput"  required="true" value="{!obj.Name}" messageWhenValueMissing="{!$Label.c.Objectives_Space_Name_Error}"
+                            aura:id="spaceName" />
+                    </div>
+                    <div style="margin-top:20px;">
+                        <lightning:select name="selectItem" label="{!$Label.c.Status}" value="{!obj.Status__c}" aura:id="selectOptions">
+                            <option value="Not Started">{!$Label.c.Not_Started}</option>
+                            <option value="In Progress">{!$Label.c.In_Progress}</option>
+                            <option value="Committed">{!$Label.c.Committed}</option>
+                            <option value="Executed">{!$Label.c.Executed}</option>
+                            <option value="Declined">{!$Label.c.Declined}</option>
+                            <option value="Not Applicable">{!$Label.c.Not_Applicable}</option>
+                        </lightning:select>
+                    </div>
+                        <c:SubType aura:id="subType" id="{!idx}" objStatus="{!obj.Status__c}" selectedSubType="{!obj.Sub_Type_Selection__c}" ObjectiveSubType="{!obj.Sub_Type__r.Sub_Type_Values__c}" />
+                    <div>
+                        <div aura:id="declinedList" data-record="{!idx}" class="{!obj.Status__c != 'Declined' ? 'slds-hide declinedStyle': 'slds-show declinedStyle'}" onchange="{!c.setDeclinedVal}">
+                            <lightning:select name="declinedList" required="true" label="{!$Label.c.Objectives_Declined_Reason}" aura:id="declineOptions" value="{!obj.Declined_Reason__c}" onchange="{!c.updateRecord}">
+                                <option value="None">{!$Label.c.Objectives_None}</option>
+                                <aura:iteration items="{!v.declinedVals}" var="val">
+                                    <option value="{!val}" selected="{!val == obj.Declined_Reason__c}">{!val}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                        <div aura:id="declineOther" class="{!if(and(obj.Status__c == 'Declined', obj.Declined_Reason__c == 'Other'), 'slds-show', 'slds-hide') + ' declinedStyle slds-form-element slds-m-top--medium'}">
+                            <lightning:input label="{!$Label.c.Objectives_Other}" required="false" name="Declined Reason" value="{!obj.Other_Reason__c}"/>
+                        </div>
+                    </div>
+                    <div class="{!(obj.Status__c != 'Committed' &amp;&amp; obj.Status__c != 'Executed') ? 'slds-hide': 'slds-show'}">
+                        <div class="spaceDistrib slds-m-top_small">
+                            <lightning:textarea aura:id="note" name="myTextArea"
+                                label="{!$Label.c.Objectives_Notes_Distributors}" maxlength="300" value="{!obj.Notes_for_Distributor__c}"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-col slds-p-horizontal--small divStyleClass">
+                    <div>
+                        <lightning:textarea aura:id="note" name="myTextArea" label="{!$Label.c.Objectives_Space_Details}" maxlength="300"
+                            value="{!obj.Description__c}" />
+                    </div>
+                      
+                </div>
+            </div>
+        </aura:if>
+        <!-- Merchandise -->
+        <aura:if isTrue="{!obj.RecordType.Name == 'Merchandise'}">
+            <!--Header-->
+            <div class="slds-page-header slds-m-bottom--x-large">
+                <div class="slds-grid">
+                    <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2">
+                        <div class="slds-col slds-has-flexi-truncate">
+                            <div class="slds-media slds-no-space slds-grow">
+                                <div class="slds-media__figure">
+                                    <lightning:icon iconName="custom:custom93" alternativeText="{!$Label.c.My_Objectives}" />
+                                </div>
+                                <div class="slds-media__body">
+                                    <span class="slds-text-align--left slds-text-title--caps">{!$Label.c.Merchandise}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <aura:if isTrue="{!obj.Planned_Objective__c}">
+                        <aura:if isTrue="{!and(obj.Planned_Objective__r.CreatedBy.UserRole.Name == 'Sales Administrator', obj.Planned_Objective__r.Planned_Objective_Type__c != 'Personal')}">
+                            <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                <!-- Name to the right -->
+                                <span class="slds-text-align--right slds-text-title--caps">{!$Label.c.COE_Objective_Type}&nbsp;-&nbsp;{!obj.Planned_Objective__r.Name} </span>
+                            </div>
+                            <aura:set attribute="else">
+                                <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                    <!-- Name to the right -->
+                                    <span class="slds-text-align--right slds-text-title--caps">{!obj.Planned_Objective__r.CreatedBy.Name}&nbsp; - {!obj.Planned_Objective__r.Name} </span>
+                                </div>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">
+                            <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                <!-- Name to the right -->
+                                <span class="slds-text-align--right slds-text-title--caps">{!obj.CreatedBy.Name}&nbsp;-&nbsp;{!obj.Name} </span>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                </div>
+            </div>
+            <!-- Merchandise Details -->
+            <div class="slds-container slds-grid slds-media--responsive slds-m-bottom--x-large  " >
+                <div class="slds-col slds-p-horizontal--small slds-m-bottom--large">
+                    <div>
+                        <lightning:input label="{!$Label.c.Objectives_Name_Merchandise}" name="merchandiseInput"  required="true" value="{!obj.Name}" messageWhenValueMissing="{!$Label.c.Objectives_Merchandise_Name_Error}"
+                            aura:id="merchandiseName" />
+                    </div>
+                    <div style="margin-top:20px;">
+                        <lightning:select name="selectItem" label="{!$Label.c.Status}" value="{!obj.Status__c}" aura:id="selectOptions">
+                            <option value="Not Started">{!$Label.c.Not_Started}</option>
+                            <option value="In Progress">{!$Label.c.In_Progress}</option>
+                            <option value="Committed">{!$Label.c.Committed}</option>
+                            <option value="Executed">{!$Label.c.Executed}</option>
+                            <option value="Declined">{!$Label.c.Declined}</option>
+                            <option value="Not Applicable">{!$Label.c.Not_Applicable}</option>
+                        </lightning:select>
+                    </div>
+                        <c:SubType aura:id="subType" id="{!idx}" objStatus="{!obj.Status__c}" selectedSubType="{!obj.Sub_Type_Selection__c}" ObjectiveSubType="{!obj.Sub_Type__r.Sub_Type_Values__c}" />
+                    <div>
+                        <div aura:id="declinedList" data-record="{!idx}" class="{!obj.Status__c != 'Declined' ? 'slds-hide declinedStyle': 'slds-show declinedStyle'}" onchange="{!c.setDeclinedVal}">
+                            <lightning:select name="declinedList" required="true" label="{!$Label.c.Objectives_Declined_Reason}" aura:id="declineOptions" value="{!obj.Declined_Reason__c}" onchange="{!c.updateRecord}">
+                                <option value="None">{!$Label.c.Objectives_None}</option>
+                                <aura:iteration items="{!v.declinedVals}" var="val">
+                                    <option value="{!val}" selected="{!val == obj.Declined_Reason__c}">{!val}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                        <div aura:id="declineOther" class="{!if(and(obj.Status__c == 'Declined', obj.Declined_Reason__c == 'Other'), 'slds-show', 'slds-hide') + ' declinedStyle slds-form-element slds-m-top--medium'}">
+                            <lightning:input label="{!$Label.c.Objectives_Other}" required="false" name="Declined Reason"  value="{!obj.Other_Reason__c}"/>
+                        </div>
+                    </div>
+                    <div class="{!(obj.Status__c != 'Committed' &amp;&amp; obj.Status__c != 'Executed') ? 'slds-hide': 'slds-show'}">
+                        <div class="merchandiseDistrib slds-m-top_small">
+                            <lightning:textarea aura:id="note" name="myTextArea"
+                                label="{!$Label.c.Objectives_Notes_Distributors}" maxlength="300" value="{!obj.Notes_for_Distributor__c}"/>
+                            <c:DatePicker aura:id="dt" value="{!obj.Supporting_Materials_Delivery_Date__c}" label="{!$Label.c.Objectives_Supporting_Materials_Date}"
+                                inputClass="slds-input" requiredAstrik="" positionDate="datePickerLeft"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-col slds-p-horizontal--small divStyleClass">
+                    <div>
+                        <c:ProductSearch aura:id="brandSearch" searchValue="{!obj.Brands__c}" object="Product__c" field="TrademarkBrandLongNme__c"
+                            />
+                    </div>
+                    <div>
+                        <lightning:textarea aura:id="note" name="myTextArea" label="{!$Label.c.Objectives_Merchandise_Details}" maxlength="300"
+                            value="{!obj.Description__c}" />
+                    </div>
+                    <div class="slds-text-align--right">
+                        <button class="slds-button slds-button--brand" data-record="{!obj.Id + 'merchandise'}" onclick="{!c.copyObjective}">{!$Label.c.Objectives_Copy}</button>
+                    </div>
+                      
+                </div>
+            </div>
+        </aura:if>
+        <!-- Display -->
+        <aura:if isTrue="{!obj.RecordType.Name == 'Display'}">
+            <!--Header-->
+            <div class="slds-page-header slds-m-bottom--x-large">
+                <div class="slds-grid">
+                    <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2">
+                        <div class="slds-col slds-has-flexi-truncate">
+                            <div class="slds-media slds-no-space slds-grow">
+                                <div class="slds-media__figure">
+                                    <lightning:icon iconName="custom:custom57" alternativeText="{!$Label.c.My_Objectives}" />
+                                </div>
+                                <div class="slds-media__body">
+                                    <span class="slds-text-align--left slds-text-title--caps">{!$Label.c.Display}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <aura:if isTrue="{!obj.Planned_Objective__c}">
+                    <aura:if isTrue="{!and(obj.Planned_Objective__r.CreatedBy.UserRole.Name == 'Sales Administrator', obj.Planned_Objective__r.Planned_Objective_Type__c != 'Personal')}">
+                        <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                            <!-- Name to the right -->
+                            <span class="slds-text-align--right slds-text-title--caps">{!$Label.c.COE_Objective_Type}&nbsp;-&nbsp;{!obj.Planned_Objective__r.Name} </span>
+                        </div>
+                        <aura:set attribute="else">
+                            <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                <!-- Name to the right -->
+                                <span class="slds-text-align--right slds-text-title--caps">{!obj.Planned_Objective__r.CreatedBy.Name}&nbsp; - {!obj.Planned_Objective__r.Name} </span>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                    <aura:set attribute="else">
+                        <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                <!-- Name to the right -->
+                                <span class="slds-text-align--right slds-text-title--caps">{!obj.CreatedBy.Name}&nbsp;-&nbsp;{!obj.Name} </span>
+                            </div>
+                    </aura:set>
+                    </aura:if>
+                </div>
+            </div>
+            <!-- Display Details -->
+            <div class="slds-container slds-grid slds-media--responsive slds-m-bottom--x-large  " >
+                <div class="slds-col slds-p-horizontal--small slds-m-bottom--large">
+                    <div>
+                        <lightning:input label="{!$Label.c.Objectives_Display_Name}" name="displayInput"  required="true" value="{!obj.Name}" messageWhenValueMissing="{!$Label.c.Objectives_Display_Name_Error}" aura:id="displayName" />
+                    </div>
+                        <div style="margin-top:20px;" data-record="{!idx}" onchange="{!c.statusChange}">
+                            <!--MC-1761: Default the date to 7 days from today when status is changed to committed-->
+                        <lightning:select name="selectItem" label="{!$Label.c.Status}" value="{!obj.Status__c}" aura:id="selectOptions" required="true">
+                            <option value="Not Started">{!$Label.c.Not_Started}</option>
+                            <option value="In Progress">{!$Label.c.In_Progress}</option>
+                            <option value="Committed">{!$Label.c.Committed}</option>
+                            <option value="Executed">{!$Label.c.Executed}</option>
+                            <option value="Declined">{!$Label.c.Declined}</option>
+                            <option value="Not Applicable">{!$Label.c.Not_Applicable}</option>
+                        </lightning:select>
+                    </div>
+                        <c:SubType aura:id="subType" id="{!idx}" objStatus="{!obj.Status__c}" selectedSubType="{!obj.Sub_Type_Selection__c}" ObjectiveSubType="{!obj.Sub_Type__r.Sub_Type_Values__c}" />
+                    <div>
+                        <div aura:id="declinedList" data-record="{!idx}" class="{!obj.Status__c != 'Declined' ? 'slds-hide declinedStyle': 'slds-show declinedStyle'}" onchange="{!c.setDeclinedVal}">
+                            <lightning:select name="declinedList" required="true" label="{!$Label.c.Objectives_Declined_Reason}" aura:id="declineOptions" value="{!obj.Declined_Reason__c}" onchange="{!c.updateRecord}">
+                                <option value="None">{!$Label.c.Objectives_None}</option>
+                                <aura:iteration items="{!v.declinedVals}" var="val">
+                                    <option value="{!val}" selected="{!val == obj.Declined_Reason__c}">{!val}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                        <div aura:id="declineOther" class="{!if(and(obj.Status__c == 'Declined', obj.Declined_Reason__c == 'Other'), 'slds-show', 'slds-hide') + ' declinedStyle slds-form-element slds-m-top--medium'}">
+                            <lightning:input label="{!$Label.c.Objectives_Other}" required="false" name="Declined Reason"  value="{!obj.Other_Reason__c}"/>
+                        </div>
+                    </div>
+                    <div class="{!(obj.Status__c != 'Committed' &amp;&amp; obj.Status__c != 'Executed') ? 'slds-hide': 'slds-show'}">
+                        <div class="displayDistrib slds-m-top_small">
+                            <lightning:textarea aura:id="note" name="myTextArea"
+                                label="Notes For Distributor " maxlength="300" value="{!obj.Notes_for_Distributor__c}"/>
+                        </div>
+                            <!--MC-1761: Suggested Delivery Date is made required when status is changed to Committed -->
+                            <c:DatePicker aura:id="displaydt" value="{!obj.Supporting_Materials_Delivery_Date__c}" label="{!$Label.c.Suggested_Date_Label}" inputClass="slds-input" requiredAstrik="{!(obj.Status__c == 'Committed') ? '*': ' '}" id="{!idx}" positionDate="datePickerLeft"/>
+                    </div>
+                </div>
+                <div class="slds-col slds-p-horizontal--small divStyleClass">
+                    <c:ProductSearch aura:id="brandSearch" searchValue="{!obj.Brands__c}" object="Product__c" field="TrademarkBrandLongNme__c"
+                        showPkg="true" isDisablePkg="false" selectedPkgId="{!obj.MC_Product__c}" isOffPremise="{!v.accountIsOffPremise}" />
+                    
+                    <aura:if isTrue="{!obj.Status__c == 'Declined' ? 'true': 'false'}">
+                            <lightning:input type="number"  class="qty" label="{!$Label.c.Objectives_Quantity_Deliver}" name="quantityInput" required="false" disabled="true"
+                                             value="0" aura:id="auraQty"  />
+                            
+                            
+                            <aura:set attribute="else">
+                                
+                                <lightning:input type="number" default="1"  min="1" class="qty" label="{!$Label.c.Objectives_Quantity_Deliver}" name="quantityInput" required="false"
+                                                 value="{!obj.Product_Quantity__c}" aura:id="auraQty" messageWhenRangeUnderflow="{!$Label.c.Objectives_Initial_Quantity_Error}" />
+                                
+                            </aura:set>
+                        </aura:if> 
+                    
+                    <!--<lightning:input type="number" min="1" class="qty" label="{!$Label.c.Objectives_Quantity_Deliver}" name="quantityInput" required="true"
+                        value="{!obj.Product_Quantity__c}" aura:id="auraQty" messageWhenRangeUnderflow="{!$Label.c.Objectives_Initial_Quantity_Error}" /> -->
+                    <div class="displayDetails">
+                        <lightning:textarea aura:id="note" name="myTextArea" label="{!$Label.c.Objectives_Display_Details}" maxlength="300"
+                            value="{!obj.Description__c}" />
+                    </div>
+                     
+                </div>
+            </div>
+        </aura:if>
+          <aura:if isTrue="{!obj.RecordType.Name == 'Sampling'}">
+            <!-- Header -->
+            <div class="slds-page-header slds-m-bottom--x-large">
+                <div class="slds-grid">
+                    <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2">
+                        <div class="slds-col slds-has-flexi-truncate">
+                            <div class="slds-media slds-no-space slds-grow">
+                                <div class="slds-media__figure">
+                                    <lightning:icon iconName="standard:user" alternativeText="{!$Label.c.My_Objectives}" />
+                                </div>
+                                <div class="slds-media__body">
+                                    <span class="slds-text-align--left slds-text-title--caps"> {!$Label.c.Sampling}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <aura:if isTrue="{!obj.Planned_Objective__c}">
+                        <aura:if isTrue="{!and(obj.Planned_Objective__r.CreatedBy.UserRole.Name == 'Sales Administrator', obj.Planned_Objective__r.Planned_Objective_Type__c != 'Personal')}">
+                            <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                <!-- Name to the right -->
+                                <span class="slds-text-align--right slds-text-title--caps">{!$Label.c.COE_Objective_Type}&nbsp;-&nbsp;{!obj.Planned_Objective__r.Name} </span>
+                            </div>
+                            <aura:set attribute="else">
+                                <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                    <!-- Name to the right -->
+                                    <span class="slds-text-align--right slds-text-title--caps">{!obj.Planned_Objective__r.CreatedBy.Name}&nbsp; - {!obj.Planned_Objective__r.Name} </span>
+                                </div>
+                            </aura:set>
+                        </aura:if>
+                        <aura:set attribute="else">
+                            <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right">
+                                <!-- Name to the right -->
+                                <span class="slds-text-align--right slds-text-title--caps">{!obj.CreatedBy.Name}&nbsp;-&nbsp;{!obj.Name} </span>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                </div>
+            </div>
+            <!-- engagement Details -->
+            <div class="slds-container slds-grid slds-media--responsive slds-m-bottom--x-large ">
+                <div class="slds-col slds-p-horizontal--small slds-m-bottom--large">
+                    <div>
+                        <lightning:input label="{!$Label.c.Objectives_Name_Sampling}" name="samplingName"  required="true" value="{!obj.Name}" messageWhenValueMissing="{!$Label.c.Objectives_Engagement_Name_Error}"
+                            aura:id="egageName"  />
+                    </div>
+                    <div class="selectOption">
+                        <lightning:select name="selectItem" label="{!$Label.c.Status}" value="{!obj.Status__c}" aura:id="selectOptions" onchange="{!c.checkStatusChange}" class="{!'engStatus'+idx}">
+                            <option value="Not Started">{!$Label.c.Not_Started}</option>
+                            <option value="In Progress">{!$Label.c.In_Progress}</option>
+                            <option value="Committed">{!$Label.c.Committed}</option>
+                            <option value="Executed">{!$Label.c.Executed}</option>
+                            <option value="Declined">{!$Label.c.Declined}</option>
+                            <option value="Not Applicable">{!$Label.c.Not_Applicable}</option>
+                        </lightning:select>
+                    </div>
+                        <!-- MC:1701- Subtypes should be added on objectives instead of planned objectives -->
+                        <c:SubType aura:id="subType" id="{!idx}" objStatus="{!obj.Status__c}" selectedSubType="{!obj.Sub_Type_Selection__c}" ObjectiveSubType="{!obj.Sub_Type__r.Sub_Type_Values__c }" />
+                    <div class="declinedStyle">
+                        <div aura:id="declinedList" data-record="{!idx}" class="{!obj.Status__c != 'Declined' ? 'slds-hide': 'slds-show'}" onchange="{!c.setDeclinedVal}">
+                            <lightning:select name="declinedList" required="true" label="{!$Label.c.Objectives_Declined_Reason}" aura:id="declineOptions" value="{!obj.Declined_Reason__c}" onchange="{!c.updateRecord}">
+                                <option value="None">{!$Label.c.Objectives_None}</option>
+                                <aura:iteration items="{!v.declinedVals}" var="val">
+                                    <option value="{!val}" selected="{!val == obj.Declined_Reason__c}">{!val}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                        <div aura:id="declineOther" class="{!if(and(obj.Status__c == 'Declined', obj.Declined_Reason__c == 'Other'), 'slds-show', 'slds-hide') + ' slds-form-element slds-m-top--medium'}">
+                            <lightning:input label="{!$Label.c.Objectives_Other}" required="false" name="Declined Reason"  value="{!obj.Other_Reason__c}" onchange="{!c.updateRecord}" />
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-col slds-p-horizontal--medium  divStyleClass">
+                    <div>
+                        <c:ProductSearch aura:id="brandSearch" searchValue="{!obj.Brands__c}" object="Product__c" field="TrademarkBrandLongNme__c" showPkg="false" isRequired="{!(obj.Status__c == 'Committed') ? True: false}"
+                            />
+                    </div>
+                    <div class="slds-p-horizontal--medium engagmentDatePicker">
+                        <c:DatePicker aura:id="engageDt" id="{!idx}" value="{!obj.Date__c}" label="{!$Label.c.Objectives_Sampling_Date}"
+                            inputClass="slds-input" requiredAstrik="{!(obj.Status__c == 'Committed' || obj.Status__c == 'Executed') ? '*': ' '}" positionDate="datePickerLeftEngageDatePosition"/>
+                    </div>
+   					<div class="engagementDetails">
+                        <label class="slds-form-element__label">{!$Label.c.SamplingDol}</label>
+                        <ui:inputCurrency aura:id="amount"  class="slds-input" value="{!obj.Sampling_Dollar__c}"/>
+                    </div>
+                    
+                    <div class="slds-text-align--right">
+                        <button class="slds-button slds-button--brand" data-record="{!obj.Id + 'Sampling'}" onclick="{!c.copyObjective}">{!$Label.c.Objectives_Copy}</button>
+                    </div>
+                </div>
+            </div>
+   
+        </aura:if>
+    </aura:iteration>
+</ui:scrollerWrapper>
+</aura:component>

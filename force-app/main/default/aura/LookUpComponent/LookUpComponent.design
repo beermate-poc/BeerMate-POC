@@ -1,0 +1,10 @@
+<design:component >
+   <design:attribute name="PricebookValue" label="Opportunity Pricebook" description="Enter PriceBook Value" />
+   <design:attribute name="selectRecordId" label="Selected record" description="Get the selected product ID" />
+    <design:attribute name="selectRecordName" label="Selected record Name" description="Get the selected product Name" />
+    
+    
+    <sfdc:objects>
+        <sfdc:object>PriceBookEntry</sfdc:object>
+    </sfdc:objects>
+ </design:component>

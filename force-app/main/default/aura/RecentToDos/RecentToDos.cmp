@@ -1,0 +1,86 @@
+<aura:component controller="CallLogUtility">
+	<aura:handler name="init" action="{!c.init}" value="{!this}" />
+    <aura:handler name="TaskEditFinish" action="{!c.refresh}" event="c:TaskEditFinish" />
+	<aura:attribute name="today" type="Date" />
+	<aura:attribute name="recentTasks" type="Task[]" />
+	<aura:attribute name="lastIndexCurrentlyShown" type="Integer" />
+	<aura:attribute name="accountId" type="Id"/>
+	<aura:attribute name="showToDos" type="boolean" default="true"/>
+    <aura:attribute name="gsloadToDos" type="boolean" />
+   <aura:handler name="change" value="{!v.gsloadToDos}" action="{!c.init}" />
+	<aura:method name="loadToDos" action="{!c.init}" />
+
+	<lightning:spinner aura:id="spinner" alternativeText="Loading Data..." />
+
+	<aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+		<ui:scrollerWrapper class="scrollerSize">
+		<c:TaskEditOverlay aura:id="taskEditOverlay" showToDos="{!v.showToDos}" />
+		<aura:if isTrue="{!v.showToDos}">
+			<div class="slds">
+				<aura:iteration items="{!v.recentTasks}" var="currTask">
+					<div class="slds-p-around--medium">
+						<div class="slds-list--horizontal slds-wrap">
+							<div class="slds-item--label slds-text-color--weak slds-truncate" title="{!$Label.c.ToDo_s_Label}">{!$Label.c.ToDo_s_Label}:</div>
+							<div class="slds-item--detail slds-truncate">
+								<div data-record="{!currTask.Id}" onclick="{!c.edit}" style="text-align: left;">
+									<lightning:button class="slds-truncate" variant="base" label="{!currTask.Subject}"/>
+								</div>
+							</div>
+							<div class="slds-item--label slds-text-color--weak slds-truncate" title="{!$Label.c.Due_Date}">{!$Label.c.Due_Date}:</div>
+							<div class="slds-item--detail slds-truncate">
+								<div>
+									<ui:outputDate value="{!currTask.ActivityDate}" format="EEEE" class="{!currTask.ActivityDate}"/>
+								</div>
+								<ui:outputDate value="{!currTask.ActivityDate}" format="MM/dd/yyyy" class=" "/>
+							</div>
+							<div class="slds-item--label slds-text-color--weak slds-truncate" title=""></div>
+							<div class="slds-item--detail slds-truncate">
+								<div data-record="{!currTask.Id}" onclick="{!c.doneWithTask}">
+									<lightning:button variant="brand">Done</lightning:button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</aura:iteration>
+			</div>
+		</aura:if>
+		</ui:scrollerWrapper>
+	<aura:set attribute="else">
+		<c:TaskEditOverlay aura:id="taskEditOverlay" />
+		<ui:scrollerWrapper class="scrollerSize">
+			<div class="slds">
+				<table class="slds-table slds-table--bordered slds-table--cell-buffer slds-max-medium-table--stacked-horizontal">
+					<thead>
+						<tr class="slds-text-heading--label">
+							<th scope="col" title="{!$Label.c.ToDo_s_Label}">
+								<div>{!$Label.c.ToDo_s_Label}</div>
+							</th>
+							<th scope="col" title="{!$Label.c.Due_Date}">
+								<div>{!$Label.c.Due_Date}</div>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<aura:iteration items="{!v.recentTasks}" var="currTask">
+							<tr>
+			                    <td data-label="" title="Subject" class="subject">
+									<div data-record="{!currTask.Id}" onclick="{!c.edit}" style="text-align: left;"><lightning:button variant="base" label="{!currTask.Subject}"/></div>
+								</td>
+								<td data-label="Due Date" title="{!$Label.c.Due_Date}">
+									<div><ui:outputDate value="{!currTask.ActivityDate}" format="EEEE" class="{!currTask.ActivityDate}"/></div>
+									<ui:outputDate value="{!currTask.ActivityDate}" format="MM/dd/yyyy" class=" "/>
+								</td>
+								<td>
+									<div data-record="{!currTask.Id}" onclick="{!c.doneWithTask}">
+										<lightning:button variant="brand">{!$Label.c.Done}</lightning:button>
+									</div>
+								</td>
+							</tr>
+						</aura:iteration>
+					</tbody>
+				</table>
+			</div>
+		</ui:scrollerWrapper>
+	</aura:set>
+	</aura:if>
+</aura:component>

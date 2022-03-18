@@ -1,0 +1,10 @@
+/**
+ * Created by bryantdaniels on 9/13/17.
+ */
+.THIS {
+    background:#fff
+}
+.THIS .slds-textarea{
+    border: none;
+    background-color: white;
+}

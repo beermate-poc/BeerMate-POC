@@ -1,0 +1,50 @@
+<!--
+Author:       Ankita Shanbhag
+Company:      Accenture
+Description:  Component to Create and Edit the Contact
+-->
+<aura:component controller="GuidedSellingController">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="newContact" type="Contact" default="{	'sobjectType': 'Contact'}"/>
+    <aura:attribute name="showErrorToast" type="boolean" default="false"/>
+    <aura:attribute name="toastTitle" type="String" />
+    <aura:attribute name="toastMsg" type="String" />
+    <aura:attribute name="toastType" type="String" />
+    <aura:attribute name="accountId" type="String" />
+    <aura:attribute name="roles" type="String[]" default=" "/>
+    <aura:attribute name="showCreateContact" type="boolean"/> 
+    <aura:attribute name="refershContacts" type="boolean" />
+    <aura:attribute name="activeContact" type="boolean"  default="true"/>
+    <aura:attribute name="showEditContact" type="boolean"/>
+    <aura:attribute name="contactRole" type="String" />
+    
+    <lightning:spinner aura:id="spinner" alternativeText="Saving Data..." class="slds-hide"/>
+    
+    <aura:if isTrue="{!v.newContact.LastName == null}">
+        <div class="slds-modal__header slds-text-heading_medium slds-text-align_center">{!$Label.c.New_Contact}</div>  
+        <aura:set attribute="else">
+            <div class="slds-modal__header slds-text-heading_medium slds-text-align_center">{!$Label.c.BMC_GSEditContact}</div>              
+        </aura:set>   
+    </aura:if>
+    <br></br>
+    <div class="slds-text-align__center">
+        <aura:if isTrue="{!v.showErrorToast}">
+            <c:Toast toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}"/>
+        </aura:if>
+    </div>
+    <lightning:input required="true" value="{!v.newContact.FirstName}" aura:id="firstName" label="{!$Label.c.First_Name}" name="firstname" />
+    <lightning:input value="{!v.newContact.LastName}" required="true" aura:id="lastName"  label="{!$Label.c.Last_Name}" name="LastName"  />
+    <lightning:select aura:id="role" name="role" label="{!$Label.c.BMC_GSPosition}">
+        <option value="">{!$Label.c.Default_Picklist_Select}</option>
+        <aura:iteration items="{!v.roles}" var="role">
+            <option value="{!role}" text="{!role}" selected="{!role == v.newContact.Role__c}"></option>
+        </aura:iteration>
+    </lightning:select>	    
+    <lightning:input type="tel"  aura:id="phoneNumber"  required="false"  value="{!v.newContact.Phone}" label="{!$Label.c.Phone_Number}" name="phoneNumber"  />
+   <lightning:input type="checkbox" label="Active" name="input2" aura:id="con" checked="{!v.activeContact}" onchange="{!c.setContactActive}"/>
+    <br></br>
+    <div class="slds-modal__footer slds-button slds-align_absolute-center ">
+        <lightning:button class="slds-button" variant="neutral" label="{!$Label.c.Cancel_Label}" onclick="{!c.cancelModal}" />
+        <lightning:button class="slds-button" variant="brand" label="{!$Label.c.Save}" onclick="{!c.saveContact}" />
+    </div>
+</aura:component>

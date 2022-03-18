@@ -1,0 +1,4 @@
+.THIS .modal-body.scrollable.slds-modal__content.slds-p-around--medium {
+  height:400px !important;
+  max-height:600px !important;
+}

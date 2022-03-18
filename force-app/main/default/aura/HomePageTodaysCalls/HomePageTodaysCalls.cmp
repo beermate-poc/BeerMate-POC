@@ -1,0 +1,74 @@
+<aura:component controller="HomePageTodaysCallsController" implements="force:appHostable,flexipage:availableForAllPageTypes">
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<aura:attribute name="callLogList" type="List" />
+	<aura:attribute name="numOfItems" type="String" />
+    <aura:attribute name="pastDueCount" type="Integer" />
+
+	<div class="slds-media--responsive flexipageComponent slds slds-container" data-aura-class="flexipageComponent">
+		<article class="slds-card forceBaseCard forceCard flexipageCard">
+			<div class="slds-card__header slds-grid">
+				<header class="slds-media slds-media--center slds-has-flexi-truncate">
+					<div class="slds-media__body">
+						<h2 id="header">
+							<a href="javascript:void(0);" class="slds-card__header-link slds-truncate" onclick="{!c.navigateToListView}">
+								<span class="slds-text-heading--small slds-truncate">{!$Label.c.Todays_Calls}</span>
+							</a>
+						</h2>
+					</div>
+				</header>
+				<div class="slds-no-flex">
+					<button class="slds-button slds-button--neutral" onclick="{!c.navigateToListView}">{!$Label.c.Reschedule}</button>
+					<center><div class="slds-align_absolute-center" style="color:red;">({!v.pastDueCount} Past Due)</div></center>
+                </div>
+			</div>
+			<div class="slds-card__body slds-card__body--inner">
+				<div class="light uiAbstractList forceFilterList">
+					<div class="listTitleContainer uiBlock">
+						<div class="bLeft">
+							<div class="small forceEntityIcon">
+								<lightning:icon iconName="custom:custom14" size="medium"/>
+							</div>
+						</div>
+						<div class="bBody">
+							<h2 class="listTitle truncate">
+								<span class="titleWrapper">{!$Label.c.Todays_Calls}</span><br />
+								<span class="filterLabel filterIndicator">{!v.numOfItems}</span>
+							</h2>
+						</div>
+					</div>
+					<div class="listContent">
+						<ul class="light">
+							<aura:iteration items="{!v.callLogList}" var="callLog">
+								<li class="light actionable uiInfiniteListRow forceActionRow forceListRecord forceRecordLayout">
+									<div class="body slds-p-around--medium">
+										<div data-record="{!callLog.Account__c}" onclick="{!c.navigateToRecord}">
+											<a style="color:black;" href="javascript:void(0);">
+												<h3 class="itemTitle">
+													<span class="uiOutputText">{!callLog.Account__r.Name}</span>
+												</h3>
+												<ul class="itemRows truncate">
+													<li class="tableRowGroup">
+														<div class="slds-list--horizontal forceListRecordItem slds-p-top--xx-small">
+															<div class="slds-item--label slds-text-color--weak slds-truncate recordCell">
+																{!$Label.c.Meeting_With_Call_Log_Header}
+															</div>
+															<div class="slds-item--detail slds-truncate recordCell">
+																<span class="uiOutputText">{!callLog.KeyContact__r.Name}</span>
+															</div>
+														</div>
+													</li>
+												</ul>
+											</a>
+										</div>
+									</div>
+								</li>
+							</aura:iteration>
+						</ul>
+					</div>
+				</div>
+				<div class="errorMessageContainer forceFilterList"></div>
+			</div>
+			<div class="slds-card__footer"></div>
+		</article>
+	</div>
+</aura:component>

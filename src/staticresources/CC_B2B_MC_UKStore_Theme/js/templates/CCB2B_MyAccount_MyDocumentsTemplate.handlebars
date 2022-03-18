@@ -1,0 +1,71 @@
+<div class="panel-heading cc_heading">
+    <h3 class="panel-title cc_title">
+        {{pageLabelMap 'CCB2B_MyAccount_MyDocuments_Section_Menu'}}
+    </h3>
+</div>
+{{#if this.length}}
+    <div class="panel documentsListPanel panel-default cc_panel cc_paginator">
+        <div class="table-responsive collapsible_table">
+            <table id="documentsTable" class="table cc_table cc_order_search_table">
+                <tr class="cc_table_header_row">
+                    <th class="cc_table_header">
+                        <span class="cc_table_header_document_id">{{pageLabelMap 'CCB2B_MyAccount_MyDocuments_DocumentId_Label'}}</span>
+                    </th>
+                    <th class="cc_table_header">
+                        <span class="cc_table_header_supplier_name">{{pageLabelMap 'CCB2B_MyAccount_MyDocuments_Supplier_Label'}}</span>
+                    </th>
+                    <th class="cc_table_header">
+                        <span class="cc_table_header_name">{{pageLabelMap 'CCB2B_MyAccount_MyDocuments_Name_Label'}}</span>
+                    </th>
+                    <th class="cc_table_header">
+                        <span class="cc_table_header_issue_date">{{pageLabelMap 'CCB2B_MyAccount_MyDocuments_IssueDate_Label'}}</span>
+                    </th>
+                    <th class="cc_table_header">
+                        <span class="cc_table_header_document_type">{{pageLabelMap 'CCB2B_MyAccount_MyDocuments_DocumentType_Label'}}</span>
+                    </th>
+                    <th class="cc_table_header">
+                        <span class="cc_table_header_total_amount">{{pageLabelMap 'CCB2B_MyAccount_MyDocuments_TotalAmount_Label'}}</span>
+                    </th>
+                    <th class="cc_table_header">
+                        <span class="cc_table_header_order_actions pull-right"></span>
+                    </th>
+                </tr>
+                {{#each this}}
+                    <tr id="{{generateId 'ccb2b-ma-documents-item-' this.documentData.Name__c '-row'}}" class="myAccInvoiceRows cc_table_row">
+                        <td class="cc_table_col" data-label="{{pageLabelMap 'CCB2B_MyAccount_MyDocuments_DocumentId_Label'}}:">
+                            {{#if this.documentData.DocumentID__c}}
+                                <span id="{{generateId 'ccb2b-ma-documents-document-id-' this.documentData.Name__c '-field'}}" class="cc_col_document_id">{{this.documentData.DocumentID__c}}</span>
+                            {{else}}
+                                <span> - </span>
+                            {{/if}}
+                        </td>
+                        <td class="cc_table_col" data-label="{{pageLabelMap 'CCB2B_MyAccount_MyDocuments_Supplier_Label'}}:">
+                            <span id="{{generateId 'ccb2b-ma-documents-supplier-' this.documentData.Name__c '-field'}}" class="cc_col_supplier_name">{{this.documentData.SupplierName__c}}</span>
+                        </td>
+                        <td class="cc_table_col" data-label="{{pageLabelMap 'CCB2B_MyAccount_MyDocuments_Name_Label'}}:">
+                            <span id="{{generateId 'ccb2b-ma-documents-name-' this.documentData.Name__c '-field'}}" class="cc_col_name">{{this.documentData.Name__c}}</span>
+                        </td>
+                        <td class="cc_table_col" data-label="{{pageLabelMap 'CCB2B_MyAccount_MyDocuments_IssueDate_Label'}}:">
+                            <span id="{{generateId 'ccb2b-ma-documents-date-' this.documentData.Name__c '-field'}}" class="cc_col_issue_date">{{formatDateFromMilliseconds this.documentData.IssueDate__c 'dd/mm/yyyy'}}</span>
+                        </td>
+                        <td class="cc_table_col" data-label="{{pageLabelMap 'CCB2B_MyAccount_MyDocuments_DocumentType_Label'}}:">
+                            <span id="{{generateId 'ccb2b-ma-documents-type-' this.documentData.Name__c '-field'}}" class="cc_col_document_type">{{pageLabelMap (parseDocumentType this.documentData.DocumentType__c)}}</span>
+                        </td>
+                        <td class="cc_table_col" data-label="{{pageLabelMap 'CCB2B_MyAccount_MyDocuments_TotalAmount_Label'}}:">
+                            <span id="{{generateId 'ccb2b-ma-documents-amount-' this.documentData.Name__c '-field'}}" class="cc_col_total_amount">{{price this.documentData.TotalAmount__c}}</span>
+                        </td>
+                        <td class="cc_table_col text-right">
+                            {{#ifNotEquals this.attachmentId ''}}
+                                <span class="cc_col_attachment"><a id="{{generateId 'ccb2b-ma-orders-view-' this.documentData.Name__c '-link'}}" href="{{getAttachmentURL this.attachmentId}}" class="viewLink" download>{{pageLabelMap 'CCB2B_MyAccount_View_Label'}}</a></span>
+                            {{/ifNotEquals}}
+                        </td>
+                    </tr>
+                {{/each}}
+            </table>
+        </div>
+        <div id="modalSec"></div>
+    </div>
+    <div class="orderPaginationSec" />
+{{else}}
+    <p id="ccb2b-ma-documents-noitem-label" class="noItemsInfo">{{pageLabelMap 'CCB2B_MyAccount_MyDocuments_NoItems_Label'}}</p>
+{{/if}}

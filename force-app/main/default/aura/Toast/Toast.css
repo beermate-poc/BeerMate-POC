@@ -1,0 +1,10 @@
+/*.THIS .forceVisualMessageQueue {
+    position: fixed !important;
+    z-index: 10000 !important;
+    top:0 !important;
+    left:0 !important;
+    right:0 !important;
+}
+.THIS .forceToastMessage.slds-notify--toast {
+    min-width: 90% !important;
+}*/

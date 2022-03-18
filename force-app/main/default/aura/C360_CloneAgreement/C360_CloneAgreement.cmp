@@ -1,0 +1,31 @@
+<aura:component controller="C360_CloneAgreementController" implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global" >
+    <aura:attribute name="cloneopen" type="boolean" default="false"/>
+    <aura:attribute name="createable" type="boolean" default="false"/>
+    <aura:attribute name="nocloneopen" type="boolean" default="false"/>
+    <aura:attribute name="recordId" type="ID" />
+    <ltng:require styles="{!$Resource.slds222 + '/assets/styles/lightning-design-system-ltng.css'}"/>
+    
+    <aura:html tag="style">
+        .modal-body{
+        height : 150px !important;
+        max-height: 150px !important;
+        }
+    </aura:html>
+    
+    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+        <p><b>{!$Label.c.C360_CloneAgreement}</b>
+        </p>
+    </div>
+    <div class="slds-align_absolute-center">
+        <lightning:button  variant="brand" 
+                          label="{!$Label.c.C360_Yes}"
+                          title="Clone"
+                          onclick="{!c.clone}"/>
+        <lightning:button  variant="neutral" 
+                          label="{!$Label.c.C360_NO}"
+                          title="Cancel"
+                          onclick="{!c.onCancel}"/>
+    </div>
+    
+    
+</aura:component>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Audience xmlns="http://soap.sforce.com/2006/04/metadata">
+    <audienceName>MC Connect/Drive Access</audienceName>
+    <container>Partner Portal</container>
+    <criteria>
+        <criterion>
+            <criteriaNumber>1</criteriaNumber>
+            <criterionValue>
+                <entityField>Contact.$Contact.PDE_Passport_Services__c</entityField>
+                <entityType>User</entityType>
+                <fieldValue>Distributor Claims</fieldValue>
+            </criterionValue>
+            <operator>Includes</operator>
+            <type>FieldBased</type>
+        </criterion>
+        <criterion>
+            <criteriaNumber>2</criteriaNumber>
+            <criterionValue>
+                <entityField>Contact.$Contact.PDE_Passport_Services__c</entityField>
+                <entityType>User</entityType>
+                <fieldValue>Distributor Product Transfer</fieldValue>
+            </criterionValue>
+            <operator>Includes</operator>
+            <type>FieldBased</type>
+        </criterion>
+        <criterion>
+            <criteriaNumber>3</criteriaNumber>
+            <criterionValue>
+                <entityField>Contact.$Contact.PDE_Passport_Services__c</entityField>
+                <entityType>User</entityType>
+                <fieldValue>Distributor Reverse Logistics</fieldValue>
+            </criterionValue>
+            <operator>Includes</operator>
+            <type>FieldBased</type>
+        </criterion>
+        <criterion>
+            <criteriaNumber>4</criteriaNumber>
+            <criterionValue>
+                <entityField>Contact.$Contact.PDE_Passport_Services__c</entityField>
+                <entityType>User</entityType>
+                <fieldValue>Drive 2 - Full Access</fieldValue>
+            </criterionValue>
+            <operator>Includes</operator>
+            <type>FieldBased</type>
+        </criterion>
+        <criterion>
+            <criteriaNumber>5</criteriaNumber>
+            <criterionValue>
+                <entityField>Contact.$Contact.PDE_Passport_Services__c</entityField>
+                <entityType>User</entityType>
+                <fieldValue>Fast Track</fieldValue>
+            </criterionValue>
+            <operator>Includes</operator>
+            <type>FieldBased</type>
+        </criterion>
+        <criterion>
+            <criteriaNumber>6</criteriaNumber>
+            <criterionValue>
+                <entityField>Contact.$Contact.PDE_Passport_Services__c</entityField>
+                <entityType>User</entityType>
+                <fieldValue>InterPlant Create</fieldValue>
+            </criterionValue>
+            <operator>Includes</operator>
+            <type>FieldBased</type>
+        </criterion>
+        <criterion>
+            <criteriaNumber>7</criteriaNumber>
+            <criterionValue>
+                <entityField>Contact.$Contact.PDE_Passport_Services__c</entityField>
+                <entityType>User</entityType>
+                <fieldValue>Package Data Sheets</fieldValue>
+            </criterionValue>
+            <operator>Includes</operator>
+            <type>FieldBased</type>
+        </criterion>
+        <criterion>
+            <criteriaNumber>8</criteriaNumber>
+            <criterionValue>
+                <entityField>Contact.$Contact.PDE_Passport_Services__c</entityField>
+                <entityType>User</entityType>
+                <fieldValue>IPM Billing Price List Report</fieldValue>
+            </criterionValue>
+            <operator>Includes</operator>
+            <type>FieldBased</type>
+        </criterion>
+        <criterion>
+            <criteriaNumber>9</criteriaNumber>
+            <criterionValue>
+                <entityField>Contact.$Contact.PDE_Passport_Services__c</entityField>
+                <entityType>User</entityType>
+                <fieldValue>Space Planning Reports</fieldValue>
+            </criterionValue>
+            <operator>Includes</operator>
+            <type>FieldBased</type>
+        </criterion>
+        <criterion>
+            <criteriaNumber>10</criteriaNumber>
+            <criterionValue>
+                <entityField>Contact.$Contact.PDE_Passport_Services__c</entityField>
+                <entityType>User</entityType>
+                <fieldValue>TMS</fieldValue>
+            </criterionValue>
+            <operator>Includes</operator>
+            <type>FieldBased</type>
+        </criterion>
+        <criterion>
+            <criteriaNumber>11</criteriaNumber>
+            <criterionValue>
+                <entityField>Contact.$Contact.PDE_Passport_Services__c</entityField>
+                <entityType>User</entityType>
+                <fieldValue>pabst corporate csa full access</fieldValue>
+            </criterionValue>
+            <operator>Includes</operator>
+            <type>FieldBased</type>
+        </criterion>
+        <criterion>
+            <criteriaNumber>12</criteriaNumber>
+            <criterionValue>
+                <entityField>Contact.$Contact.PDE_Passport_Services__c</entityField>
+                <entityType>User</entityType>
+                <fieldValue>contract partner - pabst contract claims full access</fieldValue>
+            </criterionValue>
+            <operator>Includes</operator>
+            <type>FieldBased</type>
+        </criterion>
+        <criterion>
+            <criteriaNumber>13</criteriaNumber>
+            <criterionValue>
+                <entityField>Contact.$Contact.PDE_Passport_Services__c</entityField>
+                <entityType>User</entityType>
+                <fieldValue>Distributor Claims - Full Access</fieldValue>
+            </criterionValue>
+            <operator>Includes</operator>
+            <type>FieldBased</type>
+        </criterion>
+        <criterion>
+            <criteriaNumber>14</criteriaNumber>
+            <criterionValue>
+                <entityField>Contact.$Contact.PDE_Passport_Services__c</entityField>
+                <entityType>User</entityType>
+                <fieldValue>Distributor Product Transfer - Full Access</fieldValue>
+            </criterionValue>
+            <operator>Includes</operator>
+            <type>FieldBased</type>
+        </criterion>
+        <criterion>
+            <criteriaNumber>15</criteriaNumber>
+            <criterionValue>
+                <entityField>Contact.$Contact.PDE_Passport_Services__c</entityField>
+                <entityType>User</entityType>
+                <fieldValue>Distributor Reverse Logistics - Full Access</fieldValue>
+            </criterionValue>
+            <operator>Includes</operator>
+            <type>FieldBased</type>
+        </criterion>
+    </criteria>
+    <formula>1 OR 2 OR 3 OR 4 OR 5 OR 6 OR 7 OR 8 OR 9 OR 10 OR 11 OR 12 OR 13 OR 14 OR 15</formula>
+    <formulaFilterType>CustomLogicMatches</formulaFilterType>
+    <isDefaultAudience>false</isDefaultAudience>
+    <targets>
+        <target>
+            <groupName>9b49ba8e-01b7-4e6b-8916-bb218a2ca8d6$#$a8a0978c-f4db-4d3a-9f62-760929392315</groupName>
+            <priority>1</priority>
+            <targetType>ExperienceVariation</targetType>
+            <targetValue>Home_CMS_Single_Item_Component</targetValue>
+        </target>
+        <target>
+            <groupName>aa2d0042-ff59-4f8d-be3c-65c97fb6165b$#$05536e27-bb38-4fa9-b669-fd56a5174ad1</groupName>
+            <priority>1</priority>
+            <targetType>ExperienceVariation</targetType>
+            <targetValue>Carrier_Type_Home_Page_CMS_Single_Item_Component</targetValue>
+        </target>
+        <target>
+            <groupName>fdf34274-32de-4c5b-b3be-6b07b8bc09d3$#$97ef1e17-5fdb-4f2a-85fa-af97a47863b9</groupName>
+            <priority>1</priority>
+            <targetType>ExperienceVariation</targetType>
+            <targetValue>Distributor_Other_Type_Home_Page_CMS_Single_Item_Component</targetValue>
+        </target>
+    </targets>
+</Audience>

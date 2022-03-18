@@ -1,0 +1,98 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="CTS_ConsolidatePartOrderController">
+	<!-- attributes -->
+    <aura:attribute name="data" type="WorkOrderLineItem[]" default="[]"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="errors" type="Object" default="[]"/>
+    <aura:attribute name="draftValues" type="Object" default="[]"/>
+    <aura:attribute name="wolReference" type="String" default=""/>
+
+    <!-- Imports -->
+    <!--aura:import library="lightningcomponentdemo:mockdataFaker" property="mockdataLibrary"/-->
+
+    <!-- handlers-->
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }"/>
+
+    
+    <!-- the container element determine the height of the datatable -->
+    <div style="height: auto" aura:id="tasktable" class="slds-scrollable slds-hide">
+        <!--
+        <lightning:datatable
+            columns="{! v.columns }"
+            data="{! v.data }"
+            keyField="id"
+            errors="{! v.errors }"
+            draftValues="{! v.draftValues }"
+            hideCheckboxColumn="true"
+        />
+		-->
+        
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer" >
+            <thead>
+                <tr class="slds-text-title_caps">
+                    
+                    <th scope="col">
+                        <div class="slds-truncate" title="Task">Task</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Brand IN">Brand IN</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Brand Display IN">Brand Display IN</div>
+                    </th>
+                     <th scope="col">
+                        <div class="slds-truncate" title="Brand Dispense IN">Brand Dispense IN</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Handle Type">Handle Type</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Component IN">Component IN</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Component Sub Type IN">Component Sub Type IN</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Quantity">Quantity</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody> 
+                <!--### display all records of searchResult attribute by aura:iteration ###-->
+                <aura:iteration items="{!v.data}" var="taskitem" indexVar="count">
+                    <tr>
+                        
+                        <td scope="row" class="slds-text-align--right" style="width:3.25rem;">
+                  			<div class="slds-truncate">{!taskitem.LineItemNumber}</div>
+               			</td>
+                        <td scope="row">
+                            <div class="slds-truncate">{!taskitem.CTS_Brand_IN_Name__c}</div>
+                        </td>
+                        
+                        <td scope="row">
+                            <div class="slds-truncate">{!taskitem.CTS_Brand_Display_IN__c}</div>
+                        </td>
+                        <td scope="row">
+                            <div class="slds-truncate">{!taskitem.CTS_Brand_Dispense_IN__c}</div>
+                        </td>
+                        <td scope="row">
+                            <div class="slds-truncate">{!taskitem.CTS_Handle_Type__c}</div>
+                        </td>
+                        <td scope="row">
+                            <div class="slds-truncate">{!taskitem.CTS_Component_IN__c}</div>
+                        </td>
+                        <td scope="row">
+                            <div class="slds-truncate">{!taskitem.CTS_Component_Sub_Type_IN__c}</div>
+                        </td>
+                        <td scope="row">
+                            <div class="slds-truncate">{!taskitem.CTS_Quantity__c}</div>
+                        </td>
+                     </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+    </div>
+    <div aura:id="tasktableNoRec" class="slds-hide" style="text-align: center;font-weight: bold;">
+       		No Tasks Found....
+       </div>
+
+</aura:component>

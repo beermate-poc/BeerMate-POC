@@ -1,0 +1,96 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickActionwithoutheader" controller="C360_SurveyActionController">
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="surRec" type="Available_Survey__c[]" description="The data returned by the Apex controller." />
+    <aura:attribute name="surTakRec" type="SurveyTaker__c[]" description="The data returned by the Apex controller." />
+    <header class="slds-modal__header widthClass">
+    	<h2 class="slds-text-heading--large">{!$Label.c.C360_Survey}</h2>
+        <br></br>
+        <h4 class="slds-text-heading--small">Available Survey</h4>
+    </header>
+    <div>
+    	<table class="slds-table slds-table_bordered slds-table_cell-buffer" >
+			<thead id="dataHeader">
+				<tr class="slds-text-title_caps">
+                    <th scope="col">
+                    	<div class="slds-truncate" title="Name">{!$Label.c.C360_Survey_Name}</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate text-Algin-Class" title="Link">{!$Label.c.C360_Launch_Survey}</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate text-Algin-Class" title="Mandatory">{!$Label.c.C360_Mandatory}</div>
+                    </th>
+				</tr>
+			</thead>
+            <tbody id="dataContainer">
+				<aura:iteration items="{!v.surRec}" var="surAv">
+                	<tr class="slds-hint-parent">
+                        <td scope="row" class="borderR">
+                        	<div class="slds-truncate">
+                                <span class="">{!surAv.Name}</span>
+                            </div>
+                        </td>
+                    	<td scope="row" class="borderR">
+                        	<div class="slds-truncate">
+                                <!--<a href ='/apex/takesurvey?id=a0n1F00000047hN&amp;prod=MC Products&amp;availSurvey=a0o1F000000l1AG&amp;accountId=0011F0000088BBB&amp;clone=False&amp;frequency=Continuous'>-->
+                                <a onclick='{!c.GoToURL}' data-id='{!surAv.Id}' data-accId='{!surAv.Account__c}' data-attriVal ='{!surAv.Survey_Link__c}' data-clone ='{!surAv.Survey_Assignment__r.Clones_Allowed__c}'>
+                                    
+                                    <span class='' >{!$Label.c.C360_Launch_Survey}</span>
+                                       
+                                </a>
+                            </div>
+                        </td>
+                        <td scope="row" style="text-align: center;">
+                        	<div class="slds-truncate">
+                            	<span class="">
+                                	{!surAv.Survey_Assignment__r.C360_Mandatory__c}
+                                </span>  
+                            </div>
+                        </td>
+                          
+                	</tr>
+                </aura:iteration>
+            </tbody>
+     	</table>
+    </div>
+        <br><br></br></br>
+    <div>
+        <header class="slds-modal__header widthClass">
+    	<h2 class="slds-text-heading--small">{!$Label.c.C360_Survey_Taken}</h2>
+        </header>
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer" >
+			<thead id="dataHeader">
+				<tr class="slds-text-title_caps">
+                    <th scope="col">
+                    	<div class="slds-truncate" title="Name">{!$Label.c.C360_Survey_Name}</div>
+                    </th>
+                    <th scope="col">
+                    	<div class="slds-truncate" title="Name">{!$Label.c.C360_Date}</div>
+                    </th>
+                </tr>
+			</thead>
+            <tbody id="dataContainer">
+				<aura:iteration items="{!v.surTakRec}" var="surTk">
+                	<tr class="slds-hint-parent">
+                        <td scope="row" class="borderR">
+                        	<div class="slds-truncate">
+                                <span class="">{!surTk.Survey_Name__c }</span>
+                            </div>
+                        </td>
+                        <td scope="row" class="borderR">
+                        	<div class="slds-truncate">
+                                <span class="">{!surTk.CreatedDate}</span>
+                            </div>
+                        </td>
+                        	</tr>
+                </aura:iteration>
+            </tbody>
+     	</table>
+    </div>
+    <br/><br/>
+    <div>
+        <lightning:button name="Save" label="{!$Label.c.Cancel_Label}" variant="brand" onclick="{!c.hCancel}"/>       
+    	</div>
+    	<br/><br/>
+</aura:component>

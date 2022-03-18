@@ -1,0 +1,62 @@
+<aura:component implements="force:appHostable,lightning:isUrlAddressable,flexipage:availableForRecordHome,force:hasRecordId,lightning:actionOverride,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" controller="CTS_BrandSelectionController">
+    <aura:attribute name="isROIorNI" type="Boolean" default="false" access="global"/>
+    <aura:attribute name="recordTypeLabel" type="List" access="global"/>
+    <aura:attribute name="parentRecordId" type="String" access="global"/>
+    <aura:attribute name="selectedRecordTypeID" type="String" access="global"/>
+    <aura:attribute name="selectedRecordTypeLabel" type="String" access="global"/>
+    <aura:attribute name="hasNextPressed" type="Boolean" default="true" access="global"/>
+	<aura:attribute name="iscommunityUser" type="Boolean" access="global"/>  
+    <aura:attribute name="userErrorMessage" type="String" access="global"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <div >
+            <lightning:spinner aura:id="spn" alternativeText="Loading" size="medium" variant="brand"/>
+    </div>
+    <aura:if isTrue="{!v.iscommunityUser}">
+        
+    	<aura:if isTrue="{!!v.hasNextPressed}">
+               
+                
+                <header class="slds-modal__header">
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">New Technician Task: {!v.selectedRecordTypeLabel}</h2>
+                </header>    
+                <div class="slds-p-around_medium" id="modal-content-id-1">
+                    <p style="float: left;
+                              text-align: right;
+                              padding-right: 1.5rem;
+                              width: 35%;
+                              font-size: .8125rem;">Select a Record Type:</p>
+                    
+                    <aura:iteration items="{!v.recordTypeLabel}" var="s" >
+                        <span style="float: right;
+                                     text-align: left;
+                                     width: 65%;
+                                     padding-bottom: .75rem;">
+                            <lightning:input type="radio" label="{!s.Name}" name="RecordType" value="{!s.Id}" onchange ="{!c.onSelection}" />
+                        </span>
+                    </aura:iteration>		       
+                </div>
+                <div class="slds-docked-form-footer">
+                    <lightning:buttonGroup class="slds-float_right">
+                        <lightning:button label="{!$Label.c.CTS_Cancel}" onclick="{!c.handleCancel}" variant="neutral"/>
+                        <lightning:button label="{!$Label.c.CTS_Next}" onclick="{!c.showNextScreen}" variant="brand" disabled="{!v.selectedRecordTypeID==undefined?true:false}"/>
+                    </lightning:buttonGroup>             
+                </div>
+           
+    	</aura:if> 
+   
+    	{!v.body}
+     	
+     </aura:if>
+     <aura:if isTrue="{!!v.iscommunityUser}">
+         
+         <div class="slds-p-around_medium">
+        	{!v.userErrorMessage}
+           
+         </div>
+        <div class="slds-docked-form-footer" style="position: unset;">
+         	 <lightning:button  label="Close" onclick="{!c.handleCancel}" variant="neutral"/>
+         </div>
+     </aura:if>
+</aura:component>

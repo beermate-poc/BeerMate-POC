@@ -1,0 +1,21 @@
+<aura:component controller="EditMultiSelectClass" access="global" implements="lightning:availableForFlowScreens">	
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="ExecutionSupport" type="String"/>
+    <aura:attribute name="OppLineItemID" type="String"/>
+    <aura:attribute name="required" type="Boolean" default="false"/>
+    <aura:attribute name="readonly" type="Boolean" default="false"/>
+    <aura:attribute name="Label" type="String" default="Please specify"/>  
+    <aura:attribute name="myAttribute" type="String"/>
+    <aura:attribute name="picklistOptsList" type="List"/>
+    <aura:attribute name="objOpp" type="OpportunityLineItem" default="{sobjectType : 'OpportunityLineItem'}" />    
+    <aura:attribute name="selectedVal" type="String[]"/>
+    <lightning:checkboxGroup name="Select picklist" aura:id="pickListId"
+                             label="Execution Support"
+                             options="{!v.picklistOptsList}"
+                             value="{!v.selectedVal }"
+                             onchange="{!c.addPickListValue}"
+                             />
+    <aura:if isTrue="{! v.selectedVal[0] == 'Other' }">
+        <lightning:input required="{!v.required}" disabled="{!v.readonly}" aura:id="userinput" value="{!v.myAttribute}" label="{!v.Label}" onchange="{!c.changeinput}" />
+    </aura:if>
+</aura:component>

@@ -1,0 +1,52 @@
+<aura:component description="CCB2B_PayerSelection"
+                implements="lightning:availableForFlowScreens,force:hasRecordId,force:lightningQuickAction,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes"
+                controller="CCB2B_PayerSelectionController"
+                access="global">
+    <aura:attribute name="options" type="List"/>
+    <aura:attribute name="selectedOptions" type="List" default="[]"/>
+    <aura:attribute name="showModal" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{! this }" action="{! c.initialize }"/>
+    <aura:handler event="force:refreshView" action="{! c.initialize }"/>
+
+    <div class="slds-text-align--right" id="openModalButton">
+        <lightning:button variant="brand"
+                          label="Set Payers"
+                          title="Set Payers"
+                          onclick="{! c.openModal }"
+                          class="slds-text-align--right"/>
+    </div>
+
+    <aura:if isTrue="{!v.showModal}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                 aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeModal }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Create relations with Accounts</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning:dualListbox name="payers"
+                                           label="Select Payers"
+                                           sourceLabel="Available Payer Accounts"
+                                           selectedLabel="Selected"
+                                           fieldLevelHelp="Select Payer Accounts you want to connect. Their sold-to accounts will also be connected."
+                                           options="{! v.options }"
+                                           onchange="{! c.handleChange }"
+                                           disableReordering="true"/>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral"
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closeModal }"/>
+                    <lightning:button variant="brand" label="Submit" onclick="{! c.getSelectedItems }"/>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+</aura:component>

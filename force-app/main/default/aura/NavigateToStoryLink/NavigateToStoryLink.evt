@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="Fired when user clicks on Objective story link from new objective action page" >
+	<aura:attribute name="externalKey" type="String"/><!--Added this attribute to pass the external key value of the selected Objective to the parent component -->
+</aura:event>

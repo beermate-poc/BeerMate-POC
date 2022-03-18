@@ -1,0 +1,14 @@
+<!--
+Author:         Nick Serafin
+Company:        Slalom, LLC
+Description:    Event to pass the objective record that is to be copied on the call log
+Attributes:     objective - the Objective__c record
+				recordType – The record type of the objective
+History
+<Date>      <Authors Name>     <Brief Description of Change>
+6/30/2017    Nick Serafin        Initial Creation
+-->
+<aura:event access="global" type="APPLICATION" description="Event template" >
+    <aura:attribute name="objective" type="Objective__c"/>
+    <aura:attribute name="recordType" type="String"/>
+</aura:event>

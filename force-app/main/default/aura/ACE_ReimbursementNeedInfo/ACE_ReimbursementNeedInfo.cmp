@@ -1,0 +1,23 @@
+<aura:component description="ACE_ReimbursementNeedInfo" controller="ACEReimbursementApproval" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:availableForFlowScreens">
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="success" type="boolean" default="false" />
+    <aura:attribute name="error" type="boolean" default="false" />
+    <aura:attribute name="comments" type="string" />
+
+    <aura:if isTrue="{!v.success}">
+        <ui:message title="Success" severity="confirm" closable="false">
+            Request for more information has been submitted.
+        </ui:message>
+    </aura:if>
+
+    <aura:if isTrue="{!v.error}">
+        <ui:message title="Error" severity="error" closable="false" aura:id="errorMsg"/>
+    </aura:if>
+    
+    <aura:if isTrue="{! v.success == FALSE}">
+        <aura:if isTrue="{! v.error == FALSE}">
+            <ui:inputTextArea aura:id="comments" label="Comments" value="{!v.comments}" rows="5"/>
+        	<ui:button aura:id="button" buttonTitle="Submit" class="button" label="Submit" press="{!c.requestMoreInfo}"/>
+        </aura:if>
+     </aura:if>
+</aura:component>

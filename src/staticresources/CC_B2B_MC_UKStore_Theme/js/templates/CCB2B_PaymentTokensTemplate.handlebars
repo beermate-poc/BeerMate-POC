@@ -1,0 +1,72 @@
+{{#if error}}
+    <p class="paymentError">{{pageLabelMap 'Payment_Tokens_Error'}}</p>
+{{else}}
+    <div class="paymentTokens">
+        <table id="paymentTokensTable" class="table cc_table">
+            <tr class="cc_table_header_row">
+                <th class="cc_table_header"></th>
+                <th class="cc_table_header">
+                    <span>{{pageLabelMap 'Payment_Tokens_Card_Holder'}}</span>
+                </th>
+                <th class="cc_table_header">
+                    <span>{{pageLabelMap 'Payment_Tokens_Card_Type'}}</span>
+                </th>
+                <th class="cc_table_header">
+                    <span>{{pageLabelMap 'Payment_Tokens_Card_Number'}}</span>
+                </th>
+                <th class="cc_table_header">
+                    <span>{{pageLabelMap 'Payment_Tokens_Card_Expires'}}</span>
+                </th>
+                <th class="cc_table_header"></th>
+            </tr>
+            {{#each availableTokens}}
+                <tr class="paymentTokenRow cc_table_row">
+                    <td class="cc_table_col cc_payment_token_select">
+                        <input id="ccb2b-payment-token-{{CCB2B_PaymentTokenID__c}}"  data-id={{Id}} class="paymentToken" type="radio" value={{CCB2B_PaymentTokenID__c}} name="paymentToken"/>
+                        <label for="ccb2b-payment-token-{{CCB2B_PaymentTokenID__c}}"></label>
+                    </td>
+                    <td class="cc_table_col" data-label="{{pageLabelMap 'Payment_Tokens_Card_Holder'}}:">
+                        {{#if CCB2B_CardHolderName__c}} <span>{{{CCB2B_CardHolderName__c}}}</span>{{else}}<span> - </span>{{/if}}
+                    </td>
+                    <td class="cc_table_col" data-label="{{pageLabelMap 'Payment_Tokens_Card_Type'}}:">
+                        {{#if CCB2B_CardBrand__c}} <span>{{CCB2B_CardBrand__c}}</span>{{else}}<span> - </span>{{/if}}
+                    </td>
+                    <td class="cc_table_col cc_table_number" data-label="{{pageLabelMap 'Payment_Tokens_Card_Number'}}:">
+                        {{#if CCB2B_CardObfuscatedNumber__c}} <span>{{CCB2B_CardObfuscatedNumber__c}}</span>{{else}}<span> - </span>{{/if}}
+                    </td>
+                    <td class="cc_table_col cc_table_expires" data-label="{{pageLabelMap 'Payment_Tokens_Card_Expires'}}:">
+                        {{#if CCB2B_CardExpiryDate__c}} <span>{{date CCB2B_CardExpiryDate__c}}</span>{{else}}<span> - </span>{{/if}}
+                    </td>
+                    <td>
+                        <span class="glyphicon glyphicon-trash removeToken pull-right" data-id="{{Id}}"></span>
+                    </td>
+                </tr>
+            {{/each}}
+            <tr class="paymentTokenRow cc_table_row">
+                <td class="cc_table_col">
+                    <input id="ccb2b-payment-token-new" class="paymentToken" type="radio" checked value='newToken' name="paymentToken"/>
+                    <label for="ccb2b-payment-token-new"></label>
+                </td>
+                <td colspan="5" class="cc_table_col" data-label="{{pageLabelMap 'Payment_Tokens_Use_New_Card'}}<:">
+                    {{pageLabelMap 'Payment_Tokens_Use_New_Card'}}
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td class="paymentInfo"><em>{{pageLabelPrefixMap 'CCB2B_CardPayment_' (Card)}}</em></td>
+            </tr>
+        </table>
+    </div>
+    <div id="removeTokenError" class="modal fade cc_modal in" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content cc_modal_content">
+                <div class="modal-body cc_modal_body text-center">
+                    <p>{{pageLabelMap 'Payment_Tokens_Remove_Token_Error'}}</p>
+                </div>
+                <div class="modal-footer cc_modal_footer text-center">
+                    <input type="button" class="btn primary_button btn-default btn-sm" data-dismiss="modal" value="{{pageLabelMap 'Ok'}}">
+                </div>
+            </div>
+        </div>
+    </div>
+{{/if}}

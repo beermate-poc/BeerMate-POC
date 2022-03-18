@@ -1,0 +1,152 @@
+<aura:component  access="global" controller="C360_ObjectiveListController">
+    
+	<aura:attribute name="isOffPrem" type="Boolean" default="false" />
+	<!-- Objectives -->
+    <aura:attribute name="objectives" type="Objective__c[]" />
+    <!--Ids-->
+    <aura:attribute name="accountId" type="Id" default="" />
+    
+    <aura:attribute name="RecordTypeName" type="string" default=""/><!--Holds the values in this format "REcordTypeId_Name" from C360_ObjectveList.cmp-->
+        
+    <aura:attribute name="EventId" type="Id" default="" />
+    <aura:attribute name="ErrorMsg" type="String"/>
+    
+    <aura:attribute name="userRole" type="String" default=''/>
+    <aura:attribute name="forOnlyEditSave" type="boolean" default="true"/>
+    <aura:attribute name="newObjective" type="Objective__c" default="{'sobjectType': 'Objective__c'}" />
+    
+    <aura:attribute name="fieldsetfound" type="boolean" default="false"/>
+    <aura:attribute name="isCreate" type="boolean" default="false"/>
+    <aura:attribute name="fieldSetSectionInfoMap" type="object"/>
+    <aura:attribute name="reqfieldsMap" type="map"/><!-- Used for validating the page on Save Populated in Init method-->
+    <aura:attribute name="subTypeValues" type="String[]" default="[]"/>
+    <aura:attribute name="selectedSubType" type="String" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <!--
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    -->
+	
+	<aura:handler name="plannedObjChanged" event="c:PlannedObjectiveSelected"
+    action="{!c.plannedObjectiveChanged}"/>
+    
+    <aura:registerEvent name="EditPageResetEvent" type="c:ResetObjectiveEditView" />
+    
+    <lightning:quickActionAPI aura:id="quickActionAPI"/>
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+        
+            <div >                
+                <div class="spinnerHolder slds-hide" aura:id="divspn">
+                    <lightning:spinner aura:id="spn" alternativeText="Loading" size="medium" variant="brand"/>
+                </div>
+                <header class="slds-modal__header">
+                    <aura:if isTrue="{!v.isCreate}">
+                    	<h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">New Objective</h2>
+                	<aura:set attribute="else">
+                    	<h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Edit Objective</h2>   
+                        
+                    </aura:set>
+                    
+                    </aura:if>
+                    
+                </header>
+                <div class="error-Msg" aura:id="ErrorMsg">
+                    {!v.ErrorMsg}
+                </div>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    
+                    
+                   <lightning:recordEditForm aura:id="objRecordEditForm" recordId="{!v.objectives[0].Id}" recordTypeId="{!v.newObjective.RecordTypeId}" objectApiName="Objective__c" >
+                        <lightning:messages />
+                        <aura:iteration items="{!v.fieldSetSectionInfoMap}" var="SectionInfo" indexVar="key">     
+                            <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder ">
+                                <span class="section-header-title slds-p-horizontal--small slds-truncate">{!SectionInfo.key}</span>
+                            </h3>
+                            
+                            <lightning:layout multipleRows="true">
+                                <aura:iteration items="{!SectionInfo.value}" var="s" >
+                                    
+                                        <aura:if isTrue="{!and(s.isAccessible , or(s.FieldName == 'Brands__c',or(s.FieldName == 'Planned_Objective__c',s.FieldName == 'Sub_Type__c')))}">
+                                            <lightning:layoutItem padding="around-small" size="{!$Browser.isDesktop? '6':'12'}">
+                                            <aura:if isTrue="{!s.FieldName == 'Brands__c'}">
+                                                <aura:if isTrue="{!!v.isCreate}">
+                                                
+                                                    <aura:if isTrue="{!v.newObjective.BMC_Product_Level__c ==$Label.c.BMC_Objectives_Brand}">
+                                                         <c:ProductSearch aura:id="EngbrandSearch" label="{!$Label.c.Brand}" searchValue="{!v.newObjective.Brands__c}" object="Product__c" field="TrademarkBrandLongNme__c"
+                                                         showPkg="false" isDisabled="true" isDisablePkg="true" selectedPkgId="{!v.newObjective.MC_Product__c}" isOffPremise="{!v.isOffPrem}" isRequired="{!s.FieldRequired}" />                   
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!v.newObjective.BMC_Product_Level__c ==$Label.c.BMC_Objectives_BrandPackage}">
+                                                        <c:ProductSearch aura:id="EngbrandSearch" label="{!$Label.c.Brand}" searchValue="{!v.newObjective.Brands__c}" object="Product__c" field="TrademarkBrandLongNme__c"
+                                                                         showPkg="true" isDisablePkg="false" selectedPkgId="{!v.newObjective.MC_Product__c}" isOffPremise="{!v.isOffPrem}" isRequired="{!s.FieldRequired}" isFromObjectivesPage="false" />
+                                                    </aura:if>
+                                                    
+                                                    <aura:if isTrue="{!v.newObjective.BMC_Product_Level__c ==$Label.c.BMC_Objectives_BrandGroup}">
+                                                        <c:ProductSearch aura:id="EngbrandSearch" label="{!$Label.c.BMC_Objectives_BrandGroup}" searchValue="{!v.newObjective.BMC_Brand_Group__c}" object="Product__c" field="CmrclPlanningBrandGroupNme__c"
+                                                                         showPkg="false" isDisabled="true" isDisablePkg="true"  selectedPkgId="{!v.newObjective.MC_Product__c}" isOffPremise="{!v.isOffPrem}" isRequired="{!s.FieldRequired}"/>
+                                                    </aura:if>
+                                                    
+                                                    <aura:if isTrue="{!v.newObjective.BMC_Product_Level__c ==$Label.c.BMC_Objectives_BrandGroupPackage}">
+                                                        <c:ProductSearch aura:id="EngbrandSearch" label="{!$Label.c.BMC_Objectives_BrandGroup}" searchValue="{!v.newObjective.BMC_Brand_Group__c}" object="Product__c" field="CmrclPlanningBrandGroupNme__c"
+                                                                         showPkg="true" isDisabled="true" isDisablePkg="true"  selectedPkgId="{!v.newObjective.MC_Product__c}" isOffPremise="{!v.isOffPrem}" isRequired="{!s.FieldRequired}" isFromObjectivesPage="false" />
+                                                    </aura:if>
+                                                    
+                                                    <aura:if isTrue="{!v.newObjective.BMC_Product_Level__c ==$Label.c.BMC_Brand_Family_Package}">
+                                                        <c:ProductSearch aura:id="EngbrandSearch" label="{!$Label.c.BMC_Brand_Family_Package}" searchValue="{!v.newObjective.BMC_Brand_Family__c}" object="Product__c" field="TrademarkBrandFamilyNme__c"
+                                                                         showPkg="true" isDisabled="true" isDisablePkg="true"  selectedPkgId="{!v.newObjective.MC_Product__c}" isOffPremise="{!v.isOffPrem}" isRequired="{!s.FieldRequired}" isFromObjectivesPage="false" />
+                                                    </aura:if>                 
+                        
+                                                </aura:if>
+                                                <aura:if isTrue="{!v.isCreate}">
+                                                
+                                            	<c:ProductSearch aura:id="EngbrandSearch" object="Product__c" field="TrademarkBrandLongNme__c" showPkg="true" isOffPremise="{!v.isOffPrem}" searchValue="{!v.newObjective.Brands__c}" selectedPkgId="{!v.newObjective.MC_Product__c}" isRequired="{!s.FieldRequired}" isFromObjectivesPage="false" />
+                                                </aura:if>
+                                            </aura:if>
+                                            <aura:if isTrue="{!s.FieldName == 'Planned_Objective__c'}">
+                                            	<c:MboComponent aura:id="plannedObjective" objectiveType="{!SectionInfo.key}" selectedObjective="{!v.newObjective.Planned_Objective__c}" />
+                                            </aura:if>
+                                            <aura:if isTrue="{!s.FieldName == 'Sub_Type__c'}">
+                                            	<c:SubType aura:id="subType" id="{!key}" objStatus="{!v.newObjective.Status__c}" selectedSubType="{!v.newObjective.Sub_Type_Selection__c}" ObjectiveSubType="{!v.newObjective.Sub_Type__r.Sub_Type_Values__c }" subTypeValues="{!v.subTypeValues}" />
+                                            </aura:if>
+                                            </lightning:layoutItem>
+                                            <aura:set attribute="else">
+                                                <aura:if isTrue="{!and(s.isAccessible,!s.isLookup)}">
+                                                    <lightning:layoutItem padding="around-small" size="{!$Browser.isDesktop? '6':'12'}">
+                                                    <lightning:inputField aura:id="inputInfo" fieldName="{!s.FieldName}" required="{!s.FieldRequired}"/>
+                                                    
+                                                    </lightning:layoutItem>
+                                                </aura:if>
+                                                
+                                                <aura:if isTrue="{!and(s.isAccessible,and(s.isLookup,!v.isCreate))}">
+                                                    <lightning:layoutItem padding="around-small" size="{!$Browser.isDesktop? '6':'12'}">
+                                                    <lightning:outputField aura:id="outputInfo" fieldName="{!s.FieldName}" />
+                                                    </lightning:layoutItem>
+                                                </aura:if>
+                                             </aura:set>
+                                        </aura:if>
+                                    
+                                 </aura:iteration>                                 
+                            </lightning:layout>
+                            
+                        </aura:iteration>
+            			
+                    </lightning:recordEditForm>
+                    
+                    
+                </div>
+                
+                <div class="error-Msg" aura:id="ErrorMsg">
+                    {!v.ErrorMsg}
+                </div>
+                <footer>
+                	<lightning:buttonGroup class="slds-float_right">
+                            <lightning:button label="{!$Label.c.CTS_Cancel}" onclick="{!c.handleCancel}" variant="neutral"/>
+                            <lightning:button aura:id="saveButton" variant="brand" label="{!$Label.c.Save}" title="{!$Label.c.Save}" onclick="{!c.onSave}" disabled="false" />
+                            <!--
+                            <lightning:button variant="brand" type="submit" label="Update" />
+							-->
+                        </lightning:buttonGroup>
+                </footer>
+            </div>
+        
+</aura:component>

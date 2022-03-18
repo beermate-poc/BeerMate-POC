@@ -1,0 +1,13 @@
+.THIS .slds-modal__container{
+    max-width: 1000rem !important;
+    width:100% !important;
+}
+.THIS .slds-modal__footer{
+    text-align: center;
+}
+.THIS .modal-header{
+    background:#FAFAF9;
+}
+.THIS.divClass{
+    background:white;
+}

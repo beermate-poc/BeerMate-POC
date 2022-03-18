@@ -1,0 +1,18 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" controller="PlannedObjectiveSelectController">
+    <aura:attribute name="plannedObjectives" type="Planned_Objective__c[]" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="selectedObjective" type="String" />
+    <aura:attribute name="objectiveType" type="String" default="null"/>
+    <aura:registerEvent name="plannedObjChanged" type="c:PlannedObjectiveSelected"/>
+
+    <div class="slds-form-element">
+        <div class="slds-form-element__control">
+            <lightning:select name="select" label="{!$Label.c.MBO_Comp_Label}" aura:id="plannedSelect" onchange="{!c.selectChanged}" value="{!v.selectedObjective}">
+                <option value="">{!$Label.c.Default_Picklist_Select}</option>
+                <aura:iteration items="{!v.plannedObjectives}" var="option">
+                    <option value="{!option.Id}" text="{!option.Planned_Objective_Type__c + ': ' + option.Name}" selected="{!option.Id == v.selectedObjective}"></option>
+                </aura:iteration>
+            </lightning:select>
+        </div>
+    </div>
+</aura:component>

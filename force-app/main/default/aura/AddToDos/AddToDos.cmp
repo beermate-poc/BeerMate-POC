@@ -1,0 +1,16 @@
+<aura:component >
+	<aura:attribute name="datePickerPosition" type="String" />
+	<div class="slds" style="margin: 0px 0 0 0">
+		<div class="slds-form-element">
+			<div class="slds-form-element__control">
+				<c:AddToDoRow aura:id="addToDoRow" inputPlaceholder="{!$Label.c.To_Do_Placeholder}" datePickerPosition="{!v.datePickerPosition}"/>
+				<c:AddToDoRow aura:id="addToDoRow" datePickerPosition="{!v.datePickerPosition}"/>
+				<c:AddToDoRow aura:id="addToDoRow" datePickerPosition="{!v.datePickerPosition}"/>
+				{!v.body}
+				<div class="slds-grid" style="margin: 15px 2% 0 0">
+					<lightning:button variant="base" label="{!$Label.c.Add_one_more_label}" onclick="{!c.addInput}"/>
+				</div>
+			</div>
+		</div>
+	</div>
+</aura:component>

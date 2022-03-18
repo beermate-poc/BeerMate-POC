@@ -1,0 +1,26 @@
+<aura:component controller="C360_CloneCallController" implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global" >
+	<aura:handler name="init" action="{!c.init}" value="{!this}" />
+	<aura:attribute name="recordId" type="String" />
+    <aura:attribute name="clonedId" type="String" />
+    <aura:attribute name="editnow" type="boolean" default="false"/>
+    <aura:attribute name="cloneEvnt" type="Event"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:if isTrue="{!v.Spinner}">
+    <div aura:id="spinnerId" class="slds-spinner_container">
+       <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+         <span class="slds-assistive-text">Loading</span>
+         <div class="slds-spinner__dot-a"></div>
+         <div class="slds-spinner__dot-b"></div>
+       </div>
+    </div>
+ </aura:if>
+   <aura:if isTrue="{!v.editnow}">
+    <force:recordEdit aura:id="edit" recordId="{!v.clonedId}"/>
+		<div>
+            <!--<lightning:button  class="slds-button slds-button_neutral" label="Cancel" onclick="{!c.cancelRecord}" />-->
+            <lightning:button  class="slds-button slds-button--brand"  label="Save" onclick="{!c.saveRecord}"/>
+    	</div>   
+	</aura:if>
+</aura:component>

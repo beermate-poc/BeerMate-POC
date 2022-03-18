@@ -1,0 +1,82 @@
+<aura:component controller="CallLogUtility" implements="force:lightningQuickAction,force:appHostable">
+
+    <aura:attribute name="accountId" type="Id" />
+    <aura:attribute name="callLogId" type="Id" />
+    <aura:attribute name="newToDo" type="ContentNote" default="{'sobjectType': 'ContentNote'}"/>
+    <aura:attribute name="mobileCSS" type="String" default="slds-modal--form" />
+    <aura:attribute name="showNewToDo" type="boolean" />
+    <aura:attribute name="showObjView" type="boolean"/>
+    <aura:attribute name="showToast" type="boolean" />
+    <aura:attribute name="showErrorToast" type="boolean" default="false"/>
+    <aura:attribute name="toastTitle" type="String" />
+    <aura:attribute name="toastMsg" type="String" />
+    <aura:attribute name="toastType" type="String" />
+    <aura:attribute name="newRecord" type="String" />
+    <aura:attribute name="loadToDos" type="boolean" />
+    <aura:attribute name="showNewToDoAIF" type="boolean"/>
+
+    <lightning:spinner aura:id="spinner" class="slds-hide" alternativeText="Please wait..." />
+
+    <div class="slds-text-align__center">
+        <aura:if isTrue="{!v.showErrorToast}">
+            <c:Toast toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}"/>
+        </aura:if>
+    </div>
+    
+    <aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+    <div class="">
+        <div class="">
+            <div class="modalStyle ">
+                <div class="mobileView  " >
+                    <div class="slds-float_left">
+                        <lightning:button class="slds-button" variant="neutral" onclick="{!c.closeNewToDoModalMobile}" label="{!$Label.c.Cancel_Label}" />
+                    </div>
+                    <div class="slds-float_right ipadStyle">
+                        <lightning:button class="slds-button" variant="brand" onclick="{!c.addToDo}" label="{!$Label.c.Save}" />
+                    </div>
+                    <h2 class="slds-text-heading--medium slds-truncate" title="{!$Label.c.Add_to_Dos}">{!$Label.c.Add_to_Dos}</h2>
+                </div>
+                <ui:scrollerWrapper class="scrollerSize">
+                    <div class="formContent" style="height:600px;">
+                        <h3 class="slds-section-title--divider">{!$Label.c.To_Do_Information}</h3>
+                        <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                            <div class="slds-form-element">
+                                <c:AddToDos aura:id="addToDoSection" datePickerPosition="datePickerRight"/>
+                            </div>
+                        </div>
+                    </div>
+                </ui:scrollerWrapper>
+            </div>
+        </div>
+    </div>
+    <aura:set attribute="else">
+    <div class="">
+        <div role="dialog" tabindex="-1" class="{!v.mobileCSS + ' slds-modal ' + ' slds-fade-in-open '}">
+            <div class="slds-modal__container modalStyle ">
+                <div class="slds-modal__header">
+                    <h2 class="slds-text-heading--medium slds-truncate" title="New Contact">Add To-Do's</h2>
+                </div>
+                <ui:scrollerWrapper class="scrollerSize">
+                    <div class="slds-modal__content" style="height:600px;">
+                        <h3 class="slds-section-title--divider">{!$Label.c.To_Do_Information}</h3>
+                        <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                            <div class="slds-form-element">
+                                <c:AddToDos aura:id="addToDoSection" datePickerPosition="datePickerRight"/>
+                            </div>
+                        </div>
+                    </div>
+                </ui:scrollerWrapper>
+                <div class="slds-modal__footer mobileViewHeader">
+                    <lightning:button class="slds-button" variant="neutral" label="{!$Label.c.Cancel_Label}" onclick="{!c.closeNewToDoModal}" />
+                    <lightning:button class="slds-button" variant="brand" label="{!$Label.c.Save}" onclick="{!c.addToDo}" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</aura:set>
+        </aura:if>
+
+
+</aura:component>

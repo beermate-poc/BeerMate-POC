@@ -1,0 +1,154 @@
+<aura:component controller="ACE_ClaimsProcessHandlerSAP" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" >
+    <aura:attribute name="TotalClaimErrors" type="Integer"/>
+    <aura:attribute name="headerId" type="String"/>
+    <aura:attribute name="requestID" type="String"/>
+    <aura:attribute name="shipTo" type="String"/>
+    <aura:attribute name="allocId" type="String"/>
+    <aura:attribute name="LastBatchRun" type="DateTime"/>
+    <aura:attribute name="LastBatchNoFormat" type="DateTime"/>
+    <aura:attribute name="sortedBy" type="String" default="Name"/>
+    <aura:attribute name="sortedDirection" type="String" default="asc"/>
+    <aura:attribute name="rangeStart" type="Date"/>
+    <aura:attribute name="startDate" type="Date"/>
+    <aura:attribute name="startTime" type="Time" default="00:00"/>
+    <aura:attribute name="rangeEnd" type="Date"/>
+    <aura:attribute name="claimExist" type="Boolean" default= "false"/>
+    <aura:attribute name="showClaims" type="Boolean" default= "false"/>
+    <aura:attribute name="processingValue" type="Boolean" default="false"/>
+    <aura:attribute name="processingValuerep" type="Boolean" default="false"/>
+    <aura:attribute name="processingnrml" type="Boolean" default="true"/>
+    <aura:attribute name="isLoading" type="Boolean" default="false"/>
+    <aura:attribute name="processingrep" type="Boolean" default="false"/>
+    <aura:attribute name="processingOptions" type="List" default="[
+                                                                  {'label': 'Normal Processing', 'value': 'Normal Processing'},
+                                                                  {'label': 'Repeat Processing', 'value': 'Repeat Processing'}
+                                                                  ]"/>
+    
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="selectedData" type="Object"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="selectedRowList" type="List"/>
+    <aura:attribute name="selectedRowsCount" type="Integer" default="0"/>
+    <aura:attribute name="maxRowSelection" type="Integer" default="200"/>
+    
+    <aura:attribute name="claimList" type="PartnerFundClaim[]"/>
+    <aura:attribute name="claimRec" type="PartnerFundClaim" default="{ 'sobjectType': 'PartnerFundClaim' }"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <div> 
+        <lightning:card title="" class = "slds-small-size_3-of-3" ><br/>
+            <div class="slds-grid slds-wrap">
+                <div class="slds-col slds-size_1-of-2">
+                    <h1 class="slds-p-left_medium txt-header-color slds-text-heading_medium">Basic Selection Criteria</h1>
+                </div>
+                <!--<div class="slds-col slds-size_1-of-2">
+                    <h1 class="txt-header-color  slds-text-align_right slds-p-right_large slds-text-body_small">Last Batch Run Date : {!v.LastBatchRun}</h1>
+                </div>-->
+            </div>
+            <div class="slds-p-left_large slds-text-heading_regular">      
+                <!--<lightning:radioGroup name="Processing" 
+                          label=""
+                          options="{! v.processingOptions }"
+                          value="{! v.processingValue}"
+                          type="radio"
+                          />-->
+                <div class="" aura:id="ShowOptions">        
+                    <span class="slds-radio">
+                        <input type="radio" aura:id="Show1" id="radio-1a" name="addoptions" checked="checked" value="{!v.processingnrml}" onchange="{!c.criteriaChanged}" />
+                        <label class="slds-radio__label" for="radio-1a">
+                            <span class="slds-radio_faux"></span>
+                            <span class="slds-form-element__label">Normal Processing</span>
+                        </label>
+                    </span>
+                    <div></div>
+                    <aura:if isTrue="{!v.processingValue}">
+                        <div class="slds-grid slds-wrap">
+                           <!-- <div class="slds-col slds-size_1-of-3  slds-p-around_small">
+                                <lightning:input type="Date" id="field-one" name="input1"  label="Start Date" value="{!v.startDate}"  />
+                            </div>
+                            <div class="slds-col slds-size_1-of-3 slds-p-around_small">
+                                <lightning:input type="Time" name="input2" label="Start Time" value="{!v.startTime}" />
+                            </div> -->
+                            <div class="slds-col slds-size_1-of-3">
+                    			<h1 class="txt-header-color slds-p-around_small slds-text-body_regular">Last Batch Run Date : {!v.LastBatchRun}</h1>
+                			</div>
+                            <div class="slds-col slds-size_1-of-3 slds-p-top_x-small">
+                                <lightning:button class="btn-color" label="Send Claims To SAP" title="Send Claims To SAP" onclick="{! c.sendClaimNormal}" />
+                            </div>
+                        </div> 
+                    </aura:if>
+                    <span class="slds-radio">
+                        <input type="radio" id="radio-1b" name="addoptions" value="{!v.processingrep}" onchange="{!c.criteriaChanged}" />
+                        <label class="slds-radio__label" for="radio-1b">
+                            <span class="slds-radio_faux"></span>
+                            <span class="slds-form-element__label">Repeat Processing</span>
+                        </label>
+                    </span>        
+                </div>
+            </div>
+        </lightning:card>  
+        <aura:if isTrue="{!v.processingValuerep}">
+            <lightning:card title="" class = "slds-small-size_3-of-3" ><br/>
+                <h1 class="slds-p-left_small txt-header-color slds-text-heading_medium ">Repeat Processing Filter Criteria</h1>
+                
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-col slds-size_1-of-3 slds-p-around_small">
+                        <lightning:input aura:id="startDate" type="date" label="Start Approved Date" name="startDate" value="{!v.rangeStart}"/>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3 slds-p-around_small">
+                        <lightning:input aura:id="endDate" type="date" class="label-hidden" label="End Approved Date" name="endDate" value="{!v.rangeEnd}"/>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3  slds-p-around_small">
+                        <lightning:input type="text" id="field-one" name="input1" label="Fund Request ID" value="{!v.requestID}" />
+                    </div>
+                    <div class="slds-col slds-size_1-of-3 slds-p-around_small">
+                        <lightning:input type="text" name="input2" label="Approve and Release ID" value="{!v.allocId}" />
+                    </div>
+                    <div class="slds-col slds-size_1-of-3 slds-p-around_small">
+                        <lightning:input type="text" name="input3" label="Header Record Number" value="{!v.headerId}" />
+                    </div>
+                    <div class="slds-col slds-size_1-of-3 slds-p-around_small">
+                        <lightning:input type="text" name="input3" label="Ship To" value="{!v.shipTo}" />
+                    </div>
+                </div>
+                <div class="slds-card__body slds-card__body_inner slds-text-body_regular slds-p-top_small" >
+                    <lightning:button class="btn-color" label="Retrieve Claims" title="Retreive Claims" onclick="{! c.handleClaimErrors}" /> 
+                </div>
+            </lightning:card>
+        </aura:if>
+    </div><br/>
+    <aura:if isTrue="{!v.showClaims}">
+        <lightning:card title="" class = "slds-p-top_small slds-size_1-of-2 slds-small-size_2-of-3 slds-medium-size_3-of-4 slds-large-size_3-of-3" >
+            <div class="slds-grid slds-wrap">
+                <div class="slds-size_4-of-12">
+                    <h1 class="slds-p-left_medium txt-header-color slds-text-heading_medium">Reimbursement Claims</h1>
+                </div>
+                <div class="slds-size_4-of-12 slds-align_absolute-center">
+                    <lightning:button class="btn-color" label="Send Claims To SAP" title="Send Claims To SAP" onclick="{!c.sendClaimsSAP}" /> 
+                </div>
+                <div class="slds-size_3-of-12">
+                    <p class="slds-text-color_weak slds-text-align_right">Total Selected Claims: {! v.selectedRowsCount }</p>
+                </div>
+                <div class="slds-size_0.1-of-12">
+                    <lightning:helptext class="slds-p-right_medium" iconName="utility:info" content="Total Count of Header and its related Line items." />
+                </div>
+            </div>   
+            <div class = "slds-p-around_medium" style="height: 200px" aura:id="ReimburseTable1">
+                <lightning:datatable
+                                     columns="{!v.columns}"
+                                     aura:id="ReimburseTable"
+                                     data="{!v.data}"
+                                     keyField="id"
+                                     class ="table-test"
+                                     onsort="{!c.updateColumnSorting}"
+                                     sortedBy="{!v.sortedBy}"  
+                                     sortedDirection="{!v.sortedDirection}"
+                                     enableInfiniteLoading="true"
+                                     maxRowSelection="{! v.maxRowSelection}"
+                                     onrowselection="{! c.updateSelectedRow}"/>
+            </div>
+        </lightning:card>
+    </aura:if> 
+    <aura:if isTrue="{! v.isLoading }">
+        <lightning:spinner alternativeText="Loading"/>
+    </aura:if>
+</aura:component>

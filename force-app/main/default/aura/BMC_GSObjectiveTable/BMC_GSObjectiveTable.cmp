@@ -1,0 +1,215 @@
+<aura:component controller="GuidedSellingController">
+    <aura:handler name="init" action="{!c.init}" value="{!this}" />
+    <aura:attribute name="objectiveData" type="Object"/>
+    <aura:attribute name="objectiveColumns" type="List"/>
+    <aura:attribute name="gapsData" type="Object"/>
+    <aura:attribute name="gapsColumns" type="List"/>
+    <aura:attribute name="chainActivitiesData" type="Object"/>
+    <aura:attribute name="chainActivitiesColumns" type="List"/>
+ 	<aura:attribute name="opportunitiesData" type="Object"/>
+    <aura:attribute name="opportunitesColumns" type="List"/>
+    <aura:attribute name="refreshObjectives" type="boolean" />
+    <aura:attribute name="tableStyle" type="boolean" default="false"/>
+    <aura:attribute name="showCreateObj" type="boolean" default="false"/>
+    <aura:attribute name="objectName" type="String"/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="isOffPrem" type="Boolean" />
+    <aura:attribute name="SellingStoryDashboard" type="String" />
+    <aura:attribute name="PermSet" type="boolean" default="false"/>
+     <aura:attribute name="DashboardLink" type="String"/>
+    <aura:attribute name="showDashboard" type="boolean" default="false"/>
+    <aura:attribute name="showGuidedSellingComponent" type="boolean" default="true"/>
+    <aura:attribute name="externalId" type="String"/>
+    <aura:attribute name="smartSkuOpp" type="SmartSKUs__c" default="{'sobjectType': 'SmartSKUs__c'}"/>
+    <aura:method name="PermissionSetCheck" action="{!c.init}" />
+    <aura:registerEvent name="BMC_ObjectiveEvent" type="c:BMC_ObjectiveEvent"/>
+    <aura:registerEvent name="SellingDashboardEvent" type="c:SellingDashboardEvent"/>
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    <table class="slds-table slds-table_bordered">
+        <thead>
+            <aura:iteration items="{!v.objectiveColumns}" var="cols">
+                <th scope="col">
+                    <div class="slds-text-body_small slds-truncate slds-cell-wrap" title="">{!cols.label}</div>
+                </th>
+            </aura:iteration>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.objectiveData}" var="Objective">
+                <tr>
+                    <td>
+                        <div class="slds-text-body_small slds-truncate slds-cell-wrap" title="Name">{!Objective.Name}</div>
+                    </td>
+                    <td>
+                        <div class="slds-text-body_small slds-truncate slds-cell-wrap" title="RecordType">{!Objective.RecordType.Name}</div>
+                    </td>
+                    <td>
+                        <div class="slds-text-body_small slds-truncate slds-cell-wrap" title="Status">{!Objective.Status__c}</div>
+                    </td>
+                      <td>
+                       <aura:if isTrue="{!and(Objective.Smart_Objective__c, v.PermSet)}"> 
+                        <div class="slds-text-body_small slds-truncate slds-cell-wrap" title="Selling Story"></div>
+                             <lightning:button variant="base" label="Selling Story" title="Base action" onclick="{!c.NavigateToSellingStoryDB}" value="{!Objective.External_Key__c}"/>
+                       </aura:if>
+                    </td>
+                </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+    <!-- Gaps Table -->
+    <ui:scrollerWrapper class="scrollerSize">
+    <table class="slds-table slds-table_bordered">
+        <thead>
+            <aura:iteration items="{!v.gapsColumns}" var="gaps">
+                <th scope="col">
+                    <div class="slds-text-body_small slds-truncate slds-cell-wrap" title="">{!gaps.label}</div>
+                </th>
+            </aura:iteration>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.gapsData}" var="gapstbl">
+                <tr>
+                    <td>
+                        <div class="slds-text-body_small slds-truncate slds-cell-wrap" title="Brand Package">{!gapstbl.gapBrandPackage}</div>
+                    </td>
+                   
+                    <td width="5px;"><center>
+                        <aura:if isTrue="{!gapstbl.gap}">
+                            <lightning:icon iconName="utility:check" size="x-small" />
+                            <!-- <aura:set attribute="else">
+                                                    <lightning:icon iconName="utility:close" size="x-small" />
+                                                </aura:set>-->
+                        </aura:if>
+                        </center>
+                    </td> 
+                    
+                    <td width="5px;"> 
+                        <center>
+                            <aura:if isTrue="{!gapstbl.planogram}">
+                                <lightning:icon iconName="utility:check" size="x-small" />
+                                <!--<aura:set attribute="else">
+                                                    <lightning:icon iconName="utility:close" size="xx-small" />
+                                                </aura:set>-->
+                            </aura:if> 
+                        </center>
+                    </td>
+                     <td>
+                       <!-- <div class="slds-text-body_small slds-truncate slds-cell-wrap" title="Last Purchased Date">{!gapstbl.enddate}</div>-->
+                         <ui:outputDate  class="slds-text-body_small slds-truncate slds-cell-wrap" value="{!gapstbl.enddate}"/>
+                    </td>
+                    <!-- <td>
+                    <div class="slds-text-body_small slds-truncate slds-cell-wrap" title="Start Date">{!gapstbl.startDate}</div>
+                </td>-->
+                    <!-- <td>
+                    <aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+                        <lightning:buttonIcon iconName="utility:add"  name="{!gapstbl}" variant="bare" alternativeText="{!$Label.c.BMC_GSCreateObjective}" title="{!$Label.c.BMC_GSChainObjectName}" iconClass="dark" onclick="{! c.createObjective}">
+                        </lightning:buttonIcon>
+                        <aura:set 	attribute="else">
+                           <lightning:button value ="{!gapstbl.Id}" name="{!gapstbl}" variant="brand" label="{!$Label.c.BMC_GSCreateObjective}" title="{!$Label.c.BMC_GSChainObjectName}" onclick="{! c.createObjective}" /> 
+                        </aura:set>
+                    </aura:if>
+                </td>-->
+                    <td>
+                        <div class="slds-text-body_small slds-truncate slds-cell-wrap" title="Type">{!gapstbl.mandateType}</div>
+                    </td>
+                </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+         </ui:scrollerWrapper>
+    <ui:scrollerWrapper class="scrollerSize">
+        <table class="slds-table slds-table_bordered">
+            <thead>
+                <aura:iteration items="{!v.chainActivitiesColumns}" var="activities">
+                    <th scope="col">
+                        <div class="slds-text-body_small slds-truncate slds-cell-wrap" title="">{!activities.label}</div>
+                    </th>
+                </aura:iteration>
+            </thead>
+            <tbody>
+                <aura:iteration items="{!v.chainActivitiesData}" var="activitiestbl">
+                    <tr>
+                            <td>
+                                <div class="slds-text-body_small slds-truncate slds-cell-wrap" style="width:300px" title="Chain Execution Name">{!activitiestbl.BMC_Chain_Activity_ID__r.BMC_Chain_Activity_Name__c}</div>
+                            </td>
+                            <td>
+                                <div class="slds-text-body_small slds-truncate slds-cell-wrap" style="width:300px" title="Product(s)">{!activitiestbl.BMC_All_Brand_Packages__c}</div>
+                            </td>
+                            <td>
+                                <div class="slds-text-body_small slds-truncate slds-cell-wrap"  title="Element(s)">{!activitiestbl.BMC_Elements__c}</div>
+                            </td>
+                            <td>
+                                <div class="slds-text-body_small slds-truncate slds-cell-wrap"  title="Start Date">
+                                   <!-- {!activitiestbl.BMC_Chain_Activity_ID__r.BMC_Start_Date__c}-->
+                                    <ui:outputDate value="{!activitiestbl.BMC_Start_Date__c}"/>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="slds-text-body_small slds-truncate slds-cell-wrap"  title="End Date">
+                                    <!--{!activitiestbl.BMC_Chain_Activity_ID__r.BMC_End_Date__c}-->
+                                        <ui:outputDate value="{!activitiestbl.BMC_End_Date__c}"/>
+                                
+                                </div>
+                            </td>
+                        <td>
+                         <!--   <aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+                                <lightning:buttonIcon  iconName="utility:add" name="{!opportunitiestbl}" variant="bare" alternativeText="{!$Label.c.BMC_GSCreateObjective}"  title="{!$Label.c.BMC_GSSKUObjectName}" value ="{!opportunitiestbl.Id}" iconClass="dark" onclick="{! c.createObjective}">
+                                </lightning:buttonIcon>
+                                <aura:set 	attribute="else">
+                                    <lightning:button name="{!opportunitiestbl}" value ="{!opportunitiestbl.Id}" variant="brand" label="{!$Label.c.BMC_GSCreateObjective}" title="{!$Label.c.BMC_GSSKUObjectName}" onclick="{! c.createObjective}" />
+                                </aura:set>
+                            </aura:if>-->
+                        </td>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+    </ui:scrollerWrapper>
+    
+    <!--</div>-->
+    <!-- SmartSKU Data Table -->
+    <ui:scrollerWrapper class="scrollerSize">
+        <table class="slds-table slds-table_bordered">
+            <thead>
+                <aura:iteration items="{!v.opportunitesColumns}" var="opportunities">
+                    <th scope="col">
+                        <div class="slds-text-body_small slds-truncate slds-cell-wrap" title="">{!opportunities.label}</div>
+                    </th>
+                </aura:iteration>
+            </thead>
+            <tbody>
+                <aura:iteration items="{!v.opportunitiesData}" var="opportunitiestbl">
+                    <tr>
+                        <aura:if isTrue="{!v.isOffPrem}">
+                            <td>
+                                <div class="slds-text-body_small slds-truncate slds-cell-wrap" title="Brand">{!opportunitiestbl.Brand__c}</div>
+                            </td>
+                            <td>
+                                <div class="slds-text-body_small slds-truncate slds-cell-wrap" title="Brand">{!opportunitiestbl.Package__c}</div>
+                            </td>
+                            <td>
+                                <div class="slds-text-body_small slds-truncate slds-cell-wrap" title="90 day volume">{!opportunitiestbl.Projected90Days__c}</div>
+                            </td>
+                            <aura:set attribute="else">
+                                <td>
+                                    <div class="slds-text-body_small slds-truncate slds-cell-wrap" title="Brand Package">{!opportunitiestbl.Brand_Package__c}</div>
+                                </td>
+                                <td>
+                                    <div class="slds-text-body_small slds-truncate" title="90 day volume">{!opportunitiestbl.Projected90Days__c}</div>
+                                </td>
+                            </aura:set>
+                        </aura:if>
+                        <td>
+                            <aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+                                <lightning:buttonIcon  iconName="utility:add" name="{!opportunitiestbl}" variant="bare" alternativeText="{!$Label.c.BMC_GSCreateObjective}"  title="{!$Label.c.BMC_GSSKUObjectName}" value ="{!opportunitiestbl.Id}" iconClass="dark" onclick="{! c.createObjective}">
+                                </lightning:buttonIcon>
+                                <aura:set 	attribute="else">
+                                    <lightning:button name="{!opportunitiestbl}" value ="{!opportunitiestbl.Id}" variant="brand" label="{!$Label.c.BMC_GSCreateObjective}" title="{!$Label.c.BMC_GSSKUObjectName}" onclick="{! c.createObjective}" />
+                                </aura:set>
+                            </aura:if>
+                        </td>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+    </ui:scrollerWrapper>
+</aura:component>

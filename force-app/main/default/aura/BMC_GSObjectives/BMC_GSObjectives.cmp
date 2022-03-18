@@ -1,0 +1,87 @@
+<!--
+Author:       Francesca Fong-Choy
+Company:      Accenture
+Description:  Component for Guided selling objectives tab/page that will hold the Objectives, Chain Mandate Gaps, and SmartSKU Data
+-->
+
+<aura:component controller="GuidedSellingController" >
+    <aura:attribute name="objectiveData" type="Object"/>
+    <aura:attribute name="objectiveColumns" type="List"/>
+    <aura:attribute name="gapsData" type="Object"/>
+    <aura:attribute name="gapsColumns" type="List"/>
+    <aura:attribute name="opportunitiesData" type="Object"/>
+    <aura:attribute name="opportunitiesColumns" type="List"/>
+    <aura:attribute name="chainActivitiesData" type="Object"/>
+    <aura:attribute name="chainActivitiesColumns" type="List"/>
+ 	<aura:attribute name="refreshObjectives" type="boolean" />
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="callogId" type="Id" />
+    <aura:attribute name="toastTitle" type="String" />
+    <aura:attribute name="showToast" type="boolean" default="false"/>
+    <aura:attribute name="toastMsg" type="String" />
+    <aura:attribute name="toastType" type="String" />
+    <aura:attribute name="objectiveLength" type="String" />
+    <aura:attribute name="gapsLength" type="String" />
+    <aura:attribute name="skuLength" type="String" />
+    <aura:attribute name="actLength" type="String" />
+    <aura:attribute name="showCreateObj" type="boolean" default="false"/>
+    <aura:attribute name="tableStyle" type="boolean" default="false"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:attribute name="objectivesTab" type="boolean" default="true"/>
+    <aura:attribute name="isOffPrem" type="Boolean" default="false" />
+    <aura:attribute name="objectName" type="String"/>
+    <aura:attribute name="refreshObj" type="Boolean"/>
+     <aura:attribute name="DashboardLink" type="String"/>
+    <aura:attribute name="showDashboard" type="boolean" default="false"/>
+    <aura:attribute name="externalId" type="String"/>
+    <aura:registerEvent  name="planoLiveEvent"  type="c:BMC_GSPlanoLiveDateEvt"/>
+    <aura:handler name="SellingDashboardEvent" event="c:SellingDashboardEvent" action="{!c.NavigateToSellingStoryDB}"/>
+    <aura:handler name="change" value="{!v.refreshObj}" action="{!c.refreshObjectiveTab}" />
+    <div class="iframeClass">
+        <aura:if isTrue="{!v.showDashboard}">
+              <iframe aura:id="vfFrame" height="650px" width="100%" src="{!v.DashboardLink}" />   
+        </aura:if>
+    </div>
+    <div class="slds-text-align__center">
+        <aura:if isTrue="{!v.showToast}">
+            <c:Toast toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}"/>
+        </aura:if>
+    </div>
+    <ui:scrollerWrapper class="scrollerSize">
+        <lightning:accordion aura:id="Objectives" >  
+            <lightning:accordionSection name="{!$Label.c.BMC_GSObjectives}" label="{!v.objectiveLength}"> 
+                <aura:set attribute="body">
+                    <div style="height:150px;" class="slds-scrollable_y">
+                        <c:BMC_GSObjectiveTable objectiveData="{!v.objectiveData}" objectiveColumns="{!v.objectiveColumns}"/>                     
+                    </div>
+                </aura:set>
+            </lightning:accordionSection>
+            <!-- </lightning:accordion>-->
+            <!--<lightning:accordion aura:id="Gaps" >-->
+            <lightning:accordionSection name="{!$Label.c.BMC_GSGaps}" label="{!v.gapsLength}">
+                <aura:set attribute="body">
+                    <div style="height:200px;" class="slds-scrollable_y">
+                        <c:BMC_GSObjectiveTable gapsData="{!v.gapsData}" gapsColumns="{!v.gapsColumns}" tableStyle="{!v.tableStyle}" isOffPrem="{!v.isOffPrem}" recordId="{!v.recordId}" showCreateObj="{!v.showCreateObj}" />
+                    </div>
+                </aura:set>
+            </lightning:accordionSection>
+            <lightning:accordionSection name="Chain Activities" label="{!v.actLength}">
+                <aura:set attribute="body">
+                    <div style="height:200px;" class="slds-scrollable_y">
+                        <c:BMC_GSObjectiveTable chainActivitiesData="{!v.chainActivitiesData}" chainActivitiesColumns="{!v.chainActivitiesColumns}" tableStyle="{!v.tableStyle}" isOffPrem="{!v.isOffPrem}" recordId="{!v.recordId}" showCreateObj="{!v.showCreateObj}"/>
+                    </div>
+                </aura:set>
+            </lightning:accordionSection>
+            
+            <!-- </lightning:accordion>-->
+            <!--<lightning:accordion aura:id="Opportunities" >-->
+            <lightning:accordionSection name="{!$Label.c.BMC_GSOpportunities}" label="{!v.skuLength}">
+                <aura:set attribute="body">
+                    <div style="height:200px;" class="slds-scrollable_y">
+                        <c:BMC_GSObjectiveTable opportunitiesData="{!v.opportunitiesData}" opportunitesColumns="{!v.opportunitiesColumns}" tableStyle="{!v.tableStyle}" isOffPrem="{!v.isOffPrem}" recordId="{!v.recordId}" showCreateObj="{!v.showCreateObj}"/>
+                    </div>
+                </aura:set>
+            </lightning:accordionSection> 
+        </lightning:accordion>
+    </ui:scrollerWrapper>
+</aura:component>

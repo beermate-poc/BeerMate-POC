@@ -1,0 +1,31 @@
+<aura:component >
+     <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="columns" type="List"/>
+         <ui:scrollerWrapper class="scrollerSize">
+    <table class="slds-table slds-table_bordered ">
+        <thead>
+            <aura:iteration items="{!v.columns}" var="cols">
+                    <th scope="col">
+                        <div class="slds-truncate slds-cell-wrap" title="">{!cols.label}</div>
+                    </th>
+            </aura:iteration>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.data}" var="priorCalls">
+            <tr>
+                <td>
+                    <!--<div class="slds-truncate" title="Name">{!priorCalls.CreatedDate}</div>-->
+                    <lightning:formattedDateTime value="{!priorCalls.Call_Start_Date__c}"/>
+                </td>
+                 <td>
+                    <div class="slds-truncate slds-cell-wrap" title="RecordType">{!priorCalls.CallLogOwner}</div>
+                </td>
+                 <td>
+                    <div class="slds-truncate slds-cell-wrap " title="Statud">{!priorCalls.Call_Summary__c}</div>
+                </td>
+            </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+    </ui:scrollerWrapper>
+</aura:component>

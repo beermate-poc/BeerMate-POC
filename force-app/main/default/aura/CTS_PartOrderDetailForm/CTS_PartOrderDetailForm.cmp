@@ -1,0 +1,187 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global"
+                		controller="CTS_ConsolidatePartOrderController">
+	<aura:attribute name="editPartOrder" type="ProductRequest" default="{ 'sobjectType': 'ProductRequest' }"/>
+    <aura:attribute name="codeRequired" type="boolean" default="true"/>
+    <aura:attribute name="data" type="ProductRequestLineItem[]"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="errors" type="Object" default="[]"/>
+    <aura:attribute name="draftValues" type="Object" default="[]"/>
+    
+    <aura:attribute name="SANumber" type="String"/>
+    <aura:attribute name="TRName" type="String"/>
+    <aura:attribute name="EditForm" type="boolean" default="true" />
+    <aura:attribute name="ErrorMsg" type="String" default = ""/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    
+    
+    <lightning:spinner aura:id="spn" alternativeText="Loading" size="medium" variant="brand"/>
+    <aura:renderif isTrue="{!v.EditForm}">
+        <lightning:card> 
+            <aura:set attribute="title">
+                <h2 style = "font-size: larger;line-height: 1.25;">Part Order Detail</h2>
+            
+        	</aura:set>
+            
+            <div class="error-Msg" aura:id="ErrorMsg">
+                    {!v.ErrorMsg}
+                </div>
+            <lightning:card>
+                <aura:set attribute="title">
+                    <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder ">
+                            <span class="section-header-title slds-p-horizontal--small slds-truncate">Information</span>
+                        </h3> 
+                 </aura:set>
+                <lightning:layout class="slds-wrap">
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="12">
+                         Part Authorisation Warning :
+                        <force:outputField aura:id="partorderNumber" value="{!v.editPartOrder.CTS_Part_Authorisation_Warning__c}"/>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                         Part Order Number :
+                        <force:outputField aura:id="partorderNumber" value="{!v.editPartOrder.ProductRequestNumber}"/>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        <span style="color:red;">* </span>TR 
+                        	<div aura:id="divtag1TR" class="slds-input slds-combobox__input slds-combobox__input-value slds-hide">                           
+                                        {!v.TRName}                          
+                                        <lightning:button class="slds-float_right" variant="base" onclick="{!c.toggleDisplayTR}" title="Remove">
+                                            X
+                                        </lightning:button>
+                            </div>
+                            <div aura:id="divtag2TR">                                                    
+                                <force:inputField aura:id="TR" value="{!v.editPartOrder.CTS_TR__c}" required="true" />
+                            </div>
+                        
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                         Work Order :
+                        <force:outputField aura:id="workorderNumber" value="{!v.editPartOrder.WorkOrder.WorkOrderNumber}"/>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        ServiceAppointment
+                        <div aura:id="divtag1SA" class="slds-input slds-combobox__input slds-combobox__input-value slds-hide">                           
+                                        {!v.SANumber}                          
+                                        <lightning:button class="slds-float_right" variant="base" onclick="{!c.toggleDisplaySA}" title="Remove">
+                                            X
+                                        </lightning:button>
+                            </div>
+                            <div aura:id="divtag2SA">                                                    
+                                <force:inputField aura:id="ServiceAppointment" value="{!v.editPartOrder.CTS_Service_Appointment__c}"/>
+                            </div>
+                        
+                        
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        Order line Header notes  
+                        <force:inputField aura:id="headerNotes" value="{!v.editPartOrder.Description}" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        <span style="color:red;">* </span>Status 
+                        <force:inputField aura:id="status" value="{!v.editPartOrder.Status}" required="true" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        <span style="color:red;">* </span>Delivery Method  
+                        <force:inputField aura:id="deliveryMethod" value="{!v.editPartOrder.CTS_Delivery_Method__c}" required="true" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        
+                        <span style="color:red;">* </span>Required Delivery Date
+                        <force:inputField aura:id="requiredDelivery" value="{!v.editPartOrder.CTS_Requested_Delivery_Date__c}" required="true"/>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        Address 
+                        <force:inputField aura:id="address" value="{!v.editPartOrder.CTS_Address_Line_1__c}" required="true" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        City
+                        <force:inputField aura:id="city" value="{!v.editPartOrder.CTS_Town_or_Ctiy__c}" required="true" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        Zip/Postal Code 
+                        <force:inputField aura:id="postalCode" value="{!v.editPartOrder.CTS_Postal_Code__c}" required="true" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        Country
+                        <force:inputField aura:id="country" value="{!v.editPartOrder.CTS_Country_Code__c}" required="true" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        Parts Cost :
+                        <force:outputField aura:id="partscost" value="{!v.editPartOrder.CTS_Parts_Cost__c }"/>
+                    </lightning:layoutItem>
+                    
+                </lightning:layout>
+            </lightning:card>
+            <lightning:card >
+                <aura:set attribute="title">
+                    <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder ">
+                            <span class="section-header-title slds-p-horizontal--small slds-truncate">Alternate Address Details</span>
+                        </h3> 
+                 </aura:set>
+                <lightning:layout class="slds-wrap">
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        <lightning:input type="checkbox" aura:id="isAltAddReq" label="Is Alternate Address Required ?" value="{!v.editPartOrder.CTS_Add_Alternate_Address__c}" checked="{!v.editPartOrder.CTS_Add_Alternate_Address__c}"/>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        Address
+                        <force:inputField aura:id="altAddress" value="{!v.editPartOrder.CTS_Alternate_Address__c}" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        City
+                        <force:inputField aura:id="altAddressCity" value="{!v.editPartOrder.CTS_Alternate_Address_City__c}" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        State/Provinance
+                        <force:inputField aura:id="altAddressState" value="{!v.editPartOrder.CTS_Alternate_Address_State__c}" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        Zip/Postal Code
+                        <force:inputField aura:id="altAddressZip" value="{!v.editPartOrder.CTS_Alternate_Zip_Postal_Code__c}" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        Country
+                        <force:inputField aura:id="altAddressCountry" value="{!v.editPartOrder.CTS_Alternate_Country__c}" />
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:card>
+        </lightning:card>
+        <lightning:card title="Part Order Line Detail" class="bgcolor">
+            <lightning:datatable
+                columns="{! v.columns }"
+                data="{! v.data }"
+                keyField="Id"
+                errors="{! v.errors }"
+                draftValues="{! v.draftValues }"
+                onrowaction="{!c.handleClick}"
+                onsave="{! c.handleSaveEdition }"
+                hideCheckboxColumn="true"
+             />
+       </lightning:card>
+       <lightning:card title="Technician Task Details" aura:id="tasktable" class="bgcolor slds-hide">
+       		{!v.body}
+       </lightning:card>
+        
+        <div class="error-Msg2" aura:id="ErrorMsg">
+                    {!v.ErrorMsg}
+                </div>
+       <div class="slds-docked-form-footer" style="position: unset;background: none;box-shadow: none;">
+            <lightning:buttonGroup class="slds-float_right">
+                <lightning:button label="{!$Label.c.CTS_Cancel}" onclick="{!c.cancel}" variant="neutral"/>
+                <lightning:button label="{!$Label.c.CTS_Save}" onclick="{!c.handleSave}" variant="neutral"/>
+                <lightning:button label="Add Parts" onclick="{!c.newPartLines}" variant="neutral"/>
+            </lightning:buttonGroup>             
+        </div>
+    </aura:renderif>
+    <aura:renderif isTrue="{!!v.EditForm}">
+        
+       
+         <c:CTS_PartOrderLineItems parentRecordId = "{!v.recordId}"/>
+        
+    	
+        <lightning:buttonGroup class="slds-float_left">
+            <lightning:buttonIcon iconName="utility:back" variant="brand" onclick="{!c.goBack}" alternativeText="Back to detail page"/>
+        </lightning:buttonGroup>
+    </aura:renderif>
+    
+</aura:component>

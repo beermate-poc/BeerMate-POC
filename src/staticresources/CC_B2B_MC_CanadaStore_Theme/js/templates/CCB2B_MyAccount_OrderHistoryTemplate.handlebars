@@ -1,0 +1,187 @@
+{{#if (checkContactDisplayPermissions 'order_history')}}
+    <div class="panel panel-default cc_panel cc_myaccount_myorders">
+        <div class="panel-heading cc_heading">
+            <h3 id="ccb2b-ma-orders-title-label" class="panel-title cc_title">{{pageLabelMap 'MyAccount_MyOrders'}}</h3>
+        </div>
+        <div class="cc_myaccount_content">
+            <div class="messagingSection-orderhistory-Error" role="alert" style="display: none"></div>
+            <div class="messagingSection-orderhistory-Info" role="alert" style="display: none">
+                <button type="button" class="close cc_close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&#215;</span></button>
+            </div>
+            {{#ifDisplay 'srch.ord'}}
+            <form id="searchOrderForm" class="form-inline searchOrderForm cc_search_order_form cc_form-inline">
+                <div class="form-group form-group-sm ">
+                    <label for="searchOrderInput" class="sr-only">Search order</label>
+                    <input id="searchOrderInput" type="text" class="form-control searchOrderInput input-text cc_search_order_input" name="searchOrderInput" value="{{searchOrder}}" placeholder="{{pageLabelMap 'MyOrdersInc_SearchOrders'}}"/>
+                </div>
+                <div id="datepicker" class="input-daterange">
+                    <div class="form-group form-group-sm date">
+                        <label for="fromDateStr" class="cc_from_date_str">{{pageLabelMap 'MyOrdersInc_SearchFrom'}}</label>
+                        <div class="input-group date">
+                            <input type="text" id="fromDateStr" name="fromDateStr" value="{{this.fromDateStr}}" class="form-control requestedDate fromDate cc_from_date" readonly="true">
+                            <div class="input-group-addon">
+                                <span class="glyphicon glyphicon-th"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm date">
+                        <label for="toDateStr" class="cc_to_date_str">{{pageLabelMap 'MyOrdersInc_SearchTo'}}</label>
+                        <div class="input-group date">
+                            <input type="text" id="toDateStr" class="form-control requestedDate toDate cc_to_date" name="toDateStr" value="{{this.toDateStr}}" readonly="true">
+                            <div class="input-group-addon">
+                                <span class="glyphicon glyphicon-th"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="cc_order_search_action">
+                <input id="ccb2b-ma-orders-search-button" type="button" class="btn btn-default btn-sm searchOrder cc_search_order" value="{{pageLabelMap 'MyOrdersButton_SearchOrders'}}"/>
+                <input id="ccb2b-ma-orders-reset-button" type="button" class="primary_button btn btn-default btn-sm resetOrder cc_reset_order" value="{{pageLabelMap 'MyOrdersButton_ResetOrders'}}"/>
+            </div>
+            {{/ifDisplay}}
+        </div>
+    </div>
+    {{#if this.orderList}}
+    <div class="panel orderListPanel panel-default cc_panel cc_paginator">
+        <div class="table-responsive collapsible_table text-center">
+            <table id="orderTable" class="table shopping_cart cc_table cc_order_search_table">
+                <tr class="cc_table_header_row">
+                    <th class="cc_table_header text-center">
+                        <span class="cc_table_header_sap_order_id">{{pageLabelMap 'CCB2B_CheckOut_OrderSAPId_Label'}}</span>
+                    </th>
+                    <th class="cc_table_header text-center">
+                        <span class="cc_table_header_cc_order_id">{{pageLabelMap 'CCB2B_CheckOut_OrderCCId_Label'}}</span>
+                    </th>
+                    <th class="cc_table_header text-center">
+                        <span class="cc_table_header_cc_order_source">{{pageLabelMap 'CCB2B_CheckOut_OrderSource_Label'}}</span>
+                    </th>
+                    {{#ifDisplay 'MO.DsplExtOrderNumber'}}
+                    <th class="cc_table_header text-center">
+                        <span class="cc_table_header_external_order_id">{{pageLabelMap 'ExternalOrderID'}}</span>
+                    </th>
+                    {{/ifDisplay}}
+                    {{#ifDisplay 'MO.DsplPONumber'}}
+                    <th class="cc_table_header text-center">
+                        <span class="cc_table_header_po_number">{{pageLabelMap 'PO Number'}}</span>
+                    </th>
+                    {{/ifDisplay}}
+                    <th class="cc_table_header text-center">
+                        <span class="cc_table_header_order_date">{{pageLabelMap 'MyOrdersInc_OrderDate'}}</span>
+                    </th>
+                    <th class="cc_table_header text-center">
+                        <span class="cc_shipping_delivery_date">{{pageLabelMap 'CCB2B_CheckOut_ExpectedDeliveryDate_Label'}}</span>
+                    </th>
+                    <th class="cc_table_header text-center">
+                        <span class="cc_table_header_order_status">{{pageLabelMap 'CCB2B_OrderStatus_Overall'}}</span>
+                    </th>
+                    <th class="cc_table_header text-center">
+                        <span class="cc_table_header_delivery_status">{{pageLabelMap 'CCB2B_OrderStatus_Delivery'}}</span>
+                    </th>
+                    <th class="cc_table_header text-center">
+                        <span class="cc_table_header_order_amount">{{pageLabelMap 'MyOrdersInc_OrderAmount'}}</span>
+                    </th>
+                    {{#ifStoreSetting 'Filter_Orders_Based_on_Owner__c'}}
+                    &#160;
+                    {{else}}
+                    <th class="cc_table_header text-center">
+                        <span class="cc_table_header_order_owner ord_owner_hdr">{{pageLabelMap 'MyOrdersInc_Owner'}}</span>
+                    </th>
+                    {{/ifStoreSetting}}
+                    {{#ifDisplay 'MO.ShActOnOrd'}}
+                    <th class="cc_table_header text-center">
+                        <span class="cc_table_header_order_actions pull-right"></span>
+                    </th>
+                    {{/ifDisplay}}
+                </tr>
+                {{#each this.orderList}}
+                <tr id="{{generateId 'ccb2b-ma-orders-item-' orderName '-row'}}" class="myAccOrderRows cc_table_row">
+                    <td class="cc_table_col" data-label="{{pageLabelMap 'CCB2B_CheckOut_OrderSAPId_Label'}}:">
+                        {{#if CCB2BSAPOrderID}}
+                            <a id="{{generateId 'ccb2b-ma-orders-sapid-' orderName '-link'}}" href="#" data-id="{{encryptedId}}" class="orderSapId gotoOrderDetails cc_goto_order_detailss">{{CCB2BSAPOrderID}}</a>
+                        {{else}} <span> - </span>
+                        {{/if}}
+                    </td>
+                    <td class="cc_table_col orderEncryptedRow" data-label="{{pageLabelMap 'CCB2B_CheckOut_OrderCCId_Label'}}:">
+                        {{#if showOrderName}}
+                            <a id="{{generateId 'ccb2b-ma-orders-ccid-' orderName '-link'}}" href="#" data-id="{{encryptedId}}" class="orderCCId gotoOrderDetails cc_goto_order_detailss">{{orderName}}</a>
+                        {{/if}}
+                    </td>
+                    <td class="cc_table_col orderEncryptedRow" data-label="{{pageLabelMap 'CCB2B_CheckOut_OrderSource_Label'}}:">
+                        {{#if orderSource}}
+                            <span id="{{generateId 'ccb2b-ma-orders-source-' orderName '-field'}}" class="cc_col_order_source">{{pageLabelPrefixMap 'CCB2B_OrderSource_' (parseOrderSource orderSource)}}</span>
+                        {{/if}}
+                    </td>
+                    {{#ifDisplay 'MO.DsplExtOrderNumber'}}
+                    <td class="cc_table_col" data-label="{{pageLabelMap 'ExternalOrderID'}}:">
+                        <span class="cc_col_external_order_id">{{externalOrderId}}</span>
+                    </td>
+                    {{/ifDisplay}}
+                    {{#ifDisplay 'MO.DsplPONumber'}}
+                    <td class="cc_table_col" data-label="{{pageLabelMap 'PO Number'}}:">
+                        <span class="cc_col_po_number">{{poNumber}}</span>
+                    </td>
+                    {{/ifDisplay}}
+                    <td class="cc_table_col" data-label="{{pageLabelMap 'MyOrdersInc_OrderDate'}}:">
+                        <span id="{{generateId 'ccb2b-ma-orders-orderdate-' orderName '-field'}}" class="cc_col_order_date">{{orderDateStr}}</span>
+                    </td>
+                    <td class="cc_table_col" data-label="{{pageLabelMap 'CCB2B_CheckOut_ExpectedDeliveryDate_Label'}}:">
+                        <span id="{{generateId 'ccb2b-ma-orders-requestdate-' orderName '-field'}}" class="cc_col_request_date">{{requestDate}}</span>
+                    </td>
+                    <td class="cc_table_col" data-label="{{pageLabelMap 'MyOrdersInc_Status'}}:">
+                        <span id="{{generateId 'ccb2b-ma-orders-orderstatus-' orderName '-field'}}">
+                        {{#if status}}
+                            {{pageLabelPrefixMap 'CCB2B_OrderStatus_' (parseOrderStatus status)}}
+                        {{else}}
+                            {{pageLabelMap 'CCB2B_OrderStatus_BEING_PROCESSED'}}
+                        {{/if}}
+                        </span>
+                    </td>
+                    <td class="cc_table_col" data-label="{{pageLabelMap 'MyOrdersInc_DeliveryStatus'}}:">
+                        {{#if CCB2BDeliveryStatus}}
+                            <span id="{{generateId 'ccb2b-ma-orders-deliverystatus-' orderName '-field'}}" class="statusRow">
+                                {{pageLabelPrefixMap 'CCB2B_OrderDeliveryStatus_' (parseOrderStatus CCB2BDeliveryStatus)}}
+                            </span>
+                        {{/if}}
+                    </td>
+                    <td class="cc_table_col" data-label="{{pageLabelMap 'MyOrdersInc_OrderAmount'}}:">
+                        <span id="{{generateId 'ccb2b-ma-orders-amount-' orderName '-field'}}" class="cc_col_order_amount">{{#if CCB2BSAPTotalPrice}} {{price CCB2BSAPTotalPrice currencyIsoCode}}{{else}}{{price totalAmount currencyIsoCode}}{{/if}}</span>
+                    </td>
+                    {{#ifStoreSetting 'Filter_Orders_Based_on_Owner__c'}}
+                    &#160;
+                    {{else}}
+                    <td class="cc_table_col" data-label="{{pageLabelMap 'MyOrdersInc_Owner'}}:">
+                        <span class="cc_col_order_owner ord_owner">{{ownerName}}</span>
+                    </td>
+                    {{/ifStoreSetting}}
+                    {{#ifDisplay 'MO.ShActOnOrd'}}
+                    <td class="cc_table_col text-right">
+                        {{#if this.canCancel}}
+                        {{#ifDisplay 'MO.ShAmdBt'}}
+                        {{#if this.canAmend}}
+                        <input id="{{generateId 'ccb2b-ma-orders-amend-' orderName '-button'}}" type="button" class="btn btn-default btn-sm promptCancel promptAmend cc_col_prompt_amend" data-id="{{sfid}}" data-mode="Edit" value="{{pageLabelMap 'Amend'}}"/>&#160;
+                        {{/if}}
+                        {{/ifDisplay}}
+                        {{/if}}
+                        {{#if this.canCancel}}
+                        {{#ifDisplay 'MO.ShCanBt'}}
+                        <input id="{{generateId 'ccb2b-ma-orders-cancel-' orderName '-button'}}" type="button" class="btn btn-default btn-sm promptCancel cc_col_prompt_cancel" data-id="{{sfid}}" data-mode="Cancel" value="{{pageLabelMap 'Cancel'}}"/>
+                        {{/ifDisplay}}
+                        {{/if}}
+                        {{#if this.canReOrder}}
+                        <input id="{{generateId 'ccb2b-ma-orders-reorder-' orderName '-button'}}" type="button" class="primary_button btn btn-default btn-sm reorder cc_col_reorder" data-id="{{sfid}}" value="{{pageLabelMap 'MyOrdersInc_Reorder'}}"/>
+                        {{/if}}
+                    </td>
+                    {{/ifDisplay}}
+                </tr>
+                {{/each}}
+            </table>
+        </div>
+        <div id="modalSec"></div>
+    </div>
+    <div class="orderPaginationSec"></div>
+    {{> confirmReorderModal}}
+    {{else}}
+        <p id="ccb2b-ma-orders-noitem-label" class="noItemsInfo">{{pageLabelMap 'CCB2B_MyAccount_NoItems_MyOrders_Label'}}</p>
+    {{/if}}
+{{/if}}

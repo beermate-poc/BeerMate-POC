@@ -1,0 +1,86 @@
+# This is a basic workflow to help you deploy to a Salesforce environment
+
+name: Deploy-to-TEST
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the specified branches
+on:
+  push:
+    branches: 
+      - develop
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel  
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    container: dxatscale/sfpowerscripts:latest
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout the source branch
+        uses: actions/checkout@v2.3.4
+        with:
+          fetch-depth: 0
+          ref: develop
+
+#       - name: 'Install sfdx-cli & delta plugins'
+#         run: |
+#           npm install sfdx-cli --global
+#           echo 'y' | npx sfdx plugins:install sfpowerkit
+
+      - name: Delta package
+        run: |
+          git rev-parse --abbrev-ref HEAD
+          LATEST_STABLE_TAG=`git tag -l TEST/v*  --sort=creatordate | tail -n1`
+          echo The last stable tag is $LATEST_STABLE_TAG
+          CURRENT_COMMIT_ID=`git rev-parse --verify HEAD`
+          echo The current commit ID is $CURRENT_COMMIT_ID
+          npx sfdx sfpowerkit:project:diff -t $CURRENT_COMMIT_ID -r $LATEST_STABLE_TAG -d delta -x
+
+          mkdir -p delta/convertmdapi
+          mkdir -p delta/force-app
+          cp destructiveChanges/destructiveChangesPre.xml destructiveChanges/destructiveChangesPost.xml destructiveChanges/package.xml delta/convertmdapi/
+          cd delta/
+          sfdx force:source:convert -r force-app -d convertmdapi
+          cd ..
+          cd delta/convertmdapi
+          echo =================================================================================
+          echo ===================== The structure of convertmdapi folder ====================== 
+          echo =================================================================================    
+          ls -d $PWD/*
+          cd ..
+          cd ..
+
+      - name: Deploy to target org
+        run: |
+          echo 
+          echo =================================================================================
+          echo ========================== Destructive Changes Pre ============================== 
+          echo =================================================================================
+          cat delta/convertmdapi/destructiveChangesPre.xml
+          echo
+          echo =================================================================================
+          echo ========================== Main Deployment Package ============================== 
+          echo =================================================================================
+          cat delta/convertmdapi/package.xml
+          echo =================================================================================
+          echo ========================== Destructive Changes Post ============================= 
+          echo =================================================================================
+          cat delta/convertmdapi/destructiveChangesPost.xml
+          sfdx force:auth:jwt:grant --clientid ${{secrets.TESTsalesforceDevOrgClientId}} --jwtkeyfile ./buildfiles/cert/server.key --username ${{secrets.TESTsalesforceOrgUserName}} --instanceurl ${{secrets.prodOrgInstanceURL}}
+          sfdx force:mdapi:deploy -d delta/convertmdapi -l ${{secrets.testLevel}} -u ${{secrets.TESTsalesforceOrgUserName}} --ignorewarnings -w 60
+
+      - name: Add new tag
+        run: |
+          current_version=`git tag -l TEST/v* --sort=creatordate | tail -n1 | awk -F'v' '{print $NF}'`
+          echo CURRENT VERSION: TEST/v$current_version
+          major=`echo $current_version | cut -d'.' -f 1`
+          major=`expr $major + 1`
+          next_version=`echo $major`
+          echo NEXT VERSION: TEST/v$next_version
+          git tag `echo TEST/v$next_version`
+          git push ${{secrets.repository}} --tags
+
+      # - name: Retrieve the code coverage
+      #   run:
+      #     sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.TESTsalesforceOrgUserName}}

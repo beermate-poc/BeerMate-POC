@@ -1,0 +1,33 @@
+<!--Home Page links to open apps and external sites-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global">    
+<!--<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>-->
+
+    <div class="slds-grid slds-wrap">
+           
+        <div class="bgcolor slds-col slds-p-horizontal--medium slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-1 slds-p-around--small">
+             <div class="gridHeader truncation">
+                 <h2 id="header">
+                 <span class="slds-text-heading--small slds-truncate">{!$Label.c.C360_UsefulLinks}</span>
+                 </h2>
+        	</div>
+       <h2>{!$Label.c.C360_CanadaSection}</h2>
+             <!--<a onclick="{!c.clickBWB}">{!$Label.c.C360_BuildingWithBeerApp_Name}</a><br/>-->
+             <a onclick="{!c.clickOneDrive}">{!$Label.c.C360_OneDrive_Name}</a><br/>
+             <!--<a onclick="{!c.clickBP}">{!$Label.c.C360_BeerPointApp_Name}</a><br/>-->
+             <a onclick="{!c.clickMCManager}">{!$Label.c.C360_MAManager_Name}</a><br/>
+             <a onclick="{!c.analyticSmart}">{!$Label.c.C360_AnalyticSmart_Name}</a><br/>
+             <a onclick="{!c.navigateStaples}">{!$Label.c.C360_Staples_Name}</a><br/>
+             <a onclick="{!c.clickArchWay}">{!$Label.c.C360_Archway_Name}</a><br/>
+           <a onclick="{!c.clickBPMolsonShopLink}">{!$Label.c.C360_BPMolsonShopName}</a><br/> 
+             <a onclick="{!c.clickVault}">{!$Label.c.C360_Vault_Name}</a><br/>
+             
+            
+ <!--       <h2>{!$Label.c.C360_UKSection}</h2> 
+            <a onclick="{!c.clickBP}">{!$Label.c.C360_BeerPointApp_Name}</a><br/>
+            <a onclick="{!c.click60Shop}">{!$Label.c.C360_60SecondShop_Name}</a>
+    -->        
+        </div>
+    </div>
+    
+
+ </aura:component>

@@ -1,0 +1,39 @@
+<div class="copyright">
+    <small>
+            {{displayFooterLogo}}
+    </small>
+    <span>{{pageLabelMap 'CCB2B_Footer_Copyright'}}</span>
+</div>
+<div class="foot-menu">
+    <div class="foot-link">
+            <a id="{{generateId 'menu_foot_' 'terms_and_conditions'}}" href="{{pageLabelMap 'CCB2B_Terms_URI'}}" target="_blank">
+                {{pageLabelMap 'CCB2B_Terms_Label'}}
+            </a>
+    </div>
+    <span>|</span>
+    <div class="foot-link">
+        <a id="{{generateId 'menu_foot_' 'privacy_policy'}}" href="{{pageLabelMap 'CCB2B_Policy_URI'}}" target="_blank">
+            {{pageLabelMap 'CCB2B_Policy_Label'}}
+        </a>
+    </div>
+    <div class="foot-link">
+        <p class="foot-uk-link">{{pageLabelMap 'CCB2B_Footer_UKStoreAddress' (setLink 'CCB2B_Footer_UKStoreURI' 'CCB2B_Footer_UKStoreURI' true)}}</p>
+    </div>
+    {{#each menuItems}}
+        {{#ifEquals mType 'URL'}}
+            <div class="foot-list-item">
+                <a id="{{generateId 'ccb2b-menu-foot-' displayName}}" data-href="{{linkURL}}" {{linkTarget openInNewWindow}}>
+                    {{displayName}}
+                </a>
+            </div>
+        {{/ifEquals}}
+        {{#ifEquals mType 'FooterURL'}}
+            <div class="foot-list-item">
+                <a id="{{generateId 'ccb2b-menu-foot-' displayName}}" data-href="{{linkURL}}" {{linkTarget openInNewWindow}}>
+                    {{displayName}}
+                </a>
+            </div>
+        {{/ifEquals}}
+    {{/each}}
+</div>
+<div id="teconsent"></div>

@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT" description="Fires on Comp save" >
+    <aura:attribute name="selectedObjectiveId" type="Id"/>
+     <aura:attribute name="isSaved" type="boolean"/>
+</aura:event>

@@ -1,0 +1,44 @@
+<aura:component controller="BMC_ChainActivityController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:availableForFlowScreens" >
+    
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="test" type="boolean" />
+    <aura:attribute name="seasonalMessage" type="boolean" />
+    <aura:attribute name="chainName" type= "String"/>
+    <aura:attribute name="chainStatus" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="pageReference" type="Object"/>
+    <div class="divClass">
+        <lightning:navigation aura:id="navService"/>
+        <div class="modal-header slds-modal__header mainHeader slds-p-around--small">
+            <h2 class="title slds-text-heading--medium">Chain Execution Assignments</h2>
+        </div>
+        <aura:if isTrue="{!v.chainStatus}"> 
+            <center> 
+                <div class="slds-text-heading_medium">{!$Label.c.BMC_CA_Cancel}</div>
+                <br/>
+            </center>
+            <aura:set attribute="else">
+                <div class="slds-modal__footer">
+                    <lightning:button
+                                      label="Product Selection"
+                                      variant="brand"
+                                      onclick="{! c.openProdSelection}"    
+                                      />
+                    <lightning:button
+                                      label="Outlet Selection"
+                                      variant="brand"
+                                      onclick="{! c.openOutletSelection}"    
+                                      />
+                    <lightning:overlayLibrary aura:id="overlayLib"/>    
+                    
+                    <lightning:button
+                                      name ="outletButton"
+                                      label="Upload Outlet List"
+                                      variant="brand"
+                                      onclick="{!c.uploadCAOutlet}" 
+                                      />
+                </div> 
+            </aura:set>
+        </aura:if>
+    </div>
+</aura:component>

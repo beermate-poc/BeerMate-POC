@@ -1,0 +1,53 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasRecordId" access="global" >	
+	<aura:attribute name="userIdList" type="Integer[]"/>
+    <aura:html tag="style">
+          @media only screen 
+            and (min-device-width : 768px) 
+            and (max-device-width : 1024px) and (orientation:portrait)   { 
+        		.scrollerSize{
+                         height: 840px;
+                  }
+        }
+        @media only screen 
+            and (min-device-width : 768px) 
+            and (max-device-width : 1024px) and (orientation:landscape)   { 
+        		.scrollerSize{
+                         height: auto;
+                  }
+        }
+        
+        @media screen and (min-width: 1080px) {
+                .cuf-content {
+           			 padding: 0 0rem !important;
+                }
+                .slds-p-around--medium {
+                    padding: 0rem !important;
+                }       
+                .slds-modal__content{
+                    overflow-y:hidden !important;
+                    height:unset !important;
+                    max-height:unset !important;
+                }
+        		.scrollerSize{
+                         height: 500px;
+                  }
+         }
+        
+    </aura:html>
+	
+    <div class="slds-modal__content slds-p-around--x-small slds-align_absolute-center slds-size_1-of-1 slds-is-relative " aura:id="modalbody" id="modalbody">
+   		
+    			<ui:scrollerWrapper class="scrollerSize">
+        			<c:AssignObjectiveToSelectedUser aura:id="targetUserObj"  objectiveId="{!v.recordId}"   editingObjective="false" isSharedObjective="true"   />
+    			</ui:scrollerWrapper>
+			
+        
+    </div>
+    	<div class="modal-footer slds-modal__footer slds-size_1-of-1">
+          
+                <ui:button class="slds-button slds-button_neutral" label="{!$Label.c.Cancel_Label}" press="{! c.cancel}" /> 
+                <ui:button class="slds-button slds-button--brand"
+                       label="{!$Label.c.Apply}" press="{!c.saveObjective}"/>
+
+        </div>
+</aura:component>

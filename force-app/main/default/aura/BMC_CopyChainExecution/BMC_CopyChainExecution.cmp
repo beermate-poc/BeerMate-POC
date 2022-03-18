@@ -1,0 +1,242 @@
+<aura:component controller="BMC_CopyChainExecutionController" implements="flexipage:availableForRecordHome,force:hasRecordId,flexipage:availableForAllPageTypes,force:appHostable,force:lightningQuickActionWithoutHeader"  >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="newExecution" type="Object"/>
+    <aura:attribute name="newExecutionError" type="String"/>
+    <aura:attribute name="chainActivity" type="BMC_Chain_Activity__c"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="recordTypeId" type="String"/>
+    <aura:attribute name="recordTypeName" type="String"/>
+    <aura:attribute name="userInfo" type="user"/> 
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="oppty" 
+                    type="BMC_Chain_Activity__c" 
+                    default="{ 'sobjectType': 'BMC_Chain_Activity__c'}"/>
+    
+    
+    <aura:html tag="style">
+        .slds-modal__container{
+        height : auto;
+        width: 70%;
+        max-width: 70rem;
+        }
+        .modal-body{
+        height : 500px !important;
+        max-height: 500px !important;
+        }
+        
+        .customFooter{
+        overflow-y:hidden !important;
+        display: inline !important;
+        z-index: 0; !important;
+        }
+        
+    </aura:html> 
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner />
+    </aura:if>  
+    <div class="slds-page-header" >
+        <p class="slds-text-heading_label">{!$Label.c.BMC_CopyExecution}</p>
+    </div>
+    
+    <div aura:id="Activity" class="slds-show">
+        <lightning:recordEditform
+                                  recordid="{!v.recordId}"
+                                  recordTypeId="{!v.recordTypeId}"
+                                  objectApiName="BMC_Chain_Activity__c">  
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:input  name="{!$Label.c.BMC_ChainExecutionName}" aura:id="name" label="{!$Label.c.BMC_ChainExecutionName}"
+                                     value="{!v.chainActivity.BMC_Chain_Activity_Name__c}" required="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:input name="{!$Label.c.BMC_Owner}" label="{!$Label.c.BMC_Owner}" value="{!v.userInfo.Name}" disabled="true"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:input name="{!$Label.c.BMC_ChainParentAccount}" label="{!$Label.c.BMC_ChainParentAccount}" value="{!v.chainActivity.BMC_Chain_Parent_Account__r.Name}" disabled="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:input name="{!$Label.c.BMC_TotalProductsSelected}" label="{!$Label.c.BMC_TotalProductsSelected}" value="{!v.chainActivity.BMC_Total_Products_Possible__c}" disabled="true"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:inputField aura:id="MandateType" fieldName="BMC_Mandate_Type__c"  disabled="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:input name="{!$Label.c.BMC_TotalOutletsSelected}" label="{!$Label.c.BMC_TotalOutletsSelected}" value="{!v.chainActivity.BMC_Total_Outlets_Selected__c}" disabled="true"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:inputField aura:id="status" fieldName="BMC_Status__c" value="Pending" disabled="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:input fieldName="BMC_Cancellation_Reason__c" name="{!$Label.c.BMC_CancellationReason}" label="{!$Label.c.BMC_CancellationReason}" value="--None--" disabled="true"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:inputField aura:id="startDate" fieldName="BMC_Start_Date__c"  required="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:inputField aura:id="gapStatus" fieldName="BMC_Gap_Calculation_Status__c"  disabled="true"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:inputField aura:id="endDate" fieldName="BMC_End_Date__c"  required="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:input name="{!$Label.c.BMC_Clonedfrom}" label="{!$Label.c.BMC_Clonedfrom}" value="{!v.chainActivity.Name}" disabled="true"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:inputField aura:id="mobRestrction" fieldName="BMC_Mobile_Restriction__c"  disabled="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:inputField  aura:id="MBO" fieldName="BMC_Monthly_Business_Objectives__c"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:inputField aura:id="Notes" fieldName="BMC_Notes__c"  />
+                </lightning:layoutItem>
+            </lightning:layout>
+            <div class="slds-page-header">
+                <th ><h1>{!$Label.c.BMC_OnPremiseElements}</h1></th></div>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">{!$Label.c.BMC_HappyHourSpecials}<br></br>
+                    <ui:inputCheckbox Name="{!$Label.c.BMC_HappyHourSpecials}" Label="{!$Label.c.BMC_HappyHourSpecials}" aura:id="happyhr" value="{!v.chainActivity.BMC_Happy_Hour_Specials__c}"/>
+                    <!-- <lightning:inputField aura:id="happyhr" fieldName="BMC_Happy_Hour_Specials__c" value="{!v.chainActivity.BMC_Happy_Hour_Specials__c}" />-->
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">{!$Label.c.BMC_LTO_BOM}
+                    <ui:inputCheckbox Name="{!$Label.c.BMC_LTO_BOM}" Label="{!$Label.c.BMC_LTO_BOM}" aura:id="ltobom" value="{!v.chainActivity.BMC_LTO_BOM__c}"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">{!$Label.c.BMC_WeeklyFeatures}
+                    <ui:inputCheckbox Name="{!$Label.c.BMC_WeeklyFeatures}" Label="{!$Label.c.BMC_WeeklyFeatures}" aura:id="weekly" value="{!v.chainActivity.BMC_Weekly_Features__c}"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            
+            <div class="slds-page-header">
+                <th ><h1>{!$Label.c.BMC_OffPremiseElements}</h1></th></div>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">{!$Label.c.BMC_AdFeature}
+                    <ui:inputCheckbox Name="{!$Label.c.BMC_AdFeature}" Label="{!$Label.c.BMC_AdFeature}" aura:id="adfeature" value="{!v.chainActivity.BMC_Ad_Feature__c}"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">{!$Label.c.BMC_Display}
+                    <ui:inputCheckbox Name="{!$Label.c.BMC_Display}" Label="{!$Label.c.BMC_Display}" aura:id="display" value="{!v.chainActivity.BMC_Display__c}"/>
+                </lightning:layoutItem>
+            </lightning:layout> 
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">{!$Label.c.BMC_Event}
+                    <ui:inputCheckbox Name="{!$Label.c.BMC_Event}" Label="{!$Label.c.BMC_Event}" aura:id="event" value="{!v.chainActivity.BMC_Event__c}"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">{!$Label.c.BMC_POS}
+                    <ui:inputCheckbox Name="{!$Label.c.BMC_POS}" Label="{!$Label.c.BMC_POS}" aura:id="pos" value="{!v.chainActivity.BMC_POS__c}"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">{!$Label.c.BMC_Other}
+                    <ui:inputCheckbox Name="{!$Label.c.BMC_Other}" Label="{!$Label.c.BMC_Other}" aura:id="other" value="{!v.chainActivity.BMC_Other__c}"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <div class="slds-page-header">
+                <th ><h1>{!$Label.c.BMC_ElectronicFundsTransfer}</h1></th></div>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">{!$Label.c.BMC_EFT}
+                    <ui:inputCheckbox Name="{!$Label.c.BMC_EFT}" Label="{!$Label.c.BMC_EFT}" aura:id="eft" value="{!v.chainActivity.BMC_Electronic_Funds_Transfer__c}"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:inputField aura:id="costest"  fieldName="BMC_Program_Cost_Estimate__c" />
+                </lightning:layoutItem>
+            </lightning:layout> 
+            <div class="modal-footer slds-modal__footer slds-size_1-of-1 slds-docked-form-footer">
+                <lightning:button variant="Brand" class="slds-button" label="{!$Label.c.BMC_Save}" onclick="{!c.handleSave}"/>
+                <lightning:button variant="Neutral" class="slds-button" label="{!$Label.c.BMC_CancelButton}" onclick="{!c.handleCancel}"/>
+            </div>
+        </lightning:recordEditform>
+    </div>
+    <div aura:id="Mandate" class="slds-hide">
+        <lightning:recordEditform
+                                  recordid="{!v.recordId}"
+                                  recordTypeId="{!v.recordTypeId}"
+                                  objectApiName="BMC_Chain_Activity__c">
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:input  name="{!$Label.c.BMC_ChainExecutionName}" aura:id="mname" label="{!$Label.c.BMC_ChainExecutionName}"
+                                     value="{!v.chainActivity.BMC_Chain_Activity_Name__c}" required="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:input name="{!$Label.c.BMC_Owner}" label="{!$Label.c.BMC_Owner}" value="{!v.userInfo.Name}" disabled="true"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:input name="{!$Label.c.BMC_ChainParentAccount}" label="{!$Label.c.BMC_ChainParentAccount}" value="{!v.chainActivity.BMC_Chain_Parent_Account__r.Name}" disabled="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:input name="{!$Label.c.BMC_TotalProductsSelected}" label="{!$Label.c.BMC_TotalProductsSelected}" value="{!v.chainActivity.BMC_Total_Products_Possible__c}" disabled="true"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:inputField aura:id="mMandateType" fieldName="BMC_Mandate_Type__c"  disabled="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:input name="{!$Label.c.BMC_TotalOutletsSelected}" label="{!$Label.c.BMC_TotalOutletsSelected}" value="{!v.chainActivity.BMC_Total_Outlets_Selected__c}" disabled="true"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:inputField aura:id="mstatus" fieldName="BMC_Status__c" value="Pending" disabled="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:input fieldName="BMC_Cancellation_Reason__c" name="{!$Label.c.BMC_CancellationReason}" label="{!$Label.c.BMC_CancellationReason}" value="--None--" disabled="true"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:inputField aura:id="mstartDate" fieldName="BMC_Start_Date__c" required="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:inputField aura:id="mgapStatus" fieldName="BMC_Gap_Calculation_Status__c" value="{!v.chainActivity.BMC_Gap_Calculation_Status__c}" disabled="true"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:inputField aura:id="mendDate" fieldName="BMC_End_Date__c"  required="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:input name="{!$Label.c.BMC_Clonedfrom}" label="{!$Label.c.BMC_Clonedfrom}" value="{!v.chainActivity.Name}" disabled="true"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:inputField aura:id="mNotes" fieldName="BMC_Notes__c" />
+                </lightning:layoutItem>
+            </lightning:layout>
+            <div class="slds-size--1-of-2"> <lightning:inputField aura:id="mmobRestrction" fieldName="BMC_Mobile_Restriction__c"  disabled="true"/>
+            </div>
+            <div class="slds-page-header">
+                <th ><h1>{!$Label.c.BMC_AdditionalInformationforDistributionChoice}</h1></th></div>
+            <div class="slds-size--1-of-2"><lightning:inputField aura:id="mMinProducts" fieldName="BMC_Distributor_Option_Minimum_Products__c"  />
+            </div>
+            <div class="slds-page-header">
+                <th ><h1>{!$Label.c.BMC_AdditionalInformationforSeasonal}</h1></th></div>
+            <div class="slds-size--1-of-2">
+                <lightning:inputField aura:id="mSeasonalBg" fieldName="BMC_Seasonal_Brand_Group__c"  />
+            </div>
+            <div class="modal-footer slds-modal__footer slds-size_1-of-1 slds-docked-form-footer">
+                <lightning:button variant="Brand" class="slds-button" label="{!$Label.c.BMC_Save}" onclick="{!c.handleSaveMandate}"/>
+                <lightning:button variant="Neutral" class="slds-button" label="{!$Label.c.BMC_CancelButton}" onclick="{!c.handleCancel}"/>
+            </div>
+        </lightning:recordEditform>
+    </div>
+    
+</aura:component>

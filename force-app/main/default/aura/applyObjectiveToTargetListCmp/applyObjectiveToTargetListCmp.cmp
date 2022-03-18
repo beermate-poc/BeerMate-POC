@@ -1,0 +1,229 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" controller="TargetListController">
+	<aura:registerEvent name="cancelApplyObjective" type="c:cancelApplyObjectiveToTargetListEvt"/>
+    <aura:attribute name="objectiveId" type="Id" />
+    <aura:attribute name="objectiveName" type="String" />
+    <aura:attribute name="targetLists" type="Object[]" />
+    <aura:attribute name="searchKey" type="String" />
+    <aura:attribute name="applySelected" type="Boolean" default="true" />
+    
+    <aura:handler name="init" action="{!c.init}" value="{!this}" />
+    <aura:method name="initializeObjectiveId" action="{!c.initObjectiveId}">
+        <aura:attribute type="Id" name="objId" default="aasdasd" />
+    </aura:method>
+<!-- MC-1738 Registering RetainUserState_ObjectiveTab event that is used to requery the data for the tables  -->
+    <aura:registerEvent name="retainUserState_ObjectiveTab" type="c:RetainUserState_ObjectiveTab"/>
+
+	<lightning:spinner aura:id="spinner" class="slds-show" alternativeText="Please wait..." />
+	<aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+        <div class="slds-p-around--medium" style="height:700px;">
+            <div>
+                <div class="modalStyle">
+                    <div class=" mobileView ">
+                        <div class="slds-float_left">
+                            <lightning:button class="slds-button" variant="neutral" label="{!$Label.c.Cancel_Label}" onclick="{!c.closeModal}" />
+                        </div>
+                        <div class="slds-float_right">
+                            <aura:if isTrue="{!v.applySelected}" >
+			                	<lightning:button class="slds-button" variant="brand" label="{!$Label.c.Apply}" onclick="{!c.applyObjectiveToAccounts}" />
+			                	<aura:set attribute="else">
+			                      <lightning:button class="slds-button" variant="brand" label="{!$Label.c.Remove}" onclick="{!c.removeObjectiveFromAccounts}" />
+			                    </aura:set>
+			                </aura:if>
+                        </div>
+                        <h2 class="slds-text-heading--medium slds-truncate">{!$Label.c.Apply_Manage}&nbsp;{!v.objectiveName}&nbsp;{!$Label.c.Apply_Account_List}</h2>
+                    </div>
+				<div class="slds-tabs--scoped formContent">
+					<ul class="slds-tabs--scoped__nav" role="tablist">
+						<li onclick="{!c.existingCriteriaClick}" aura:id="existingTab" class="slds-tabs--scoped__item slds-active" role="presentation"><a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-scoped-1" id="tab-scoped-1__item">{!$Label.c.Apply_to_List}</a></li>
+						<li onclick="{!c.newCriteriaClick}" aura:id="newTab" class="slds-tabs--scoped__item" role="presentation"><a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-2" id="tab-scoped-2__item">{!$Label.c.Remove_from_List}</a></li>
+					</ul>
+					<div aura:id="existingContent" class="slds-tabs--scoped__content slds-show" role="tabpanel" aria-labelledby="tab-scoped-1__item">
+						<div class="slds-grid slds-p-around--medium">
+							<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2 slds-p-bottom--medium">
+								<div class="slds-size--8-of-12 slds-float--left">
+									<lightning:input label="{!$Label.c.Search}" name="searchBar" value="{!v.searchKey}" placeholder="{!$Label.c.Target_List_Placeholder}"/>
+								</div>
+								<div class="slds-size--4-of-12 slds-float--left buttonPadding">
+									<lightning:button class="slds-button" variant="brand" label="{!$Label.c.Search}" onclick="{!c.searchKeyChange}" /> 
+								</div>
+							</div>
+						</div>
+						<div id="mobileExistingList">
+							<ui:scrollerWrapper class="scrollerSizeExisting">
+								<aura:iteration items="{!v.targetLists}" var="tar">
+									<div class="slds-p-around--medium">
+										<div class="slds-list--horizontal slds-wrap">
+											<div class="slds-item--label slds-text-color--weak slds-truncate" title="{!$Label.c.Target_List_Name}">{!$Label.c.Target_List_Name}:</div>
+											<div class="slds-item--detail slds-truncate">
+												<div class="slds-form-element">
+													<div class="slds-form-element__control">
+														<label class="slds-radio" for="{!'tarMobile' + tar.Id}">
+															<input type="radio" name="optionsMobile" id="{!'tarMobile' + tar.Id}" class="slds-p-around--small targetMobile"/>
+															<span class="slds-radio--faux"></span>
+															<span class="slds-form-element__label slds-truncate">{!tar.Name}</span>
+														</label>
+													</div>
+												</div>
+											</div>
+											
+											<div class="slds-item--label slds-text-color--weak slds-truncate" title="{!$Label.c.Number_of_Accounts}">{!$Label.c.Number_of_Accounts}:</div>
+											<div class="slds-item--detail slds-truncate"><ui:outputNumber value="{!tar.Count_Target_Accounts__c}" /></div>
+                                            <div class="slds-item--label slds-text-color--weak slds-truncate" title="{!$Label.c.Date_Created}">{!$Label.c.Date_Created}:</div>
+											<div class="slds-item--detail slds-truncate slds-cell-wrap"><ui:outputDate value="{!tar.CreatedDate}" format="MM/DD/YYYY"/></div>
+										</div>
+									</div>
+								</aura:iteration>
+							</ui:scrollerWrapper>
+						</div>
+					</div>
+                    
+					<div aura:id="newContent" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-2__item">
+						<div id="mobileExistingList">
+							<ui:scrollerWrapper class="scrollerSizeExisting">
+								<aura:iteration items="{!v.targetLists}" var="tar">
+									<div class="slds-p-around--medium">
+										<div class="slds-list--horizontal slds-wrap">
+											<div class="slds-item--label slds-text-color--weak slds-truncate" title="{!$Label.c.Target_List_Name}">{!$Label.c.Target_List_Name}:</div>
+											<div class="slds-item--detail slds-truncate">
+												<div class="slds-form-element">
+													<div class="slds-form-element__control">
+														<label class="slds-radio" for="{!'tarMobile2' + tar.Id}">
+															<input type="radio" name="optionsMobile" id="{!'tarMobile2' + tar.Id}" class="slds-p-around--small targetMobile"/>
+															<span class="slds-radio--faux"></span>
+															<span class="slds-form-element__label slds-truncate">{!tar.Name}</span>
+														</label>
+													</div>
+												</div>
+											</div>
+											<div class="slds-item--label slds-text-color--weak slds-truncate" title="{!$Label.c.Number_of_Accounts}">{!$Label.c.Number_of_Accounts}:</div>
+											<div class="slds-item--detail slds-truncate"><ui:outputNumber value="{!tar.Count_Target_Accounts__c}" /></div>
+                                            <div class="slds-item--label slds-text-color--weak slds-truncate" title="{!$Label.c.Date_Created}">{!$Label.c.Date_Created}:</div>
+											<div class="slds-item--detail slds-truncate slds-cell-wrap"><ui:outputDate value="{!tar.CreatedDate}" format="MM/DD/YYYY"/></div>
+										</div>
+									</div>
+								</aura:iteration>
+							</ui:scrollerWrapper>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<aura:set attribute="else">
+	<div aura:id="targetListModal" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-modal--large slds-fade-in-open">
+		<div class="slds-modal__container">
+			<div class="slds-modal__header">
+				<lightning:buttonIcon iconName="utility:close" variant="bare-inverse" size="large" alternativeText="Close" class="slds-modal__close"
+				 onclick="{!c.closeModal}" />
+				<h2 class="slds-text-heading--medium">{!$Label.c.Apply_Manage}&nbsp;{!v.objectiveName}&nbsp;{!$Label.c.Apply_Account_List}</h2>
+			</div>
+			<div class="slds-modal__content">
+				<div class="slds-tabs--scoped">
+					<ul class="slds-tabs--scoped__nav" role="tablist">
+						<li onclick="{!c.existingCriteriaClick}" aura:id="existingTab" class="slds-tabs--scoped__item slds-active" role="presentation"><a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-scoped-1" id="tab-scoped-1__item">{!$Label.c.Apply_to_List}</a></li>
+						<li onclick="{!c.newCriteriaClick}" aura:id="newTab" class="slds-tabs--scoped__item" role="presentation"><a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-2" id="tab-scoped-2__item">{!$Label.c.Remove_from_List}</a></li>
+					</ul>
+					<div aura:id="existingContent" class="slds-tabs--scoped__content slds-show" role="tabpanel" aria-labelledby="tab-scoped-1__item">
+						<div class="slds-grid slds-p-around--medium">
+							<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2 slds-p-bottom--medium">
+								<div class="slds-size--8-of-12 slds-float--left">
+									<lightning:input label="{!$Label.c.Search}" name="searchBar" value="{!v.searchKey}" placeholder="{!$Label.c.Target_List_Placeholder}"/>
+								</div>
+								<div class="slds-size--4-of-12 slds-float--left buttonPadding">
+									<lightning:button class="slds-button" variant="brand" label="{!$Label.c.Search}" onclick="{!c.searchKeyChange}" /> 
+								</div>
+							</div>
+						</div>
+						<div id="normalExistingList" class="slds-p-around--medium">
+							<table class="slds-table slds-table--bordered slds-table--cell-buffer slds-table--fixed-layout" role="grid">
+								<thead>
+									<tr class="slds-text-title--caps">
+										<th scope="col" style="width:50px;">
+											<div class="slds-truncate" title="{!$Label.c.Target_List_Name}">{!$Label.c.Target_List_Name}</div>
+										</th>
+										<th scope="col" class="slds-cell-shrink">
+											<div class="slds-truncate" title="{!$Label.c.Number_of_Accounts}">{!$Label.c.Number_of_Accounts}</div>
+										</th>
+                                        <th scope="col" class="slds-cell-shrink">
+											<div class="slds-truncate" title="{!$Label.c.Date_Created}">{!$Label.c.Date_Created}</div>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<aura:iteration items="{!v.targetLists}" var="tar">
+										<tr scope="row">
+											<td data-label="TARGET LIST NAME" class="slds-truncate">
+												<div class="slds-form-element">
+													<div class="slds-form-element__control">
+														<label class="slds-radio" for="{!'tar' + tar.Id}">
+															<input type="radio" name="options" id="{!'tar' + tar.Id}" class="slds-p-around--small target"/>
+															<span class="slds-radio--faux"></span>
+															<span class="slds-form-element__label slds-truncate">{!tar.Name}</span>
+														</label>
+													</div>
+												</div>
+											</td>
+											<td data-label="NUMBER OF ACCOUNTS" class="slds-truncate"><ui:outputNumber value="{!tar.Count_Target_Accounts__c}" /></td>
+                                            <td data-label="DATE CREATED" class="slds-truncate slds-cell-wrap"><ui:outputDate value="{!tar.CreatedDate}" format="MM/DD/YYYY"/></td>
+										</tr>
+									</aura:iteration>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div aura:id="newContent" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-2__item">
+						<div id="normalExistingList" class="slds-p-around--medium">
+							<table class="slds-table slds-table--bordered slds-table--cell-buffer slds-table--fixed-layout" role="grid">
+								<thead>
+									<tr class="slds-text-title--caps">
+										<th scope="col" style="width:50px;">
+											<div class="slds-truncate" title="{!$Label.c.Target_List_Name}">{!$Label.c.Target_List_Name}</div>
+										</th>
+										<th scope="col" class="slds-cell-shrink">
+											<div class="slds-truncate" title="{!$Label.c.Number_of_Accounts}">{!$Label.c.Number_of_Accounts}</div>
+										</th>
+                                        <th scope="col" class="slds-cell-shrink">
+											<div class="slds-truncate" title="{!$Label.c.Date_Created}">{!$Label.c.Date_Created}</div>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<aura:iteration items="{!v.targetLists}" var="tar2">
+										<tr scope="row">
+											<td data-label="TARGET LIST NAME" class="slds-truncate">
+												<div class="slds-form-element">
+													<div class="slds-form-element__control">
+														<label class="slds-radio" for="{!'tar2' + tar2.Id}">
+															<input type="radio" name="options" id="{!'tar2' + tar2.Id}" class="slds-p-around--small target2"/>
+															<span class="slds-radio--faux"></span>
+															<span class="slds-form-element__label slds-truncate">{!tar2.Name}</span>
+														</label>
+													</div>
+												</div>
+											</td>
+											<td data-label="NUMBER OF ACCOUNTS" class="slds-truncate"><ui:outputNumber value="{!tar2.Count_Target_Accounts__c}" /></td>
+                                            <td data-label="DATE CREATED" class="slds-truncate slds-cell-wrap"><ui:outputDate value="{!tar2.CreatedDate}" format="MM/DD/YYYY"/></td>
+											
+										</tr>
+									</aura:iteration>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="slds-modal__footer">
+						<lightning:button class="slds-button" variant="neutral" label="{!$Label.c.Cancel_Label}" onclick="{!c.closeModal}" />
+						<aura:if isTrue="{!v.applySelected}" >
+		                	<lightning:button class="slds-button" variant="brand" label="{!$Label.c.Apply}" onclick="{!c.applyObjectiveToAccounts}" />
+		                	<aura:set attribute="else">
+		                      <lightning:button class="slds-button" variant="brand" label="{!$Label.c.Remove}" onclick="{!c.removeObjectiveFromAccounts}" />
+		                    </aura:set>
+		                </aura:if>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+					<div aura:id="targetListBackdrop" class="slds-backdrop slds-backdrop--open"></div>
+				</aura:set>
+			</aura:if>
+</aura:component>

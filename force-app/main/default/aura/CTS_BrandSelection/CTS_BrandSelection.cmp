@@ -1,0 +1,479 @@
+<aura:component implements="force:hasRecordId,lightning:actionOverride,forceCommunity:availableForAllPageTypes" access="global" controller="CTS_BrandSelectionController">
+    <aura:attribute name="isROIorNI" type="Boolean" default="false"/>
+    <aura:attribute name="refreshFlag" type="Boolean" default="true"/>
+    <aura:attribute name="refreshOutFlag" type="Boolean" default="true"/>
+    <aura:attribute name="recordId" type="String" default=""/>
+    <aura:attribute name="gasIN" type="String" default=""/>
+    <aura:attribute name="gasOUT" type="String" default=""/>
+    <aura:attribute name="couplerIN" type="String" default=""/>
+    <aura:attribute name="couplerOUT" type="String" default=""/>
+    <aura:attribute name="parentRecordId" type="String"/>
+    <aura:attribute name="parentRecordName" type="String"/>
+    <aura:attribute name="recordTypeId" type="String"/>
+    <aura:attribute name="taskinfo" type="WorkOrderLineItem"
+                    default="{ 'sobjectType': 'WorkOrderLineItem'}"/>
+    <aura:attribute name="allowableDisplayTypeIN" type="list"/>
+    <aura:attribute name="allowableDisplayTypeOUT" type="list"/>
+    <aura:attribute name="allowableBrandDispenseIN" type="list"/>
+    <aura:attribute name="allowableBrandDispenseOUT" type="list"/>
+    <aura:attribute name="allowableCoolingIN" type="list"/>
+    <aura:attribute name="allowableCoolingOUT" type="list"/>
+    <aura:attribute name="allowableHandle" type="list"/>
+    
+    <aura:attribute name="defaultBrandDispenseIN" type="String"/>
+    <aura:attribute name="defaultBrandDispenseOUT" type="String"/>
+    <aura:attribute name="defaultDisplayIN" type="String"/>
+    <aura:attribute name="defaultDisplayOUT" type="String"/>
+    <aura:attribute name="defaultCoolingIN" type="String"/>
+    <aura:attribute name="defaultCoolingOUT" type="String"/>
+    <aura:attribute name="defaultHandleType" type="String"/>
+    <aura:attribute name="ErrorMsg" type="String"/>
+    <aura:attribute name="PriorBrandSectionInfoMap" type="object"/>
+    <aura:attribute name="BrandSectionInfoMap" type="object"/>
+    <aura:attribute name="PostBrandSectionInfoMap" type="object"/>
+    <aura:attribute name="BrandInInfo" type="object"/>
+    <aura:attribute name="BrandOutInfo" type="object"/>
+    <aura:attribute name="selectedRecordTypeLabel" type="String"/>
+    <aura:attribute name="BrandIN" type="String" default=""/>
+    <aura:attribute name="BrandOUT" type="String" default=""/>
+    <aura:attribute name="isFromInit" type="Integer" default="0"/>
+    <aura:attribute name="NoteMsg" type="String"/>
+    <aura:attribute name="isAssetLines" type="Boolean" default="false"/>
+    <aura:attribute name="ceaAssetInfo" type="object"/>
+    <aura:attribute name="ceaDestinationInfo" type="object"/>
+    <aura:attribute name="ceaAssetProductInfo" type="object"/>
+    <aura:attribute name="selectedProductLookUp" type="sObject" />
+    <aura:attribute name="selectedPartItemLookUp" type="sObject" />
+    <aura:attribute name="Oldtaskinfo" type="WorkOrderLineItem"
+                    default="{ 'sobjectType': 'WorkOrderLineItem'}" />
+    <aura:attribute name="runRecommendation" type="Boolean" default="true"/>
+    <aura:attribute name="hideRecommendation" type="Boolean" default="false"/>
+    <aura:attribute name="isEditMode" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="change" value="{!v.taskinfo.CTS_Brand_IN__c}" action="{!c.getAllowableBrandInPicklistValues}"/>
+    <aura:handler name="change" value="{!v.taskinfo.CTS_Brand_OUT__c}" action="{!c.getAllowableBrandOutPicklistValues}"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>   
+    <aura:registerEvent name="RecordSavedEvent" type="c:CTS_BrandSelectionEvent" />
+    <aura:handler name="PartsSavedEvent" event="c:CTS_CloseBrandSelectionCmp" action="{!c.closeComponent}"/>
+    <aura:handler name="ErrorOnPartsSavedEvent" event="c:CTS_ErrorOnPartRecommendation" action="{!c.displayErrorsFromPartsScreen}"/>
+    
+    <lightning:recordEditForm aura:id="editForm" recordId="{!v.recordId}" recordTypeId="{!v.recordTypeId}" objectApiName="WorkOrderLineItem">
+        <lightning:messages/>
+        
+        <div class="backdropClass slds-modal__container" style="{!$Browser.isDesktop? 'min-width: 40rem;':'min-width: 37rem;max-width: 37rem;'}">
+            <div class="spinnerHolder">
+                <lightning:spinner aura:id="spn" alternativeText="Loading" size="medium" variant="brand"/>
+            </div>
+            <header class="slds-modal__header">
+                <lightning:buttonIcon iconName="utility:close"
+                                      onclick="{! c.handleCancel }"
+                                      alternativeText="close"
+                                      variant="bare-inverse"
+                                      class="slds-modal__close" aura:id="close"/>
+                <aura:if isTrue="{!v.recordId==''}">
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">New {!v.selectedRecordTypeLabel}</h2>
+                </aura:if>
+                <aura:if isTrue="{!(v.recordId!='')}">
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Edit {!v.selectedRecordTypeLabel}</h2>
+                </aura:if>
+            </header>
+            <div class="note-Msg" aura:id="NoteMsg">
+                {!v.NoteMsg}
+            </div>
+            <div class="error-Msg" aura:id="ErrorMsg">
+                {!v.ErrorMsg}
+            </div>
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                
+                
+                
+                <aura:iteration items="{!v.PriorBrandSectionInfoMap}" var="SectionInfo" indexVar="key">     
+                    <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder ">
+                        <span class="section-header-title slds-p-horizontal--small slds-truncate">{!SectionInfo.key}</span>
+                    </h3>          
+                    <aura:renderIf isTrue="{!v.PriorBrandSectionInfoMap[0]}">
+                        <lightning:layout multipleRows="true">
+                            
+                            <aura:renderIf isTrue="{!(v.ceaAssetProductInfo!=null)}">
+                                <lightning:layoutItem padding="around-small" size="{!$Browser.isDesktop? '6':'12'}">
+                                    <c:CTS_LookupCustomSearch  objectAPIName="Product2" IconName="standard:product"
+                                                              selectedRecord="{!v.selectedProductLookUp}" 
+                                                              label="{!v.ceaAssetProductInfo.FieldLabel}" FieldAPIName="{!v.ceaAssetProductInfo.FieldName}" childObjectRecord = "{!v.taskinfo}" isRequired="{!v.ceaAssetProductInfo.FieldRequired}" />
+                                </lightning:layoutItem>
+                            </aura:renderIf>
+                        </lightning:layout>
+                    </aura:renderIf>
+                    
+                    <lightning:layout multipleRows="true">
+                        <aura:iteration items="{!SectionInfo.value}" var="s" >
+                            <aura:if isTrue="{! and(s.FieldName!='CEA_Part_Item__c', and(s.FieldName!='CEA_Destination_Location__c' ,s.FieldName!='CEA_Product__c' ))}">
+                                <lightning:layoutItem padding="around-small" size="{!$Browser.isDesktop? '6':'12'}">
+                                    
+                                    <aura:if isTrue="{! and(!s.isIncompatibleInSF1,s.FieldName!='CEA_Asset_Family__c')}">                                                    
+                                        <aura:if isTrue="{!s.FieldRequired}">
+                                            <span class="slds-required" >*</span>
+                                        </aura:if>                                                    
+                                        <lightning:inputField class="{!(s.FieldRequired ? 'fieldrequired' : 'notrequired')}" aura:id="inputInfo" fieldName="{!s.FieldName}"/> 
+                                    </aura:if>
+                                    
+                                    <aura:if isTrue="{!and(!s.isIncompatibleInSF1,s.FieldName =='CEA_Asset_Family__c')}">                                                    
+                                        <aura:if isTrue="{!s.FieldRequired}">
+                                            <span class="slds-required" >*</span>
+                                        </aura:if>                                                    
+                                        <lightning:inputField class="{!(s.FieldRequired ? 'fieldrequired' : 'notrequired')}" aura:id="inputInfo" fieldName="{!s.FieldName}" onchange="{!c.AssetFamilyCheck}"/> 
+                                    </aura:if>
+                                    
+                                    <aura:if isTrue="{!and(s.isIncompatibleInSF1, s.FieldName!='WorkOrderId')}">
+                                        <lightning:outputField aura:id="inputInfo" fieldName="{!s.FieldName}" />
+                                    </aura:if>
+                                    
+                                </lightning:layoutItem>
+                            </aura:if>
+                        </aura:iteration>                                  
+                    </lightning:layout>              
+                    
+                </aura:iteration>
+                <aura:renderIf isTrue="{!v.PriorBrandSectionInfoMap[0]}">
+                    <lightning:layout multipleRows="true">
+                        
+                        
+                        <aura:renderIf isTrue="{!(v.ceaAssetInfo!=null)}">
+                            <lightning:layoutItem padding="around-small" size="{!$Browser.isDesktop? '6':'12'}">
+                                <!--        
+                                    <aura:if isTrue="{!v.ceaAssetInfo.FieldRequired}">
+                                                <span class="slds-required" >*</span>
+                                            </aura:if>-->
+                                
+                                <c:CTS_LookupCustomSearch  objectAPIName="CEA_MCCE_Part_Item__c" IconName="standard:product"
+                                                          selectedRecord="{!v.selectedPartItemLookUp}" 
+                                                          label="{!v.ceaAssetInfo.FieldLabel}" FieldAPIName="{!v.ceaAssetInfo.FieldName}" 
+                                                          assistiveField="CEA_Product__r.Name" assistiveField2 ="CEA_Inventory_no__c" childObjectRecord = "{!v.taskinfo}" isRequired="{!v.ceaAssetInfo.FieldRequired}"/>
+                                <!--
+                                            <p class="styleLabel">{!v.ceaAssetInfo.FieldLabel}</p>
+                                            <div aura:id="divAsset1" class="slds-input slds-combobox__input slds-combobox__input-value slds-hide">                           
+                                                {!v.taskinfo.CEA_Part_Item__r.Name}                         
+                                                <lightning:button class="slds-float_right" variant="base" onclick="{!c.toggleDisplayAsset}" title="Remove">
+                                                    X
+                                                </lightning:button>
+                                            </div>
+                                            <div aura:id="divAsset2">
+                                               
+                                                <force:inputField aura:id="CEA_Asset" value="{!v.taskinfo.CEA_Part_Item__c}" />
+                                            </div> 
+         -->
+                            </lightning:layoutItem>
+                        </aura:renderIf>
+                        <aura:renderIf isTrue="{!(v.ceaDestinationInfo!=null)}">
+                            <lightning:layoutItem padding="around-small" size="{!$Browser.isDesktop? '6':'12'}">
+                                
+                                <aura:if isTrue="{!v.ceaDestinationInfo.FieldRequired}">
+                                    <span class="slds-required" >*</span>
+                                </aura:if>
+                                <p class="styleLabel">{!v.ceaDestinationInfo.FieldLabel}</p>
+                                <div aura:id="divLoc1" class="slds-input slds-combobox__input slds-combobox__input-value slds-hide">                           
+                                    {!v.taskinfo.CEA_Destination_Location__r.Name}                       
+                                    <lightning:button class="slds-float_right" variant="base" onclick="{!c.toggleDisplayDestination}" title="Remove">
+                                        X
+                                    </lightning:button>
+                                </div>
+                                <div aura:id="divLoc2">
+                                    <force:inputField aura:id="CEA_Destination_Location" value="{!v.taskinfo.CEA_Destination_Location__c}" />
+                                </div> 
+                            </lightning:layoutItem>
+                        </aura:renderIf>
+                        <!--aura:renderIf isTrue="{!(v.ceaAssetProductInfo!=null)}">
+                            <lightning:layoutItem padding="around-small" size="{!$Browser.isDesktop? '6':'12'}">
+                                <  
+                                            <aura:if isTrue="{!v.ceaAssetProductInfo.FieldRequired}">
+                                                <span class="slds-required" >*</span>
+                                            </aura:if>
+-->
+                                
+                                <!--c:CTS_LookupCustomSearch  objectAPIName="Product2" IconName="standard:product"
+                                                          selectedRecord="{!v.selectedProductLookUp}" 
+                                                          label="{!v.ceaAssetProductInfo.FieldLabel}" FieldAPIName="{!v.ceaAssetProductInfo.FieldName}" childObjectRecord = "{!v.taskinfo}" isRequired="{!v.ceaAssetProductInfo.FieldRequired}" />
+                                
+                                <
+                                            <p class="styleLabel">{!v.ceaAssetProductInfo.FieldLabel}</p>
+                                            <div aura:id="divPrd1" class="slds-input slds-combobox__input slds-combobox__input-value slds-hide">                           
+                                                {!v.taskinfo.CEA_Product__r.Name}                       
+                                                <lightning:button class="slds-float_right" variant="base" onclick="{!c.toggleAssetProduct}" title="Remove">
+                                                    X
+                                                </lightning:button>
+                                            </div>
+                                            <div aura:id="divPrd2">
+                                                <force:inputField aura:id="CEA_Product" value="{!v.taskinfo.CEA_Product__c}" />
+                                            </div> 
+         -->
+                            <!--/lightning:layoutItem>
+                        </aura:renderIf-->
+                    </lightning:layout> 
+                </aura:renderIf>
+                <aura:renderIf isTrue="{!v.BrandSectionInfoMap[0]}">
+                    <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder ">
+                        <span class="section-header-title slds-p-horizontal--small slds-truncate">Brand</span>
+                    </h3> 
+                    <lightning:layout multipleRows="true">                                        
+                        <aura:renderIf isTrue="{!(v.BrandInInfo!=null)}" >
+                            <lightning:layoutItem padding="around-small" size="{!$Browser.isDesktop? '6':'12'}">
+                                <aura:if isTrue="{!v.BrandInInfo.FieldRequired}">
+                                    <span class="slds-required" >*</span>
+                                </aura:if>
+                                <p class="styleLabel">{!v.BrandInInfo.FieldLabel}</p>
+                                <!--
+                                                 <force:inputField value="{!v.taskinfo.CTS_Brand_IN__c}" aura:id="Brand_IN"  />
+                                             -->
+                                
+                                <div aura:id="divtag1" class="slds-input slds-combobox__input slds-combobox__input-value slds-hide">                           
+                                    {!v.taskinfo.CTS_Brand_IN__r.Name}                          
+                                    <lightning:button class="slds-float_right" variant="base" onclick="{!c.toggleDisplay}" title="Remove">
+                                        X
+                                    </lightning:button>
+                                </div>
+                                <div aura:id="divtag2">
+                                    
+                                    <force:inputField aura:id="Brand_IN" value="{!v.taskinfo.CTS_Brand_IN__c}"></force:inputField>
+                                </div> 
+                            </lightning:layoutItem >
+                        </aura:renderIf>  
+                        <aura:renderIf isTrue="{!(v.BrandOutInfo!=null)}" >
+                            <lightning:layoutItem padding="around-small" size="{!$Browser.isDesktop? '6':'12'}">
+                                <aura:if isTrue="{!v.BrandOutInfo.FieldRequired}">
+                                    <span class="slds-required" >*</span>
+                                </aura:if>
+                                <p class="styleLabel">{!v.BrandOutInfo.FieldLabel}</p>
+                                <!--
+                       <force:inputField value="{!v.taskinfo.CTS_Brand_OUT__c}" aura:id="Brand_OUT"  />
+                                              -->
+                                
+                                <div aura:id="divtag1OUT" class="slds-input slds-combobox__input slds-combobox__input-value slds-hide">                           
+                                    {!v.taskinfo.CTS_Brand_OUT__r.Name}                          
+                                    <lightning:button class="slds-float_right" variant="base" onclick="{!c.toggleDisplayOUT}" title="Remove">
+                                        X
+                                    </lightning:button>
+                                </div>
+                                <div aura:id="divtag2OUT">
+                                    <force:inputField aura:id="Brand_OUT" value="{!v.taskinfo.CTS_Brand_OUT__c}"></force:inputField>
+                                </div> 
+                            </lightning:layoutItem >
+                        </aura:renderIf>  
+                        <aura:iteration items="{!v.BrandSectionInfoMap[0].value}" var="s" >
+                            <aura:if isTrue="{!s.FieldName=='CTS_Brand_Display_Sub_type_IN__c'}">
+                                <lightning:inputField value="{!v.taskinfo.CTS_Brand_Display_IN__c}" style="display:none !important;" aura:id="Brand_Display_IN_Custom"  fieldName="CTS_Brand_Display_IN__c" />  
+                            </aura:if>  
+                            <aura:if isTrue="{!s.FieldName=='CTS_Brand_Display_Sub_type_OUT__c'}">
+                                <lightning:inputField value="{!v.taskinfo.CTS_Brand_Display_OUT__c}" style="display:none !important;" aura:id="Brand_Display_OUT_Custom"  fieldName="CTS_Brand_Display_OUT__c" />  
+                            </aura:if>  
+                            <aura:renderIf isTrue="{!and(s.FieldName!='CTS_Brand_IN__c',s.FieldName!='CTS_Brand_OUT__c')}" >
+                                <lightning:layoutItem padding="around-small" size="{!$Browser.isDesktop? '6':'12'}">
+                                    <aura:if isTrue="{!s.FieldName=='CTS_Brand_Dispense_IN__c'}">
+                                        <aura:if isTrue="{!s.FieldRequired}">
+                                            <span class="slds-required" >*</span>
+                                        </aura:if>
+                                        <lightning:select label="{!s.FieldLabel}" aura:id="customInputInfo" name="CTS_Brand_Dispense_IN__c" value="{!v.taskinfo.CTS_Brand_Dispense_IN__c}" >
+                                            <option value=""></option>
+                                            <aura:iteration items="{!v.allowableBrandDispenseIN}" var="sval">
+                                                <option value="{!sval}" selected="{!sval==v.defaultBrandDispenseIN}">{!sval}</option>
+                                            </aura:iteration>
+                                        </lightning:select>	                                                
+                                    </aura:if>                                           
+                                    <aura:if isTrue="{!s.FieldName=='CTS_Brand_Dispense_OUT__c'}">
+                                        <aura:if isTrue="{!s.FieldRequired}">
+                                            <span class="slds-required" >*</span>
+                                        </aura:if>
+                                        <lightning:select label="{!s.FieldLabel}" aura:id="customInputInfo" name="CTS_Brand_Dispense_OUT__c" value="{!v.taskinfo.CTS_Brand_Dispense_OUT__c}" >
+                                            <option value=""></option>
+                                            <aura:iteration items="{!v.allowableBrandDispenseOUT}" var="sval">
+                                                <option value="{!sval}" selected="{!sval==v.defaultBrandDispenseOUT}">{!sval}</option>
+                                            </aura:iteration>
+                                        </lightning:select>		   
+                                    </aura:if>
+                                    
+                                    <aura:if isTrue="{!s.FieldName=='CTS_Brand_Display_IN__c'}">
+                                        <aura:if isTrue="{!s.FieldRequired}">
+                                            <span class="slds-required" >*</span>
+                                        </aura:if>
+                                        <lightning:select onchange="{!c.setDisplayTypeIN}" label="{!s.FieldLabel}" aura:id="customInputInfo" name="CTS_Brand_Display_IN__c" value="{!v.taskinfo.CTS_Brand_Display_IN__c}">
+                                            <option value=""></option>
+                                            <aura:iteration items="{!v.allowableDisplayTypeIN}" var="sval">
+                                                <option value="{!sval}" selected="{!sval==v.defaultDisplayIN}">{!sval}</option>
+                                            </aura:iteration>
+                                        </lightning:select>		   
+                                    </aura:if>
+                                    
+                                    <aura:if isTrue="{!and(s.FieldName=='CTS_Brand_Display_Sub_type_IN__c',v.refreshFlag==true)}">
+                                        <aura:if isTrue="{!s.FieldRequired}">
+                                            <span class="slds-required" >*</span>
+                                        </aura:if>
+                                        <lightning:inputField value="{!v.taskinfo.CTS_Brand_Display_Sub_type_IN__c}" aura:id="inputInfoDisplaySubTypeIn" fieldName="CTS_Brand_Display_Sub_type_IN__c" />  
+                                    </aura:if>
+                                    
+                                    <aura:if isTrue="{!s.FieldName=='CTS_Brand_Display_OUT__c'}">
+                                        <aura:if isTrue="{!s.FieldRequired}">
+                                            <span class="slds-required" >*</span>
+                                        </aura:if>
+                                        <lightning:select label="{!s.FieldLabel}"  onchange="{!c.setDisplayTypeOUT}" aura:id="customInputInfo" name="CTS_Brand_Display_OUT__c" value="{!v.taskinfo.CTS_Brand_Display_OUT__c}">
+                                            <option value=""></option>
+                                            <aura:iteration items="{!v.allowableDisplayTypeOUT}" var="sval">
+                                                <option value="{!sval}" selected="{!sval==v.defaultDisplayOUT}">{!sval}</option>
+                                            </aura:iteration>
+                                        </lightning:select>		   
+                                    </aura:if>
+                                    
+                                    <aura:if isTrue="{!and(s.FieldName=='CTS_Brand_Display_Sub_type_OUT__c',v.refreshOutFlag==true)}">
+                                        <aura:if isTrue="{!s.FieldRequired}">
+                                            <span class="slds-required" >*</span>
+                                        </aura:if>
+                                        <lightning:inputField value="{!v.taskinfo.CTS_Brand_Display_Sub_type_OUT__c}" aura:id="inputInfoDisplaySubTypeOut" fieldName="CTS_Brand_Display_Sub_type_OUT__c" />  
+                                    </aura:if>
+                                    
+                                    <aura:if isTrue="{!s.FieldName=='CTS_Cooling_Type_IN__c'}">
+                                        <aura:if isTrue="{!s.FieldRequired}">
+                                            <span class="slds-required" >*</span>
+                                        </aura:if>
+                                        <lightning:select label="{!s.FieldLabel}" aura:id="customInputInfo" name="CTS_Cooling_Type_IN__c" value="{!v.taskinfo.CTS_Cooling_Type_IN__c}">
+                                            <option value=""></option>
+                                            <aura:iteration items="{!v.allowableCoolingIN}" var="sval">
+                                                <option value="{!sval}" selected="{!sval==v.defaultCoolingIN}">{!sval}</option>
+                                            </aura:iteration>
+                                        </lightning:select>		   
+                                    </aura:if>
+                                    
+                                    <aura:if isTrue="{!s.FieldName=='CTS_Cooling_Type_OUT__c'}">
+                                        <aura:if isTrue="{!s.FieldRequired}">
+                                            <span class="slds-required" >*</span>
+                                        </aura:if>
+                                        <lightning:select label="{!s.FieldLabel}" aura:id="customInputInfo" name="CTS_Cooling_Type_OUT__c" value="{!v.taskinfo.CTS_Cooling_Type_OUT__c}">
+                                            <option value=""></option>
+                                            <aura:iteration items="{!v.allowableCoolingOUT}" var="sval">
+                                                <option value="{!sval}" selected="{!sval==v.defaultCoolingOUT}">{!sval}</option>
+                                            </aura:iteration>
+                                        </lightning:select>		   
+                                    </aura:if>    
+                                    
+                                    <aura:if isTrue="{!s.FieldName=='CTS_Handle_Type__c'}">
+                                        <aura:if isTrue="{!s.FieldRequired}">
+                                            <span class="slds-required" >*</span>
+                                        </aura:if>
+                                        <lightning:select label="{!s.FieldLabel}" aura:id="customInputInfo" name="CTS_Handle_Type__c" value="{!v.taskinfo.CTS_Handle_Type__c}">
+                                            <option value=""></option>
+                                            <aura:iteration items="{!v.allowableHandle}" var="sval">
+                                                <option value="{!sval}" selected="{!sval==v.defaultHandleType}">{!sval}</option>
+                                            </aura:iteration>
+                                        </lightning:select>		   
+                                    </aura:if>
+                                    
+                                    <aura:if isTrue="{!s.FieldName== 'CTS_Coupler_IN__c'}">
+                                        <aura:if isTrue="{!s.FieldRequired}">
+                                            <span class="slds-required" >*</span>
+                                        </aura:if>
+                                        <lightning:inputField value="{!v.couplerIN}" aura:id="inputInfo" fieldName="{!s.FieldName}" />  
+                                    </aura:if>
+                                    <aura:if isTrue="{!s.FieldName=='CTS_Coupler_OUT__c'}">
+                                        <aura:if isTrue="{!s.FieldRequired}">
+                                            <span class="slds-required" >*</span>
+                                        </aura:if>
+                                        <lightning:inputField value="{!v.couplerOUT}" aura:id="inputInfo" fieldName="{!s.FieldName}" />  
+                                    </aura:if>
+                                    <aura:if isTrue="{!s.FieldName== 'CTS_Gas_Type_IN__c'}">
+                                        <aura:if isTrue="{!s.FieldRequired}">
+                                            <span class="slds-required" >*</span>
+                                        </aura:if>
+                                        <lightning:inputField value="{!v.gasIN}" aura:id="inputInfo" fieldName="{!s.FieldName}" />  
+                                    </aura:if>
+                                    <aura:if isTrue="{!s.FieldName== 'CTS_Gas_Type_OUT__c'}">
+                                        <aura:if isTrue="{!s.FieldRequired}">
+                                            <span class="slds-required" >*</span>
+                                        </aura:if>
+                                        <lightning:inputField value="{!v.gasOUT}" aura:id="inputInfo" fieldName="{!s.FieldName}" />  
+                                    </aura:if>
+                                    <aura:if isTrue="{!!(s.FieldName=='CTS_Brand_IN__c' || s.FieldName=='CTS_Brand_OUT__c' || s.FieldName=='CTS_Brand_Dispense_IN__c' || s.FieldName=='CTS_Brand_Dispense_OUT__c' || s.FieldName=='CTS_Brand_Display_IN__c' || s.FieldName=='CTS_Brand_Display_OUT__c' || s.FieldName=='CTS_Cooling_Type_IN__c' || s.FieldName=='CTS_Cooling_Type_OUT__c' || s.FieldName=='CTS_Handle_Type__c'|| s.FieldName== 'CTS_Coupler_IN__c' || s.FieldName== 'CTS_Coupler_OUT__c' || s.FieldName== 'CTS_Gas_Type_IN__c' || s.FieldName== 'CTS_Gas_Type_OUT__c' || s.isIncompatibleInSF1 || s.FieldName== 'CTS_Brand_Display_Sub_type_IN__c' || s.FieldName== 'CTS_Brand_Display_Sub_type_OUT__c')}">
+                                        <aura:if isTrue="{!s.FieldRequired}">
+                                            <span class="slds-required" >*</span>
+                                        </aura:if>
+                                        <lightning:inputField aura:id="inputInfo" fieldName="{!s.FieldName}" />  
+                                    </aura:if>                                        
+                                    <aura:if isTrue="{!s.isIncompatibleInSF1}">
+                                        <lightning:outputField aura:id="inputInfo" fieldName="{!s.FieldName}" />  
+                                    </aura:if>
+                                </lightning:layoutItem>
+                            </aura:renderIf>
+                        </aura:iteration>
+                    </lightning:layout>                                                         
+                </aura:renderIf>
+                <aura:iteration items="{!v.PostBrandSectionInfoMap}" var="SectionInfo" indexVar="key">     
+                    <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder ">
+                        <span class="section-header-title slds-p-horizontal--small slds-truncate">{!SectionInfo.key}</span>
+                    </h3>
+                    
+                    <lightning:layout multipleRows="true">
+                        <aura:iteration items="{!SectionInfo.value}" var="s" >
+                            <lightning:layoutItem padding="around-small" size="{!$Browser.isDesktop? '6':'12'}">
+                                <aura:if isTrue="{!!s.isIncompatibleInSF1}">
+                                    <aura:if isTrue="{!s.FieldRequired}">
+                                        <span class="slds-required" >*</span>
+                                    </aura:if>
+                                    <aura:if isTrue="{!(s.FieldName=='CTS_Component_Sub_Type_IN__c')}">
+                                        <lightning:inputField aura:id="inputInfo" fieldName="{!s.FieldName}" onchange="{!c.CompSubTypeCheck}" />
+                                        <aura:set attribute="else">
+                                            <lightning:inputField aura:id="inputInfo" fieldName="{!s.FieldName}"/>
+                                        </aura:set>
+                                    </aura:if>  
+                                </aura:if>
+                                <aura:if isTrue="{!s.isIncompatibleInSF1}">
+                                    <lightning:outputField aura:id="inputInfo" fieldName="{!s.FieldName}" />  
+                                </aura:if>
+                            </lightning:layoutItem>
+                        </aura:iteration>                                  
+                    </lightning:layout>
+                    
+                </aura:iteration>
+            </div>
+            <div class="note-Msg" aura:id="NoteMsg">
+                {!v.NoteMsg}
+            </div>
+            <div class="error-Msg" aura:id="ErrorMsg">
+                {!v.ErrorMsg}
+            </div>
+            <footer class="slds-modal__footer">
+                <lightning:buttonGroup class="slds-float_right">
+                    <lightning:button label="{!$Label.c.CTS_Cancel}" onclick="{!c.handleCancel}" variant="neutral"/>
+                    <lightning:button aura:id="saveNewrslButton" class="{!and($Browser.isDesktop, !v.isAssetLines)? '':'hideContent'}" variant="neutral" label="{!$Label.c.CTS_Save_New}" title="{!$Label.c.CTS_Save_New}" onclick="{!c.onSaveNew}"/>
+                    <lightning:button aura:id="saverslButton" variant="brand" label="{!$Label.c.CTS_Save}" title="{!$Label.c.CTS_Save}" onclick="{!c.onSave}"/>
+                    <lightning:button aura:id="saveNewrslButtonTask" class="{!and($Browser.isDesktop, !v.isAssetLines)? 'slds-hide':'hideContent slds-hide'}" variant="neutral" label="{!$Label.c.CTS_Save_New}" title="{!$Label.c.CTS_Save_New}" onclick="{!c.onSaveNewParts}"/>
+                	<lightning:button aura:id="saverslButtonTask" class="slds-hide" variant="brand" label="Save Parts" title="{!$Label.c.CTS_Save}" onclick="{!c.onSaveParts}"/>
+                    <lightning:button aura:id="recommendPartsButtonTaskPage" class="{!or(v.hideRecommendation,v.isAssetLines)? 'slds-hide':''}" variant="brand" label="Recommend Parts" title="Recommend Parts" onclick="{!c.getPartsRecommendation}"/>
+                    
+                    <lightning:button aura:id="backTorecommendPartsPage" class="slds-hide" variant="neutral" label="" title="Parts" onclick="{!c.getbackToPartsPage}" iconName="utility:forward" />
+                </lightning:buttonGroup>             
+            </footer>
+        </div>
+        
+    </lightning:recordEditForm> 
+    <div aura:id="partsView" class="slds-hide">
+    	<div class="backdropClass slds-modal__container" style="{!$Browser.isDesktop? 'min-width: 40rem;':'min-width: 37rem;max-width: 37rem;'}">
+            
+            <header class="slds-modal__header">
+                <lightning:buttonIcon iconName="utility:close"
+                                      onclick="{! c.handleCancel }"
+                                      alternativeText="close"
+                                      variant="bare-inverse"
+                                      class="slds-modal__close" aura:id="close1"/> 
+                <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">Parts Recommended</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+            	<c:CTS_PartRecommendation_Screen aura:id="partsScreen"></c:CTS_PartRecommendation_Screen>
+             
+            </div>
+            <footer class="slds-modal__footer">
+            	<lightning:button aura:id="backToTaskPage" variant="neutral" label="" title="Back" onclick="{!c.getBackToTaskPage}" iconName="utility:back" iconPosition="left"/>
+                <lightning:button label="{!$Label.c.CTS_Cancel}" onclick="{!c.handleCancel}" variant="neutral"/>
+                <lightning:button aura:id="saveNewrslButtonParts" class="{!and($Browser.isDesktop, !v.isAssetLines)? '':'hideContent'}" variant="neutral" label="{!$Label.c.CTS_Save_New}" title="{!$Label.c.CTS_Save_New}" onclick="{!c.onSaveNewParts}"/>
+                <lightning:button aura:id="saverslButtonParts" variant="brand" label="{!$Label.c.CTS_Save}" title="{!$Label.c.CTS_Save}" onclick="{!c.onSaveParts}"/>
+        	</footer>
+        </div>
+    </div>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</aura:component>

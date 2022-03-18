@@ -1,0 +1,86 @@
+.THIS .quickLinks a {
+    padding: 0 10px;
+}
+
+.THIS .datePickerLeft {
+    top: -290px;
+    left: 5px;
+    position: absolute;
+    z-index: 100;
+}
+.THIS .datePickerLeftDatePosition {
+    top: -230px;
+    left: 5px;
+    position: absolute;
+    z-index: 100;
+}
+.THIS .datePickerLeftEngageDatePosition {
+    top: -150px;
+    left: 5px;
+    position: absolute;
+    z-index: 100;
+}
+.THIS .datePickerLeftAdjustment { 
+    top: -23px;
+    left: 5px;
+    position: absolute;
+    z-index: 100;
+}
+.THIS .datePickerRight {
+    top: -50px;
+    right: 320px;
+    position: absolute;
+    z-index: 800;
+}
+.THIS .datePickerRightMobile {
+    top: -50px;
+    right: 280px;
+    position: absolute;
+    z-index: 800;
+}
+.THIS .datePickerRightAdjustment { 
+    top: -250px;
+    right: 320px;
+    position: absolute;
+    z-index: 100;
+    overflow: visible;
+}
+.THIS .datePicker * {
+    z-index: 101;
+}
+
+.THIS .date-output .inputIcon svg {
+    padding-bottom: 3px !important;
+    
+   
+}
+
+.THIS .clearIcon {
+    float: right;
+    line-height: 1.875rem;
+}
+
+.THIS.outsideWrapper {
+    position: fixed;
+    z-index: 99;
+    width: 95%;
+    left: 0;
+    top: 0;
+    height: 100%;
+}
+
+.THIS > div {
+    display: flex;
+}
+
+.THIS > div .slds-input {
+    flex-grow: 1;
+   
+}
+.THIS .slds-form-element{
+    width: 100%;
+}
+.THIS .slds-input-has-icon .slds-input__icon{
+    margin: -15px;
+    margin-right: -6px;
+}

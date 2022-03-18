@@ -1,0 +1,68 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="CTS_LookupCustomController">
+    <!--declare attributes--> 
+    <aura:attribute name="selectedRecord" type="sObject" default="{}" description="Use,for store SELECTED sObject Record"/>
+    <aura:attribute name="listOfSearchRecords" type="List" description="Use,for store the list of search records which returns from apex class"/>
+    <aura:attribute name="SearchKeyWord" type="string"/>
+    <aura:attribute name="objectAPIName" type="string" default=""/>
+    <aura:attribute name="FieldAPIName" type="string" default=""/>
+    <aura:attribute name="IconName" type="string" default=""/>
+    <aura:attribute name="isRequired" type="boolean" default="false"/>
+    <aura:attribute name="label" type="string" default=""/>
+    <aura:attribute name="Message" type="String" default=""/>
+    <aura:attribute name="assistiveField" type="string" />
+    <aura:attribute name="assistiveField2" type="string" />
+    <aura:attribute name="childObjectRecord" type="object"/>
+    <!--
+	Attributes Explanation:
+		objectAPIName - Object on which this Lookup is done
+		FieldAPIName - Actualy Field that is mapped to this Lookup
+		isRequired - To make the custom lookup to be required by default is false
+		assistiveField - On search along with Name of the record if required to pull some field of interest
+		childObjectRecord - Mostly used for Lookup filter setup, all the fields that are involed in lookup filter can be passed in as object.
+	-->
+    <!--declare events hendlers-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="selectedRecordEvent" event="c:CTS_LookupRecordSelectEvent" action="{!c.handleComponentEvent}"/> 
+    
+    
+    <div aura:id="searchRes" class="slds-form-element slds-lookup slds-is-close" data-select="single">
+        <label aura:id="lookup-pill-Label" class="slds-form-element__label slds-hide" for="lookup-348">{!v.label}</label>
+        <!--This part is for display search bar for lookup-->  
+        <div class="slds-form-element__control">
+            
+            <div class="slds-input-has-icon slds-input-has-icon--right">
+                <!-- This markup is for when an record is selected -->
+                <div aura:id="lookup-pill" class="slds-pill-container slds-hide">
+                    
+                     <lightning:pill class="pillSize" label="{!v.selectedRecord.Name}" name="{!v.selectedRecord.Name}" onremove="{! c.clear }">
+                          <aura:set attribute="media">
+                             <lightning:icon iconName="{!v.IconName}" size="x-small" alternativeText="{!v.IconName}"/>
+                          </aura:set>
+                      </lightning:pill>
+                </div>
+                <div aura:id="lookupField" onkeyup="{! c.keyPressController }" class="slds-show" onmousedown="{!c.onblur}">
+                   
+                    
+                        <lightning:input
+                            aura:id="enter-search"
+                            name="enter-search"
+                            label="{!v.label}"
+                            type="search"
+                            
+                            value="{!v.SearchKeyWord}"
+                            placeholder="{!'search '+v.label+'..'}"
+                            required = "{!v.isRequired}"
+                        />
+                </div>   
+            </div>
+        </div>
+        <!--This part is for Display typehead lookup result List-->  
+        <ul style="min-height:40px;margin-top:0px !important;position: fixed;width: 90%;overflow: auto;max-height: 200px;" class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-lookup__menu slds" role="listbox">
+            <lightning:spinner class="slds-hide" variant="brand" size="small" aura:id="mySpinner"/>
+            <center> {!v.Message}</center>
+            <aura:iteration items="{!v.listOfSearchRecords}" var="singleRec">
+                <c:CTS_LookupSearchResult record="{!singleRec}" IconName="{!v.IconName}" assistiveField="{!v.assistiveField}" assistiveField2 ="{!v.assistiveField2}"/> 
+            </aura:iteration>
+        </ul>
+    </div>
+</aura:component>

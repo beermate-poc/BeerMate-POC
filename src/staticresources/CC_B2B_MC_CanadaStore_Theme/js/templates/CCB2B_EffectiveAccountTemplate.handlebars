@@ -1,0 +1,15 @@
+<div class="panel panel-default cc_panel cc_effective_accounts {{#ifPageDisplay 'ccrz__CheckoutNew'}}checkoutHeader {{/ifPageDisplay}}">
+    <div id="switcherDropdown" class="panel-body cc_body">
+        <div class="effAccount dropdown">
+            <button class="btn btn-secondary dropdown-toggle" {{#ifPageDisplay 'ccrz__CheckoutNew'}} disabled="disabled" {{else}}{{#ifPageDisplay 'ccrz__OrderConfirmation'}} disabled="disabled"{{/ifPageDisplay}}{{/ifPageDisplay}} type="button" id="effAccountSwitcher" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span>{{#if this.workingEffAccount }} {{{workingEffAccount.name}}} {{else}} {{pageLabelMap 'SELECT_ACCOUNT' }}
+                {{/if}}</span><span class="icon-arrow-down"></span>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="effAccountSwitcher">
+                {{#each this.effectiveList}}
+                    <a data-id="{{sfid}}" class="pickAccount dropdown-item" href="#">{{{name}}}</a>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+</div>

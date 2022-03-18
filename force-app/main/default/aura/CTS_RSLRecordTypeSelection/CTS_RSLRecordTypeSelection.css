@@ -1,0 +1,19 @@
+.THIS.spinnerHolder{
+    position: relative;
+    display: inline-block;
+    margin-left: 15px;
+    width: 55px;
+    vertical-align: middle;
+    white-space: nowrap;
+    
+}
+.THIS .slds-spinner_container {
+    position: inherit;
+}
+.THIS .error-Msg{
+    color:red !important;
+    font-size:14px !important;
+    text-align:center !important;
+    background: antiquewhite !important;
+    overflow: auto;
+}

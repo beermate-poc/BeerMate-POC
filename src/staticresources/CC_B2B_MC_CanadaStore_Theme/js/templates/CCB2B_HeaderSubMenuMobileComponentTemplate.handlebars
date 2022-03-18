@@ -1,0 +1,42 @@
+{{#each children}}
+    {{#if children}}
+        <li class="menu-item dropdown dropdown-submenu dropdown-submenu-mobile">
+            {{#ifEquals mType 'Category'}}
+                {{categoryDropdownLink this 'category' true text=displayName}}
+            {{/ifEquals}}
+            {{#ifEquals mType 'Product'}}
+                <a id="{{generateId 'ccb2b-menu-m-' displayName}}" class="product dropdown-toggle" data-toggle="dropdown" href="#" data-id="{{linkURL}}" data-menuid="{{menuId}}" {{linkTarget openInNewWindow}}>{{displayName}} <span class="hidden-xs icon-arrow-right"></span><span class="visible-xs icon-plus-dark"></span><span class="visible-xs icon-minus-dark"></span></a>
+            {{/ifEquals}}
+            {{#ifEquals mType 'URL'}}
+                <a id="{{generateId 'ccb2b-menu-m-' displayName}}" class="menuTypeURL dropdown-toggle" data-toggle="dropdown" href="#" data-href="{{linkURL}}" data-menuid="{{menuId}}" {{linkTarget openInNewWindow}}>{{displayName}} <span class="hidden-xs icon-arrow-right"></span><span class="visible-xs icon-plus-dark"></span><span class="visible-xs icon-minus-dark"></span></a>
+            {{/ifEquals}}
+            {{#ifEquals mType 'None'}}
+                <a id="{{generateId 'ccb2b-menu-m-' displayName}}" class="dropdown-toggle" data-toggle="dropdown" href="#" data-menuid="{{menuId}}">{{displayName}} <span class="hidden-xs icon-arrow-right"></span><span class="visible-xs icon-plus-dark"></span><span class="visible-xs icon-minus-dark"></span></a>
+            {{/ifEquals}}
+            <ul class="dropdown-menu">
+                {{> subMenuItemMobile}}
+            </ul>
+        </li>
+    {{else}}
+        {{#ifEquals mType 'Category'}}
+            <li id="{{generateId 'ccb2b-menu-m-' displayName}}">{{categoryLink this 'cc_category' text=displayName}}</li>
+        {{/ifEquals}}
+        {{#ifEquals mType 'Product'}}
+            <li id="{{generateId 'ccb2b-menu-m-' displayName}}">{{productLink this 'cc_product' text=displayName}}</li>
+        {{/ifEquals}}
+        {{#ifEquals mType 'URL'}}
+            {{#if (checkContactDisplayPermissions 'order_history')}}
+                <li><a id="{{generateId 'ccb2b-menu-m-' displayName}}" class="menuTypeURL" href="#" data-href="{{linkURL}}" data-menuid="{{menuId}}" {{linkTarget openInNewWindow}}>{{displayName}}</a></li>
+            {{else}}
+                {{#ifNotEquals displayName 'REORDER'}}
+                    {{#ifNotEquals displayName 'COMMANDER DE NOUVEAU'}}
+                    <li><a id="{{generateId 'ccb2b-menu-m-' displayName}}" class="menuTypeURL" href="#" data-href="{{linkURL}}" data-menuid="{{menuId}}" {{linkTarget openInNewWindow}}>{{displayName}}</a></li>
+                    {{/ifNotEquals}}
+                {{/ifNotEquals}}
+            {{/if}}
+        {{/ifEquals}}
+        {{#ifEquals mType 'None'}}
+            <li><a id="{{generateId 'ccb2b-menu-m-' displayName}}" href="#" data-menuid="{{menuId}}">{{displayName}}</a></li>
+        {{/ifEquals}}
+    {{/if}}
+{{/each}}

@@ -1,0 +1,48 @@
+
+<div class="modal fade cc_modal cc_edit_wishlist" id="renameMod_{{sfid}}" tabindex="-1" role="dialog" aria-labelledby="Edit Wishlist">
+    <div class="modal-dialog modal-sm cc_modal_dialog" role="document">
+        <div class="modal-content cc_modal_content">
+            <div class="modal-header cc_modal_header">
+                <button type="button" class="close cc_close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&#215;</span></button>
+                {{#if name}}
+                <h4 id="ccb2b-ma-fav-modal-name-field" class="modal-title cc_modal_title" id="myModalLabel">{{name}}</h4>
+                {{else}}
+                <h4 id="ccb2b-ma-fav-modal-name-field" class="modal-title cc_modal_title" id="myModalLabel">{{pageLabelMap 'Action_CreateWishlist'}}</h4>
+                {{/if}}
+            </div>
+            <div class="modal-body cc_modal_body">
+                <form id="renameForm" class="form-horizontal cc_form-horizontal cc_rename_form">
+                    <div class="form-group cc_wishlist_name">
+                        <label for="inputWishlistName" class="col-sm-2 control-label sr-only">{{pageLabelMap 'MyAccount_WishlistName'}}</label>
+                        <div class="col-sm-12">
+                            <input id="inputWishlistName" type="text" placeholder="{{pageLabelMap 'MyAccount_Name'}}" value="{{name}}" name="name" class="rename_{{sfid}} form-control cc_rename_input" maxlength="255"/>
+                        </div>
+                    </div>
+                    <div class="form-group cc_wishlist_desc">
+                        <label for="inputWishlistDesc" class="col-sm-2 control-label sr-only">{{pageLabelMap 'MyAccount_WishlistDescription'}}</label>
+                        <div class="col-sm-12">
+                            <input id="inputWishlistDesc" type="text" placeholder="{{pageLabelMap 'Field_Notes'}}" value="{{note}}" name="note" class="rename_{{sfid}} form-control cc_rename_notes_input"/>
+                        </div>
+                    </div>
+                    <div class="form-group cc_wishlist_default">
+                        <div class="col-sm-12">
+                            <div class="checkbox">
+                                <input id="wishlist_active" type="checkbox" value="true" {{#if isActive }} checked {{/if}} name="isActive" class="rename_{{sfid}}" />
+                                <label for="wishlist_active" class="cc_wishlist_active">{{pageLabelMap 'Heading_Active'}}</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer cc_modal_footer">
+                <div class="form-group cc_save_changes">
+                        {{#if isRO}}
+                        &#160;
+                        {{else}}
+                        <input id="ccb2b-ma-fav-modal-save-button" type="button" class="btn primary_button btn-default btn-sm save cc_save" data-id="{{sfid}}" value="{{pageLabelMap 'Save'}}"/>
+                        {{/if}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

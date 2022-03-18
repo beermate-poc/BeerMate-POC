@@ -1,0 +1,67 @@
+<!--
+Author:       Ankita Shanbhag
+Company:      Accenture
+Description:  Component to load the Account Contacts, MillerCoors Contacts and Distributor Sales Rep
+-->
+<aura:component controller="GuidedSellingController" >
+    <aura:attribute name="contactdata" type="Object"/>
+    <aura:attribute name="contactcolumns" type="List"/>
+    <aura:attribute name="distContactsownerData" type="Object"/>
+    <aura:attribute name="distContactsownercolumn" type="List"/>
+    <aura:attribute name="mcContactdata" type="Object"/>
+    <aura:attribute name="mcContactcolumn" type="List"/>
+    <aura:attribute name="refershContacts" type="boolean" />
+    <aura:attribute name="createContactquick" type="boolean" />
+    <aura:attribute name="showCreateContact" type="boolean" />
+    <aura:attribute name="showEditContact" type="boolean" />
+    <aura:attribute name="contactToEdit" type="Contact" />
+    <aura:attribute name="contactToGS" type="Contact"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="toastTitle" type="String" />
+    <aura:attribute name="showToast" type="boolean" default="false"/>
+    <aura:attribute name="toastMsg" type="String" />
+    <aura:attribute name="toastType" type="String" />
+    <aura:attribute name="tableStyle" type="boolean" default="false"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:handler name="change" value="{!v.refershContacts}" action="{!c.refreshContactTab}" />
+    <aura:handler name="change" value="{!v.contactToEdit}" action="{!c.getContactToEdit}" />
+   	<aura:attribute name="contactTab" type="boolean" default="true"/>
+    <aura:attribute name="distAccountId" type="List"/>
+    <aura:attribute name="callFectchacctOwner" type="boolean" default="false"/>
+    <aura:handler name="change" value="{!v.callFectchacctOwner}" action="{!c.callAccountOwner}" />
+    <div class="slds-text-align__center">
+        <aura:if isTrue="{!v.showToast}">
+            <c:Toast toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}"/>
+        </aura:if>
+    </div>
+    <ui:scrollerWrapper class="scrollerSize">
+    <lightning:accordion aura:id="acctContact" activeSectionName="{!$Label.c.BMC_GSAccountContacts}">
+        <lightning:accordionSection name="{!$Label.c.BMC_GSAccountContacts}" label="{!$Label.c.BMC_GSAccountContacts}" >
+            <aura:set attribute="body">
+                <div style="height:150px;" class="slds-scrollable_y">
+                <c:BMC_GSContactTable data="{!v.contactdata}" columns="{!v.contactcolumns}" refershContacts="{!v.refershContacts}" showCreateContact="{!v.showCreateContact}" contactToEdit="{!v.contactToEdit}" tableStyle="{!v.tableStyle}"/>
+                    </div>
+                </aura:set>
+        </lightning:accordionSection>
+    </lightning:accordion>
+    <lightning:accordion aura:id="distContact" activeSectionName="{!$Label.c.BMC_GSDistributorSalesReps}">
+         <lightning:accordionSection name="{!$Label.c.BMC_GSDistributorSalesReps}" label="{!$Label.c.BMC_GSDistributorSalesReps}" >
+             <aura:set attribute="body">
+               <div style="height:150px;" class="slds-scrollable_y">
+                 <c:BMC_GSContactTable distributiondata="{!v.distContactsownerData}" distributioncolumns="{!v.distContactsownercolumn}" tableStyle="{!v.tableStyle}"/>
+                 </div>
+                 </aura:set>
+        </lightning:accordionSection>
+
+    </lightning:accordion>
+    <lightning:accordion aura:id="millerContact" activeSectionName="{!$Label.c.BMC_GSMillercoorsContacts}" >
+        <lightning:accordionSection name="{!$Label.c.BMC_GSMillercoorsContacts}" label="{!$Label.c.BMC_GSMillercoorsContacts}">
+            <aura:set attribute="body">
+                <div style="height:150px;" class="slds-scrollable_y">
+                <c:BMC_GSContactTable mcContactdata="{!v.mcContactdata}" mcContactcolumns="{!v.mcContactcolumn}" tableStyle="{!v.tableStyle}"/>
+                </div>
+                </aura:set>
+        </lightning:accordionSection>
+    </lightning:accordion>
+        </ui:scrollerWrapper>
+</aura:component>

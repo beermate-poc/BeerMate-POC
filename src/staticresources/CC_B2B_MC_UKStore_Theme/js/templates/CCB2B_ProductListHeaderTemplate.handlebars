@@ -1,0 +1,194 @@
+
+<div class="cc_product_list_header col-md-12">
+    <div class="messagingSection-Error" style="display: none"></div>
+    <div class="messagingSection-Warning" style="display: none"></div>
+    <div class="messagingSection-Info" style="display: none"></div>
+    {{#unless this.noResults}}
+    <div class="panel panel-default cc_panel">
+        <div class="panel-body cc_body">
+            {{#if this.isCategory}}
+            <div class="cc_category_details">
+                <div class="cc_category_row row">
+                    {{#if this.category.categoryMediasS}}
+                    <div class="col-md-3 cc_category_media">
+                        <img src="{{displayEProductMedia this.category.categoryMediasS.[0]}}" class="img-responsive img-thumbnail cc_category_img pull-left" />
+                    </div>
+                    {{/if}}
+                    <div class="{{#if this.category.categoryMediasS}}col-md-9{{else}}col-md-12{{/if}}">
+                        <h4 id="ccb2b-plp-categoryname-field" class="cc_category_name">{{this.category.sfdcName}}
+                            {{#ifGreater this.renderedCount 0}}
+                            {{#ifGreater this.prodCount 0}}
+                            <p id="ccb2b-plp-resulttagline-field" class="cc_product_results_tagline">
+                                {{pageLabelMap 'ProductList_ResultsTagline' this.renderedCount this.prodCount}}
+                            </p>
+                            {{/ifGreater}}
+                            {{/ifGreater}}
+                        </h4>
+                        <p class="cc_category_desc">
+                            {{unescape this.category.shortDesc}}
+                        </p>
+                        <div class="cc_subcategories row">
+                            {{#each this.subcategories}}
+                            {{#if this.categoryMediasS}}
+                            <div class="cc_subcategory_media col-md-2">
+                                {{categoryLink this 'cc_subcategory_img' image=(displayImage this 'img-responsive center-block img-thumbnail pull-left' src=(displayEProductMedia this.categoryMediasS.[0]) alt=this.sfdcName)}}
+                            </div>
+                            {{/if}}
+                            <div class="{{#if this.categoryMediasS}}col-md-10{{else}}col-md-12{{/if}} cc_subcategory_details">
+                                {{categoryLink this 'cc_subcategory_link' text=this.sfdcName}}
+                                <p class="cc_subcategory_desc">
+                                    {{unescape this.shortDesc}}
+                                </p>
+                            </div>
+                            <div class="clearfix"></div>
+                            {{/each}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{else}}
+            <h4 class="cc_search_title">{{pageLabelMap 'ProductList_SearchResults'}} {{#ifGreater prodCount 0}}<small class="cc_product_results_tagline pull-right">{{pageLabelMap 'ProductList_ResultsTaglineSearch' this.renderedCount this.prodCount this.searchString}}</small>{{/ifGreater}}</h4>
+            <hr />
+            <span class="cc_search_message">{{pageLabelMap 'ProductList_SearchResultsBody' this.searchString}} </span>
+            {{/if}}
+        </div>
+    </div>
+    <div class="panel panel-default cc_panel cc_controls_panel">
+        <div class="panel-body cc_body">
+            <div class="row">
+                <!-- cc_page_controls -->
+                <div class="cc_page_controls col-xs-offset-6 col-xs-6 col-md-12 pull-right text-right">
+                    <ul class="layout list-inline cc_controls_list" >
+                        <li class="col-xs-12 col-md-3 pull-right form-group result-size ">
+                            <select id="ccb2b-plp-productsize-button" class="form-control cc_page_size_control " >
+                                {{#each itemsPerOptions}}
+                                <option id="{{generateId 'ccb2b-plp-productsize-' this '-select'}}" value="{{safeQuote this}}" {{#ifEquals ../pageSize this}} selected {{/ifEquals}}>{{pageLabelMap 'ProductList_PageSize' this}}</option>
+                                {{/each}}
+                            </select>
+                            <span class="caret"></span>
+                        </li>
+                        {{#ifGreater this.layoutOptions.length 1}}
+                        <li class="hidden-xs cc_layout_control cc_layout_option_grid">
+                            <button id="ccb2b-plp-gridlayout-button" data-id="grid" class="btn btn-default btn-sm cc_layout_option {{#ifEquals layout 'grid'}}active disabled{{/ifEquals}}"><span class="fa fa-th fa-lg" aria-hidden="true"></span></button>
+                        </li>
+                        <li class="hidden-xs cc_layout_control cc_layout_option_list">
+                            <button  id="ccb2b-plp-listlayout-button" data-id="list" class="btn btn-default btn-sm cc_layout_option {{#ifEquals layout 'list'}}active disabled{{/ifEquals}}"><span class="fa fa-th-list fa-lg" aria-hidden="true"></span></button>
+                        </li>
+                        {{/ifGreater}}
+                    </ul>
+                </div>
+                <div class="cc_sort_controls col-xs-12 col-md-12 pull-right">
+                    <div class="cc_product_sort pull-right">
+                        <div class="btn-group cc_sort_options"  >
+                            {{#if prodCategoryIds}}
+                            {{#ifDisplay 'PL.SeqSort'}}
+                            <div class="btn-group cc_sort_item">
+                                <button type="button" class="btn btn-default btn-sm cc_sort_option cc_sort_sequence {{#ifEquals sortBy 'categorySequence'}} active {{/ifEquals}}" data-id="categorySequence" data-order="asc">{{pageLabelMap 'ProductList_SortSequence'}}</button>
+                            </div>
+                            {{/ifDisplay}}
+                            {{else}}
+                            {{#ifDisplay 'PL.RelSort'}}
+                            <div class="btn-group cc_sort_item">
+                                <button type="button"  class="btn btn-default btn-sm cc_sort_option cc_sort_relevance {{#ifEquals sortBy 'searchRank'}} active {{/ifEquals}}" data-id="searchRank" data-order="desc">{{pageLabelMap 'ProductList_SortRelevance'}}</button>
+                            </div>
+                            {{/ifDisplay}}
+                            {{/if}}
+                            {{#ifDisplay 'PL.NameSort'}}
+                            <div class="btn-group dropdown cc_sort_name_container">
+                                <button id="ccb2b-plp-sortname-button" class="btn btn-default btn-sm dropdown-toggle cc_sort_name_toggle {{#ifEquals sortBy 'sfdcName'}} active {{/ifEquals}}" type="button" id="cc_sort_name_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    {{pageLabelMap 'ProductList_SortName'}}
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="cc_sort_name_dropdown">
+                                    <li class="cc_sort_name_item {{#ifEquals sortBy 'sfdcName'}} {{#ifEquals sortOrder 'asc'}}active{{/ifEquals}}{{/ifEquals}}">
+                                        <button id="ccb2b-plp-sortname-asc-select" class="btn btn-default cc_sort_option cc_sort_name_asc" data-id="sfdcName" data-order="asc">{{pageLabelMap 'ProductList_SortNameAsc'}}</button>
+                                    </li>
+                                    <li class="cc_sort_name_item {{#ifEquals sortBy 'sfdcName'}} {{#ifEquals sortOrder 'desc'}}active{{/ifEquals}}{{/ifEquals}}">
+                                        <button id="ccb2b-plp-sortname-dsc-select" class="btn btn-default cc_sort_option cc_sort_name_desc" data-id="sfdcName" data-order="desc" >{{pageLabelMap 'ProductList_SortNameDesc'}}</button>
+                                    </li>
+                                </ul>
+                            </div>
+                            {{/ifDisplay}}
+                            {{#ifDisplay 'PL.NewestSort'}}
+                            <div class="btn-group cc_sort_item">
+                                <button type="button" class="btn btn-default btn-sm cc_sort_option cc_sort_newest {{#ifEquals sortBy 'startDate'}} active {{/ifEquals}}"  data-id="startDate" data-order="desc">{{pageLabelMap 'ProductList_SortNewest'}}</button>
+                            </div>
+                            {{/ifDisplay}}
+                            {{#ifDisplay 'PL.PriceSort'}}
+                            <div class="btn-group dropdown cc_sort_price_container">
+                                <button id="ccb2b-plp-sortprice-button" class="btn btn-default btn-sm dropdown-toggle cc_sort_price_toggle {{#ifEquals sortBy 'price'}} active {{/ifEquals}}" type="button" id="cc_sort_price_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    {{pageLabelMap 'ProductList_SortPrice'}}
+                                </button>
+                                <ul class="dropdown-menu pull-right" aria-labelledby="cc_sort_price_dropdown">
+                                    <li class="cc_sort_price_item {{#ifEquals sortBy 'price'}} {{#ifEquals sortOrder 'asc'}}active{{/ifEquals}}{{/ifEquals}}">
+                                        <button id="ccb2b-plp-sortprice-asc-select" class="btn btn-default cc_sort_option cc_sort_price_asc" data-id="price" data-order="asc" >{{pageLabelMap 'ProductList_SortPriceAsc'}}</button>
+                                    </li>
+                                    <li class="cc_sort_price_item {{#ifEquals sortBy 'price'}} {{#ifEquals sortOrder 'desc'}}active{{/ifEquals}}{{/ifEquals}}">
+                                        <button id="ccb2b-plp-sortprice-dsc-select" class="btn btn-default cc_sort_option cc_sort_price_desc" data-id="price" data-order="desc" >{{pageLabelMap 'ProductList_SortPriceDesc'}}</button>
+                                    </li>
+                                </ul>
+                            </div>
+                            {{/ifDisplay}}
+                        </div>
+                    </div>
+                </div>
+                <!-- end  page and sort controls -->
+                {{#if this.prodFilters}}
+                    <!-- cc_filter_breadcrumbs -->
+                    <div class="col-md-12 cc_filter_breadcrumbs">
+                        <div class="panel panel-default cc_panel cc_filter_breadcrumb_panel">
+                            <div class="panel-body cc_body">
+                                <div class="row cc_row">
+
+                                    <div class="col-md-4 cc_remove_filters_control">
+                                        <button class="btn btn-default cc_remove_filters">{{pageLabelMap 'ProductList_ClearFilters'}}</button>
+                                        <span class=" pull-left plp-active-filters" >
+                                            {{pageLabelMap 'ProductList_ActiveFilters'}}
+                                        </span>
+                                    </div>
+                                    <div class="col-md-8 cc_filter_breadcrumb_container">
+                                        <ul class="cc_filter_breadcrumb_list list-inline">
+                                            {{#each this.prodFilters}}
+                                                {{#ifEquals this.filterType 'Slider'}}
+                                                    <li class="cc_filter_breadcrumb label label-default">
+                                                        {{this.name}}: {{this.filterMin}} - {{this.filterMax}}&#160;&#160;
+                                                        <a href="javascript:void(0);" class="remove cc_remove_filter" data-specId="{{this.sfid}}">
+                                                            <i class="fa fa-times fa-inverse fa-pull-right" aria-hidden="true"></i>
+                                                        </a>
+                                                    </li>&#160;
+                                                {{/ifEquals}}
+                                                {{#ifEquals this.filterType 'Checkbox'}}
+                                                    {{#each this.specValues}}
+                                                        <li class="cc_filter_breadcrumb label label-default">
+                                                            {{../name}}: {{value}}&#160;&#160;
+                                                            <a href="javascript:void(0);" class="remove cc_remove_filter" data-specId="{{../sfid}}" data-specValue="{{value}}">
+                                                                <i class="fa fa-times fa-inverse fa-pull-right" aria-hidden="true"></i>
+                                                            </a>
+                                                        </li>&#160;
+                                                    {{/each}}
+                                                {{/ifEquals}}
+                                            {{/each}}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {{/if}}
+                {{#unless this.noResults}}
+                <div class="col-xs-12 col-sm-6">
+                    <div class="cc_wishlist">
+                        <div class="wishFinder addToWishlist" data-sku="{{this.SKU}}">
+                            <div id="{{generateId 'ccb2b-plp-grid-addfav-' 'PLP-Add-All' '-btn'}}" class="wishButtonsAll"></div>
+                        </div>
+                    </div>
+                </div>
+                {{/unless}}
+            </div>
+        </div>
+    </div>
+    {{/unless}}
+</div>
+
+{{#if this.noResults}}
+{{>noResultsDisplay}}
+{{/if}}

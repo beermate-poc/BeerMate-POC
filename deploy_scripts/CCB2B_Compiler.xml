@@ -1,0 +1,231 @@
+<project name="Closure Compiler" default="zipAndCompressECommerce" basedir=".">
+ 
+    <!--
+    CCB2B_compiler.xml is used to minify all JavaScript files for given storefront and compress them into zip resource
+    for SalesForce static resource.
+ 
+    Requirements:
+    - Installed Apache Ant (1.10.* or newer) and added to environment variables as %ANT_HOME%
+    - Add antcontrib.jar file to %ANT_HOME%/lib directory from jars folder or to your IDE Ant lib
+    - Add Google Closure Compiler jar as closure-compiler.jar %ANT_HOME%/lib directory from jars folder or to your IDE Ant lib
+    - Installed Node.js (8.11.3 or newer)
+    - Installed NPM (5.6.0 or newer)
+    - Globally installed handlebars to NPM (Run: npm install -g handlebars@4.1.2)
+    -->
+    
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+     <classpath>
+      <pathelement location="./ant-contrib.jar"/>
+     </classpath>
+    </taskdef>
+    <taskdef name="jscomp" classname="com.google.javascript.jscomp.ant.CompileTask" classpath="./closure-compiler.jar"/>
+
+    <!-- PROPERTIES -->
+    <property name="staticResourcesPath" value="..\src\staticresources"/>
+    <property name="Handlebars.namespace" value="CCRZ.templates"/>
+    <property name="Handlebars.temp.tempStorefront.js" value="js\temp-storefront.js"/>
+    <property name="Handlebars.temp.templates.js" value="js\templates.js"/>
+    <property name="Handlebars.temp.templates" value=""/>
+    <property name="Handlebars.temp.models" value=""/>
+    <property name="Handlebars.temp.views" value=""/>
+ 
+    <!-- TARGETS -->
+    <target name="zipAndCompressECommerce">
+        <compressAllJavaScripts resource="CC_B2B_MC_CanadaStore_Theme"/>
+        <compressAllJavaScripts resource="CC_B2B_MC_DefaultStore_Theme"/>
+        <compressAllJavaScripts resource="CC_B2B_MC_UKStore_Theme"/>
+        <zipResources resource="CC_B2B_MC_CanadaStore_Theme"/>
+        <zipResources resource="CC_B2B_MC_DefaultStore_Theme"/>
+        <zipResources resource="CC_B2B_MC_UKStore_Theme"/>
+    </target>
+ 
+ 
+    <!-- MACRODEF -->
+ 
+    <!--
+    Macrodef used to zip salesforce static resource.
+ 
+    Attributes:
+    - resource: Name of the resource file
+    - path*: Path to static resources folder (Default: "${user.dir}\src\staticresources").
+ 
+    -->
+    <macrodef name="zipResources">
+        <attribute name="resource"/>
+        <attribute name="path" default="${staticResourcesPath}"/>
+ 
+        <sequential>
+            <local name="staticPath"/>
+            <delete file="@{path}\@{resource}.resource"/>
+            <zip zipfile="@{path}\@{resource}.resource" basedir="@{path}\@{resource}"/>
+        </sequential>
+    </macrodef>
+ 
+    <!--
+    Macrodef used to change value of the property. If value isn't provided the given property will be set to "".
+ 
+    Attributes:
+    - property: Name of the property to change
+    - value*: New value of the property (Default: "").
+ 
+    -->
+    <macrodef name="changeProperty">
+        <attribute name="property"/>
+        <attribute name="value" default=""/>
+ 
+        <sequential>
+            <var name="@{property}" value="@{value}"/>
+        </sequential>
+    </macrodef>
+ 
+    <!--
+    Macrodef used to add new element to list in form of string. If list is empty it will add new element without
+    connector, otherwise it will append list with a new element and provided connector.
+ 
+    Attributes:
+    - list: Name of the list property
+    - element: Value that will be added to string-list.
+    - connector*: A space or given element between the list and new value. (Default: " ").
+ 
+    -->
+    <macrodef name="appendToList">
+        <attribute name="list"/>
+        <attribute name="element"/>
+        <attribute name="connector" default=" "/>
+ 
+        <sequential>
+            <if>
+                <equals arg1="${@{list}}" arg2=""/>
+                <then>
+                    <var name="@{list}" value="@{element}"/>
+                </then>
+                <else>
+                    <var name="@{list}" value="${@{list}}@{connector}@{element}"/>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+ 
+    <!--
+    Macrodef used to compress handlebars templates into minified file.
+ 
+    Attributes:
+    - resource: Path for static resource.
+    - templates: Path for templates
+    Requirements:
+    - Installed Node.js
+    - Installed NPM
+    - Globally installed handlebars to NPM.
+ 
+    -->
+    <macrodef name="compressHandlebarsTemplates">
+        <attribute name="resource"/>
+        <attribute name="templates"/>
+
+        <sequential>
+            <exec failonerror="true" executable="cmd">
+                <arg value="/c"/>
+                <arg value="handlebars"/>
+                <arg value="@{templates}"/>
+                <arg value="-f"/>
+                <arg value="@{resource}\${Handlebars.temp.templates.js}"/>
+                <arg value="-n"/>
+                <arg value="&quot;${Handlebars.namespace}&quot;"/>
+            </exec>
+        </sequential>
+    </macrodef>
+ 
+    <!--
+    Macrodef used to merge all files into one temporary file that will be further used for compression.
+ 
+    Attributes:
+    - resource: Path for static resource.
+ 
+    -->
+    <macrodef name="concatAllJavascriptFiles">
+        <attribute name="resource"/>
+ 
+        <sequential>
+            <concat destfile="@{resource}\${Handlebars.temp.tempStorefront.js}">
+                <filelist dir="@{resource}\js">
+                    <file name="helpers.js"/>
+                    <file name="custom.js"/>
+                </filelist>
+                <filelist files="@{resource}\${Handlebars.temp.templates.js}"/>
+                <filelist files="${Handlebars.temp.models}"/>
+                <filelist files="${Handlebars.temp.views}"/>
+            </concat>
+        </sequential>
+    </macrodef>
+ 
+    <!--
+    Macrodef used to set temporary handlebars properties with proper files with given file extension and connector.
+ 
+    Attributes:
+    - resource: Path for static resource.
+    - temp: Temporary handlebar property (example: handlebars.temp.models)
+    - fileExt: File extension
+    - connector*: A space or given element between the list and new value. (Default: " ").
+ 
+    -->
+    <macrodef name="setHandlebarsTemp">
+        <attribute name="resource"/>
+        <attribute name="temp"/>
+        <attribute name="fileExt"/>
+        <attribute name="connector" default=" "/>
+ 
+        <sequential>
+            <changeProperty property="Handlebars.temp.@{temp}"/>
+ 
+            <for param="filePath">
+                <path>
+                    <fileset dir="@{resource}\js\@{temp}" includes="*.@{fileExt}"/>
+                </path>
+                <sequential>
+                    <local name="fileName"/>
+                    <basename property="fileName" file="@{filePath}"/>
+                    <appendToList list="Handlebars.temp.@{temp}" element="@{filePath}" connector="@{connector}"/>
+                </sequential>
+            </for>
+        </sequential>
+    </macrodef>
+ 
+    <!--
+    Macrodef used to compress js files for given static resource folder.
+    If static resource folder doesn't exist the macrodef will fail.
+ 
+    Attributes:
+    - resource: Name of the resource file
+    - path*: Path to static resources folder (Default: "${user.dir}\src\staticresources").
+ 
+    -->
+    <macrodef name="compressAllJavaScripts">
+        <attribute name="resource"/>
+        <attribute name="path" default="${staticResourcesPath}"/>
+
+        <sequential>
+            <local name="staticResource"/>
+            <property name="staticResource" value="@{path}\@{resource}"/>
+            <fail message="${staticResource} doesn't exist.">
+                <condition>
+                    <not><available file="${staticResource}" type="dir"/></not>
+                </condition>
+            </fail>
+
+            <setHandlebarsTemp resource="${staticResource}" temp="templates" fileExt="handlebars"/>
+            <setHandlebarsTemp resource="${staticResource}" temp="models" fileExt="js" connector=","/>
+            <setHandlebarsTemp resource="${staticResource}" temp="views" fileExt="js" connector=","/>
+            <compressHandlebarsTemplates resource="${staticResource}" templates="${staticResource}\js\templates"/>
+            <concatAllJavascriptFiles resource="${staticResource}"/>
+
+            <jscomp compilationlevel="whitespace" debug="true" output="${staticResource}\js\storefront.min.js">
+                <sources dir="${staticResource}">
+                    <file name="${Handlebars.temp.tempStorefront.js}"/>
+                </sources>
+            </jscomp>
+
+            <delete file="${staticResource}\${Handlebars.temp.templates.js}"/>
+            <delete file="${staticResource}\${Handlebars.temp.tempStorefront.js}"/>
+        </sequential>
+    </macrodef>
+</project>

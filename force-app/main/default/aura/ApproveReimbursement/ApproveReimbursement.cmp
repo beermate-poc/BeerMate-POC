@@ -1,0 +1,63 @@
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId" controller="ACEReimbursementApproval" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="ErrorMessage" type="string[]"/>
+    <aura:attribute type="boolean" name="ErrorCount"/>
+    <aura:attribute name="HeaderMessage" type="String"/>
+    <aura:attribute type="Boolean" name="ShowClose" default="true"/>
+    <aura:attribute type="Boolean" name="Success" default="true"/>
+    <aura:attribute type="PartnerFundClaim" name="reimbursementRecord" />
+    <aura:attribute name="showErrorToast" type="boolean" default="false"/>
+    <aura:attribute name="toastTitle" type="String" />
+    <aura:attribute name="toastMsg" type="String" />
+    <aura:attribute name="toastType" type="String" />
+    <aura:attribute name="errormsg" type="boolean" default="false"/>
+      <aura:attribute name="ErrorMsgs" type="string[]"/>
+	 <aura:html tag="style">
+        .cuf-content {
+        padding: 0 0rem !important;
+        }
+        .slds-p-around--medium {
+        padding: 0rem !important;
+        }       
+        .slds-modal__content{
+        height:unset !important;
+        max-height:unset !important;
+        }
+    </aura:html>
+    <div style="background-color:Red">
+    <aura:if isTrue="{!v.showErrorToast}">
+            
+            <c:Toast toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}"/>
+        </aura:if>
+    </div>
+<div class="modal-header slds-modal__header slds-size_1-of-1">
+        <h4 class="title slds-text-heading--medium" >{!v.HeaderMessage}</h4>
+    </div>
+<div class="modal-body scrollable slds-modal__content slds-p-around--medium" >
+        <div class="detail slds-text-align--center" style="padding:12px">
+            <aura:if isTrue="{!v.ErrorCount}">  
+                <aura:iteration items="{!v.ErrorMessage}" var="obj">
+                    <p style="color:red"> {!obj}</p><br/>
+                </aura:iteration>
+                <ui:button class="slds-button slds-button_neutral" label="Close" press="{!c.Close}"/>
+				<aura:set attribute="else">
+					Are you sure you want to approve this reimbursement?
+				</aura:set>  
+            </aura:if>
+        </div>
+    </div>  
+
+<div class="modal-footer slds-modal__footer slds-size_1-of-1">
+        <div class="forceChangeRecordTypeFooter">
+            <aura:if isTrue="{!v.ShowClose}">  
+                <ui:button class="slds-button slds-button_neutral" label="Approve" press="{!c.Approve}"/>
+			    <ui:button class="slds-button slds-button_neutral" label="Close" press="{!c.Close}"/>
+                            
+			</aura:if>
+	        <aura:set attribute= "else">
+                <ui:button class="slds-button slds-button_neutral" label="Cancel" press="{!c.Cancel}" />           
+			</aura:set>
+			 
+        </div>
+    </div> 
+</aura:component>

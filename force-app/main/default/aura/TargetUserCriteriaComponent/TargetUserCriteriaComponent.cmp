@@ -1,0 +1,327 @@
+<!--
+Author:			Nick Serafin
+Company:		Slalom, LLC
+Description:	Handles the creation of Target User Criteria for survey assignments
+Attributes:		numOfUsers – number of users that match filters
+				saveExistingCriteria – Boolean to check what tab the user is on
+				filterValidation – Boolean to to set whether to validate inputs
+				targetName - String to hold name of target user criteria 
+				validationMessage - String to hold validation message
+				filterDescription - String to hold description of target user criteria
+				searchKey - String to hold user search value for existing target criteria list
+				targetCriteriaList - List to hold existing target user criteria record
+				top10List - List to hold top 10 of target criteria records with most active survey assignments
+				saveDisabled - Boolean to disable save button
+				getExistingFlag - Boolean to determine what tab is currently focused on
+				viewMoreDisabled - Boolean to determine whether or not to enable the view more button
+				showDeleteConfirmation - Boolean to determine whether or not to show the delete confirmation modal
+				showEditModal - Boolean to determine whether or not to show the edit modal
+				saveEditCriteria - Boolean to disable save button on the edit modal
+				targetCriteriaId - Holds Id of currently selected target criteria record
+				andORConditionValue - Selected value for AND/OR condition picklist
+				andORConditionValues - Values for the AND/OR condition picklist
+				pageNumber - Number of page for sets of records to display
+				pageSize - Number of records to show each time the view more button is clicked
+Event Handlers: init – sets up initial list of existing target user criteria records
+History
+<Date>      <Authors Name>     <Brief Description of Change>
+8/8/2017    Nick Serafin        Updated to show number of users matching the criteria filters
+12/27/2017  Nick Serafin        Updated Existing Criteria tab to show records in groups and show the count of 
+                                active survey assignments for each record. Added Edit and Delete functionality
+-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" controller="TargetCriteriaController">
+	<aura:attribute name="numOfUsers" type="Integer" default="0"/>
+	<aura:attribute name="saveExistingCriteria" type="Boolean" default="true"/>
+	<aura:attribute name="filterValidation" type="Boolean" default="true" />
+	<aura:attribute name="targetName" type="String" />
+	<aura:attribute name="validationMessage" type="String" />
+	<aura:attribute name="filterDescription" type="String" />
+	<aura:attribute name="userReportLink" type="String" />
+	<aura:attribute name="searchKey" type="String" default=""/>
+	<aura:attribute name="targetCriteriaList" type="List" />
+	<aura:attribute name="top10List" type="List" />
+	<aura:attribute name="saveDisabled" type="Boolean" default="true" />
+	<aura:attribute name="getExistingFlag" type="Boolean" default="false" />
+	<aura:attribute name="viewMoreDisabled" type="Boolean" default="false" />
+	<aura:attribute name="showDeleteConfirmation" type="Boolean" default="false" />
+	<aura:attribute name="showEditModal" type="Boolean" default="false" />
+	<aura:attribute name="saveEditCriteria" type="Boolean" default="false" />
+	<aura:attribute name="targetCriteriaId" type="String" default="" />
+	<aura:attribute name="andORConditionValue" type="String" default="" />
+	<aura:attribute name="andORConditionValues" type="String[]" default="" />
+	<aura:attribute name="readOnly" type="Boolean" default="false" />
+	<!-- pagination attributes -->
+	<aura:attribute name="pageNumber" type="Integer" default="1"/>
+	<aura:attribute name="pageSize" type="Integer" default="10"/>
+	<aura:handler name="init" action="{!c.init}" value="{!this}" />
+	<aura:handler event="c:SearchValueChange" action="{!c.validateFilter}" />
+
+	<lightning:spinner aura:id="spinner" class="slds-show" alternativeText="Please wait..." />
+
+	<div aura:id="userCriteriaModal">
+		<div class="slds-container">
+			<div>
+				<div class="slds-tabs--scoped">
+					<ul class="slds-tabs--scoped__nav" role="tablist">
+						<li onclick="{!c.existingCriteriaClick}" aura:id="existingTab" class="slds-tabs--scoped__item slds-active" title="{!$Label.c.TargetUserCri_Create_New}" role="presentation"><a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-scoped-1" id="tab-scoped-1__item">{!$Label.c.Add_From_Existing_Tab}</a></li>
+						<li onclick="{!c.newCriteriaClick}" aura:id="newTab" class="slds-tabs--scoped__item" title="{!$Label.c.TargetUserCri_Search_Existing}" role="presentation"><a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-2" id="tab-scoped-2__item">{!$Label.c.Create_New_Tab}</a></li>
+					</ul>
+					<div aura:id="existingContent" class="slds-tabs--scoped__content slds-show" role="tabpanel" aria-labelledby="tab-scoped-1__item">
+						<div class="slds-grid slds-p-around--medium">
+							<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2 slds-p-bottom--medium" onkeyup="{!c.checkButtonPress}">
+								<div class="slds-size--8-of-12 slds-float--left">
+									<lightning:input label="{!$Label.c.Filter}" name="searchBar" value="{!v.searchKey}" placeholder="{!$Label.c.Enter_Search_Value}"/>
+								</div>
+								<div class="slds-size--4-of-12 slds-float--left buttonPadding">
+									<lightning:button class="slds-button" variant="brand" label="Search" onclick="{!c.searchKeyChange}" /> 
+								</div>
+							</div>
+						</div>
+						<div id="normalExistingList" class="slds-p-around--medium" aura:id="existingTableScroll">
+							<div class="slds-table--header-fixed_container">
+								<ui:scrollerWrapper class="scrollerSizeExisting">
+									<table class="slds-table slds-table_bordered slds-table--header-fixed">
+										<thead>
+											<tr class="slds-text-title--caps">
+													<th scope="col" class="slds-cell-shrink">
+														<div class="slds-truncate slds-cell-fixed" style="padding-left:10px;" title="{!$Label.c.Action}">{!$Label.c.Action}</div>
+													</th>
+													<th scope="col" class="slds-cell-shrink">
+														<div class="slds-truncate slds-cell-fixed" title="{!$Label.c.Target_Name_Label}">{!$Label.c.Target_Name_Label}</div>
+													</th>
+													<th scope="col" class="slds-cell-shrink">
+														<div class="slds-truncate slds-cell-fixed" title="{!$Label.c.User_Filters}">{!$Label.c.User_Filters}</div>
+													</th>
+													<th scope="col" class="slds-cell-shrink">
+														<div class="slds-truncate slds-cell-fixed" title="{!$Label.c.Number_of_Users}">{!$Label.c.Number_of_Users}</div>
+													</th>
+													<th scope="col" class="slds-cell-shrink">
+														<div class="slds-truncate slds-cell-fixed slds-cell-wrap" title="{!$Label.c.Target_Criteria_Active_Survey_Assignments}">{!$Label.c.Target_Criteria_Active_Survey_Assignments}</div>
+													</th>
+												</tr>
+											</thead>
+											<tbody>
+												<aura:iteration items="{!v.targetCriteriaList}" var="tar">
+													<tr scope="row">
+														<td data-label="ACTION" class="slds-truncate">
+															<span data-record="{!tar.tarCriteriaObj.Id}" onclick="{!c.openEditModal}">
+																<lightning:button class="slds-truncate" variant="base" label="{!$Label.c.Target_Criteria_Edit}"/>
+															</span> |
+															<span data-record="{!tar.tarCriteriaObj.Id}" onclick="{!c.openDeleteConfirmation}">
+																<lightning:button class="slds-truncate" variant="base" label="{!$Label.c.Target_Criteria_Delete}" />
+															</span>
+														</td>
+														<td data-label="TARGET NAME" class="slds-truncate">
+															<span data-record="{!tar.tarCriteriaObj.Id}" onclick="{!c.openReadOnlyModal}">
+																<a>{!tar.tarCriteriaObj.Name}</a>
+															</span>
+														</td>
+														<td data-label="USER FILTER" class="slds-truncate slds-cell-wrap">{!tar.tarCriteriaObj.Filter_Description__c}</td>
+														<td data-label="NUMBER OF USERS" class="slds-truncate"><ui:outputNumber value="{!tar.recordCount}" /></td>
+														<td data-label="NUMBER OF ACTIVE ASSIGNMENTS" class="slds-truncate"><ui:outputNumber value="{!tar.activeSurveyAssignmentsCount}" /></td>
+													</tr>
+												</aura:iteration>
+											</tbody>
+											<tfoot>
+												<td colspan="2"></td>
+												<td>
+													<aura:if isTrue="{!v.targetCriteriaList.length > 0}">
+														<lightning:button disabled="{!v.viewMoreDisabled}" class="slds-button" variant="brand" label="View More" onclick="{!c.getNextPage}" />
+													</aura:if>
+												</td>
+												<td colspan="2"></td>
+											</tfoot>
+										</table>
+								</ui:scrollerWrapper>
+							</div>
+						</div>
+					</div>
+					<div aura:id="newContent" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-2__item">
+						<ui:scrollerWrapper class="scrollerSizeAdd">
+							<ui:message aura:id="validationMessage" severity="error" closable="false" class="slds-hide slds-text-align--center">
+								{!v.validationMessage}
+							</ui:message>
+							<div class="slds-grid slds-wrap slds-p-around--medium">
+								<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2 slds-p-bottom--medium">
+									<lightning:input label="{!$Label.c.Target_Name_Label}" name="targetName" value="{!v.targetName}" placeholder="{!$Label.c.Enter_Name}" onchange="{!c.enableSaveButton}"/>
+								</div>
+								<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2 slds-text-align--right slds-p-bottom--medium">
+									<label class="slds-form-element__label">{!$Label.c.Number_of_Users_Label}&nbsp;<ui:outputNumber value="{!v.numOfUsers}" /></label>
+								</div>
+								<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2">
+									<lightning:input label="{!$Label.c.Filter_Description_Label}" name="filterDescription" value="{!v.filterDescription}" placeholder="{!$Label.c.Enter_Description}"/>
+								</div>
+								<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2">
+									<lightning:select name="andORPicklist" label="Condition (AND/OR)" aura:id="andORPicklist" value="{!v.andORConditionValue}" onchange="{!c.validateFilter}">
+										<option value="">--Select--</option>
+										<aura:iteration items="{!v.andORConditionValues}" var="andOR">
+											<option value="{!andOR}" text="{!andOR}" selected="{!andOR == v.andORConditionValue}"></option>
+										</aura:iteration>
+									</lightning:select>
+								</div>
+							</div>
+							<div class="slds-form--compound slds-p-around--medium">
+								<div class="slds-form-element__group">
+									<label class="slds-form-element__label">{!$Label.c.User_Filters_Heading}</label><br />
+									<label class="slds-form-element__label">{!$Label.c.Target_User_Criteria_Filter_Help_Text}</label>
+									<div class="slds-form-element__row">
+										<div class="slds-form-element slds-size--1-of-2">
+											<c:MultiSelectPills aura:id="profile" field="Profile.Name" object="User" label="{!$Label.c.Target_User_Profile}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Profile_Placeholder}"/>
+										</div>
+										<div class="slds-form-element slds-size--1-of-2">
+											<c:MultiSelectPills aura:id="department" field="Department" object="User" label="{!$Label.c.Target_User_Department}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Department_Placeholder}"/>
+										</div>
+									</div>
+									<div class="slds-form-element__row">
+										<div class="slds-form-element slds-size--1-of-2">
+											<c:MultiSelectPills aura:id="role" field="UserRole.Name" object="User" label="{!$Label.c.Target_User_Role}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Role_Placeholder}"/>
+										</div>
+										<div class="slds-form-element slds-size--1-of-2">
+											<c:MultiSelectPills aura:id="city" field="City" object="User" label="{!$Label.c.Target_User_City}" filterField="IsActive" placeholder="{!$Label.c.Target_User_City_Placeholder}"/>
+										</div>
+									</div>
+									<div class="slds-form-element__row">
+										<div class="slds-form-element slds-size--1-of-2">
+											<c:MultiSelectPills aura:id="title" field="Title" object="User" label="{!$Label.c.Target_User_Title}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Title_Placeholder}"/>
+										</div>
+										<div class="slds-form-element slds-size--1-of-2">
+											<c:MultiSelectPills aura:id="state" field="State" object="User" label="{!$Label.c.Target_User_State}" filterField="IsActive" placeholder="{!$Label.c.Target_User_State_Placeholder}"/>
+										</div>
+									</div>
+									<div class="slds-form-element__row">
+										<div class="slds-form-element slds-size--1-of-2">
+											<c:MultiSelectPills aura:id="mgrUsername" field="ManagerUsername__c" object="User" label="{!$Label.c.Target_User_Mgr_Username}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Manager_Placeholder}"/>
+										</div>
+										<div class="slds-form-element slds-size--1-of-2">
+											<c:MultiSelectPills aura:id="country" field="Country" object="User" label="{!$Label.c.Target_User_Country}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Country_Placeholder}"/>
+										</div>
+									</div>
+									<div class="slds-form-element__row">
+										<div class="slds-form-element slds-size--1-of-2">
+											<c:MultiSelectPills aura:id="division" field="Division" object="User" label="{!$Label.c.Target_Criteria_Division}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Division_Placeholder}"/>
+										</div>
+									</div>
+								</div>
+							</div>
+						</ui:scrollerWrapper>
+					</div>
+				</div>
+			</div>
+			<aura:if isTrue="{!v.saveExistingCriteria == false}">
+				<div class="slds-modal__footer">
+					<lightning:button disabled="{!v.saveDisabled}" class="slds-button" variant="brand" label="{!$Label.c.Save}" onclick="{!c.saveUserCriteria}" />
+				</div>
+			</aura:if>
+			<aura:if isTrue="{!v.showDeleteConfirmation}">
+				<div class="demo-only">
+				  <section role="alertdialog" tabindex="-1" aria-labelledby="prompt-heading-id" aria-describedby="prompt-message-wrapper" class="slds-modal slds-fade-in-open slds-modal_prompt" aria-modal="true">
+					<div class="slds-modal__container">
+					  <header class="slds-modal__header slds-theme_error slds-theme_alert-texture">
+						<h2 class="slds-text-heading_medium" id="prompt-heading-id">{!$Label.c.Target_Criteria_Delete_Confirmation_Header}</h2>
+					  </header>
+					  <div class="slds-modal__content slds-p-around_medium slds-text-align--center">
+						<p>{!$Label.c.Target_Criteria_Delete_Confirmation}</p>
+					  </div>
+					  <footer class="slds-modal__footer slds-theme_default">
+						<button class="slds-button slds-button_brand" onclick="{!c.deleteRecord}">Delete</button>
+						<button class="slds-button slds-button_neutral" onclick="{!c.closeDeleteConfirmation}">Cancel</button>
+					  </footer>
+					</div>
+				  </section>
+				  <div class="slds-backdrop slds-backdrop_open"></div>
+				</div>
+			</aura:if>
+			<aura:if isTrue="{!v.showEditModal}">
+				<div aura:id="targetCriteriaEditModal" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-modal--large slds-fade-in-open">
+					<div class="slds-modal__container">
+						<div class="slds-text-align--right buttonIcon" onclick="{!c.closeEditModal}">
+							<lightning:icon iconName="utility:close" variant="inverse" />
+						</div>
+						<div class="slds-modal__header">
+							<h2 class="slds-text-heading--medium">{!$Label.c.Target_Criteria_Edit_Header}</h2>
+						</div>
+						<div class="slds-modal__content">
+							<ui:scrollerWrapper class="scrollerSizeAdd">
+								<ui:message aura:id="validationMessage" severity="error" closable="false" class="slds-hide slds-text-align--center">
+									{!v.validationMessage}
+								</ui:message>
+								<div class="slds-grid slds-wrap slds-p-around--medium">
+									<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2 slds-p-bottom--medium">
+										<lightning:input label="{!$Label.c.Target_Name_Label}" name="targetName" value="{!v.targetName}" placeholder="{!$Label.c.Enter_Name}" onchange="{!c.enableSaveButton}" disabled="{!v.readOnly}"/>
+									</div>
+									<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2 slds-text-align--right slds-p-bottom--medium">
+										<label class="slds-form-element__label">{!$Label.c.Number_of_Users_Label}&nbsp;<ui:outputNumber value="{!v.numOfUsers}" />
+										<aura:if isTrue="{!v.readOnly}">&nbsp;(<a href="{!v.userReportLink}" target="_blank">{!$Label.c.Target_User_View_Users_Link}</a>)</aura:if></label>
+									</div>
+									<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2">
+										<lightning:input label="{!$Label.c.Filter_Description_Label}" name="filterDescription" value="{!v.filterDescription}" placeholder="{!$Label.c.Enter_Description}" disabled="{!v.readOnly}"/>
+									</div>
+									<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2">
+										<lightning:select name="andORPicklist" label="Condition (AND/OR)" aura:id="andORPicklist" value="{!v.andORConditionValue}" onchange="{!c.validateFilter}" disabled="{!v.readOnly}">
+											<option value="">--Select--</option>
+											<aura:iteration items="{!v.andORConditionValues}" var="andOR">
+												<option value="{!andOR}" text="{!andOR}" selected="{!andOR == v.andORConditionValue}"></option>
+											</aura:iteration>
+										</lightning:select>
+									</div>
+								</div>
+								<div class="slds-form--compound slds-p-around--medium">
+									<div class="slds-form-element__group">
+										<label class="slds-form-element__label">{!$Label.c.User_Filters_Heading}</label><br />
+										<label class="slds-form-element__label">{!$Label.c.Target_User_Criteria_Filter_Help_Text}</label>
+										<div class="slds-form-element__row">
+											<div class="slds-form-element slds-size--1-of-2">
+												<c:MultiSelectPills aura:id="profileEdit" field="Profile.Name" object="User" label="{!$Label.c.Target_User_Profile}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Profile_Placeholder}" disabled="{!v.readOnly}"/>
+											</div>
+											<div class="slds-form-element slds-size--1-of-2">
+												<c:MultiSelectPills aura:id="departmentEdit" field="Department" object="User" label="{!$Label.c.Target_User_Department}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Department_Placeholder}" disabled="{!v.readOnly}"/>
+											</div>
+										</div>
+										<div class="slds-form-element__row">
+											<div class="slds-form-element slds-size--1-of-2">
+												<c:MultiSelectPills aura:id="roleEdit" field="UserRole.Name" object="User" label="{!$Label.c.Target_User_Role}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Role_Placeholder}" disabled="{!v.readOnly}"/>
+											</div>
+											<div class="slds-form-element slds-size--1-of-2">
+												<c:MultiSelectPills aura:id="cityEdit" field="City" object="User" label="{!$Label.c.Target_User_City}" filterField="IsActive" placeholder="{!$Label.c.Target_User_City_Placeholder}" disabled="{!v.readOnly}"/>
+											</div>
+										</div>
+										<div class="slds-form-element__row">
+											<div class="slds-form-element slds-size--1-of-2">
+												<c:MultiSelectPills aura:id="titleEdit" field="Title" object="User" label="{!$Label.c.Target_User_Title}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Title_Placeholder}" disabled="{!v.readOnly}"/>
+											</div>
+											<div class="slds-form-element slds-size--1-of-2">
+												<c:MultiSelectPills aura:id="stateEdit" field="State" object="User" label="{!$Label.c.Target_User_State}" filterField="IsActive" placeholder="{!$Label.c.Target_User_State_Placeholder}" disabled="{!v.readOnly}"/>
+											</div>
+										</div>
+										<div class="slds-form-element__row">
+											<div class="slds-form-element slds-size--1-of-2">
+												<c:MultiSelectPills aura:id="mgrUsernameEdit" field="ManagerUsername__c" object="User" label="{!$Label.c.Target_User_Mgr_Username}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Manager_Placeholder}" disabled="{!v.readOnly}"/>
+											</div>
+											<div class="slds-form-element slds-size--1-of-2">
+												<c:MultiSelectPills aura:id="countryEdit" field="Country" object="User" label="{!$Label.c.Target_User_Country}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Country_Placeholder}" disabled="{!v.readOnly}"/>
+											</div>
+										</div>
+										<div class="slds-form-element__row">
+											<div class="slds-form-element slds-size--1-of-2">
+												<c:MultiSelectPills aura:id="divisionEdit" field="Division" object="User" label="{!$Label.c.Target_Criteria_Division}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Division_Placeholder}" disabled="{!v.readOnly}"/>
+											</div>
+										</div>
+									</div>
+								</div>
+							</ui:scrollerWrapper>
+						</div>
+						<aura:if isTrue="{!v.readOnly == false}">
+							<div class="slds-modal__footer">
+								<div class="slds-text-align--center">
+									<lightning:button class="slds-button" variant="brand" label="{!$Label.c.Save}" onclick="{!c.saveUserCriteria}" />
+									<lightning:button class="slds-button" variant="neutral" label="{!$Label.c.Cancel_Label}" onclick="{!c.closeEditModal}" />
+								</div>
+							</div>
+						</aura:if>
+					</div>
+				</div>
+				<div aura:id="targetCriteriaEditModalBackdrop" class="slds-backdrop slds-backdrop--open"></div>
+			</aura:if>
+		</div>
+	</div>
+</aura:component>

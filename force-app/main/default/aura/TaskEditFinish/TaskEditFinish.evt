@@ -1,0 +1,1 @@
+<aura:event type="COMPONENT" description="Event created when TaskEditOverlay finishes updating the record" />

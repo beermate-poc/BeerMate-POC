@@ -1,0 +1,44 @@
+<aura:component controller="C360_fieldSalesController"  implements="flexipage:availableForRecordHome,force:hasRecordId,flexipage:availableForAllPageTypes,force:appHostable,force:lightningQuickActionWithoutHeader" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="fieldSales" type="String"/>
+    <aura:attribute name="errorMessage" type="String"/>
+    <aura:attribute name="isC360User" type="Boolean" Default="True"/>
+    <aura:attribute name="errorMessageCheck" type="Boolean" Default="False"/>
+    <aura:attribute name="IsSpinner" type="Boolean" Default="false"/>
+    
+    <div class="slds-col modal-header slds-modal__header">
+        <h2 class="title slds-text-heading--medium">Field Sales Notes</h2>
+    </div>
+    <aura:if isTrue="{!v.IsSpinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container" style="position:relative">
+            <lightning:spinner variant="brand"  size="large" />
+        </div>
+        <aura:set attribute="else">   
+            <aura:if isTrue="{!v.isC360User}">    
+                <aura:unescapedHtml value="{!$Label.c.C360_Field_Sales_Notes_Help_Text}" />
+                
+                <aura:if isTrue="{!v.errorMessageCheck}">
+                    <ui:message title="Error" severity="error" closable="true">
+                        <ui:outputText value="{!v.errorMessage}" />
+                    </ui:message>
+                </aura:if> 
+                
+                <lightning:textarea aura:id="fieldSalesNotes"  name="myTextArea" value="{!v.fieldSales}" 
+                                    label="Field Sales Notes" class="tallTextArea" maxlength="14000" />
+                <lightning:button variant="neutral" label="Cancel" onclick="{! c.cancelClick }" />
+                <lightning:button variant="brand" label="Save" onclick="{! c.saveClick }" />
+                
+                <aura:set attribute="else">
+                    &nbsp;
+                    <ui:message title="Error" severity="error" closable="false">
+                        <ui:outputText value="{!$Label.c.C360_Field_Sales_Notes_Non_C360_User_Error}" />       
+                    </ui:message>       
+                    
+                </aura:set>
+                
+            </aura:if>
+        </aura:set>
+    </aura:if> 
+    
+    
+</aura:component>

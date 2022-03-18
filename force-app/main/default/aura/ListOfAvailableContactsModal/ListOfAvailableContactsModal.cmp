@@ -1,0 +1,149 @@
+<aura:component controller="CallLogUtility" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global">
+
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<aura:attribute name="contact" type="Contact[]" />
+	<aura:attribute name="contacts" type="Contact[]" />
+	<aura:attribute name="nextMeetingContactId" type="Id" />
+	<aura:attribute name="createContact" type="boolean" default="false" />
+	<aura:attribute name="pickContact" type="boolean" default="true" />
+	<aura:attribute name="firstName" type="String"  />
+	<aura:attribute name="lastName" type="String"  />
+	<aura:attribute name="mobileCSS" type="String" default="slds-modal--form" />
+	<aura:attribute name="phoneNumber" type="String"  />
+	<aura:attribute name="selectedContact" type="String" />
+	<aura:attribute name="headerLabel" type="String" default="Select Contact"/>
+	<aura:attribute name="roles" type="String[]" default=" "/>
+	<aura:attribute name="newContact" type="Contact" default="{
+							 'sobjectType': 'Contact'
+							 }"/>
+	<aura:attribute name="contactOption" type="String" default=''/>  
+	<aura:attribute name="changedContact" type="boolean" default="false" />
+	<aura:attribute name="showObjView" type="boolean"/>
+	<aura:attribute name="showContact" type="boolean"/>
+	<aura:attribute name="showErrorToast" type="boolean" default="false"/>
+	<aura:attribute name="toastTitle" type="String" />
+	<aura:attribute name="toastMsg" type="String" />
+	<aura:attribute name="toastType" type="String" />
+
+	<lightning:spinner aura:id="spinner" alternativeText="Saving Data..." class="slds-hide"/>
+
+	<div class="slds-text-align__center">
+		<aura:if isTrue="{!v.showErrorToast}">
+			<c:Toast toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}"/>
+		</aura:if>
+	</div>
+
+	<aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+		<div aura:id="Modalbox">
+			<div class="modalStyle slds-p-around--medium">
+				<div class="mobileView">
+					<h2 class="slds-text-heading--medium slds-truncate" title="{!$Label.c.New_Contact}">{!v.headerLabel}</h2>
+					<aura:renderIf isTrue="{!v.pickContact}">
+						<lightning:button variant="brand" aura:id="createNewButton" class="slds-button desktopView createContactButton" onclick="{!c.createNewContact}">{!$Label.c.Create_New_Contact}</lightning:button>
+					</aura:renderIf>
+				</div>
+				<div class="slds-p-around--medium">
+						<aura:renderIf isTrue="{!v.pickContact}">
+							<lightning:select onchange="{!c.selectedContact}" aura:id="pickedContact" name="pickContact" label="{!$Label.c.Select_A_Contact}" >
+								<option aura:id = 'emptyOption' class = 'emptyOption' value="{!v.contactOption}" text="{!v.contactOption}"></option>
+								<aura:iteration indexVar="index" items="{!v.contacts}" var="contact">
+									<option  value="{!index}" text="{!contact.Name}"></option>
+								</aura:iteration>
+							</lightning:select>
+						</aura:renderIf>
+						<aura:renderIf isTrue="{!v.createContact}">
+							<div>
+								<div class="slds-form-element">
+									<div class="slds-form-element__control">
+										<lightning:input required="true" value="{!v.newContact.firstName}" aura:id="firstName" label="{!$Label.c.First_Name}" name="firstname" />
+									</div>
+								</div>
+								<div class="slds-form-element">
+									<div class="slds-form-element__control">
+										<lightning:input value="{!v.newContact.LastName}" required="true" aura:id="lastName"  label="{!$Label.c.Last_Name}" name="LastName"  />
+									</div>
+								</div>
+								<div class="slds-form-element">
+									<div class="slds-form-element__control">
+										<lightning:select aura:id="role" name="role" label="{!$Label.c.Role}">
+											<option value="">{!$Label.c.Default_Picklist_Select}</option>
+											<aura:iteration items="{!v.roles}" var="role">
+												<option value="{!role}" text="{!role}" selected="{!v.newContact.Role__c}"></option>
+											</aura:iteration>
+										</lightning:select>	
+									</div>
+								</div>
+								<div class="slds-form-element">
+									<div class="slds-form-element__control">
+										<lightning:input type="tel"  aura:id="phoneNumber"  required="false"  value="{!v.newContact.phone}" label="{!$Label.c.Phone_Number}" name="phoneNumber"  />
+									</div>
+								</div>
+							</div>
+						</aura:renderIf>
+				</div>
+				<div style="text-align: center;">
+					<lightning:button class="slds-button" variant="neutral" label="{!$Label.c.Cancel_Label}" onclick="{!c.cancelModal}" />
+					<lightning:button class="slds-button" variant="brand" label="{!$Label.c.Save}" onclick="{!c.saveContact}" />
+				</div>
+			</div>
+		</div>
+	<aura:set attribute="else">
+		<div>
+			<div role="dialog" tabindex="-1" aura:id="Modalbox" aria-labelledby="header43" class="slds-modal slds-fade-in-open" >
+				<div class="slds-modal__container modalStyle">
+					<div class="slds-modal__header desktopView  mobileView">
+						<h2 class="label slds-text-heading--medium slds-truncate" title="{!$Label.c.New_Contact}">{!v.headerLabel}</h2>
+						<aura:renderIf isTrue="{!v.pickContact}">
+							<lightning:button variant="brand" aura:id="createNewButton" class="slds-button desktopView createContactButton" onclick="{!c.createNewContact}">{!$Label.c.Create_New_Contact}</lightning:button>
+						</aura:renderIf>
+					</div>
+					<div class="slds-modal__content slds-p-around--medium">
+							<aura:renderIf isTrue="{!v.pickContact}">
+								<lightning:select onchange="{!c.selectedContact}" aura:id="pickedContact" name="pickContact" label="{!$Label.c.Select_A_Contact}" >
+									<option aura:id = 'emptyOption' class = 'emptyOption' value="{!v.contactOption}" text="{!v.contactOption}"></option>
+									<aura:iteration indexVar="index" items="{!v.contacts}" var="contact">
+										<option  value="{!index}" text="{!contact.Name}"></option>
+									</aura:iteration>
+								</lightning:select>
+							</aura:renderIf>
+							<aura:renderIf isTrue="{!v.createContact}">
+								<div>
+									<div class="slds-form-element">
+										<div class="slds-form-element__control">
+											<lightning:input required="true" value="{!v.newContact.firstName}" aura:id="firstName" label="{!$Label.c.First_Name}" name="firstname" />
+										</div>
+									</div>
+									<div class="slds-form-element">
+										<div class="slds-form-element__control">
+											<lightning:input value="{!v.newContact.LastName}" required="true" aura:id="lastName"  label="{!$Label.c.Last_Name}" name="LastName"  />
+										</div>
+									</div>
+									<div class="slds-form-element">
+										<div class="slds-form-element__control">
+											<lightning:select aura:id="role" name="role" label="{!$Label.c.Role}">
+												<option value="">{!$Label.c.Default_Picklist_Select}</option>
+												<aura:iteration items="{!v.roles}" var="role">
+													<option value="{!role}" text="{!role}" selected="{!v.newContact.Role__c}"></option>
+												</aura:iteration>
+											</lightning:select>	
+										</div>
+									</div>
+									<div class="slds-form-element">
+										<div class="slds-form-element__control">
+											<lightning:input type="tel"  aura:id="phoneNumber"  required="false"  value="{!v.newContact.phone}" label="{!$Label.c.Phone_Number}" name="phoneNumber"  />
+										</div>
+									</div>
+								</div>
+							</aura:renderIf>
+					</div>
+					<div class="slds-modal__footer">
+						<lightning:button class="slds-button" variant="neutral" label="{!$Label.c.Cancel_Label}" onclick="{!c.cancelModal}" />
+						<lightning:button class="slds-button" variant="brand" label="{!$Label.c.Save}" onclick="{!c.saveContact}" />
+					</div>
+				</div>
+			</div>
+			<div class="slds-backdrop slds-backdrop--open"></div>
+		</div>
+		</aura:set>
+	</aura:if>
+</aura:component>

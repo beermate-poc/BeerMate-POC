@@ -1,0 +1,22 @@
+<div class="btn-group dropdown form-group">
+    <button id="ccb2b-plp-addtofav-btn" type="button" class="btn btn-default btn-sm dropdown-toggle addAllToWishlistButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="addToWishLabel">{{pageLabelMap 'AddtoWishlistAll'}}</span>
+        <span class="caret"></span>
+        <span class="sr-only">{{pageLabelMap 'Wishlist_ToggleDropdown'}}</span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropWish">
+        {{#each this.models}}
+            <li><a id="{{generateId 'ccb2b-plp-fav-' attributes.sfid '-select'}}" href="javascript:void(0);" class="pickWish" data-id="{{attributes.sfid}}">{{{attributes.name}}}</a></li>
+        {{/each}}
+        <li role="separator" class="divider"></li>
+        <li>
+            <div class="row center-block">
+                <div class="col-xs-12">
+                    <label for="ccb2b-plp-newfavname-input" class="sr-only">{{pageLabelMap 'Wishlist_EnterName'}}</label>
+                    <input id="ccb2b-plp-newfavname-input" type="text" maxlength="255" class="newListName form-control" placeholder="{{pageLabelMap 'MyAccount_Name'}}"/>
+                </div>
+            </div>
+        </li>
+        <li><a id="ccb2b-plp-createnewfav-btn" href="javascript:void(0);" class="pickWish createNewWish" data-id="-1">{{pageLabelMap 'Action_CreateWishlist'}}</a></li>
+    </ul>
+</div>

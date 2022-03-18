@@ -1,0 +1,4 @@
+<design:component>
+    <design:attribute name="OppLineItemID" label="OppLineItemID" description="Enter OppLineItemID" />
+    <design:attribute name="ExecutionSupport" label="ExecutionSupport" description="Get ExecutionSupport" />
+</design:component>

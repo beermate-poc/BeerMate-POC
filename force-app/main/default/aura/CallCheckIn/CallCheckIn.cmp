@@ -1,0 +1,25 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,flexipage:availableForAllPageTypes,force:appHostable,force:lightningQuickAction" Controller='AccountCallCheckIn'>
+    <aura:attribute name="message" type="String" default=""/>
+    <aura:attribute name="messageType" type="String" default="info"/>
+    <aura:attribute name="statusCheck" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="showToast" type="Boolean" default="false"/>
+	<aura:attribute name="toastTitle" type="String" />
+	<aura:attribute name="toastMsg" type="String" />
+	<aura:attribute name="toastType" type="String" />
+    
+    <aura:if isTrue="{!!v.statusCheck}">
+     <div data-aura-rendered-by="565:0" class="forceDotsSpinner" data-aura-class="forceDotsSpinner">
+         <!--<lightning:spinner variant="brand" class="slds-hide" aura:id="spinner" size="Medium" />-->
+         <div class="slds-spinner_medium slds-spinner slds-spinner_brand " role="status" data-aura-rendered-by="566:0"><span class="slds-assistive-text" data-aura-rendered-by="567:0">Loading...</span><div class="slds-spinner__dot-a" data-aura-rendered-by="569:0"></div><div class="slds-spinner__dot-b" data-aura-rendered-by="570:0"></div></div>
+	</div>
+    </aura:if>  
+    
+   <div class="slds-text-align__center">
+   
+    <aura:if isTrue="{!v.showToast}">
+      
+      <c:C360_ToastforMobile toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}" recordId="{!v.recordId}"/>
+    </aura:if>
+   </div>
+</aura:component>

@@ -1,0 +1,218 @@
+<!--
+Author:         Jacqueline Passehl
+Company:        Slalom, LLC
+Description:    Contains the contents of the AddObjective component's "Target Users" tab. Allows users to create objectives
+				targeted to users. Displays a table of users underneath the current logged in user in the manager hierarchy and allows filtering for title and department.
+Attributes:     
+				currentUsers -  to determine which child component tab the user is currently looking at
+				allUsers -		a list of all the users underneath the current logged in user/manager
+				currentUsers -  a list of all the users underneath the logged in user/manager but with filtering applied
+				titleFilter -   a String array that holds all the Title filters as passed through by the
+							    onSearchChange event from MultiSelectPulls
+				departmentFilter - same as titleFilter, but for department.
+				objective      -the objective taked from CreateNewPersonalObjective
+				objectiveId	   -the objective's id
+				userIdList	   - the list of users's ids of who were selected- in order to create junction object 
+								Objective_User_Assignment__c
+				errorsFound    - returns true if errors were found
+
+Handlers:
+				init - call the apex class findUserinManagerHierarchy to get all the users below the logged in user/manager
+				c:SearchValueChange - to filter the list of logged in users each time a filter is applied or removed.
+
+				searchValueChange - will call filterUserList which goes through the list of users and filter them according to 
+									title and department filters
+				insertOrRemoveJunction  - will insert or remove Objective_User_Assignment__c junction object if the toggleApplyUsers toggle box is checked off and the user selects users to apply the objective to.
+				vireMoreDisabled - determine if "View More" button is disabled or enbabled based on how many users in currentuserList
+				viewMoreFiltering - to determine wether filtering the list is happening due to a a click of "View More"
+				or if it's just filtering from adding or removing a title/department fitler
+				pageNumber- current page of users being displayed
+				pageSize-   max amount of users being displayed at a time
+
+History
+<Date>      <Authors Name>     <Brief Description of Change>
+1/30/2018    Jacqueline       Initial Creation
+-->
+<aura:component controller="AddObjectiveController">
+
+	<aura:attribute name="editingObjective" type="Boolean" />
+	<aura:attribute name="isSharedObjective" type="Boolean" default="false"/>
+	<aura:attribute name="currentUsers" type="Object[]"/>
+	<aura:attribute name="allUsers" type="Object[]"/>
+	<aura:attribute name="titleFilter" type="String[]" default="[]"/>
+	<aura:attribute name="departmentFilter" type="String[]" default="[]"/>
+	<aura:attribute name="toggleApplyUsers" type="Boolean" default="true"/>
+	<aura:attribute name="objective" type="Objective__c"/>
+	<aura:attribute name="objectiveId" type="Integer"/>
+	<aura:attribute name="userIdList" type="Integer[]"/>
+	<aura:attribute name="errorsFound" type="Boolean" default="false"/>
+	<aura:attribute name="plannedObjType" type="String" />
+	<aura:attribute name="numOfUsers" type="Integer" default="0"/>
+	<aura:attribute name="userRole" type="String"/>
+	<aura:attribute name="delegateUserId" type="String"/>
+ 
+	<aura:attribute name="viewMoreDisabled" type="Boolean" default="true" />
+	<aura:attribute name="pageNumber" type="Integer" default="1"/>
+	<aura:attribute name="pageSize" type="Integer" default="100"/>
+	<aura:attribute name="viewMoreFiltering" type="Boolean" default="true"/>
+
+
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<aura:handler event="c:SearchValueChange" action="{!c.filterUserList}"/>
+	<aura:handler name="change" value="{!v.editingObjective}" action="{!c.handleEditing}"/>
+
+	<aura:method name="saveObjective" action="{!c.saveObjective}"/>
+
+	<aura:method name="insertOrRemoveJunction" action="{!c.insertOrRemoveJunction}"/>
+
+	<aura:if isTrue="{!v.editingObjective == False}">
+
+		<div class="{!v.isSharedObjective == false ? 'slds-hide' : ''}">
+		<!--Target User Content-->
+		<c:MultiSelectPills aura:id="title" field="Title" object="User" label="{!$Label.c.Target_User_Title}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Title_Placeholder}"/>
+		<c:MultiSelectPills aura:id="department" field="Department" object="User" label="{!$Label.c.Target_User_Department}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Department_Placeholder}"/>
+		<!--Checkbox Toggle-->
+		<lightning:spinner aura:id="spinner" class="slds-hide" alternativeText="Please wait..." />
+		<br />
+		<div class="slds-grid slds-wrap">
+			<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2 slds-p-bottom--medium">
+				<label class="slds-checkbox_toggle">
+					<span class="slds-form-element__label slds-m-bottom_none">{!$Label.c.TargetUserObj_ApplyUsers}</span>
+					<br/>
+					<input type="checkbox" aura:id="userToggle" aria-describedby="toggle-desc" onchange="{!c.toggleBoxClick}" checked="true"/>
+					<span id="toggle-desc" class="slds-checkbox_faux_container" aria-live="assertive">
+						<span class="slds-checkbox_faux"></span>
+						<span class="slds-checkbox_on">{!$Label.c.TargetUserObj_ApplyAllUsers}</span>
+						<span class="slds-checkbox_off">{!$Label.c.TargetUserObj_ApplyCertainUsers}</span>
+					</span>
+				</label>
+			</div>
+			<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2 slds-text-align--right slds-p-bottom--medium">
+				<label class="slds-form-element__label">{!$Label.c.Number_of_Users_Label}&nbsp;<ui:outputNumber value="{!v.numOfUsers}" /></label>
+			</div>
+		</div>
+		<!--End Checkbox Toggle-->
+		<!--Users Data Table-->
+		<table class="slds-table slds-table--bordered slds-table--cell-buffer slds-table--fixed-layout" role="grid">
+			<thead>
+				<tr class="slds-text-title--caps">
+					<aura:if isTrue="{!v.toggleApplyUsers == false}">
+						<th scope="col" class="slds-cell-shrink" style="width:10px">
+
+						</th>
+					</aura:if>
+					<th scope="col" style="width:50px;">
+						<div class="slds-truncate" title="User Name">{!$Label.c.TargetUserObj_Name}</div>
+					</th>
+					<th scope="col" class="slds-cell-shrink">
+						<div class="slds-truncate" title="User Title">{!$Label.c.TargetUserObj_Title}</div>
+					</th>
+					<th scope="col" class="slds-cell-shrink">
+						<div class="slds-truncate" title="User Department">{!$Label.c.TargetUserObj_Department}</div>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!--Enter Table Body-->
+				<aura:iteration items="{!v.currentUsers}" var="user" indexVar="idx">
+					<tr aura:id="userDataRow" class="slds-hint-parent">
+						<div class="{!v.toggleApplyUsers == false ? '' : 'slds-hide'}">
+							<td data-label="USER SELECT" class="slds-truncate slds-cell-shrink" >
+								<div class="slds-checkbox_add-button">
+									<input type="checkbox" id="{!user.Id}" class="slds-assistive-text userlist" value="on" onchange="{!c.updateNumOfUsersSelected}"/>
+									<label for="{!user.Id}" class="slds-checkbox_faux">
+										<span class="slds-assistive-text"></span>
+									</label>
+								</div>
+							</td>
+						</div>
+						<td data-label="NAME" class="slds-truncate">{!user.Name}</td>
+						<td data-label="TITLE" class="slds-truncate slds-text-align_left">{!user.Title}</td>
+						<td data-label="DEPARTMENT" class="slds-truncate">{!user.Department}</td>
+					</tr>
+				</aura:iteration>
+				<!--Enter Table Body-->
+			</tbody>
+		</table>
+		<div align="center">
+			<br/>
+			<lightning:button aura:id="viewMoreButton" disabled="{!v.viewMoreDisabled}" class="slds-button" variant="brand" label="{!$Label.c.ViewMore}" onclick="{!c.getNextPage}" />
+	 		<!--End Users Data Table-->
+	 		<!--End Target User Content-->	
+	 	</div>
+ 	</div>
+</aura:if>
+		<aura:if isTrue="{!v.editingObjective == True}">
+
+		<div class="{!v.isSharedObjective == false ? 'slds-hide' : ''}">
+		<c:MultiSelectPills aura:id="titleEdit" field="Title" object="User" label="{!$Label.c.Target_User_Title}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Title_Placeholder}"/>
+		<c:MultiSelectPills aura:id="departmentEdit" field="Department" object="User" label="{!$Label.c.Target_User_Department}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Department_Placeholder}"/>
+		<lightning:spinner aura:id="spinner" class="slds-hide" alternativeText="Please wait..." />
+		<br />
+		<div class="slds-grid slds-wrap">
+			<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2 slds-p-bottom--medium">
+				<label class="slds-checkbox_toggle">
+					<span class="slds-form-element__label slds-m-bottom_none">{!$Label.c.TargetUserObj_ApplyUsers}</span>
+					<br/>
+					<input type="checkbox" aura:id="userToggleEdit" aria-describedby="toggle-desc" onchange="{!c.toggleBoxClick}" checked="{!v.toggleApplyUsers}"/>
+					<span id="toggle-desc" class="slds-checkbox_faux_container" aria-live="assertive">
+						<span class="slds-checkbox_faux"></span>
+						<span class="slds-checkbox_on">{!$Label.c.TargetUserObj_ApplyAllUsers}</span>
+						<span class="slds-checkbox_off">{!$Label.c.TargetUserObj_ApplyCertainUsers}</span>
+					</span>
+				</label>
+			</div>
+			<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2 slds-text-align--right slds-p-bottom--medium">
+				<label class="slds-form-element__label">{!$Label.c.Number_of_Users_Label}&nbsp;<ui:outputNumber value="{!v.numOfUsers}" /></label>
+			</div>
+		</div>
+
+				<table class="slds-table slds-table--bordered slds-table--cell-buffer slds-table--fixed-layout" role="grid">
+			<thead>
+				<tr class="slds-text-title--caps">
+					<aura:if isTrue="{!v.toggleApplyUsers == false}">
+						<th scope="col" class="slds-cell-shrink" style="width:10px">
+
+						</th>
+					</aura:if>
+					<th scope="col" style="width:50px;">
+						<div class="slds-truncate" title="User Name">{!$Label.c.TargetUserObj_Name}</div>
+					</th>
+					<th scope="col" class="slds-cell-shrink">
+						<div class="slds-truncate" title="User Title">{!$Label.c.TargetUserObj_Title}</div>
+					</th>
+					<th scope="col" class="slds-cell-shrink">
+						<div class="slds-truncate" title="User Department">{!$Label.c.TargetUserObj_Department}</div>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!--Enter Table Body-->
+				<aura:iteration items="{!v.currentUsers}" var="user" indexVar="idx">
+					<tr aura:id="userDataRow" class="slds-hint-parent">
+						<div class="{!v.toggleApplyUsers == false ? '' : 'slds-hide'}">
+							<td data-label="USER SELECT" class="slds-truncate slds-cell-shrink" >
+								<div class="slds-checkbox_add-button">
+									<input type="checkbox" aura:id="userCheckedList" id="{!user.Id}" class="slds-assistive-text userlistEdit" value="on" onchange="{!c.updateNumOfUsersSelected}"/>
+									<label for="{!user.Id}" class="slds-checkbox_faux">
+										<span class="slds-assistive-text"></span>
+									</label>
+								</div>
+							</td>
+						</div>
+						<td data-label="NAME" class="slds-truncate">{!user.Name}</td>
+						<td data-label="TITLE" class="slds-truncate slds-text-align_left">{!user.Title}</td>
+						<td data-label="DEPARTMENT" class="slds-truncate">{!user.Department}</td>
+					</tr>
+				</aura:iteration>
+				<!--Enter Table Body-->
+			</tbody>
+		</table>
+		<div align="center">
+			<br/>
+		<lightning:button aura:id="viewMoreButton" disabled="{!v.viewMoreDisabled}" class="slds-button" variant="brand" label="{!$Label.c.ViewMore}" onclick="{!c.getNextPage}" />
+	</div>
+	</div>
+	</aura:if>
+
+</aura:component>

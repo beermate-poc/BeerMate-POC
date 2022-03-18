@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION">
+    <aura:attribute name="accounts" Type="Account[]"/>
+    <aura:attribute name="filetrby" Type="String"/>
+</aura:event>

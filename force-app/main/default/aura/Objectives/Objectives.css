@@ -1,0 +1,170 @@
+/* ----------- iPhone 4 and 4S ----------- */
+
+/* Portrait */
+@media only screen 
+  and (min-device-width: 320px) 
+  and (max-device-width: 480px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: portrait) {
+    .THIS.scrollerSize{
+        height: 255px;
+    }
+}
+
+
+/* ----------- iPhone 5, 5S, 5C and 5SE ----------- */
+
+/* Portrait */
+@media only screen 
+  and (min-device-width: 320px) 
+  and (max-device-width: 568px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: portrait) {
+    .THIS.scrollerSize{
+        height: 255px;
+    }
+}
+
+/* ----------- iPhone 6, 6S, 7 and 8 ----------- */
+
+/* Portrait */
+@media only screen 
+  and (min-device-width: 375px) 
+  and (max-device-width: 667px) 
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: portrait) { 
+    .THIS.scrollerSize{
+        height: 315px;
+    }
+}
+
+/* ----------- iPhone 6+, 7+ and 8+ ----------- */
+
+/* Portrait */
+@media only screen 
+  and (min-device-width: 414px) 
+  and (max-device-width: 736px) 
+  and (-webkit-min-device-pixel-ratio: 3)
+  and (orientation: portrait) { 
+    .THIS.scrollerSize{
+        height: 360px;
+    }
+}
+
+/* ----------- iPhone X ----------- */
+
+/* Portrait */
+@media only screen 
+  and (min-device-width: 375px) 
+  and (max-device-width: 413px) 
+  and (-webkit-min-device-pixel-ratio: 3)
+  and (orientation: portrait) { 
+    .THIS.scrollerSize{
+        height: 450px;
+    }
+}
+
+/* ----------- iPad 3, 4 and Pro 9.7" ----------- */
+
+/* Portrait */
+@media only screen 
+  and (min-device-width: 768px) 
+  and (max-device-width: 1024px) 
+  and (orientation: portrait) 
+  and (-webkit-min-device-pixel-ratio: 2) {
+    .THIS.scrollerSize{
+        height: 725px;
+    }
+}
+
+/* Landscape */
+@media only screen 
+  and (min-device-width: 768px) 
+  and (max-device-width: 1024px) 
+  and (orientation: landscape) 
+  and (-webkit-min-device-pixel-ratio: 2) {
+    .THIS.scrollerSize{
+        height: 510px;
+    }
+
+}
+
+/* ----------- iPad Pro 12.9" ----------- */
+
+/* Portrait */
+@media only screen 
+  and (min-device-width: 1024px) 
+  and (max-device-width: 1024px) 
+  and (orientation: portrait) 
+  and (-webkit-min-device-pixel-ratio: 2) {
+    .THIS.scrollerSize{
+        height: 1050px;
+    }
+}
+
+/* Landscape */
+@media only screen 
+  and (min-device-width: 1366px) 
+  and (max-device-width: 1366px) 
+  and (orientation: landscape) 
+  and (-webkit-min-device-pixel-ratio: 2) {
+    .THIS.scrollerSize{
+        height: 750px;
+    }
+}
+@media (max-width: 361px){
+    .THIS.scrollerSize{
+        height: 280px;
+    }
+}
+.THIS .declineOther{
+    margin-top: 11px;
+}
+.THIS .declineReason{
+    margin-top: 20px;
+}
+.THIS .qty{
+    margin-top: 12px;
+}
+.THIS .selectOption{
+    margin-top: 20px;
+}
+.THIS .engagmentDatePicker{
+    width: 103%;
+    margin-left: -12px;
+    margin-bottom: 23px;
+}
+.THIS .engageDistrib{
+    margin-top: 10px;
+}
+.THIS .featureDistrib{
+    margin-top: 20px;
+}
+.THIS .displayDistrib{
+    margin-top:20px;
+}
+.THIS .declinedStyle{
+    margin-top: 20px;
+}
+.THIS .engagementType{
+    margin-top: 5px;
+}
+.THIS .engagementDetails{
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+.THIS .featureDetails{
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+.THIS .placementDetails{
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+.THIS .displayDetails{
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+.THIS .tooltip{
+     margin-top: -1%;
+}

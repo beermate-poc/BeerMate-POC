@@ -1,0 +1,91 @@
+<aura:component >
+    <aura:registerEvent name="accountSelected" type="c:AccountSelected"/>
+    <aura:attribute name="account" type="Account"/>
+    <aura:attribute name="userProfile" type="String"/>
+    
+
+    <div onclick="{!c.navigateToDetailsView}" class="accountList" >
+    <!-- Will use this once the map is implemented -->
+     <!-- <div onclick="{!c.AccountSelected}" class="accountList" > -->
+        <lightning:tile class="slds-p-top_medium slds-p-bottom_medium slds-p-left_x-small slds-border_top">
+            <div class="slds-grid slds-wrap">
+                <div class="slds-col slds-size_2-of-3">
+                    <span>
+                        <dt>
+                            <div class="accountName slds-truncate">{!v.account.Name}</div>
+                        </dt>
+                        <dd class="slds-item_detail slds-truncate detailValue slds-text-color_weak" title="{!$Label.c.Account_List_Item_Street_Address}">{!v.account.BillingStreet}&nbsp;{!v.account.BillingPostalCode}</dd>
+                    </span>
+                </div>
+                <div class="slds-col slds-size_1-of-3">
+                    <span>
+                        <dt class="slds-item_label slds-text-color_weak slds-truncate  slds-text-color_weak slds-p-right_x-small slds-p-top_xx-small rightHandColumn " title="{!$Label.c.Account_List_Item_Distance}">
+                            <lightning:formattedNumber value="{!v.account.calculatedDistance}" maximumFractionDigits="2"/>
+                            &nbsp;{!$Label.c.Account_List_Item_Miles} 
+                        </dt> 
+                        <!--<lightning:formattedNumber value="{!v.account.nearByLoc}" maximumFractionDigits="2"/>-->
+                    </span>
+                        <dt class="slds-item_label slds-text-color_weak slds-truncate  slds-text-color_weak slds-p-right_x-small slds-p-top_xx-small rightHandColumn" title="{!$Label.c.Account_List_Item_Trade_Channel}">{!v.account.TradeChannelDesc__c }</dt> 
+                </div>
+             <!--    Account Status -->
+                <aura:if  isTrue="{!v.userProfile!=$Label.c.BMC_Sales_User  &amp;&amp; v.userProfile!=$Label.c.BMC_Sales_Administrator}">
+                <div class="slds-col slds-size_1-of-3">
+                    <span>
+                        <dt class="slds-item_detail slds-truncate detailValue slds-p-top_large leftHandColumn colWidth" title="{!$Label.c.C360_AccountStatus}" style="color:black">
+                        {!$Label.c.C360_AccountStatus} 
+                        <span class= "greyTextBackground">{!v.account.C360_Account_Status__c }</span>	
+                        </dt>
+                    </span>          
+                </div> 
+                <!-- SAP ID -->
+                 <div class="slds-col slds-size_2.5-of-3">
+                    <span>
+                        <dt class="slds-item_detail slds-truncate detailValue slds-p-top_large colWidth" title="SAP ID" style="color:black">
+                        {!$Label.c.C360_SAP_ID}
+                        <span class= "greyTextBackground">{!v.account.C360_SAP_ID__c }</span>	
+                        </dt>
+                    </span>          
+                </div> 
+                <!-- Account Owner -->
+               
+                <div class="slds-col slds-size_1-of-3">
+                    <span>
+                        <dt class="slds-item_label slds-text-color_weak slds-truncate slds-p-top_large slds-p-right_x-small leftHandColumn colWidth" title="{!$Label.c.C360_Account_Owner}" style="color:black">
+                        &nbsp;{!$Label.c.C360_Account_Owner}&nbsp;
+                        <span class= "greyTextBackground">{!v.account.C360_Owner__c }</span>		
+                        </dt>
+                    </span>
+                </div>
+                    </aura:if>
+               <div></div>
+                <aura:if  isTrue="{!v.userProfile==$Label.c.BMC_Sales_User  || v.userProfile==$Label.c.BMC_Sales_Administrator || v.userProfile=='System Administrator'}">
+                <div class="slds-col slds-size_1-of-3">
+                    <span>
+                        <dd class="slds-item_detail slds-truncate detailValue slds-p-top_large" title="{!$Label.c.Account_List_Item_13_Wk_Volume}" style="color:black">
+                        &nbsp;{!$Label.c.Account_List_Item_Lv13Vol}&nbsp; 
+                        <span class= "greyTextBackground">{!v.account.Total_13_Wk_Volume__c== null ? 0: v.account.Total_13_Wk_Volume__c}</span>
+                        </dd>
+                    </span>
+                </div>
+                <div class="slds-col slds-size_2.5-of-3">
+                    <span>
+                        <dt class="slds-item_label slds-text-color_weak slds-p-top_large slds-text-align_center" title="{!$Label.c.Account_List_Item_Brand}" style="color:black">
+                        #&nbsp;{!$Label.c.Account_List_Item_Brand} 
+                        <span class= "greyTextBackground">{!v.account.Number_of_Brands_13_Wk__c== null ? 0: v.account.Number_of_Brands_13_Wk__c}</span>
+                        </dt>
+                    </span>
+                </div>
+                <div class="slds-col slds-size_1-of-3">
+                    <span>
+                        <dt class="slds-item_label slds-text-color_weak slds-truncate slds-p-top_large slds-p-right_x-small rightHandColumn" title="{!$Label.c.Account_List_Item_Package}" style="color:black">
+                        #&nbsp;{!$Label.c.Account_List_Item_Package} 
+                        <span class= "greyTextBackground">{!v.account.Number_of_Brand_Packages_13_Wk__c== null ? 0: v.account.Number_of_Brand_Packages_13_Wk__c}</span>
+                        </dt>
+                    </span>                    
+                </div>             
+                    </aura:if>
+            </div>
+                 
+        </lightning:tile>
+    </div>
+</aura:component>

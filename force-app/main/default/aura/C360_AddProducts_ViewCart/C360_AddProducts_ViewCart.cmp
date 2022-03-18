@@ -1,0 +1,269 @@
+<aura:component controller="C360_ProductDetails" implements="flexipage:availableForRecordHome,force:hasRecordId,flexipage:availableForAllPageTypes,force:appHostable,force:lightningQuickAction">
+    <aura:dependency resource="markup://force:navigateToSObject" type="EVENT"/>
+    <aura:handler name = "init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="passedFromBeerLoss" type="Boolean" default="false"/>
+    <aura:attribute name="prevNotes" type="String"/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="orderProdId" type="Id" />
+    <aura:attribute name="isvalid" type="boolean" default="true" />
+    <aura:attribute name="ordProdList" type="List" />
+    <aura:attribute name="opUomMap" type="Map"/>
+    <aura:attribute name="ordType" type="Order[]"/>
+    <aura:attribute name="litList" type="List"/>
+    <aura:attribute name="opUom" type="List"/>
+    <aura:attribute name="rCodeList" type="List"/>
+    <aura:attribute name="isCEorder" type="boolean" default="false"/>
+    <aura:attribute name="litListStatus" type="List"/>
+    <aura:attribute name="ordProd" type="C360_Order_Product__c"
+                    default="{'sObjectType' : 'C360_Order_Product__c'}" />
+    <aura:method name="validate" action="{!c.validate}">
+        <aura:attribute name="recordId" type="Id"/>
+    </aura:method>
+    <aura:method name="submitted" action="{!c.submit}">
+        <aura:attribute name="recordId" type="Id"/>
+    </aura:method>
+    <aura:method name="refresh" action="{!c.doInit}"/>
+    <!--<div class="slds-box slds-box_x-small slds-theme_shade">
+        <h1><b>{!$Label.c.C360_OrderDetails}</b></h1>        
+    </div>-->
+     <ltng:require styles="/resource/slds222/assets/styles/salesforce-lightning-design-system-ltng.min.css" />
+     <div class="container">
+ <!--   <div class="slds-page-header fixed-header">	-->
+          
+        
+  <!--      <div class="slds-grid slds-wrap slds-grid-
+			-pull-padded">	
+	-->
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped" id="product_table"> 
+            <thead>
+         <tr style="height:1rem;">
+         	 <th style="background:#F9F9FA;"><h1><b>{!$Label.c.C360_OrderDetails}</b></h1></th>
+                   
+                </tr>
+             <!--      </div> -->
+                </thead>
+<!--    </div> -->
+   <!-- <div class="slds-scrollable ht"> -->
+  <!-- 1st section 
+   <div class="container">
+    
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped" id="product_table"> 
+            <thead> 	-->
+                <tr class="slds-line-height_reset">	<!-- style="height:50px;"	-->
+                    <th scope="col" class="">  
+                         <div class="slds-truncate" title="{!$Label.c.C360_AccName}"><b>{!$Label.c.C360_AccName}</b></div> 
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="{!$Label.c.C360_ReqDD}"><b>{!$Label.c.C360_ReqDD}</b></div>          	
+                    </th>
+                    <th scope="col" class="{!v.ordType[0].RecordType.Name=='Indirect Order'?'slds-hide':''}">
+                        <div class="slds-truncate" title="{!$Label.c.C360_ConfirmDD}"><b>{!$Label.c.C360_ConfirmDD}</b></div>          	
+                    </th>
+                    
+                    <th scope="col" class="{!v.ordType[0].RecordType.Name=='Indirect Order'?'slds-hide':''}">
+                        
+                        <div class="slds-truncate" title="{!$Label.c.Net_TotalPrice}"><b>{!$Label.c.Net_TotalPrice}</b></div>          
+                       		           	
+                    </th>
+                    <th scope="col" class="{!v.ordType[0].RecordType.Name=='Indirect Order'?'slds-hide':''}">
+                        <div class="slds-truncate" title="{!$Label.c.C360_TotalPrice}"><b>{!$Label.c.C360_TotalPrice}</b></div>          
+                       			           	
+                    </th>
+                    <th scope="col" class="{!v.ordType[0].RecordType.Name=='Direct Order'?'slds-hide':''}">
+                         <div class="slds-truncate" title="{!$Label.c.c360_Wholesaler_Dist}"><b>{!$Label.c.c360_Wholesaler_Dist}</b></div>          
+                        		           	
+                    </th>
+                    
+                </tr>
+                
+    
+         <tr > 
+             <td class="slds-cell-wrap"  style="width:10%">{! v.ordProdList[0].Order__r.Account.Name}</td>
+             <td class="slds-cell-wrap" style="width:5%">{!v.ordProdList[0].Order__r.C360_Requested_Delivery_Date__c}</td>
+             <td class="{!v.ordType[0].RecordType.Name=='Indirect Order'?'slds-hide':'slds-cell-wrap'}" style="width:5%"> {!v.ordProdList[0].Order__r.C360_Confirmed_Delivery_Date__c} </td>
+             <td class="{!v.ordType[0].RecordType.Name=='Indirect Order'?'slds-hide':'slds-cell-wrap'}" style="width:5%">{!v.ordProdList[0].Order__r.Net_Total_Price__c}</td>
+             <td class="{!v.ordType[0].RecordType.Name=='Indirect Order'?'slds-hide':'slds-cell-wrap'}" style="width:5%">  {!v.ordProdList[0].Order__r.C360_Total_Price__c} </td>
+             <td class="slds-cell-wrap"  style="width:10%">{!v.ordProdList[0].Order__r.C360_Wholesaler_Distributor__c}</td>
+
+          </tr>
+          
+        </table>     
+  
+            <!--</tbody>-->
+       
+<!--    </div>	-->
+         </div>
+    
+         <div class="slds-grid">
+    <!--<div class="slds-scrollable ht">-->  <!-- style="height: 15rem;" -->
+        
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer ">
+            <thead> 
+                <tr style="height:1rem;">
+                   <th style="background:#F9F9FA;"> <h1><b>{!$Label.c.C360_Cart}</b></h1>	</th>
+                    <th style="background:#F9F9FA;"></th><th style="background:#F9F9FA;"></th><th style="background:#F9F9FA;"></th><th style="background:#F9F9FA;"></th><th style="background:#F9F9FA;"></th><th style="background:#F9F9FA;"></th><th style="background:#F9F9FA;"></th><th style="background:#F9F9FA;"></th><th style="background:#F9F9FA;"></th>
+                   <th style="background:#F9F9FA;"></th>  <th style="background:#F9F9FA;"></th>                    
+     			</tr>
+
+                <tr class="slds-line-height_reset">
+                    <th class="" scope="col"  style="width:20%">
+                       <div class="slds-truncate" title="{!$Label.c.C360_LineItemType}">{!$Label.c.C360_LineItemType}</div> 
+                    </th>
+                    <th scope="col"  style="width:3%" class="{!v.ordType[0].RecordType.Name=='Indirect Order'?'slds-hide':''}">   
+                     <div class="slds-truncate" title="{!$Label.c.C360_Order_UOM}">{!$Label.c.C360_Order_UOM}</div>
+                    </th>
+                    <th scope="col" class="" style="width:3%">
+                      <div class="slds-truncate slds-cell-wrap" title="{!$Label.c.C360_Quantity}">{!$Label.c.C360_Quantity}</div>
+                    </th>		
+                    <th scope="col" class="{!v.passedFromBeerLoss==True?'':'slds-hide'}">    
+                    	<div class="slds-truncate" title="{!$Label.c.CTS_ReasonCode}">{!$Label.c.CTS_ReasonCode}</div>
+                    </th>
+                    
+                    <th scope="col" style="width:3%">
+                
+                    <div class="slds-truncate slds-cell-wrap" title="{!$Label.c.C360_ProductName}">{!$Label.c.C360_ProductName}</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate slds-cell-wrap" title="{!$Label.c.C360_ProductID_SKU}">{!$Label.c.C360_ProductID_SKU}</div>
+                    </th>		<!-- class="slds-cell-wrap" -->
+                    
+                    <!-- POC if Canada, hide ABV-->
+                   
+                    <th scope="col" style="width:5%">
+                    	<div class="slds-truncate slds-cell-wrap" title="{!$Label.c.C360_ABV}">{!$Label.c.ABV_Liquid_desc}</div>
+                    </th>
+
+                   <!-- <th scope="col">
+                        
+                        <div class="slds-truncate" title="{!$Label.c.C360_Base_UOM}">{!$Label.c.C360_Base_UOM}</div>
+                    </th>-->
+                    
+                    <th scope="col" class="{!or(v.ordType[0].Status=='Edit in Progress',v.ordType[0].Status=='Submitted')?'slds-cell-wrap rsn-wdt':'slds-hide'}">
+                        
+                        <div class="slds-truncate" title="{!$Label.c.Product_Rejection_Reason_Label}">{!$Label.c.Product_Rejection_Reason_Label}</div>
+                    </th>
+                    <!--            <th scope="col" class="slds-cell-wrap ltd-wdt">{!$Label.c.C360_Liquid_Type_Description}</th>    //<div style="width:70px;"> </div> -->
+                    
+                   
+                    	<th scope="col" class="">
+                    		<div class="slds-truncate slds-cell-wrap" title="{!$Label.c.C360_Cases_per_Row}"> {!$Label.c.Case_Row_Pallet}</div>
+                    	</th>
+                    	
+                   
+                    <th scope="col" class="{!v.ordType[0].RecordType.Name=='Indirect Order'?'slds-hide ':'slds-cell-wrap'}">
+                       
+                        <div class="slds-truncate" title="{!$Label.c.C360_Price}"> {!$Label.c.C360_Price}</div>
+                    </th>
+                    <!--<th scope="col" class="{!and(opList.External_Order_Product_Key__c!='',or(v.ordType[0].Status=='Edit in Progress',v.ordType[0].Status=='Submitted'))?'slds-hide':'slds-cell-wrap'}">{!$Label.c.C360_Remove}</th>-->
+                    <th scope="col" class="">
+                        
+                    </th> 
+          <!--          <th style="color:white;">.</th><th style="color:white;">.</th><th style="color:white;">.</th><th style="color:white;">.</th><th style="color:white;">.</th>
+				-->
+                </tr>
+            </thead>
+            <tbody>
+                <aura:iteration items="{!v.ordProdList}" var="opList" indexVar="key" >
+                    <tr>	
+                        <!--Line Item Type Picklist -->            
+                        <td class="slds-truncate" style="width:20%" >
+                            
+                            <lightning:select name="selectLit" aura:id="selectLit" >
+                                <aura:if isTrue="{!or(v.ordType[0].Type=='CA Standard',v.isCEorder==true)}">
+                                    <option value="" text="{!$Label.c.C360_None}"></option>
+                                </aura:if> 
+                                <aura:iteration items="{! v.litList}" var="lit">
+                                    <option value="{!lit.value}" text="{!lit.label}" selected="{!lit.value==opList.C360_Line_Item_Type__c}"
+                                            id="litId"></option> 
+                                </aura:iteration> 
+                                
+                            </lightning:select> 
+                            
+                        </td>
+                        <td scope="col" class="{!v.ordType[0].RecordType.Name=='Indirect Order'?'slds-hide slds-cell-wrap':''}" style="width:20%">
+
+                            
+                            <c:C360_UomPicklist recordId="{!opList.Product__r.Id}" opUomMap="{!v.opUomMap}" ordType="{!v.ordType}" aura:Id="selectUOM"   selctUom="{!opList.C360_Order_UoM__c}"/>
+                        </td>  
+                        <td class="slds-cell-wrap" style="width:10%"> 
+                            
+                           
+                                
+                                <lightning:input label="" pattern="^[0-9][0-9]*" aura:id="{!'index' + key}" 
+                                                 value="{!opList.C360_Quantity__c}"  class="slds-input_height" min="0" 
+                                                 messageWhenPatternMismatch="Please provide Positive Integers." type="tel"
+                                                 style="width:60px"
+                                                 />	
+                                
+                                
+                                
+                        </td>
+                        <!-- Reason Code LOV input field -->
+                        <td scope="col" class="{!v.passedFromBeerLoss==True?'':'slds-hide'}">
+                            <lightning:select aura:id="{!'reasonCode' + key}"> 
+                                <option value="">{!$Label.c.C360_None}</option>
+                                <aura:iteration items="{! v.rCodeList}" var="rCode">
+                                    <option value="{! rCode.value}" text="{! rCode.label}" selected="{! rCode.value==opList.CTS_Reason_Code__c}"></option>
+                                </aura:iteration>  
+                            </lightning:select>
+                        </td>
+                        <td  class="slds-cell-wrap" style="width:10%">{! opList.Product__r.Name}</td>
+                        <td  class="slds-cell-wrap" style="width:3%">{! opList.C360_Product_ID_SKU__c}</td>
+                        
+                        <!-- POC if Canada, hide ABV-->
+                    	
+                        <td class="slds-cell-wrap" style="width:5%">{! opList.Product__r.C360_ABV_Alcohol_by_Volume__c +'/'+ opList.Product__r.C360_Liquid_Type_Description__c}</td>
+                      
+                        
+                        <!--<aura:if isTrue="{!opList.Product__r.C360_Country__c =='Canada'}">
+                            <td  class="slds-cell-wrap" style="width:5%">{! opList.Product__r.C360_Base_Unit_of_Measure_Desc__c}</td> 
+                        </aura:if> 
+                        <aura:if isTrue="{!opList.Product__r.C360_Country__c =='UKI'}">
+                            <td style="width:5%" class="slds-cell-wrap">{! opList.Product__r.C360_Sales_UOM_Desc__c}</td>
+                        </aura:if> 
+                        <aura:if isTrue="{!and(opList.Product__r.C360_Country__c!='UKI',opList.Product__r.C360_Country__c!='Canada')}">
+                            <td  class="slds-cell-wrap" style="width:5%">{!opList.Product__r.C360_Base_Unit_of_Measure_Desc__c}</td>
+                        </aura:if>-->
+                        <!--             <td scope="col" class="slds-cell-wrap ltd-wdt">{! opList.Product__r.C360_Liquid_Type_Description__c}</td>   //<div style="width:70px;"> </div> -->   
+                        
+                        <aura:if isTrue="{!or(v.ordType[0].Status=='Edit in Progress',v.ordType[0].Status=='Submitted')}">
+                            <td  class="slds-cell-wrap" style="width:15%">
+                                <!--    <div class="qty-wdt">	-->
+                                <lightning:select  aura:id="selectstatus" name="{!key}" onchange = "{!c.setDefautQuantity}"> 
+                                    <aura:iteration items="{! v.litListStatus}" var="lit">
+                                        <option value="{!lit.value}" text="{!lit.label}" selected="{!lit.value==opList.C360_Rejection_Reason__c}"
+                                                id="litIds"></option> 
+                                    </aura:iteration>                      
+                                </lightning:select> 
+                                <!--    </div>	-->
+                                
+                            </td>
+                        </aura:if>
+                       <td  class="slds-cell-wrap" style="width:5%">{! opList.Product__r.C360_Cases_per_Row__c +'/'+  opList.Product__r.C360_Cases_per_Pallet__c}</td>                        
+                        <td  class="{!v.ordType[0].RecordType.Name=='Indirect Order'?'slds-hide':'slds-cell-wrap'}" style="width:5%">
+                            <lightning:formattedNumber value="{! opList.C360_Unit_Price__c}" style="decimal" minimumFractionDigits="2"/>
+                        </td>
+                        
+                        <!-- Delete icon -->
+                        
+                        <!-- <td scope="col" class="{!and(opList.External_Order_Product_Key__c!='',or(v.ordType[0].Status=='Edit in Progress',v.ordType[0].Status=='Submitted'))?'slds-hide':'slds-cell-wrap'}">-->
+                        
+                        
+                        <td style="width:5%"  class="{!and(opList.External_Order_Product_Key__c!=null,or(v.ordType[0].Status=='Edit in Progress',v.ordType[0].Status=='Submitted'))?'slds-hide slds-cell-wrap':'slds-cell-wrap'}">
+                           
+                               
+                                    <lightning:buttonIcon aura:id="{!'btn_index' + key}" iconName="utility:close"
+                                                          size="xx-small"
+                                                          onclick="{!c.deleteOrderProd}"
+                                                          value="{!opList.Id}"
+                                                          alternativeText="Delete"/>
+                               
+                          
+                        </td>
+                        
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>   
+    </div>	
+</aura:component>

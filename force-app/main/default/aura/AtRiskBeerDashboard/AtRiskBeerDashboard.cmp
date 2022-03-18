@@ -1,0 +1,6 @@
+<aura:component controller="TableauDashboardsHandler" implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="ifmsrc" type="String"/>
+    <iframe aura:id="iframe"  scrolling="no" height="150px" width="100%" src="{!v.ifmsrc}" frameborder="true"/>
+</aura:component>

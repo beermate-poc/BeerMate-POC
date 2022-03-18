@@ -1,0 +1,47 @@
+<aura:component controller="PDE_AccountHierachySharing" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes">
+    <aura:attribute name="ltngcurrentRecId" type="String" />
+	<aura:attribute name="gridColumns" type="list" />
+    <aura:attribute name="selectedLookUpRecord" type="sObject" default="{}"/>
+    <aura:attribute name="gridData" type="Object" />
+    <aura:attribute name="gridExpandedRows" type="List" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="isLoading" type="Boolean" default = "false"/>
+    <aura:attribute name="recordId" type="ID" />
+    <aura:attribute name="isUserAccess" type="Boolean" default = "false" />
+    <aura:attribute name="baseUrl" type="String" default=""></aura:attribute>
+	<aura:attribute name="theme_ui" type="String" default=""></aura:attribute>
+    <aura:attribute name="thisClearResult" type="Boolean" default="false" />
+    <aura:method name="reInit" action="{!c.doInit}" description="Runs the init method again "/>
+    <aura:if isTrue = "{!v.isUserAccess}">
+     <div class ="slds-form_horizontal slds-form slds-grid slds-wrap">
+         <div class="slds-size_0.05-of-5 ">
+              <p class="slds-p-top_large slds-p-right_none"><b>Account Name</b></p>
+         </div>
+        <div class="slds-p-top_medium slds-p-bottom_small slds-size_2-of-5 slds-p-left_small ">
+           
+            <c:PDE_CustomLookup  objectAPIName="Account" IconName="standard:account"
+                                selectedRecord="{!v.selectedLookUpRecord}"
+                                clearResult = "{!v.thisClearResult}"
+                                label="" />
+        </div>  
+         <div class="slds-size_1-of-5 slds-p-top_medium scan-field">
+        <lightning:button iconName="utility:adduser" variant ="base" label="Add" title="Add Relation" 
+                          onclick="{!c.handleClickRelation}"/> 
+        </div> 
+     </div>
+     <lightning:treeGrid columns="{! v.gridColumns }"
+        data="{! v.gridData }"
+        keyField="name"
+        expandedRows="{! v.gridExpandedRows}"
+        aura:id="mytree" 
+        onrowaction="{!c.onRowSelect}" 
+        hideCheckboxColumn="true"  
+		id ="mytree1"	
+         />
+     <aura:if isTrue ="{!v.isLoading}">
+   		<div class="">
+    	<lightning:spinner class="spins" aura:id="Spinner" alternativeText="Loading" size="medium" variant="brand" />
+		</div>
+	</aura:if> 
+     </aura:if>    
+</aura:component>

@@ -1,0 +1,64 @@
+<aura:component implements="force:appHostable,lightning:isUrlAddressable,flexipage:availableForRecordHome,force:hasRecordId,lightning:actionOverride,forceCommunity:availableForAllPageTypes" access="global" controller="CTS_BrandSelectionController">
+    <aura:attribute name="isROIorNI" type="Boolean" default="false" access="global"/>
+    <aura:attribute name="recordTypeLabel" type="List" access="global"/>
+    <aura:attribute name="parentRecordId" type="String" access="global"/>
+    <aura:attribute name="selectedRecordTypeID" type="String" access="global"/>
+    <aura:attribute name="selectedRecordTypeLabel" type="String" access="global"/>
+    <aura:attribute name="hasNextPressed" type="Boolean" default="false" access="global"/>
+	<aura:attribute name="isAssetLines" type="Boolean" default="false"/>
+	<aura:attribute name="ParentWorkOrder" type="object"/>    
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <aura:handler name="RecordSavedEvent" event="c:CTS_BrandSelectionEvent" action="{!c.reSetComponent}"/>
+    
+    <aura:if isTrue="{!!v.hasNextPressed}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open" style="position: relative;">
+            
+            <div class="slds-modal__container">                
+                <div class="spinnerHolder">
+                    <lightning:spinner aura:id="spn" alternativeText="Loading" size="medium" variant="brand"/>
+                </div>
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.handleCancel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">New Technician Task: {!v.selectedRecordTypeLabel}</h2>
+                </header>
+                
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p style="float: left;
+                              text-align: right;
+                              padding-right: 1.5rem;
+                              width: 35%;
+                              font-size: .8125rem;">Select a Record Type:</p>
+                    
+                    <aura:iteration items="{!v.recordTypeLabel}" var="s" >
+                        <span style="float: right;
+                                     text-align: left;
+                                     width: 65%;
+                                     padding-bottom: .75rem;">
+                            <lightning:input type="radio" label="{!s.Name}" name="RecordType" value="{!s.Id}" onchange ="{!c.onSelection}" />
+                        </span>
+                    </aura:iteration>		       
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:buttonGroup class="slds-float_right">
+                        <lightning:button label="{!$Label.c.CTS_Cancel}" onclick="{!c.handleCancel}" variant="neutral"/>
+                        <lightning:button label="{!$Label.c.CTS_Next}" onclick="{!c.showNextScreen}" variant="brand" disabled="{!v.selectedRecordTypeID==undefined?true:false}"/>
+                    </lightning:buttonGroup>             
+                </footer> 
+            </div>
+        </section> 
+        
+    	</aura:if>
+    <aura:if isTrue="{!v.hasNextPressed}">
+        <div style="{!$Browser.isDesktop? 'position: absolute;padding-left: 25%;':'float:none;'}" >
+    	{!v.body}
+        </div>
+        </aura:if>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+</aura:component>

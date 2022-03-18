@@ -1,0 +1,133 @@
+.THIS {
+    position:absolute;
+    width: 90%;
+}
+
+.THIS>div {
+    height: 6%;
+}
+
+/* ----------- iPhone 5, 5S, 5C and 5SE ----------- */
+@media only screen 
+  and (min-device-width: 320px) 
+  and (max-device-width: 568px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: portrait) {
+        .THIS .wrapperClass {
+	height: 500px;
+}
+}
+/* Iphone 6/7/8 */
+
+@media only screen 
+  and (min-device-width: 375px) 
+  and (max-device-width: 667px) 
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: portrait) { 
+.THIS .wrapperClass {
+	height: 500px;
+}
+}
+
+
+/* IPhone 7 plus */
+@media only screen 
+  and (min-device-width: 414px) 
+  and (max-device-width: 736px) 
+  and (-webkit-min-device-pixel-ratio: 3)
+  and (orientation: portrait) { 
+.THIS .wrapperClass {
+	height: 600px;
+}
+}
+/* Iphone X */
+@media only screen 
+  and (min-device-width: 375px) 
+  and (max-device-width: 812px) 
+  and (-webkit-min-device-pixel-ratio: 3)
+  and (orientation: portrait) { 
+.THIS .wrapperClass {
+	height: 600px;
+}
+}
+
+/* IPad landscape*/
+
+@media (max-device-width : 1024px)
+    and (min-device-width : 768px)
+    and (orientation: landscape)  {
+    .THIS .wrapperClass {
+	height: 559px;
+}
+}
+
+/* IPad portrait*/
+@media (max-device-width : 1024px)
+    and (min-device-width : 768px)
+    and (orientation: portrait){
+    .THIS .wrapperClass {
+	height: 817px;
+}
+}
+/* ----------- iPhone 5, 5S, 5C and 5SE ----------- */
+@media only screen 
+  and (min-device-width: 320px) 
+  and (max-device-width: 568px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: portrait) {
+        .THIS .editwrapperClass {
+	height: 350px;
+}
+}
+/* Iphone 6/7/8 */
+
+@media only screen 
+  and (min-device-width: 375px) 
+  and (max-device-width: 667px) 
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: portrait) { 
+.THIS .editwrapperClass {
+	height: 450px;
+}
+}
+
+
+/* IPhone 7 plus */
+@media only screen 
+  and (min-device-width: 414px) 
+  and (max-device-width: 736px) 
+  and (-webkit-min-device-pixel-ratio: 3)
+  and (orientation: portrait) { 
+.THIS .editwrapperClass {
+	height: 550px;
+}
+}
+/* Iphone X */
+@media only screen 
+  and (min-device-width: 375px) 
+  and (max-device-width: 812px) 
+  and (-webkit-min-device-pixel-ratio: 3)
+  and (orientation: portrait) { 
+.THIS .editwrapperClass {
+	height: 550px;
+}
+}
+
+/* IPad landscape*/
+
+@media (max-device-width : 1024px)
+    and (min-device-width : 768px)
+    and (orientation: landscape)  {
+    .THIS .editwrapperClass {
+	height: 559px;
+}
+}
+
+/* IPad portrait*/
+@media (max-device-width : 1024px)
+    and (min-device-width : 768px)
+    and (orientation: portrait){
+    .THIS .editwrapperClass {
+	height: 817px;
+}
+}

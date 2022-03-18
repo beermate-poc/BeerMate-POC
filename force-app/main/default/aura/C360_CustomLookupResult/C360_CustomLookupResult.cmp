@@ -1,0 +1,17 @@
+<!--Component to display  Lookup search results-->
+<aura:component >
+     <aura:attribute name="oUser" type="User" />
+    <!--Register the component level event-->
+    <aura:registerEvent name="oSelectedUserEvent" type="c:C360_SelectedUserEvent"/>
+	<li role="presentation">
+        <span class="slds-lookup__item-action slds-media slds-media--center" id="lookup-option-350" role="option">
+         <div class="slds-media__body">
+          <div class="slds-input-has-icon slds-input-has-icon--right">
+            <c:SVG class="slds-input__icon" xlinkHref="{!$Resource.slds222 + '/assets/icons/standard-sprite/svg/symbols.svg#user'}" />                   
+            <div class="slds-lookup__result-text"><a onclick="{!c.selectUser}">{!v.oUser.Name}</a></div>
+
+          </div>
+        </div>    
+        </span>
+    </li>
+</aura:component>

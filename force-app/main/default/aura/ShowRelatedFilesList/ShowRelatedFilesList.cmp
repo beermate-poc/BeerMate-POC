@@ -1,0 +1,40 @@
+<aura:component controller="C360_ObjectiveListController">
+    <aura:attribute name="contentDocs" type="ContentDocumentLink[]" />
+    <aura:attribute name="sObjectId" type="String"/>
+    <aura:attribute name="eventId" type="String"/>
+    <aura:attribute name="filesFound" type="Boolean" default="true"/>
+    
+    <aura:registerEvent name="OnClickShowFilesEvent" type="c:ShowRelatedFilesListEvent" />
+    <aura:registerEvent name="OnClickEditPageEvent" type="c:OnClickEditPageEvent" />
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }"/>
+     <lightning:button variant="Neutral" label="{!$Label.c.Back_Button}" onclick="{!c.goBackToParent}" />
+    <br></br>
+    <br></br>
+    <aura:if isTrue="{!v.filesFound}">
+    	<header class="slds-modal__header widthClass headerSize">
+            <h3 class="slds-text-heading--large">{!$Label.c.Files}</h3>           
+        </header>
+   <lightning:layout multipleRows="true">
+       
+    	<aura:iteration items="{!v.contentDocs}" var="fileinfo">
+            
+            <lightning:layoutItem padding="around-small" size="5">
+            	<lightning:fileCard fileId="{!fileinfo.ContentDocumentId}" description="{!fileinfo.ContentDocument.Title}"/>
+            </lightning:layoutItem>
+			
+        
+    	</aura:iteration>
+    </lightning:layout>
+    <aura:set attribute="else">
+      <h2 style="text-align:center;font-size: 2em;">{!$Label.c.No_Files_Found}</h2>
+        <br></br>
+        <br></br>
+    </aura:set>
+    </aura:if>
+    <!--<footer class="slds-modal__footer" style="background-color: white;">
+            <lightning:button variant= "Brand" label = "Proceed" onclick="{!c.gotoEditPage}"/>
+                
+              <lightning:button variant= "Brand" label = "{!$Label.c.C360_New}" onclick="{!c.hNewRecord}"/>
+            <lightning:button variant="Neutral" label="{!$Label.c.Back_Button}" onclick="{!c.goBackToParent}" />
+    </footer>-->
+</aura:component>

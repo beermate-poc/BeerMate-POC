@@ -1,0 +1,66 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionwithoutheader" controller="C360_Assign_by_Where_to_Hunt_Helper" >
+	  <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>   
+    <aura:attribute name="targetAcc" type="Where_to_Hunt__c" description="The data returned by the Apex handler." />
+    
+    <header class="slds-modal__header widthClass">
+    	<h2 class="slds-text-heading--large">{!$Label.c.C360_Assign_Objectives_To_Users_By_Where_To_Hunt}</h2>
+    </header>
+        
+         <div>
+    	<table class="slds-table slds-table_bordered slds-table_cell-buffer" >
+			<thead id="dataHeader">
+				<tr class="slds-text-title_caps">
+                    <th scope="col">
+                        <ui:inputCheckbox aura:id="allIds" change="{!c.hselAllRec}"/>
+                    </th>
+                    <th scope="col" >
+                    	<div class="slds-truncate" title="Target List Name">{!$Label.c.C360_Target_List_Name}</div>
+                    </th>
+                    <th scope="col">
+                    	<div class="slds-truncate" title="# of Target Accounts">{!$Label.c.C360_no_of_Target_Accounts}</div>
+                    </th>
+                    
+                    <th scope="col">
+                    	<div class="" title="Created Date">{!$Label.c.C360_Created_DateTime}</div>
+                    </th>
+                </tr>
+			</thead>
+            
+			<tbody id="dataContainer">
+				<aura:iteration items="{!v.targetAcc}" var="taracc">
+                	<tr class="slds-hint-parent">
+                        <td scope="row" class="borderR">
+                        	<div class="slds-truncate">
+                                <ui:inputCheckbox text="{!taracc.Id}" aura:id="selectedIds" value="" change="{!c.hselRec}"/>                            
+                            </div>
+                        </td>
+                        <td scope="row" class="borderR">
+                        	<div class="slds-truncate">
+                            	<span class="">{!taracc.Name}</span>
+                            </div>
+                        </td>
+                    	
+                        <td scope="row" style="text-align: center;">
+                        	<div class="slds-truncate">
+                            	<span class="">{!taracc.Count_Target_Accounts__c}</span>  
+                            </div>
+                        </td> 
+                        
+                        <td scope="row" class="borderR">
+                        	<div class="slds-truncate">
+                               <span class="">
+                                 <ui:outputDate value="{!taracc.CreatedDate}"/>
+                                </span>  
+                            </div>
+                        </td>     
+                	</tr>
+                </aura:iteration>
+			</tbody>
+		</table>
+    </div>
+    <br/><br/>
+         <div class="slds-form-element btn-Algin-Class" >
+    	<lightning:button label="{!$Label.c.Assign}" onclick="{!c.hCreateObj}" name="Assign" variant="brand" />
+        <lightning:button label="{!$Label.c.Cancel_Label}" name="Cancel" variant="neutral" onclick="{!c.hCancel}" />
+	</div>   
+</aura:component>

@@ -1,0 +1,38 @@
+.THIS .error-Msg{
+    color:red !important;
+    font-size:14px !important;
+    text-align:center !important;
+}
+.THIS .displayType-Padding{
+    padding: .75rem !important;
+}
+.THIS .brand-ErrorMsg{
+    color:red !important;
+    font-size:14px !important;
+}
+
+.THIS .full-width{
+   width:100% !important;
+   height:100% !important;
+}
+.THIS .slds-form-element__label{
+    font-family: 'Salesforce Sans',Arial,sans-serif !important;
+	line-height: 1.5 !important;
+	color: rgb(62, 62, 60) !important;
+	font-size: .8125rem !important;
+    display:none;
+}
+.THIS .scrollcontent {
+        overflow: scroll !important;
+   }
+.THIS .lookup__menu{
+    
+    position: sticky !important;
+    
+    background: rgb(255, 255, 255);
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(244, 244, 244);
+    border-image: initial;
+    border-radius: 0.25rem;
+}

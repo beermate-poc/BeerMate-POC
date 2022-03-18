@@ -1,0 +1,110 @@
+<aura:component implements="lightning:availableForFlowScreens,force:hasRecordId" access="global">
+	<aura:attribute name="OpportunityID" type="String"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="nextButtonLabel1" type="String" default="Next"/>
+    <aura:attribute name="nextButtonLabel2" type="String" default="Next"/>
+    <aura:attribute name="nextButtonLabel3" type="String" default="Next"/>
+    <aura:attribute name="nextButtonLabel4" type="String" default="Next"/>
+    <aura:attribute name="nextButtonLabel5" type="String" default="Next"/>
+    
+    <aura:attribute name="nextButtonClass1" type="String" default="slds-button_brand"/>
+    <aura:attribute name="nextButtonClass2" type="String" default="slds-button_brand"/>
+    <aura:attribute name="nextButtonClass3" type="String" default="slds-button_brand"/>
+    <aura:attribute name="nextButtonClass4" type="String" default="slds-button_brand"/>
+    <aura:attribute name="nextButtonClass5" type="String" default="slds-button_brand"/>
+    
+    <aura:attribute name="showNextButton1" type="Boolean" default="false"/>
+    <aura:attribute name="showNextButton2" type="Boolean" default="false"/>
+    <aura:attribute name="showNextButton3" type="Boolean" default="false"/>
+    <aura:attribute name="showNextButton4" type="Boolean" default="false"/>
+    <aura:attribute name="showNextButton5" type="Boolean" default="false"/>
+    
+    <aura:attribute name="disableNextButton1" type="String" default="false"/>
+    <aura:attribute name="disableNextButton2" type="String" default="false"/>
+    <aura:attribute name="disableNextButton3" type="String" default="false"/>
+    <aura:attribute name="disableNextButton4" type="String" default="false"/>
+    <aura:attribute name="disableNextButton5" type="String" default="false"/>
+    
+    <aura:attribute name="disablePreviousButton" type="String" default="false"/>
+    <aura:attribute name="previousButtonLabel" type="String" default = "Previous"/>
+    <aura:attribute name="previousButtonClass" type="String" default="slds-button_neutral"/>
+	<aura:attribute name="showPreviousButton" type="Boolean" default="false"/> 
+    
+    <aura:attribute name="buttonLocation" type="String" default="right"/>
+    <aura:attribute name="buttonClick" type="String" default="" />
+    <aura:attribute name="onFinalPage" type="Boolean" default="false"/>
+
+    <footer class="slds-card__footer my-custom-footer slds-grid slds-grid_align-spread actionsBar" >
+  
+        <aura:if isTrue="{! v.buttonLocation == 'right' }">
+            <div></div>
+            <div></div>
+        </aura:if>
+
+        <aura:if isTrue="{! v.buttonLocation == 'middle' }">
+            <div></div>
+        </aura:if>
+        
+        <div>
+            <aura:if isTrue="{! v.showPreviousButton }">
+                <lightning:button disabled = "disablePreviousButton"
+                                  class="{!'slds-button ' + v.previousButtonClass}" 
+                                  label="{!v.previousButtonLabel}" 
+                                  name="ButtonPrev" 
+                                  onclick="{!c.handleClick}" />                   	
+        	</aura:if>
+            
+            <aura:if isTrue="{! v.showNextButton1 }">
+             	<lightning:button disabled = "{!v.disableNextButton1}"
+                                  class="{!'slds-button ' + v.nextButtonClass1}" 
+                                  label="{!v.nextButtonLabel1}" 
+                                  name="ButtonNext1" 
+                                  onclick="{!c.handleClick}" />                    	
+        	</aura:if>            
+       
+            <aura:if isTrue="{! v.showNextButton2 }">
+             	<lightning:button disabled = "{!v.disableNextButton2}"
+                                  class="{!'slds-button ' + v.nextButtonClass2}" 
+                                  label="{!v.nextButtonLabel2}" 
+                                  name="ButtonNext2" 
+                                  onclick="{!c.onButtonPressed}" />                    	
+        	</aura:if>         		 
+
+            <aura:if isTrue="{! v.showNextButton3 }">
+             	<lightning:button disabled = "{!v.disableNextButton3}"
+                                  class="{!'slds-button ' + v.nextButtonClass3}" 
+                                  label="{!v.nextButtonLabel3}" 
+                                  name="ButtonNext3" 
+                                  onclick="{!c.handleClick}" />                    	
+        	</aura:if>  
+
+            <aura:if isTrue="{! v.showNextButton4 }">
+             	<lightning:button disabled = "{!v.disableNextButton4}"
+                                  class="{!'slds-button ' + v.nextButtonClass4}" 
+                                  label="{!v.nextButtonLabel4}" 
+                                  name="ButtonNext4" 
+                                  onclick="{!c.handleClick}" />                    	
+        	</aura:if>  
+            
+            <aura:if isTrue="{! v.showNextButton5 }">
+                <lightning:button disabled = "{!v.disableNextButton5}"
+                                  class="{!'slds-button ' + v.nextButtonClass5}" 
+                                  label="{!v.nextButtonLabel5}" 
+                                  name="ButtonNext3" 
+                                  onclick="{!c.handleClick}" />                    
+        	</aura:if>  
+            
+        </div>
+        
+        <aura:if isTrue="{! v.buttonLocation == 'left' }">
+            <div></div>
+            <div></div>
+        </aura:if>        
+
+        <aura:if isTrue="{! v.buttonLocation == 'middle' }">
+            <div></div>
+        </aura:if>
+        
+    </footer>
+
+</aura:component>

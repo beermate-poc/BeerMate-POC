@@ -1,0 +1,3 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global" >
+	<c:cea_AssetCheckCompleteLWC recordId="{!v.recordId}" oncloseAction="{!c.handleActions}" />
+</aura:component>

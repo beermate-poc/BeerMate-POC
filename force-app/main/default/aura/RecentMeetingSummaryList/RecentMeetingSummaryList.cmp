@@ -1,0 +1,27 @@
+<aura:component description="RecentMeetingSummaryList" controller="CallLogUtility" implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasRecordId">
+	<aura:attribute name="callLogs" type="Call_Log__c[]"/>
+	<aura:attribute name="isDisabled" type="boolean" default="false" />
+	<aura:attribute name="haveNotes" type="boolean"  />
+	<aura:attribute name="showSummaryList" type="boolean" default="true"/>
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+	<div style="background:white;">
+		<div class="modal-header slds-modal__header mainHeader" >
+			<h2 class="title slds-text-heading--medium">Call Log Summary</h2>
+		</div>
+		<aura:if isTrue="{! empty(v.callLogs)}">
+			<c:NoRecordsFound object="{!v.callLogs}" message="{!$Label.c.NoCalls}" />
+			<aura:set attribute="else">
+			<ul>
+				<aura:iteration items="{!v.callLogs}" var="callLog">
+					<c:RecentMeetingSummaryListItem callLog="{!callLog}" />
+				</aura:iteration>
+			</ul>
+			</aura:set>
+		</aura:if>
+		<div class="slds-modal__footer">
+			<lightning:button class="slds-button" variant="brand" label="Start A Call" disabled="{!v.isDisabled}" onclick="{!c.startCall}" aura:id="startCallButton" />
+			<lightning:button class="slds-button" variant="brand" label="Cancel" disabled="{!v.isDisabled}" onclick="{!c.cancelCall}" aura:id="startCallButton" />
+		</div>
+	</div>
+</aura:component>

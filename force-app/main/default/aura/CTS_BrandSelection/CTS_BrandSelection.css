@@ -1,0 +1,62 @@
+.THIS .slds-dropdown_length-with-icon-10{
+    max-height: calc(((0.8125rem * 1.5) + 1rem) * 7) !important;
+}
+.THIS .error-Msg{
+    color:red !important;
+    font-size:14px !important;
+    text-align:center !important;
+    background: antiquewhite !important;
+    overflow: auto;
+}
+.THIS .hideContent{
+    display:none !important;
+}
+.THIS .styleLabel{    
+    display: inline-block;
+    color: rgb(62, 62, 60);
+    font-size: .75rem;
+    margin-right: .5rem;
+    padding-top: .25rem;
+    margin-bottom: .125rem;
+}
+
+.THIS .slds-form-element{
+    display:inline !important;
+}
+
+.THIS lightning-input-field
+{
+    display:inline !important;    
+}
+.THIS lightning-picklist
+{
+    display:inline !important;    
+}
+.THIS.spinnerHolder{
+    position: relative;
+    display: inline-block;
+    margin-left: 15px;
+    width: 55px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+.THIS .backdropClass{
+    z-index:100000;
+	width:100%;   
+}
+
+.THIS .slds-spinner_container {
+    position: inherit;
+}
+.THIS .outerScroller {
+    
+    border-radius: 1px;
+}
+.THIS .note-Msg{
+    color:black !important;
+    font-size:15px !important;
+    text-align:center !important;
+    background: #d6ecf9 !important;
+    overflow: auto;
+    font-weight: bold; 
+}

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AuraDefinitionBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>42.0</apiVersion>
+    <description>This  Component is used to display  results based on lookup search. This component is referred in C360_AssignObjectives_To_Users component</description>
+</AuraDefinitionBundle>

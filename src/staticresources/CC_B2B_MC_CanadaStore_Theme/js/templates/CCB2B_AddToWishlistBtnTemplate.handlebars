@@ -1,0 +1,48 @@
+<div class="btn-group dropdown form-group">
+    <button
+        {{#ifPageDisplay 'ccrz__ProductDetails'}} id="ccb2b-pdp-addtofav-btn" {{/ifPageDisplay}}
+                                                  type="button" class="btn btn-default btn-sm dropdown-toggle cc_add_to_wishList" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="addToWishLabel">{{pageLabelMap 'AddtoWishlist'}}</span>
+        <span class="caret"></span>
+        <span class="sr-only">{{pageLabelMap 'Wishlist_ToggleDropdown'}}</span>
+    </button>
+
+    <ul class="dropdown-menu addProductToWishlistList " aria-labelledby="dropWish">
+        <div class="panel" >
+            <h4 class="title" >{{pageLabelMap 'AddtoWishlist'}}</h4>
+            <h4 class="closeAddToWishlist" >X</h4>
+        </div>
+
+        {{#each this}}
+            <li class="listItem">
+                <a {{#ifPageDisplay 'ccrz__ProductDetails'}} id="{{generateId 'ccb2b-pdp-fav-' sfid '-select'}}" {{/ifPageDisplay}}
+                                                             href="javascript:void(0);" class="pickWish" data-id="{{sfid}}">{{{name}}}
+                    <span class="plusWishlistMarker" data-id="{{sfid}}" > + </span>
+                    {{#if isActive}}
+                        <span class="defaultWishlistMarker"data-id="{{sfid}}" >{{pageLabelMap 'DefaultWishlist'}}</span>
+                    {{/if}}
+                </a>
+
+            </li>
+            <li role="separator" class="divider"></li>
+        {{/each}}
+
+        <li class="listItem" style="height: 40px;margin-bottom: 8px;">
+            <span class="plusWishlistMarker" style="position: relative; left: -36px;" > + </span>
+            <a style="position: relative; top: -32px; background-color: rgba(255,255,255,0.2);"
+                {{#ifPageDisplay 'ccrz__ProductDetails'}} id="ccb2b-pdp-createnewfav-btn" {{/ifPageDisplay}}
+                                                         href="javascript:void(0);" class="pickWish createNewWish" data-id="-1">{{pageLabelMap 'Action_CreateWishlist'}}
+
+            </a>
+        </li>
+        <li class="listItem">
+            <div class="row center-block" >
+                <div class="col-xs-12">
+                    <label for="ccb2b-pdp-newfavname-input" class="sr-only">{{pageLabelMap 'Wishlist_EnterName'}}</label>
+                    <input {{#ifPageDisplay 'ccrz__ProductDetails'}}id="ccb2b-pdp-newfavname-input" {{/ifPageDisplay}}
+                            type="text" maxlength="255" class="newListName form-control" placeholder="{{pageLabelMap 'MyAccount_Name'}}"/>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>

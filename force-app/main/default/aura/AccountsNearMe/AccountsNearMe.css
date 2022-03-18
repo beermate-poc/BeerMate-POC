@@ -1,0 +1,43 @@
+.THIS {
+    position:absolute;
+    width: 100%;
+}
+
+.THIS>div {
+    height: 6%;
+}
+
+/* Iphone 7 */
+@media (max-device-width : 667px) and (min-device-width : 375px) {
+    .THIS .wrapperClass {
+	height: 480px;
+}
+}
+
+
+
+/* IPhone 7 plus */
+@media (max-device-width : 736px) and (min-device-width : 414px) {
+    .THIS .wrapperClass {
+	height: 480px;
+}
+}
+
+/* IPad landscape*/
+
+@media (max-device-width : 1024px)
+    and (min-device-width : 768px)
+    and (orientation: landscape)  {
+    .THIS .wrapperClass {
+	height: 559px;
+}
+}
+
+/* IPad portrait*/
+@media (max-device-width : 1024px)
+    and (min-device-width : 768px)
+    and (orientation: portrait){
+    .THIS .wrapperClass {
+	height: 817px;
+}
+}

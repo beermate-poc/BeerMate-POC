@@ -1,0 +1,52 @@
+{{#ifEquals pricingType 'external'}}
+    <div class="row cc_qty_control_row">
+        <div class="col-md-12 changeQtySection">
+            <div class="form-group">
+                <div class="input-group cc_input_group">
+                        <span class="input-group-btn cc_input_group_btn">
+                             <input type="button" value="{{pageLabelMap 'Prod_QtyDecrSingle'}}" class="qtyButton readonlyBtn btn btn-default btn-sm cc_minus">
+                        </span>
+                    <input type="text" name="qty" value="{{quantity}}" class="qtyInput readonlyBtn input-text plus_minus form-control input-sm cc_entry" />
+                    <span class="input-group-btn cc_input_group_btn">
+                            <input type="button" value="{{pageLabelMap 'Prod_QtyIncrSingle'}}" class="qtyButton readonlyBtn btn btn-default btn-sm cc_plus">
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+{{else}}
+    {{#ifNotEquals pricingType "attrGroup" }}
+        {{#ifEquals qtyIncrement 1}}
+            <div class="row cc_qty_control_row">
+                <div class="col-md-12 changeQtySection">
+                    <div class="form-group">
+                        <div class="input-group cc_input_group">
+                            <span class="input-group-btn cc_input_group_btn">
+                                 <input id="{{generateId 'ccb2b-basket-minus-' product.SKU '-btn'}}" type="button" value="{{pageLabelMap 'Prod_QtyDecrSingle'}}" class="{{#ifLessThan quantity 2}} readonlyBtn{{/ifLessThan}} {{#ifEquals price 0}} readonlyBtn {{else}} minus cc_minus {{/ifEquals}} qtyButton">
+                            </span>
+                            <input data-id="{{generateId 'ccb2b-basket-qty-' product.SKU '-input'}}" id="entry_{{sfid}}" type="text" name="qty" value="{{quantity}}" class="{{#ifEquals price 0}} readonlyBtn {{else}} entry {{/ifEquals}} qtyInput input-text plus_minus form-control input-sm cc_entry" maxlength="7" />
+                            <span class="input-group-btn cc_input_group_btn">
+                                  <input id="{{generateId 'ccb2b-basket-plus-' product.SKU '-btn'}}" type="button" value="{{pageLabelMap 'Prod_QtyIncrSingle'}}" class="{{#ifEquals price 0}} readonlyBtn {{else}} plus cc_plus {{/ifEquals}} qtyButton">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{/ifEquals}}
+            <input type="hidden" name="qtyIncrement" value="{{qtyIncrement}}" class="item_qtyIncrement" />
+            <input type="hidden" name="qtySkipIncrement" value="{{qtySkipIncrement}}" class="item_qtySkipIncrement" />
+    {{else}}
+        {{#ifEquals pricingType 'attrGroup'}}
+                <div class="row cc_qty_control_row">
+                    <div class="col-md-3 col-md-offset-9">
+                        <div class="form-group">
+                            <p class="cc_order_quantity">
+                                <span class="cc_quantity_label">{{pageLabelMap 'CartInc_Qty'}}&#58;&#160;</span>
+                                <span class="cc_quantity">{{quantity}}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+        {{/ifEquals}}
+    {{/ifNotEquals}}
+{{/ifEquals}}

@@ -1,0 +1,11 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<aura:attribute name="recordId" type="Id" />
+	<aura:attribute name="ifmsrc" type="String"/>
+    <button class="slds-button slds-button--neutral slds-float_right" onclick="{!c.openHelpMeUrl}">{!$Label.c.Help_Me}</button>
+	<!--<ui:scrollerWrapper class="scrollerSize">
+		<div class="slds-p-bottom- -xx-large slds-p-around- -medium">
+			<iframe aura:id="iframe"  scrolling="yes" height="650px" width="100%" src="{!v.ifmsrc}" frameborder="true"/>
+		</div>
+	</ui:scrollerWrapper>-->
+</aura:component>

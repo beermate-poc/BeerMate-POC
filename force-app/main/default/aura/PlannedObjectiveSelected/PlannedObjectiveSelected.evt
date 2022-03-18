@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT" description="This event is fired by MboComponent when a Planned Objective is selected, so that the new Objective forms can use the selected Planned Objective's data." >
+    <aura:attribute name="cmpString" type="String" />
+    <aura:attribute name="template" type="Objective__c" />
+</aura:event>

@@ -1,0 +1,47 @@
+.THIS.scrollerSize {
+    height: 600px;
+}
+.THIS .modalStyle{
+    justify-content:flex-start;     
+}
+.THIS .mobileView{
+    display:none;
+}
+.THIS .formContent{
+    padding-top: 45px;
+}
+@media (max-width: 1367px) and (min-width: 320px){
+   .THIS .mobileView {
+        display: block;
+        padding: 1rem;
+        border-bottom: 2px solid rgb(221, 219, 218);
+        text-align: center;
+        position: fixed;
+        background:white;
+        z-index: 1;
+        margin-top: -20px;
+        margin-left: -15px;
+        overflow: hidden;
+        width: 100%;
+    }
+    .THIS .modalStyle{
+        background: white;
+    }
+}
+@media (max-width: 1025px) and (min-width: 767px){
+    .THIS .ipadStyle{
+        padding-right: 35px;
+    }
+}
+@media (max-width: 1024px) and (min-width: 320px){
+   .THIS .mobileViewHeader {
+   		display: none;
+	}
+}
+@media (max-width: 1024px) and (min-width: 320px){
+	.THIS .slds-modal__container {
+    	margin: 0 auto;
+    	width: 100%;
+    	max-width: 100%; 
+	}
+}

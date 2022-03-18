@@ -1,0 +1,36 @@
+.THIS .slds-form-element {
+    width: 100%;
+}
+
+.THIS * {
+    box-sizing: border-box;
+}
+
+.THIS .inlineMode {
+    padding: 10px 0;
+    display: flex !important;
+}
+
+.THIS .inlineMode label {
+    width: 16.6666666667%;
+    padding-left: 1.5rem;
+    align-self: center;
+}
+
+.THIS .hideLabel label {
+    display: none;
+}
+.THIS .inlineMode .slds-form-element__control {
+    flex-grow: 1;
+}
+
+.THIS .slds-lookup__menu {
+    min-height: 60px;
+    min-width: 200px;
+}
+
+
+.THIS ::placeholder{
+    font-style: italic;
+    font-size:10px;
+}

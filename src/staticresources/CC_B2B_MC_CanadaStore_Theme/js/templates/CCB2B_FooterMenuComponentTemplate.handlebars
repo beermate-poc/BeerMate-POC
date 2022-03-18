@@ -1,0 +1,48 @@
+<div class="copyright">
+    <div>
+        {{displayFooterLogo}}
+        <div>{{pageLabelMap 'CCB2B_Footer_Copyright'}}</div>
+        <div>{{pageLabelMap 'CCB2B_Footer_Call'}}</div>
+    </div>
+</div>
+
+<div class="foot-menu">
+    <div class="foot-link">
+        <a id="{{generateId 'menu_foot_' 'terms_and_conditions'}}" href="{{pageLabelMap 'CCB2B_Terms_URI'}}" target="_blank">
+            {{pageLabelMap 'CCB2B_Terms_Label'}}
+        </a>
+    </div>
+    <div class="foot-link">
+        <p>|</p>
+    </div>
+    <div class="foot-link">
+        <a id="{{generateId 'menu_foot_' 'privacy_policy'}}" href="{{pageLabelMap 'CCB2B_Policy_URI'}}" target="_blank">
+            {{pageLabelMap 'CCB2B_Policy_Label'}}
+        </a>
+    </div>
+    {{#if (ifNotPageDisplay 'ccrz__CCChangePassword')}}
+        {{#each menuItems}}
+            {{#ifEquals mType 'URL'}}
+                <div class="foot-list-item">
+                    <a id="{{generateId 'ccb2b-menu-foot-' displayName}}" data-href="{{linkURL}}" {{linkTarget openInNewWindow}}>
+                        {{displayName}}
+                    </a>
+                </div>
+            {{/ifEquals}}
+            {{#ifEquals mType 'FooterURL'}}
+                <div class="foot-list-item">
+                    <a id="{{generateId 'ccb2b-menu-foot-' displayName}}" data-href="{{linkURL}}" {{linkTarget openInNewWindow}}>
+                        {{displayName}}
+                    </a>
+                </div>
+            {{/ifEquals}}
+        {{/each}}
+    {{/if}}
+</div>
+<!--liveChat-->
+{{#ifDisplay 'SC.chat.enable'}}
+    <div class="chat" id="live-chat" onclick="ciscoBubbleChat.showChatWindow()" role="button">
+        <span class="chat_label {{#if (isLang 'FR')}} french_label {{else}} english_label {{/if}}">{{pageLabelMap 'CCB2B_Footer_LiveChat'}}</span>
+    </div>
+{{/ifDisplay}}
+<div id="teconsent"></div>

@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT" description="Close Branselection Component">
+    <aura:attribute name="RecordSaved" type="Boolean" default="false" />
+    <aura:attribute name="isSaveAndNew" type="Boolean" default="false" />
+</aura:event>

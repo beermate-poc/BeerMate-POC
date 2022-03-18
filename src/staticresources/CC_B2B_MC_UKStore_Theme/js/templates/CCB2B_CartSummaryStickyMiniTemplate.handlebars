@@ -1,0 +1,17 @@
+{{#if (checkContactDisplayPermissions 'create_basket')}}
+<div class="row cartSummaryContainer miniSummary stickyContainer">
+    <div class="cartSummaryLine text-center">
+        <span class="icon-cart-circle cartIcon">
+            <span class="path1"></span>
+            <span class="path2"></span>
+        </span>
+    </div>
+    <div class="cartSummaryLine text-center">
+        <span class="cartCount">{{totalItems}} {{#ifGreater totalItems 1}} {{pageLabelMap 'Component_MiniCart_Items'}} {{else}} {{pageLabelMap 'Component_MiniCart_Item'}} {{/ifGreater}}</span>
+    </div>
+    {{#if (checkContactDisplayPermissions 'pricing')}}
+        <div class="cartSummaryLine text-center">{{{price subtotal}}}</div>
+    {{/if}}
+    <button class="primary_button btn btn-default btn-sm cc_checkout_btn text-center processToCart">{{pageLabelMap 'CCB2B_GoToBasket'}}</button>
+</div>
+{{/if}}

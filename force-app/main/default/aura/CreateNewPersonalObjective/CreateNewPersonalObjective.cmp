@@ -1,0 +1,1094 @@
+<!--
+Author:         Nick Serafin
+Company:        Slalom, LLC
+Description:    Handles the creation of shared/personal planned objectives and the child objectives tied to those. They are set as templates to be assigned out to accounts.
+Attributes:     noRoleMsg - If the user does not have a Sales User/ DSM role on their user record, an error msg is shown
+    plannedObjectiveType - The type of the planned objective
+    objectiveHeader - Header for the modal based on users role
+    objectiveType - The type of the objective selected
+    objectiveTypes - List of available options for the objectives
+    plannedObjective - Instance of the planned objective record to be created
+    newObjective - Instance of the objective record to be created
+Event Handlers: init - sets up initial labels and objective types available based on the user's role
+    setSearchAttr - calls the setAttributeValue function when the brand value is changed on the page
+    shouldDisableInput - this is true if the user that created objective being true is not the same as the logged 					   in user
+History
+<Date>      <Authors Name>     												<Brief Description of Change>
+6/21/2017    Nick Serafin        												Initial Creation
+5/4/2020     Lakshmi Narayanan (Accenture)										Removed Space option from creation page as part of GB-10486
+-->
+<aura:component access="global" implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction" controller="AddObjectiveController">
+    <aura:attribute name="noRoleMsg" type="Boolean" default="false"/>
+    <aura:attribute name="userRole" type="String" default=''/>
+    <aura:attribute name="plannedObjType" type="String" />
+    <aura:attribute name="objectiveHeader" type="String" />
+    <aura:attribute name="objectiveType" type="String" />
+    <aura:attribute name="objectiveTypes" type="Object[]" default=""/>
+    <aura:attribute name="disableObjType" type="Boolean" default="true" />
+    <aura:attribute name="isOffPrem" type="Boolean" default="false" />
+    <aura:attribute name="objectivePremiseType" type="String" />
+    <aura:attribute name="objectiveSubType" type="String" />
+    <aura:attribute name="plannedObjective" type="Planned_Objective__c" default="{'sobjectType': 'Planned_Objective__c'}" />
+    <aura:attribute name="delegateUserId" type="String"/>
+    <aura:attribute name="isSharedObjective" type="Boolean" default="false"/>
+    <aura:attribute name="toggleApplyUsers" type="Boolean"/>
+    <aura:attribute name="newObjective" type="Objective__c" default="{'sobjectType': 'Objective__c', 'Status__c': 'Not Started', 'Brands__c': '', 'MC_Product__c': '', 'Is_Template__c': '', 'Description__c': '','BMC_Objective_Sub_Type__c':'','BMC_Brand_Group__c':''}"/>
+    <aura:attribute name="duplicatePlannedObjective" type="Planned_Objective__c" default="{'sobjectType': 'Planned_Objective__c'}" />
+    <aura:attribute name="showCreatePersonal" type="Boolean" default="true" />
+    <aura:attribute name="duplicateFound" type="Boolean" default="false"/>
+    <aura:attribute name="errorsFound" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="setSearchAttr" event="c:SearchValueChange" action="{!c.setAttributeValue}"/>
+    <aura:registerEvent name="setTab" type="c:SetObjectiveTab"/>
+    <aura:handler name="change" value="{!v.objectiveType}" action="{!c.resetObjectiveRecord}"/>
+    
+    <aura:method name="closeModal" action="{!c.closeModal}"/>
+    <aura:method name="saveObjective" action="{!c.saveObjective}"/>
+    
+    <aura:attribute name="numOfUsers" type="Integer" default="0"/>
+    <aura:attribute name="editingObjective" type="Boolean"/>
+    <aura:handler name="change" value="{!v.editingObjective}" action="{!c.handleEditing}"/>
+    <aura:attribute name="shouldDisableInput" type="Boolean"/>
+    <aura:attribute name="selectedMBOId" type="Id" default='' />
+    <aura:attribute name="MBOobject" type="Planned_Objective__c" default="{'sobjectType': 'Planned_Objective__c'}"/>
+    <aura:handler name="change" value="{!v.selectedMBOId}" action="{!c.MBOselection}"/>
+    
+    <aura:attribute name="calledFromVF" type="boolean" default="false"/>
+    
+    <lightning:spinner aura:id="spinner" class="slds-hide" alternativeText="Please wait..." />
+    
+    <aura:if isTrue="{!or($Browser.isPhone, $Browser.isTablet)}">
+        <div class="slds-p-around--medium" aura:id="personalObjectiveModal">
+            <aura:if isTrue="{!v.editingObjective == False}">
+                <div aura:id="sldsContainer">
+                    <div class="slds-p-around--medium">
+                        <h2 class="slds-text-heading--medium">{!$Label.c.Create_Objective}</h2>
+                        <ui:scrollerWrapper class="scrollerSize">
+                            <div class="slds-form--compound">
+                                <div class="slds-form-element__group">
+                                    <aura:if isTrue="{!v.noRoleMsg == False}">
+                                        <div class="slds-form-element">
+                                            <lightning:select name="selectObjectiveType" label="{!$Label.c.Objective_Distribution}" required="true" aura:id="objectiveSelectOptions" onchange="{!c.objectiveSelection}">
+                                                <option value="Personal">{!$Label.c.Objective_Type_Personal}</option>
+                                                <option value="Shared">{!$Label.c.Objective_Type_Shared}</option>
+                                            </lightning:select>
+                                        </div>
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--1-of-1">
+                                                <lightning:select name="Objective Premise Type" label="{!$Label.c.Objective_Premise_Type}" aura:id="objectivePremiseType" value="{!v.objectivePremiseType}" onchange="{!c.updateObjectiveTypes}" required="true">
+                                                    <option value="" default='true'>{!$Label.c.Premise_Selection}</option>
+                                                    <option value="On-Premise" text="{!$Label.c.On_Premise}"></option>
+                                                    <option value="Off-Premise" text="{!$Label.c.Off_Premise}"></option>
+                                                </lightning:select>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--1-of-1">
+                                                <lightning:select name="Objective Type" label="{!$Label.c.Creat_Objectives_Type}" aura:id="objectiveTypePicklist" value="{!v.objectiveType}" disabled="{!v.disableObjType}" required="true">
+                                                    <option value="">{!$Label.c.Create_Objectives_Select_Type}</option>
+                                                    <aura:iteration items="{!v.objectiveTypes}" var="type">
+                                                        <option value="{!type.value}" text="{!type.label}" selected="{!type.selected}"></option>
+                                                    </aura:iteration>
+                                                </lightning:select>
+                                            </div>
+                                        </div>
+                                        <aura:set attribute="else">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <h2 class="slds-text-heading--medium slds-text-align--center">{!$Label.c.Create_Objectives_Role_Error}</h2>
+                                                </div>
+                                            </div>
+                                        </aura:set>
+                                    </aura:if>
+                                    <div class="{!v.objectiveType != '' ? ' ' : 'slds-hide'}">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--1-of-1">
+                                                <lightning:input value="{!v.plannedObjective.Name}" aura:id="objectiveName" type="text" label="{!$Label.c.Create_Objectives_Name}" name="objectiveName" required="true"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--1-of-1">
+                                                <c:DatePicker aura:id="startDate" value="{!v.plannedObjective.Start_Date__c}" label="{!$Label.c.Create_Objectives_Start_Date}" inputClass="slds-input" positionDate="datePickerRightMobile" requiredAstrik="*"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--1-of-1">
+                                                <c:DatePicker aura:id="endDate" value="{!v.plannedObjective.End_Date__c}" label="{!$Label.c.Create_Objectives_Deadline}" inputClass="slds-input" positionDate="datePickerRightMobile" requiredAstrik="*"/>
+                                            </div>
+                                        </div>
+                                        <div class="{!v.objectiveType == 'Display' ? ' ' : 'slds-hide'}">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:input label="{!$Label.c.Create_Objectives_Goal}" aura:id="Displaygoal" name="goal" value="{!v.newObjective.Objective_Goal__c}" pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <c:ProductSearch aura:id="DisplaybrandSearch" label="{!$Label.c.Brand}" object="Product__c" field="TrademarkBrandLongNme__c"
+                                                                     showPkg="true" packageLabel="{!$Label.c.Create_Objectives_Package}" isOffPremise="{!v.isOffPrem}" />
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:input aura:id="Displayquantity" label="{!$Label.c.Create_Objectives_Quantity_Deliver}" name="displayQuantity" value="{!v.newObjective.Product_Quantity__c}" pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number" required="true"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:textarea aura:id="Displaynote" label="{!$Label.c.Create_Objectives_Display_Details}" value="{!v.newObjective.Description__c}" name="note"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="{!v.objectiveType == 'Engagement' ? ' ' : 'slds-hide'}">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:input label="{!$Label.c.Create_Objectives_Goal}" aura:id="Engagementgoal" name="goal" value="{!v.newObjective.Objective_Goal__c}" pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <c:ProductSearch aura:id="EngagementbrandSearch" label="{!$Label.c.Brand}" object="Product__c" field="TrademarkBrandLongNme__c"
+                                                                     showPkg="false"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:textarea aura:id="Engagementnote" label="{!$Label.c.Engagement_Details}" value="{!v.newObjective.Description__c}" name="note"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                        <div class="{!v.objectiveType == 'Sampling' ? ' ' : 'slds-hide'}">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:input label="{!$Label.c.Create_Objectives_Goal}" aura:id="Engagementgoal" name="goal" value="{!v.newObjective.Objective_Goal__c}" pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <c:ProductSearch aura:id="EngagementbrandSearch" label="{!$Label.c.Brand}" object="Product__c" field="TrademarkBrandLongNme__c"
+                                                                     showPkg="false"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                           <div class="slds-form-element slds-size--1-of-1">
+                                   <label class="slds-form-element__label">{!$Label.c.SamplingDol}</label>
+                                   <ui:inputCurrency aura:id="Samplingdol"  value="{!v.newObjective.Sampling_Dollar__c}" class="field"/>
+                                </div>
+                 
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                        <div class="{!v.objectiveType == 'Feature' ? ' ' : 'slds-hide'}">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:input label="{!$Label.c.Create_Objectives_Goal}" aura:id="Featuregoal" name="goal" value="{!v.newObjective.Objective_Goal__c}" pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number"/>
+                                                </div>
+                                            </div>      
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <c:ProductSearch aura:id="FeaturebrandSearch" label="{!$Label.c.Brand}" object="Product__c" field="TrademarkBrandLongNme__c"
+                                                                     showPkg="{!v.isOffPrem}" isOffPremise="true" />
+                                                </div>
+                                            </div>
+                                            <div class="{!v.objectivePremiseType == 'On-Premise' ? ' ' : 'slds-hide'}">
+                                                <legend class="slds-form-element__legend slds-form-element__label"><abbr class="slds-required" title="{!$Label.c.Required}">*</abbr>{!$Label.c.Packaging_Required}</legend>
+                                                <div class="slds-form-element__control slds-grid slds-m-left--xx-large">
+                                                    <div class="slds-col">
+                                                        <lightning:input aura:id="FeaturedraftCbox" type="checkbox" label="{!$Label.c.Draft_Checkbox_Label}" name="draft" checked="{!v.newObjective.Draft_Package__c}"/>
+                                                        <lightning:input aura:id="FeaturecanCbox" type="checkbox" label="{!$Label.c.Can_Checkbox_Label}" name="can" class="slds-m-top--medium" checked="{!v.newObjective.Can_Package__c}"/>
+                                                    </div>
+                                                    <div class="slds-col">
+                                                        <lightning:input aura:id="FeatureglassCbox" type="checkbox" label="{!$Label.c.Bottle_Checkbox_Label}" name="glassBottle" checked="{!v.newObjective.Bottle_Package__c}"/>
+                                                        <lightning:input aura:id="FeaturealumCbox" type="checkbox" label="{!$Label.c.Aluminum_Bottle_Checkbox_Label}" name="aluminumBottle" class="slds-m-top--medium" checked="{!v.newObjective.Aluminium_Pint_Package__c}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <br />
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:textarea aura:id="Featurenote" label="{!$Label.c.Feature_Details}" value="{!v.newObjective.Description__c}" name="note"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="{!v.objectiveType == 'Merchandise' ? ' ' : 'slds-hide'}">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:input label="{!$Label.c.Create_Objectives_Goal}" aura:id="Merchandisegoal" name="goal" value="{!v.newObjective.Objective_Goal__c}" pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <c:ProductSearch aura:id="MerchandisebrandSearch" label="{!$Label.c.Brand}" object="Product__c" field="TrademarkBrandLongNme__c"
+                                                                     showPkg="false"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:textarea aura:id="Merchandisenote" label="{!$Label.c.Create_Objectives_Merchandise_Details}" value="{!v.newObjective.Description__c}" name="note"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="{!v.objectiveType == 'Placement' ? ' ' : 'slds-hide'}">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:input label="{!$Label.c.Create_Objectives_Goal}" aura:id="Placementgoal" name="goal" value="{!v.newObjective.Objective_Goal__c}" pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <c:ProductSearch aura:id="PlacementbrandSearch" label="{!$Label.c.Brand}" object="Product__c" field="TrademarkBrandLongNme__c"
+                                                                     showPkg="true" packageLabel="{!$Label.c.Create_Objectives_Size_Package_Material}" isOffPremise="{!v.isOffPrem}"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:input aura:id="Placementquantity" label="{!$Label.c.Create_Objectives_Initial_Quantity}" name="placementQuantity"  value="{!v.newObjective.Product_Quantity__c}" pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number" required="true"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="{!v.objectiveType == 'Space' ? ' ' : 'slds-hide'}">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:input label="{!$Label.c.Create_Objectives_Goal}" aura:id="Spacegoal" name="goal" value="{!v.newObjective.Objective_Goal__c}" pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:textarea aura:id="Spacenote" label="{!$Label.c.Create_Objectives_Space_Details}" value="{!v.newObjective.Description__c}" name="note"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ui:scrollerWrapper>
+                    </div>
+                </div>
+            </aura:if>
+            <aura:if isTrue="{!v.editingObjective == True}">
+                <ui:scrollerWrapper class="scrollerSize">
+                    <div class="slds-form-element__group">
+                        <div class="slds-form-element">
+                            <label class="slds-form-element__label">{!$Label.c.Objective_Distribution}</label><br />
+                            <ui:outputText value="{!v.newObjective.Planned_Objective__r.Planned_Objective_Type__c}" class="slds-text-body_regular"/>
+                        </div>
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element slds-size--1-of-1">
+                                <lightning:input value="{!v.newObjective.Planned_Objective__r.Name}" aura:id="objectiveNameEdit" type="text" label="{!$Label.c.Create_Objectives_Name}" name="objectiveName" disabled="{!v.shouldDisableInput}"/>
+                            </div>
+                        </div>
+                        <aura:if isTrue="{!v.shouldDisableInput == False}">
+                            <aura:if isTrue="{!v.newObjective.Created_Via_MBO__c}">
+                                <div class="slds-form-element__row">
+                                    <div class="slds-form-element slds-size--1-of-1">
+                                        <ui:inputDate aura:id="dateField"  label="{!$Label.c.Create_Objectives_Start_Date}" value="{!v.MBOobject.Start_Date__c}" displayDatePicker="false" disabled="true"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element__row">
+                                    <div class="slds-form-element slds-size--1-of-1">
+                                        <ui:inputDate aura:id="dateField"  label="{!$Label.c.Create_Objectives_Deadline}" value="{!v.MBOobject.End_Date__c}" displayDatePicker="false" disabled="true"/>
+                                    </div>
+                                </div>
+                                <aura:set attribute="else">
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element slds-size--1-of-1">
+                                            <c:DatePicker aura:id="startDateEdit" value="{!v.newObjective.Planned_Objective__r.Start_Date__c}" label="{!$Label.c.Create_Objectives_Start_Date}" inputClass="slds-input" positionDate="datePickerRightMobile" requiredAstrik="*"/>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element slds-size--1-of-1">
+                                            <c:DatePicker aura:id="endDateEdit" value="{!v.newObjective.Planned_Objective__r.End_Date__c}" label="{!$Label.c.Create_Objectives_Deadline}" inputClass="slds-input" positionDate="datePickerRightMobile" requiredAstrik="*"/>
+                                        </div>
+                                    </div>
+                                </aura:set>
+                            </aura:if>
+                        </aura:if>
+                        <aura:if isTrue="{!v.shouldDisableInput == True}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <ui:inputDate aura:id="dateField"  label="{!$Label.c.Create_Objectives_Start_Date}" value="{!v.newObjective.Planned_Objective__r.Start_Date__c}" displayDatePicker="false" disabled="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <ui:inputDate aura:id="dateField" label="{!$Label.c.Create_Objectives_Deadline}"  value="{!v.newObjective.Planned_Objective__r.End_Date__c}" displayDatePicker="false" disabled="true"/>
+                                </div>
+                            </div>
+                        </aura:if>
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element slds-size--1-of-1">
+                                <lightning:input label="{!$Label.c.Create_Objectives_Goal}" aura:id="goalEdit" name="displayGoal" type="number" value="{!v.newObjective.Objective_Goal__c}" disabled="{!v.shouldDisableInput}" />
+                            </div>
+                        </div>
+                        <div class="{!v.newObjective.RecordType.Name == 'Display' ? ' ' : 'slds-hide'}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Premise_Type}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Objectives_Premise_Type__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Brand}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Brands__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Package}</label><br />
+                                    <div class="{!v.newObjective.Objectives_Premise_Type__c == 'Off-Premise' ? ' ' : 'slds-hide'}">
+                                        <ui:outputText value="{!v.newObjective.MC_Product__r.PackageDesc__c}" class="slds-text-body_regular"/>
+                                    </div>
+                                    <div class="{!v.newObjective.Objectives_Premise_Type__c == 'On-Premise' ? ' ' : 'slds-hide'}">
+                                        <ui:outputText value="{!v.newObjective.MC_Product__r.OnPremisePackageDesc__c}" class="slds-text-body_regular"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Create_Objectives_Quantity_Deliver}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Product_Quantity__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Create_Objectives_Display_Details}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Description__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="{!v.newObjective.RecordType.Name == 'Engagement' ? ' ' : 'slds-hide'}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Premise_Type}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Objectives_Premise_Type__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Brand}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Brands__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Engagement_Details}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Description__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                         <div class="{!v.newObjective.RecordType.Name == 'Sampling' ? ' ' : 'slds-hide'}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Premise_Type}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Objectives_Premise_Type__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Brand}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Brands__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.SamplingDol}</label><br />
+                                   <!-- <ui:outputText value="{!v.newObjective.Description__c}" class="slds-text-body_regular"/>
+                                    <lightning:output label="{!$Label.c.SamplingDol}" aura:id="Samplingdol" name="Sampling $"  pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number"/>-->
+                                    <ui:outputText value="{!v.newObjective.Sampling_Dollar__c}" class="slds-text-body_regular"/>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <div class="{!v.newObjective.RecordType.Name == 'Feature' ? ' ' : 'slds-hide'}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Premise_Type}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Objectives_Premise_Type__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Brand}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Brands__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <legend class="slds-form-element__legend slds-form-element__label">{!$Label.c.Packaging_Required}</legend>
+                            <div class="{!v.newObjective.Objectives_Premise_Type__c == 'On-Premise' ? ' ' : 'slds-hide'}">    
+                                <div class="slds-form-element__control slds-grid slds-m-left--xx-large">
+                                    <div class="slds-col">
+                                        <lightning:input aura:id="draftCboxEdit" type="checkbox" label="{!$Label.c.Draft_Checkbox_Label}" name="draft" checked="{!v.newObjective.Draft_Package__c}" disabled="true"/>
+                                        <lightning:input aura:id="canCboxEdit" type="checkbox" label="{!$Label.c.Can_Checkbox_Label}" name="can" class="slds-m-top--medium" checked="{!v.newObjective.Can_Package__c}" disabled="true"/>
+                                    </div>
+                                    <div class="slds-col">
+                                        <lightning:input aura:id="glassCboxEdit" type="checkbox" label="{!$Label.c.Bottle_Checkbox_Label}" name="glassBottle" checked="{!v.newObjective.Bottle_Package__c}" disabled="true"/>
+                                        <lightning:input aura:id="alumCboxEdit" type="checkbox" label="{!$Label.c.Aluminum_Bottle_Checkbox_Label}" name="aluminumBottle" class="slds-m-top--medium" checked="{!v.newObjective.Aluminium_Pint_Package__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="{!v.newObjective.Objectives_Premise_Type__c == 'Off-Premise' ? ' ' : 'slds-hide'}">
+                                <div class="slds-form-element__row">
+                                    <div class="slds-form-element slds-size--1-of-1">
+                                        <ui:outputText value="{!v.newObjective.MC_Product__r.PackageDesc__c}" class="slds-text-body_regular"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Feature_Details}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Description__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="{!v.newObjective.RecordType.Name == 'Merchandise' ? ' ' : 'slds-hide'}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Premise_Type}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Objectives_Premise_Type__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Brand}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Brands__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Create_Objectives_Merchandise_Details}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Description__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="{!v.newObjective.RecordType.Name == 'Placement' ? ' ' : 'slds-hide'}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Premise_Type}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Objectives_Premise_Type__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Brand}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Brands__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Create_Objectives_Size_Package_Material}</label><br />
+                                    <div class="{!v.newObjective.Objectives_Premise_Type__c == 'Off-Premise' ? ' ' : 'slds-hide'}">
+                                        <ui:outputText value="{!v.newObjective.MC_Product__r.PackageDesc__c}" class="slds-text-body_regular"/>
+                                    </div>
+                                    <div class="{!v.newObjective.Objectives_Premise_Type__c == 'On-Premise' ? ' ' : 'slds-hide'}">
+                                        <ui:outputText value="{!v.newObjective.MC_Product__r.OnPremisePackageDesc__c}" class="slds-text-body_regular"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Create_Objectives_Initial_Quantity}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Product_Quantity__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="{!v.newObjective.RecordType.Name == 'Space' ? ' ' : 'slds-hide'}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Premise_Type}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Objectives_Premise_Type__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Create_Objectives_Space_Details}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Description__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ui:scrollerWrapper>
+            </aura:if>
+        </div>
+        <aura:set attribute="else">
+            <div class="slds-p-around--medium" aura:id="personalObjectiveModal">
+                <aura:if isTrue="{!v.editingObjective == False}">
+                    <div aura:id="sldsContainer">
+                        <div class="slds-p-around--medium">
+                            <h2 class="slds-text-heading--medium">{!$Label.c.Create_Objective}</h2>
+             
+                            <div class="slds-form--compound">
+                                <div class="slds-form-element__group">
+                                    <aura:if isTrue="{!v.noRoleMsg == False}">
+                                        <aura:if isTrue="{!v.selectedMBOId == ''}">
+                                            <aura:if isTrue="{!v.calledFromVF != true}">
+                                            <aura:if isTrue="{!or(or(greaterthan(v.numOfUsers,0), v.delegateUserId != null), v.userRole !='Sales User')}" >
+                                                <div class="slds-form-element">
+                                                    <lightning:select name="selectObjectiveType" label="{!$Label.c.Objective_Distribution}" required="true" aura:id="objectiveSelectOptions" onchange="{!c.objectiveSelection}" value="Personal">
+                                                        <option value="Personal">{!$Label.c.Objective_Type_Personal}</option>
+                                                        <option value="Shared">{!$Label.c.Objective_Type_Shared}</option>
+                                                    </lightning:select>
+                                                </div>
+                                            </aura:if>
+                                            </aura:if>
+                                            <aura:set attribute="else">
+                                                <lightning:select name="selectObjectiveType" label="{!$Label.c.Objective_Distribution}" required="true" aura:id="selectObjectiveTypeDisabled" disabled="true" value="MBO">
+                                                    <option value="MBO">{!$Label.c.Managed_Business_Objective}</option>
+                                                </lightning:select>
+                                            </aura:set>
+                                        </aura:if>
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--1-of-1">
+                                                <lightning:select name="Objective Premise Type" label="{!$Label.c.Objective_Premise_Type}" aura:id="objectivePremiseType" value="{!v.objectivePremiseType}" onchange="{!c.updateObjectiveTypes}" required="true">
+                                                    <option value="" default='true'>{!$Label.c.Premise_Selection}</option>
+                                                    <option value="On-Premise" text="{!$Label.c.On_Premise}"></option>
+                                                    <option value="Off-Premise" text="{!$Label.c.Off_Premise}"></option>
+                                                </lightning:select>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--1-of-1">
+                                                <lightning:select name="Objective Type" label="{!$Label.c.Creat_Objectives_Type}" aura:id="objectiveTypePicklist" value="{!v.objectiveType}" disabled="{!v.disableObjType}" required="true">
+                                                    <option value="">{!$Label.c.Create_Objectives_Select_Type}</option>
+                                                    <aura:iteration items="{!v.objectiveTypes}" var="type">
+                                                        <option value="{!type.value}" text="{!type.label}" selected="{!type.selected}"></option>
+                                                    </aura:iteration>
+                                                </lightning:select>
+                                            </div>
+                                        </div>
+                                        <aura:if isTrue="{!v.userRole == 'Sales Administrator'}">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <c:ProductSearch aura:id="MBOPlannedObj" label="Select MBO" object="Planned_Objective__c" field="Name"
+                                                                     showPkg="false" isRequired="false" selectedId="{!v.selectedMBOId}"/>
+                                                </div>
+                                            </div>
+                                        </aura:if>
+                                        <aura:set attribute="else">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <h2 class="slds-text-heading--medium slds-text-align--center">{!$Label.c.Create_Objectives_Role_Error}</h2>
+                                                </div>
+                                            </div>
+                                        </aura:set>
+                                    </aura:if>
+                                    <div class="{!v.objectiveType == 'Placement' ? ' ' : 'slds-hide'}">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--1-of-1">
+                                                <lightning:select name="Objective Sub Type" label="Product Level" aura:id="objectiveSubType" value="{!v.objectiveSubType}"  required="true">
+                                                    <option value="{!$Label.c.Default_Picklist_Select}" default='true'>{!$Label.c.Default_Picklist_Select}</option>
+                                                    <option value="{!$Label.c.BMC_Objectives_Brand}" text="{!$Label.c.BMC_Objectives_Brand}"></option>
+                                                    <option value="{!$Label.c.BMC_Objectives_BrandGroup}" text="{!$Label.c.BMC_Objectives_BrandGroup}"></option>
+                                                    <option value="{!$Label.c.BMC_Objectives_BrandGroupPackage}" text="{!$Label.c.BMC_Objectives_BrandGroupPackage}"></option>
+                                                    <option value="{!$Label.c.BMC_Objectives_BrandPackage}" text="{!$Label.c.BMC_Objectives_BrandPackage}"></option>
+                                                    <option value="{!$Label.c.BMC_Brand_Family_Package}" text="{!$Label.c.BMC_Brand_Family_Package}"></option>
+                                                </lightning:select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="{!v.objectiveType != '' ? ' ' : 'slds-hide'}">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--1-of-1">
+                                                <lightning:input value="{!v.plannedObjective.Name}" aura:id="objectiveName" type="text" label="{!$Label.c.Create_Objectives_Name}" name="objectiveName" required="true"/>
+                                            </div>
+                                        </div>
+                                        <aura:if isTrue="{!v.selectedMBOId == ''}">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <c:DatePicker aura:id="startDate" value="{!v.plannedObjective.Start_Date__c}" label="{!$Label.c.Create_Objectives_Start_Date}" inputClass="slds-input" positionDate="datePickerRightMobile" requiredAstrik="*"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <c:DatePicker aura:id="endDate" value="{!v.plannedObjective.End_Date__c}" label="{!$Label.c.Create_Objectives_Deadline}" inputClass="slds-input" positionDate="datePickerRightMobile" requiredAstrik="*"/>
+                                                </div>
+                                            </div>
+                                            <aura:set attribute="else">
+                                                <div class="slds-form-element__row">
+                                                    <div class="slds-form-element slds-size--1-of-1">
+                                                        <ui:inputDate aura:id="dateField"  label="{!$Label.c.Create_Objectives_Start_Date}" value="{!v.MBOobject.Start_Date__c}" displayDatePicker="false" disabled="true"/>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element__row">
+                                                    <div class="slds-form-element slds-size--1-of-1">
+                                                        <ui:inputDate aura:id="dateField"  label="{!$Label.c.Create_Objectives_Deadline}" value="{!v.MBOobject.End_Date__c}" displayDatePicker="false" disabled="true"/>
+                                                    </div>
+                                                </div>
+                                            </aura:set>	
+                                        </aura:if>
+                                        <div class="{!v.objectiveType == 'Display' ? ' ' : 'slds-hide'}">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:input label="{!$Label.c.Create_Objectives_Goal}" aura:id="Displaygoal" name="goal" value="{!v.newObjective.Objective_Goal__c}" pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <c:ProductSearch aura:id="DisplaybrandSearch" label="{!$Label.c.Brand}" object="Product__c" field="TrademarkBrandLongNme__c"
+                                                                     showPkg="true" packageLabel="{!$Label.c.Create_Objectives_Package}" isOffPremise="{!v.isOffPrem}" />
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:input aura:id="Displayquantity" label="{!$Label.c.Create_Objectives_Quantity_Deliver}" name="displayQuantity" value="{!v.newObjective.Product_Quantity__c}" pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number" required="true"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:textarea aura:id="Displaynote" label="{!$Label.c.Create_Objectives_Display_Details}" value="{!v.newObjective.Description__c}" name="note"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="{!v.objectiveType == 'Engagement' ? ' ' : 'slds-hide'}">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:input label="{!$Label.c.Create_Objectives_Goal}" aura:id="Engagementgoal" name="goal" value="{!v.newObjective.Objective_Goal__c}" pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <c:ProductSearch aura:id="EngagementbrandSearch" label="{!$Label.c.Brand}" object="Product__c" field="TrademarkBrandLongNme__c"
+                                                                     showPkg="false"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:textarea aura:id="Engagementnote" label="{!$Label.c.Engagement_Details}" value="{!v.newObjective.Description__c}" name="note"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                         <div class="{!v.objectiveType == 'Sampling' ? ' ' : 'slds-hide'}">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <c:ProductSearch aura:id="SamplingbrandSearch" label="{!$Label.c.Brand}" object="Product__c" field="TrademarkBrandLongNme__c"
+                                                                     showPkg="false"/>
+                                                </div>
+                                                
+                                            </div> 
+                                             
+                                             
+                                             <div class="slds-form-element__row">
+                            <div class="slds-form-element slds-size--1-of-1">
+                                <lightning:input label="{!$Label.c.Create_Objectives_Goal}" aura:id="goalEdit" name="displayGoal" type="number" value="{!v.newObjective.Objective_Goal__c}" disabled="{!v.shouldDisableInput}" />
+                            </div>
+                                             </div>
+                                             
+                                             
+                                             
+                                             <div class="slds-form-element__row">
+                                             <div class="slds-form-element slds-size--1-of-1">
+                                   				<label class="slds-form-element__label">{!$Label.c.SamplingDol}</label>
+                                   				<ui:inputCurrency aura:id="Samplingdol"  value="{!v.newObjective.Sampling_Dollar__c}" class="field"/>
+                                			</div>
+                                            </div>                                           
+                                        </div>
+                                        
+                                        <div class="{!v.objectiveType == 'Feature' ? ' ' : 'slds-hide'}">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:input label="{!$Label.c.Create_Objectives_Goal}" aura:id="Featuregoal" name="goal" value="{!v.newObjective.Objective_Goal__c}" pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number"/>
+                                                </div>
+                                            </div>      
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <c:ProductSearch aura:id="FeaturebrandSearch" label="{!$Label.c.Brand}" object="Product__c" field="TrademarkBrandLongNme__c"
+                                                                     showPkg="{!v.isOffPrem}" isOffPremise="true" />
+                                                </div>
+                                            </div>
+                                            <div class="{!v.objectivePremiseType == 'On-Premise' ? ' ' : 'slds-hide'}">
+                                                <legend class="slds-form-element__legend slds-form-element__label"><abbr class="slds-required" title="{!$Label.c.Required}">*</abbr>{!$Label.c.Packaging_Required}</legend>
+                                                <div class="slds-form-element__control slds-grid slds-m-left--xx-large">
+                                                    <div class="slds-col">
+                                                        <lightning:input aura:id="FeaturedraftCbox" type="checkbox" label="{!$Label.c.Draft_Checkbox_Label}" name="draft" checked="{!v.newObjective.Draft_Package__c}"/>
+                                                        <lightning:input aura:id="FeaturecanCbox" type="checkbox" label="{!$Label.c.Can_Checkbox_Label}" name="can" class="slds-m-top--medium" checked="{!v.newObjective.Can_Package__c}"/>
+                                                    </div>
+                                                    <div class="slds-col">
+                                                        <lightning:input aura:id="FeatureglassCbox" type="checkbox" label="{!$Label.c.Bottle_Checkbox_Label}" name="glassBottle" checked="{!v.newObjective.Bottle_Package__c}"/>
+                                                        <lightning:input aura:id="FeaturealumCbox" type="checkbox" label="{!$Label.c.Aluminum_Bottle_Checkbox_Label}" name="aluminumBottle" class="slds-m-top--medium" checked="{!v.newObjective.Aluminium_Pint_Package__c}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <br />
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:textarea aura:id="Featurenote" label="{!$Label.c.Feature_Details}" value="{!v.newObjective.Description__c}" name="note"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="{!v.objectiveType == 'Merchandise' ? ' ' : 'slds-hide'}">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:input label="{!$Label.c.Create_Objectives_Goal}" aura:id="Merchandisegoal" name="goal" value="{!v.newObjective.Objective_Goal__c}" pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <c:ProductSearch aura:id="MerchandisebrandSearch" label="{!$Label.c.Brand}" object="Product__c" field="TrademarkBrandLongNme__c"
+                                                                     showPkg="false"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:textarea aura:id="Merchandisenote" label="{!$Label.c.Create_Objectives_Merchandise_Details}" value="{!v.newObjective.Description__c}" name="note"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="{!v.objectiveType == 'Placement' ? ' ' : 'slds-hide'}">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:input label="{!$Label.c.Create_Objectives_Goal}" aura:id="Placementgoal" name="goal" value="{!v.newObjective.Objective_Goal__c}" pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <aura:if isTrue="{!v.objectiveSubType == $Label.c.BMC_Objectives_Brand}">
+                                                        <c:ProductSearch aura:id="PlacementbrandSearch" label="{!$Label.c.Brand}" object="Product__c" field="TrademarkBrandLongNme__c"
+                                                                         showPkg="false" packageLabel="{!$Label.c.Create_Objectives_Size_Package_Material}" isOffPremise="{!v.isOffPrem}"/>
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!v.objectiveSubType == $Label.c.BMC_Objectives_BrandGroup}">
+                                                        <c:ProductSearch aura:id="PlacementbrandSearch" label="{!$Label.c.BMC_Objectives_BrandGroup}"  object="Product__c" field="CmrclPlanningBrandGroupNme__c"
+                                                                         showPkg="false" packageLabel="{!$Label.c.Create_Objectives_Size_Package_Material}" isOffPremise="{!v.isOffPrem}"/>
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!v.objectiveSubType == $Label.c.BMC_Objectives_BrandGroupPackage}">
+                                                        <c:ProductSearch aura:id="PlacementbrandSearch" label="{!$Label.c.BMC_Objectives_BrandGroup}" object="Product__c" field="CmrclPlanningBrandGroupNme__c"
+                                                                         showPkg="true" packageLabel="{!$Label.c.Create_Objectives_Size_Package_Material}" isOffPremise="{!v.isOffPrem}"/>
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!v.objectiveSubType == $Label.c.BMC_Objectives_BrandPackage}">
+                                                        <c:ProductSearch aura:id="PlacementbrandSearch" label="{!$Label.c.Brand}" object="Product__c" field="TrademarkBrandLongNme__c"
+                                                                         showPkg="true" packageLabel="{!$Label.c.Create_Objectives_Size_Package_Material}" isOffPremise="{!v.isOffPrem}"/>
+                                                    </aura:if>
+                                                     <aura:if isTrue="{!v.objectiveSubType == $Label.c.BMC_Brand_Family_Package}">
+                                                        <c:ProductSearch aura:id="PlacementbrandSearch" label="{!$Label.c.BMC_Brand_Family_Package}" object="Product__c" field="TrademarkBrandFamilyNme__c"
+                                                                         showPkg="true" packageLabel="{!$Label.c.Create_Objectives_Size_Package_Material}" isOffPremise="{!v.isOffPrem}"/>
+                                                    </aura:if>
+                                                    
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:input aura:id="Placementquantity" label="{!$Label.c.Create_Objectives_Initial_Quantity}" name="placementQuantity"  value="{!v.newObjective.Product_Quantity__c}" pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number" required="true"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="{!v.objectiveType == 'Space' ? ' ' : 'slds-hide'}">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:input label="{!$Label.c.Create_Objectives_Goal}" aura:id="Spacegoal" name="goal" value="{!v.newObjective.Objective_Goal__c}" pattern="^[0-9]*$" messageWhenPatternMismatch="Value must be a number"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size--1-of-1">
+                                                    <lightning:textarea aura:id="Spacenote" label="{!$Label.c.Create_Objectives_Space_Details}" value="{!v.newObjective.Description__c}" name="note"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.editingObjective == True}">
+                    <div class="slds-form-element__group">
+                        <aura:if isTrue="{!and(v.selectedMBOId == '', v.newObjective.Created_Via_MBO__c == true)}" >
+                            <div class="slds-form-element">
+                                <lightning:select name="selectObjectiveType" label="{!$Label.c.Objective_Distribution}" required="true" aura:id="objectiveSelectOptionsEdit" onchange="{!c.objectiveSelection}" value="Personal">
+                                    <option value="Personal">{!$Label.c.Objective_Type_Personal}</option>
+                                    <option value="Shared">{!$Label.c.Objective_Type_Shared}</option>
+                                </lightning:select>
+                            </div>
+                        </aura:if>
+                        <aura:if isTrue="{!v.selectedMBOId!=''}">
+                            <div class="slds-form-element">
+                                <lightning:select name="selectObjectiveType" label="{!$Label.c.Objective_Distribution}" required="true" aura:id="selectObjectiveTypeDisabled" disabled="true" value="MBO">
+                                    <option value="MBO">{!$Label.c.Managed_Business_Objective}</option>
+                                </lightning:select>
+                            </div>
+                        </aura:if>
+                        <aura:if isTrue="{!v.newObjective.Created_Via_MBO__c == False}">
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label">{!$Label.c.Objective_Distribution}</label><br />
+                                <ui:outputText value="{!v.newObjective.Planned_Objective__r.Planned_Objective_Type__c}" class="slds-text-body_regular"/>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <lightning:input value="{!v.newObjective.Planned_Objective__r.Name}" aura:id="objectiveNameEdit" type="text" label="{!$Label.c.Create_Objectives_Name}" name="objectiveName" disabled="{!v.shouldDisableInput}"/>
+                                </div>
+                            </div>
+                            <aura:set attribute="else">
+                                <div class="slds-form-element__row">
+                                    <div class="slds-form-element slds-size--1-of-1">
+                                        <lightning:input value="{!v.newObjective.Name}" aura:id="objectiveNameEdit" type="text" label="{!$Label.c.Create_Objectives_Name}" name="objectiveName" disabled="{!v.shouldDisableInput}"/>
+                                    </div>
+                                </div>
+                            </aura:set>
+                        </aura:if>
+                        <aura:if isTrue="{!v.userRole == 'Sales Administrator'}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <c:ProductSearch aura:id="MBOPlannedObjEdit" label="Select MBO" object="Planned_Objective__c" field="Name"
+                                                     showPkg="false" isRequired="false" selectedId="{!v.selectedMBOId}" searchValue="{!v.MBOobject.Name}"/>
+                                </div>
+                            </div>
+                        </aura:if>
+                        <aura:if isTrue="{!v.shouldDisableInput == False}">
+                            <aura:if isTrue="{!v.selectedMBOId == ''}">
+                                <aura:if isTrue="{!v.newObjective.Created_Via_MBO__c}">
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element slds-size--1-of-1">
+                                            <c:DatePicker aura:id="startDateEdit" value="{!v.plannedObjective.Start_Date__c}" label="{!$Label.c.Create_Objectives_Start_Date}" inputClass="slds-input" positionDate="datePickerRightMobile" requiredAstrik="*"/>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element slds-size--1-of-1">
+                                            <c:DatePicker aura:id="endDateEdit" value="{!v.plannedObjective.End_Date__c}" label="{!$Label.c.Create_Objectives_Deadline}" inputClass="slds-input" positionDate="datePickerRightMobile" requiredAstrik="*"/>
+                                        </div>
+                                    </div>
+                                    <aura:set attribute="else">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--1-of-1">
+                                                <c:DatePicker aura:id="startDateEdit" value="{!v.newObjective.Planned_Objective__r.Start_Date__c}" label="{!$Label.c.Create_Objectives_Start_Date}" inputClass="slds-input" positionDate="datePickerRightMobile" requiredAstrik="*"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-size--1-of-1">
+                                                <c:DatePicker aura:id="endDateEdit" value="{!v.newObjective.Planned_Objective__r.End_Date__c}" label="{!$Label.c.Create_Objectives_Deadline}" inputClass="slds-input" positionDate="datePickerRightMobile" requiredAstrik="*"/>
+                                            </div>
+                                        </div>
+                                    </aura:set>
+                                </aura:if>
+                          <div class="{!v.newObjective.RecordType.Name == 'Sampling' ? ' ' : 'slds-hide'}">
+                           <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                   <label class="slds-form-element__label">{!$Label.c.SamplingDol}</label>
+                                   <ui:inputCurrency aura:id="amount"  value="{!v.newObjective.Sampling_Dollar__c}" class="field"/>
+                                </div>
+                            </div>
+                                    </div>
+                                <aura:set attribute="else">
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element slds-size--1-of-1">
+                                            <ui:inputDate aura:id="dateField"  label="{!$Label.c.Create_Objectives_Start_Date}" value="{!v.MBOobject.Start_Date__c}" displayDatePicker="false" disabled="true"/>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element slds-size--1-of-1">
+                                            <ui:inputDate aura:id="dateField"  label="{!$Label.c.Create_Objectives_Deadline}" value="{!v.MBOobject.End_Date__c}" displayDatePicker="false" disabled="true"/>
+                                        </div>
+                                    </div>
+                                </aura:set>	
+                            </aura:if>
+                        </aura:if>
+                        <aura:if isTrue="{!v.shouldDisableInput == True}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <ui:inputDate aura:id="dateField"  label="{!$Label.c.Create_Objectives_Start_Date}" value="{!v.newObjective.Planned_Objective__r.Start_Date__c}" displayDatePicker="false" disabled="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <ui:inputDate aura:id="dateField" label="{!$Label.c.Create_Objectives_Deadline}"  value="{!v.newObjective.Planned_Objective__r.End_Date__c}" displayDatePicker="false" disabled="true"/>
+                                </div>
+                            </div>
+                        </aura:if>
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element slds-size--1-of-1">
+                                <lightning:input label="{!$Label.c.Create_Objectives_Goal}" aura:id="goalEdit" name="displayGoal" type="number" value="{!v.newObjective.Objective_Goal__c}" disabled="{!v.shouldDisableInput}" />
+                            </div>
+                        </div>
+                        <div class="{!v.newObjective.RecordType.Name == 'Display' ? ' ' : 'slds-hide'}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Premise_Type}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Objectives_Premise_Type__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Brand}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Brands__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Package}</label><br />
+                                    <div class="{!v.newObjective.Objectives_Premise_Type__c == 'Off-Premise' ? ' ' : 'slds-hide'}">
+                                        <ui:outputText value="{!v.newObjective.MC_Product__r.PackageDesc__c}" class="slds-text-body_regular"/>
+                                    </div>
+                                    <div class="{!v.newObjective.Objectives_Premise_Type__c == 'On-Premise' ? ' ' : 'slds-hide'}">
+                                        <ui:outputText value="{!v.newObjective.MC_Product__r.OnPremisePackageDesc__c}" class="slds-text-body_regular"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Create_Objectives_Quantity_Deliver}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Product_Quantity__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Create_Objectives_Display_Details}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Description__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="{!v.newObjective.RecordType.Name == 'Engagement' ? ' ' : 'slds-hide'}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Premise_Type}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Objectives_Premise_Type__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Brand}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Brands__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                        </div>
+                           <div class="{!v.newObjective.RecordType.Name == 'Sampling' ? ' ' : 'slds-hide'}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Brand}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Brands__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+
+                            </div>
+                        <div class="{!v.newObjective.RecordType.Name == 'Feature' ? ' ' : 'slds-hide'}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Premise_Type}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Objectives_Premise_Type__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Brand}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Brands__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <legend class="slds-form-element__legend slds-form-element__label">{!$Label.c.Packaging_Required}</legend>
+                            <div class="{!v.newObjective.Objectives_Premise_Type__c == 'On-Premise' ? ' ' : 'slds-hide'}">    
+                                <div class="slds-form-element__control slds-grid slds-m-left--xx-large">
+                                    <div class="slds-col">
+                                        <lightning:input aura:id="draftCboxEdit" type="checkbox" label="{!$Label.c.Draft_Checkbox_Label}" name="draft" checked="{!v.newObjective.Draft_Package__c}" disabled="true"/>
+                                        <lightning:input aura:id="canCboxEdit" type="checkbox" label="{!$Label.c.Can_Checkbox_Label}" name="can" class="slds-m-top--medium" checked="{!v.newObjective.Can_Package__c}" disabled="true"/>
+                                    </div>
+                                    <div class="slds-col">
+                                        <lightning:input aura:id="glassCboxEdit" type="checkbox" label="{!$Label.c.Bottle_Checkbox_Label}" name="glassBottle" checked="{!v.newObjective.Bottle_Package__c}" disabled="true"/>
+                                        <lightning:input aura:id="alumCboxEdit" type="checkbox" label="{!$Label.c.Aluminum_Bottle_Checkbox_Label}" name="aluminumBottle" class="slds-m-top--medium" checked="{!v.newObjective.Aluminium_Pint_Package__c}" disabled="true"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="{!v.newObjective.Objectives_Premise_Type__c == 'Off-Premise' ? ' ' : 'slds-hide'}">
+                                <div class="slds-form-element__row">
+                                    <div class="slds-form-element slds-size--1-of-1">
+                                        <ui:outputText value="{!v.newObjective.MC_Product__r.PackageDesc__c}" class="slds-text-body_regular"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Feature_Details}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Description__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="{!v.newObjective.RecordType.Name == 'Merchandise' ? ' ' : 'slds-hide'}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Premise_Type}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Objectives_Premise_Type__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Brand}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Brands__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Create_Objectives_Merchandise_Details}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Description__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="{!v.newObjective.RecordType.Name == 'Placement' ? ' ' : 'slds-hide'}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Premise_Type}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Objectives_Premise_Type__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                     <aura:if isTrue="{!or(v.newObjective.BMC_Product_Level__c==$Label.c.BMC_Objectives_Brand, v.newObjective.BMC_Product_Level__c==$Label.c.BMC_Objectives_BrandPackage)}">
+                                          <label class="slds-form-element__label">{!$Label.c.Brand}</label><br />
+                                         <ui:outputText value="{!v.newObjective.Brands__c}" class="slds-text-body_regular"/>
+                                    </aura:if>
+                                    
+                                    <aura:if isTrue="{!or(v.newObjective.BMC_Product_Level__c== $Label.c.BMC_Objectives_BrandGroup, v.newObjective.BMC_Product_Level__c==$Label.c.BMC_Objectives_BrandGroupPackage)}">
+                                     <label class="slds-form-element__label">{!$Label.c.BMC_Objectives_BrandGroup}</label><br />
+                                        <ui:outputText value="{!v.newObjective.BMC_Brand_Group__c}" class="slds-text-body_regular"/>
+                                    </aura:if>
+                                     <aura:if isTrue="{!v.newObjective.BMC_Product_Level__c== $Label.c.BMC_Brand_Family_Package}">
+                                     <label class="slds-form-element__label">{!$Label.c.BMC_Brand_Family_Package}</label><br />
+                                        <ui:outputText value="{!v.newObjective.BMC_Brand_Family__c}" class="slds-text-body_regular"/>
+                                    </aura:if>
+                                </div>
+                            </div>
+                             <aura:if isTrue="{!or(or(v.newObjective.BMC_Product_Level__c==$Label.c.BMC_Objectives_BrandPackage, v.newObjective.BMC_Product_Level__c==$Label.c.BMC_Objectives_BrandGroupPackage),v.newObjective.BMC_Product_Level__c==$Label.c.BMC_Brand_Family_Package)}"> 
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Create_Objectives_Size_Package_Material}</label><br />
+                                    <div class="{!v.newObjective.Objectives_Premise_Type__c == 'Off-Premise' ? ' ' : 'slds-hide'}">
+                                        <ui:outputText value="{!v.newObjective.MC_Product__r.PackageDesc__c}" class="slds-text-body_regular"/>
+                                    </div>
+                                    <div class="{!v.newObjective.Objectives_Premise_Type__c == 'On-Premise' ? ' ' : 'slds-hide'}">
+                                        <ui:outputText value="{!v.newObjective.MC_Product__r.OnPremisePackageDesc__c}" class="slds-text-body_regular"/>
+                                    </div>
+                                </div>
+                            </div>
+                                  </aura:if>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Create_Objectives_Initial_Quantity}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Product_Quantity__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="{!v.newObjective.RecordType.Name == 'Space' ? ' ' : 'slds-hide'}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Premise_Type}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Objectives_Premise_Type__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size--1-of-1">
+                                    <label class="slds-form-element__label">{!$Label.c.Create_Objectives_Space_Details}</label><br />
+                                    <ui:outputText value="{!v.newObjective.Description__c}" class="slds-text-body_regular"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aura:if>
+            </div>
+        </aura:set>
+    </aura:if>
+</aura:component>

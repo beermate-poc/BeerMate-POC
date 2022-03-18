@@ -1,0 +1,218 @@
+<div class="panel panel-default cc_panel cc_checkout_review">
+    <div>
+        <h3 id="ccb2b-co-review-generalinfo-label" class="panel-title cc_section_title">{{pageLabelMap 'CheckOut_ReviewStep'}}</h3>
+    </div>
+    <div class="panel-body cc_body">
+        <form enctype="multipart/form-data" class="margin_form cc_OrderReview_new">
+            <div class="messagingSection-Error" style="display: none"></div>
+            <div class="messagingSection-Info" style="display: none"></div>
+            <div class="messagingSection-Warning" style="display: none"></div>
+            <div class="reviewCartSection"></div>
+            <hr>
+            {{#if (checkContactDisplayPermissions 'checkout_basket')}}
+                <div class="paymentSection col-sm-12 col-xs-12">
+                    <h3 id="ccb2b-co-review-paymentmethod-label" class="reviewSectionLabel">
+                        {{pageLabelMap 'CheckOut_PaymentMethod'}}
+                    </h3>
+                    <h3>{{pageLabelMap 'CCB2B_Checkout_OrderReferenceNumber'}}</h3>
+                    <input id="ccb2b-co-review-po-number" class="form-control" type="text" class="col" name="po_number" maxlength="17"/>
+
+                    <h3>{{pageLabelMap 'CCB2B_Checkout_ChoosePayment'}}</h3>
+
+                    <div class="payment_method_check">
+                        {{#each availablePaymentMethods}}
+                                <div>
+                                    <input id="ccb2b-co-review-{{this}}" class="paymentMethod" type="radio" value={{this}} name="paymentMethod"/>
+                                    <label for="ccb2b-co-review-{{this}}">{{pageLabelPrefixMap 'CCB2B_Checkout_' this}}</label>
+                                </div>
+                        {{/each}}
+                    </div>
+                    <div class="pay_by_card_section col-md-9 col-xs-12">
+                        <div id="CCB2B_PaymentTokensComponent"></div>
+                    </div>
+                    <div class="cc_billing_address col-md-3 col-xs-12">
+                        <div class="checkout_label" id="ccb2b-co-review-deliveryinfo-label">{{pageLabelMap 'CheckOut_BillingAddress'}}</div>
+                        {{#ifDisplay 'SO.DsplAddrName'}}
+                            <div class="form-group col-md-3 col-xs-6">
+                                <label>{{pageLabelMap 'CheckOut_FirstName'}}</label>
+                                <input readonly="true" id="firstName" type="text"
+                                       class="form-readonly form-control {{classPrefix}}firstNameField {{classPrefix}}Field cc_contact_input_firstname"
+                                       value="{{billingAddress.firstName}}" name="{{classPrefix}}Address.firstName"/>
+                            </div>
+                            <div class="form-group col-md-3 col-xs-6">
+                                <label>{{pageLabelMap 'CheckOut_LastName'}}</label>
+                                <input readonly="true" id="lastName" type="text"
+                                       class="form-readonly form-control {{classPrefix}}lastNameField {{classPrefix}}Field cc_contact_input_lastname"
+                                       value="{{billingAddress.lastName}}" name="{{classPrefix}}Address.lastName"/>
+                            </div>
+                        {{/ifDisplay}}
+                        {{#ifDisplay 'SO.DsplAddrCompany'}}
+                            <p class="cc_addr_billing">{{> addressDisplay (getBillingAddress billingAddress)}}</p>
+                            <p class="cc_addr_phone">{{buyerPhone}}</p>
+                        {{/ifDisplay}}
+                    </div>
+                </div>
+            {{/if}}
+            <div class="col-md-4 col-xs-12 delivery_section">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="checkout_label" id="ccb2b-co-review-deliveryaddress-label">{{pageLabelMap 'CCB2B_Checkout_DeliveryAddressTitle'}}</div>
+                        <div>{{pageLabelMap 'CCB2B_Checkout_Delivery_Info_Msg'}}</div>
+                        <div class="cc_shipping_address">
+                            <div class="text-right">
+                                <span class="icon-delivery-circle delivery_icon">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                </span>
+                            </div>
+                            {{#ifDisplay 'SO.DsplAddrName'}}
+                                <div class="form-group col-md-3 col-xs-6">
+                                    <label>{{pageLabelMap 'CheckOut_FirstName'}}</label>
+                                    <input readonly="true" id="ccb2b-co-review-shipping-firstName" type="text"
+                                           class="form-readonly form-control {{classPrefix}}firstNameField {{classPrefix}}Field cc_contact_input_firstname"
+                                           value="{{billingAddress.firstName}}" name="{{classPrefix}}Address.firstName"/>
+                                </div>
+                                <div class="form-group col-md-3 col-xs-6">
+                                    <label>{{pageLabelMap 'CheckOut_LastName'}}</label>
+                                    <input readonly="true" id="ccb2b-co-review-shipping-lastName" type="text"
+                                           class="form-readonly form-control {{classPrefix}}lastNameField {{classPrefix}}Field cc_contact_input_lastname"
+                                           value="{{billingAddress.lastName}}" name="{{classPrefix}}Address.lastName"/>
+                                </div>
+                            {{/ifDisplay}}
+                            {{#ifDisplay 'SO.DsplAddrCompany'}}
+                                <div data-orgid="companyName" id="ccb2b-co-review-shipping-businessname-field"
+                                     name="{{classPrefix}}Address.companyName">{{billingAddress.companyName}}</div>
+                            {{/ifDisplay}}
+                            <div class="address-group">
+                                    <span data-orgid="address1" id="ccb2b-co-review-shipping-address1-field"
+                                          name="{{classPrefix}}Address.address1">{{billingAddress.address1}}</span>
+                                {{#if billingAddress.address2}}
+                                    <span data-orgid="address2" id="ccb2b-co-review-billing-address2-field"
+                                          name="{{classPrefix}}Address.address2">{{billingAddress.address2}}</span>
+                                {{/if}}
+                                {{#if billingAddress.address3}}
+                                    <span data-orgid="address3" id="ccb2b-co-review-shipping-address3-field"
+                                          name="{{classPrefix}}Address.address3">{{billingAddress.address3}}</span>
+                                {{/if}}
+                            </div>
+                            <input type="hidden" class="{{classPrefix}}acctIdField {{classPrefix}}Field"
+                                   name="{{classPrefix}}Address.partnerId" maxlength=100 value="{{billingAddress.partnerId}}"/>
+                            <div>
+                                    <span data-orgid="city" id="ccb2b-co-review-shipping-city-field"
+                                          name="{{classPrefix}}Address.city">{{billingAddress.city}}</span>
+                                <span data-orgid="state" id="ccb2b-co-review-shipping-province-field"
+                                      name="{{classPrefix}}Address.state">{{billingAddress.state}}</span>
+                                <span data-orgid="postalCode" id="ccb2b-co-review-shipping-postalcode-field"
+                                      name="{{classPrefix}}Address.postalCode">{{billingAddress.postalCode}}</span>
+                            </div>
+                            <div data-orgid="country" id="ccb2b-co-review-shipping-country-field"
+                                 name="{{classPrefix}}Address.country">{{billingAddress.country}}</div>
+                            <div class="form-group col-md-3 hidden">
+                                <label>{{pageLabelMap 'CCB2B_Checkout_Country_Label'}}</label>
+                                {{{selectGeo 'country' billingAddress.countryList billingAddress.countryCode 'countryListing
+                                    form-control form-readonly' this.classPrefix}}}
+                            </div>
+                        </div>
+                        <div data-orgid="phone" id="ccb2b-co-review-shipping-phone-field"
+                             name="{{classPrefix}}Address.phone">{{pageLabelMap 'CCB2B_Checkout_Tel'}}&nbsp;{{buyerPhone}}</div>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="checkout_label" id="ccb2b-co-review-deliverymethod-label">{{pageLabelMap 'CCB2B_Checkout_DeliveryMethodTitle'}}</div>
+                        <div>{{pageLabelMap 'CCB2B_Checkout_DeliveryMethodFree'}}</div>
+                        <div class="section_separator"></div>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="checkout_label" id="ccb2b-co-review-deliverydate-label">{{pageLabelMap 'CCB2B_Checkout_DeliveryDateTitle'}}</div>
+                        <div>{{requestedDateStr}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <p class="link_button col-md-12 text-right cc_link_button pull-right">
+                    <input id="ccb2b-co-review-back-bottom-btn" class="btn btn-default btn-sm processBackToInfo cc_process_back" type="button"
+                           value="{{pageLabelMap 'Back'}}" alt="{{pageLabelMap 'Back'}}"/>
+                    {{#if (checkContactDisplayPermissions 'checkout_basket')}}
+                        <input id="ccb2b-co-review-confirm-bottom-btn" class="btn primary_button btn-default btn-sm goToConfirm proceed cc_process_review" type="button"
+                                value="{{pageLabelMap 'CheckOut_PlaceOrder'}}" alt="{{pageLabelMap 'CheckOut_PlaceOrder'}}" disabled="disabled"/>
+                    {{/if}}
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="accountErrorModal" class="modal fade cc_modal" tabindex="-1" role="dialog" aria-labelledby="accountErrorHeader">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content cc_modal_content">
+            <div class="modal-header cc_modal_header">
+                <button type="button" class="close cc_close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&#215;</span></button>
+                <h4 id="accountErrorHeader" class="modal-title cc_modal_title">{{pageLabelMap 'CCB2B_AccountError_Header'}}</h4>
+            </div>
+            <div id="accountErrorBody" class="modal-body cc_modal_body"></div>
+            <div class="modal-footer cc_modal_footer">
+                <input type="button" class="primary_button btn btn-default btn-sm goToCart" value="{{pageLabelMap 'Ok'}}"/>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="permissionErrorModal" class="modal fade cc_modal" tabindex="-1" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="permissionErrorHeader">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content cc_modal_content">
+            <div class="modal-header cc_modal_header">
+                <h4 id="permissionErrorHeader" class="modal-title cc_modal_title">{{pageLabelMap 'CCB2B_PermissionError_Header'}}</h4>
+            </div>
+            <div class="modal-body cc_modal_body">
+                <div id="permissionErrorBody">
+                    <p>{{pageLabelMap 'CCB2B_PermissionError_Body1'}}</p>
+                    <p>{{pageLabelMap 'CCB2B_PermissionError_Body2'}}</p>
+                </div>
+            </div>
+            <div class="modal-footer cc_modal_footer">
+                <input type="button" class="primary_button btn btn-default btn-sm" data-dismiss="modal" value="{{pageLabelMap 'Ok'}}"/>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="inventoryErrorModal" class="modal fade cc_modal" tabindex="-1" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="inventoryErrorHeader">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content cc_modal_content">
+            <div class="modal-header cc_modal_header">
+                <h4 id="inventoryErrorHeader" class="modal-title cc_modal_title">{{pageLabelMap 'CCB2B_InventoryError_Header'}}</h4>
+            </div>
+            <div class="modal-body cc_modal_body">
+                <div id="inventoryErrorBody"></div>
+                </br>
+                <div>{{pageLabelMap 'CCB2B_InventoryError_Footer'}}</div>
+            </div>
+            <div class="modal-footer cc_modal_footer">
+                <input type="button" class="primary_button btn btn-default btn-sm goToCart" value="{{pageLabelMap 'CCB2B_ReturnToBasket'}}"/>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="promotionErrorModal" class="modal fade cc_modal" tabindex="-1" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="promotionErrorHeader">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content cc_modal_content">
+            <div class="modal-header cc_modal_header">
+                <h4 id="promotionErrorHeader" class="modal-title cc_modal_title">{{pageLabelMap 'CCB2B_FinancialCapPromotionError_Header'}}</h4>
+            </div>
+            <div id="promotionErrorBody" class="modal-body cc_modal_body"></div>
+            <div class="modal-footer cc_modal_footer">
+                <input type="button" class="primary_button btn btn-default btn-sm goToCart" value="{{pageLabelMap 'CCB2B_ReturnToBasket'}}"/>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="availabilityErrorModal" class="modal fade cc_modal" tabindex="-1" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="availabilityErrorHeader">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content cc_modal_content">
+            <div class="modal-header cc_modal_header">
+                <h4 id="availabilityErrorHeader" class="modal-title cc_modal_title">{{pageLabelMap 'CCB2B_ProductAvailabilityError_Header'}}</h4>
+            </div>
+            <div id="availabilityErrorBody" class="modal-body cc_modal_body"></div>
+            <div class="modal-footer cc_modal_footer">
+                <input type="button" class="primary_button btn btn-default btn-sm goToCart" value="{{pageLabelMap 'CCB2B_ReturnToBasket'}}"/>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+<aura:component  controller="BMC_ChainActivityController" implements="force:lightningQuickAction,force:hasRecordId" >
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="chainName" type= "string"/>
+    <aura:attribute name="cancelOutlet" type="Boolean" />
+    <aura:attribute name="addOutlet" type="Boolean" />
+    <aura:attribute name="finalOutlet" type="Boolean"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:if isTrue= "{!v.addOutlet}">
+        <aura:if isTrue="{!v.showspinner}">
+            <lightning:spinner />
+        </aura:if> 
+        <div class="modal-header slds-modal__header mainHeader slds-p-around--small">
+            <h2 class="title slds-text-heading--medium">{!$Label.c.BMC_CAConfirmReplacement}</h2> 
+        </div>
+        <center> 
+            <div class="slds-text-body_medium">{!$Label.c.BMC_CAUploadOutletListReplacement}</div>
+            <br/>
+            <lightning:button class="slds-wrap" variant="brand" name="Confirm"  label="Confirm" onclick="{!c.uploadCAOutlet}"/>
+            <lightning:button class="slds-wrap" variant="brand" name="Cancel"  label="Cancel" onclick="{!c.gobcktoRcrdpage}"/> 
+        </center> 
+    </aura:if>
+    <aura:if isTrue="{!v.finalOutlet}">
+        <center> <div class="slds-text-heading_medium"> {!$Label.c.BMC_CA_Final_Restrict}</div> 
+            <lightning:button class="slds-wrap" variant="brand" name="Ok"  label="Ok" onclick="{!c.gobcktoRcrdpage}"/> 
+        </center>
+    </aura:if>
+    <aura:if  isTrue="{!v.cancelOutlet}">
+        <center> <div class="slds-text-heading_medium"> {!$Label.c.BMC_CA_Cancel_Restrict}</div> 
+            <lightning:button class="slds-wrap" variant="brand" name="Ok"  label="Ok" onclick="{!c.gobcktoRcrdpage}"/> 
+        </center>
+    </aura:if>
+</aura:component>

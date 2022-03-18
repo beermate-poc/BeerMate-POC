@@ -1,0 +1,92 @@
+<!--
+   @Author Accenture
+   @name BMC_EditAuditItem
+   @CreateDate  9/13/2018
+   @Description Component for editing Audit Items records.
+   @Version <1.0>
+  -->
+<aura:component controller="BMC_RetailQualityController">
+    <aura:attribute name="showEditaudit" type="boolean" default="false"/>
+    <aura:attribute name="editAuditId" type="Id" />
+    <aura:attribute name="editAuditObj" type="BMC_Audit_Item__c" />
+    <aura:attribute name="location" type="List[]"/>
+    <aura:attribute name="uomlst" type="List[]"/>
+    <aura:attribute name="damagelst" type="List[]"/>
+    <aura:attribute name="repackList" type="List[]"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="codeRequired" type="boolean" default="true"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="showErrorToast" type="boolean" default="false"/>
+    <aura:attribute name="toastTitle" type="String" />
+    <aura:attribute name="toastMsg" type="String" />
+    <aura:attribute name="toastType" type="String" />
+    
+    <div class="slds-text-align__center">
+        <aura:if isTrue="{!v.showErrorToast}">
+            <c:Toast toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}"/>
+        </aura:if>
+    </div>
+    
+    <lightning:card title="Edit Audit Item">
+        <aura:if isTrue="{!v.showSpinner}">
+            <lightning:spinner />
+        </aura:if>   
+        <ui:scrollerWrapper class="wrapperClass">  
+            <p class="slds-p-horizontal_small">
+                <label>{!$Label.c.BMC_BrandPackageName}</label><br/>
+                <span>{!v.editAuditObj.BMC_STR_Brand_Package_Audit_Item__r.BMC_Brand_Package_Audit_Pack__c}</span><br/>
+                <lightning:select aura:id="location" name="{!$Label.c.BMC_Location}" label="{!$Label.c.BMC_Location}" value="{!v.editAuditObj.BMC_Location__c}" required="true"><br/>
+                    <option value="">{!$Label.c.BMC_None}</option>
+                    <aura:iteration items="{!v.location}" var="loc">
+                        <option value="{!loc}" selected="{!v.editAuditObj.BMC_Location__c == loc}">{!loc}</option>
+                    </aura:iteration>
+                </lightning:select> 
+                <div class = "slds-grid slds-gutters">
+                    <div class="slds-col slds-col slds-size_1-of-2">
+                        <c:DatePicker requiredAstrik="{!(v.codeRequired == true) ? '*': ' '}" aura:id="auditDate" inputClass="slds-input"  value="{!v.editAuditObj.BMC_Code_Date__c}" label="{!$Label.c.BMC_Code_Date}" >
+                        </c:DatePicker>
+                    </div>
+                    <div class="slds-col">
+                        <lightning:input type="tel" name="{!$Label.c.BMC_Quantity}" label="{!$Label.c.BMC_Quantity}" value="{!v.editAuditObj.BMC_UI_Quantity__c}" required="true">	
+                        </lightning:input>
+                    </div>
+                </div>
+                <div class = "slds-grid slds-gutters">
+                    <lightning:input type="checkbox" label="{!$Label.c.BMC_No_Manufacture_Date}" name="{!$Label.c.BMC_No_Manufacture_Date}" value="{!v.editAuditObj.BMC_No_Manufacture_Date__c}" checked="{!v.editAuditObj.BMC_No_Manufacture_Date__c}" onchange="{!c.setcodedateRqrd}"/>
+                    <lightning:input type="checkbox" label="{!$Label.c.BMC_Out_of_Rotation}" name="{!$Label.c.BMC_Out_of_Rotation}" value="{!v.editAuditObj.BMC_Out_of_Rotation__c}" checked="{!v.editAuditObj.BMC_Out_of_Rotation__c}"/>
+                </div>
+                
+                
+                <lightning:select aura:id="uom" name="{!$Label.c.BMC_UOM}" label="{!$Label.c.BMC_UOM}" value="{!v.editAuditObj.BMC_UOM__c}" required="true">
+                    <option value="">{!$Label.c.BMC_None}</option>
+                    <aura:iteration items="{!v.uomlst}" var="uomVal">
+                        <option value="{!uomVal}" selected="{!v.editAuditObj.BMC_UOM__c == uomVal}">{!uomVal}</option>
+                    </aura:iteration>
+                </lightning:select>
+                <lightning:select aura:id="repack" name="{!$Label.c.BMC_Repack}" label="{!$Label.c.BMC_Repack}" value="{!v.editAuditObj.BMC_Repack__c}">
+                    <option value="">{!$Label.c.BMC_None}</option>
+                    <aura:iteration items="{!v.repackList}" var="repackVal">
+                        <option value="{!repackVal}" selected="{!v.editAuditObj.BMC_Repack__c == repackVal}">{!repackVal}</option>
+                    </aura:iteration>
+                </lightning:select> 
+                <lightning:select aura:id="delete" name="{!$Label.c.BMC_Damaged}" label="{!$Label.c.BMC_Damaged}" value="{!v.editAuditObj.BMC_Damaged__c}">
+                    <option value="">{!$Label.c.BMC_None}</option>
+                    <aura:iteration items="{!v.damagelst}" var="damageVal">
+                        <option value="{!damageVal}" selected="{!v.editAuditObj.BMC_Damaged__c == damageVal}" >{!damageVal}</option>
+                    </aura:iteration>
+                </lightning:select> <br/>                    
+                <center> 
+                    <lightning:button  class="slds-wrap" variant="brand" type="{!$Label.c.BMC_NextDate}" name="Update" label="Update" onclick="{!c.updateAuidtrec}"/>
+                    <lightning:button  class="slds-wrap" variant="brand" type="{!$Label.c.Delete}" name="{!$Label.c.Delete}" label="{!$Label.c.Delete}" onclick="{!c.deleteAuidtrec}"/>
+                    <lightning:button  variant="Neutral" type="{!$Label.c.BMC_CancelButton}" name="{!$Label.c.BMC_CancelButton}" label="{!$Label.c.BMC_CancelButton}" onclick="{!c.gotoBrndPcklist}"/>
+                </center> 
+                <!-- Display Lightning Data Service errors -->
+                <aura:if isTrue="{!not(empty(v.recordSaveError))}">
+                    <div class="recordError">
+                        {!v.recordSaveError}</div>
+                </aura:if>
+            </p>  
+        </ui:scrollerWrapper>
+    </lightning:card>
+</aura:component>

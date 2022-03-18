@@ -1,0 +1,11 @@
+{{#eachMapEntry this.pageData}}
+<div class="nvRow nvGroupRow cc_nv_group_row">
+    <!--<p class="groupName cc_group_name">{{this.groupName}}</p>-->
+    {{#each this}}
+    <div class="nvRow cc_nv_row row">
+        <label><span {{#ifPageDisplay 'ccrz__ProductDetails'}} id="{{generateId 'ccb2b-pdp-specname-' name '-field'}}" {{/ifPageDisplay}} class="name cc_name">{{this.name}}:</span></label>
+        <span {{#ifPageDisplay 'ccrz__ProductDetails'}} id="{{generateId 'ccb2b-pdp-specval-' name '-field'}}" {{/ifPageDisplay}}class="value cc_value">{{this.value}}</span>
+    </div>
+    {{/each}}
+</div>
+{{/eachMapEntry}}

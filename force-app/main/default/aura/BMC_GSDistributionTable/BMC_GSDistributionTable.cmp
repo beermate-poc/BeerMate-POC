@@ -1,0 +1,33 @@
+<aura:component >
+     <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="columns" type="List"/>
+    <ui:scrollerWrapper class="scrollerSize">
+    <table class="slds-table slds-table_bordered">
+        <thead>
+            <aura:iteration items="{!v.columns}" var="cols">
+                    <th scope="col">
+                        <div class="slds-truncate slds-cell-wrap" title="">{!cols.label}</div>
+                    </th>
+            </aura:iteration>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.data}" var="Dist">
+            <tr>
+                <td>
+                    <div class="slds-truncate slds-cell-wrap" title="Name">{!Dist.Name}</div>
+                </td>
+                 <td>
+                    <div class="slds-truncate" title="RecordType">{!Dist.Last_Purchase_Date__c}</div>
+                </td>
+                 <td>
+                    <div class="slds-truncate" title="Statud">{!Dist.L13WK__c}</div>
+                </td>
+                <td>
+                    <div class="slds-truncate" title="RecordType">{!Dist.L52WK__c}</div>
+                </td>
+            </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+    </ui:scrollerWrapper>
+</aura:component>

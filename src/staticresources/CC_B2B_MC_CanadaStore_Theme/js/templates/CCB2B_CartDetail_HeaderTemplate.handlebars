@@ -1,0 +1,77 @@
+{{#if deliveryInfo}}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="section-delivery-info">
+                <div class="container-delivery-info">
+                    <div class="img-delivery-info">
+                        <span class="icon-delivery-circle">
+                            <span class="icon-delivery1"></span>
+                        </span>
+                    </div>
+                    <div class="text-delivery-info">
+                        <span>{{formatDeliveryInfoMessage 'CCB2B_OrderReminder_Msg_Template' true }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{{/if}}
+<div class="row">
+    <div class="col-md-12">
+        <div class="messagingSection-Error" role="alert" style="display: none"></div>
+        <div class="messagingAction-Error alert alert-danger" role="alert" style="display: none"></div>
+
+        <div class="messagingSection-Warning" role="alert" style="display: none"></div>
+        <div class="messagingAction-Warning alert alert-warning" role="alert" style="display: none"></div>
+
+        <div class="messagingSection-Info" role="alert" style="display: none"></div>
+        <div class="messagingAction-Info alert alert-info" role="alert" style="display: none"></div>
+    </div>
+</div>
+{{#if deliveryInfo.trackerProgress}}
+    {{#ifNotEquals deliveryInfo.trackerProgress 100}}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="minimumOrderWarningAlert">
+                    <span class="fa fa-warning"></span>
+                    <span class="msg">{{pageLabelMap 'CCB2B_MinimumOrderVal_Alert'}}</span>
+                </div>
+            </div>
+        </div>
+    {{/ifNotEquals}}
+{{/if}}
+{{!-- volume tracker progress start --}}
+<div class="row">
+    <div class="col-md-2">
+        <button id="ccb2b-basket-continueshopping-btn-bis" class="primary_button btn btn-default btn-sm continueShoppingButton cc_continue_shopping_button" name="" type="button" >{{pageLabelMap 'CartInc_ContinueShopping'}}</button>
+    </div>
+    <div class="col-md-5"> </div>
+
+    <div class="col-md-5 vol-tracker-container">
+
+        <div class="vol-tracker-title">
+            <h4><b>{{pageLabelMap 'CCB2B_Title_VolTracker_Lbl'}}</b></h4>
+        </div>
+        <div class="vol-tracker-more">
+            <a href="{{pageConfigMap 'sc.helpdeskpath'}}" ><small>{{pageLabelMap 'CCB2B_MoreInfo_VolTracker_Lbl'}} </small></a>
+        </div>
+        <div class="vol-progress-container">
+            {{> progressTracker}}
+        </div>
+
+    </div>
+</div>
+{{!-- progress end --}}
+
+<div class="row">
+    <div class="col-md-12">
+        <p class="cart_sort cc_cart_sort">
+            <span class="cc_cart_sort_text">{{pageLabelMap 'Sort'}}</span>
+            <a href="#" class="cart_sort_item cc_cart_sort_item" data-sort="name"><span class="label label-default cc_cart_sort_text">{{pageLabelMap 'Name'}}</span></a>
+            <a href="#" class="cart_sort_item cc_cart_sort_item" data-sort="sku"><span class="label label-default cc_cart_sort_text">{{pageLabelMap 'SKU'}}</span></a>
+            <a href="#" class="cart_sort_item cc_cart_sort_item" data-sort="dateAdded"><span class="label label-default cc_cart_sort_text">{{pageLabelMap 'Date_Added'}}</span></a>
+        </p>
+    </div>
+
+</div>
+        

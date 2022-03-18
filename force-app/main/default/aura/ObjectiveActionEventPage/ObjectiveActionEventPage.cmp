@@ -1,0 +1,84 @@
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId,force:hasSObjectName,lightning:isUrlAddressable" controller="C360_ObjectiveListController">   
+    <aura:attribute name="recTypeIds" type="String" description="This is uesd for record Id" />
+    <aura:attribute name="entId" type="String" description="This is used for event Id" access="GLOBAL"/>
+    <aura:attribute name="accId" type="String" description="This is uesd for account Id" />
+    <aura:attribute name="accCountry" type="String" description="This is uesd to store country value from account" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>   
+    <aura:handler event="force:showToast" action="{!c.saveSuccessHandle}"/>
+    <aura:handler name="change" value="{!v.pageReference}" action="{!c.reInit}" />
+    
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+    <aura:attribute name="objeciveId" type="String" description="This is uesd for recent objective record Id" />
+    <aura:attribute name="usObj" type="Boolean" description="This is used to for US obj" />
+    <aura:attribute name="newObj" type="Boolean" default='false' description="This is used to for US obj" />
+    
+    <aura:attribute name="isOffPrem" type="Boolean" default="false" />
+    <aura:handler name="copyRecord" event="c:CopyRecord" action="{!c.copyRecord}" />
+    <aura:attribute name="featureCopy" type="Objective__c" default="{'sobjectType': 'Objective__c'}"/>
+    <aura:attribute name="engagementCopy" type="Objective__c" default="{'sobjectType': 'Objective__c'}"/>
+    <aura:attribute name="merchandiseCopy" type="Objective__c" default="{'sobjectType': 'Objective__c'}"/>
+    <aura:attribute name="callLogId" type="Id" />
+    <aura:attribute name="recordName" type="String"/>
+    <aura:attribute name="RecTypeID" type="Id"/>
+    <aura:attribute name="recordId" type="Id" />
+   	<aura:attribute name="isEdit" type="Boolean" default="false" />
+    <aura:attribute name="showAssignedToUser" type="Boolean" default="false" />
+    <aura:attribute name="showUpcoming" type="Boolean" default="false" />
+    <aura:attribute name="combinedObjList" type="Objective__c[]" />
+    <aura:attribute name="objRec" type="Objective__c[]" />
+    <aura:attribute name="objRecUpcoming" type="Objective__c[]" />
+    <aura:attribute name="objUsrActive" type="Objective__c[]" />
+    <aura:attribute name="objUsrUpcoming" type="Objective__c[]" />
+    <aura:attribute name="pageReference" type="Object"/>
+    <aura:handler name="OnClickEditPageEvent" event="c:OnClickEditPageEvent" action="{!c.editClick}"/>
+    <aura:handler name="OnClickobjectivestory" event="c:NavigateToStoryLink" action="{!c.navigateTosellingstoryLink}"/>
+    <aura:handler name="OnClickShowFilesEvent" event="c:ShowRelatedFilesListEvent" action="{!c.showFilesSection}"/>
+    <aura:handler name="EditPageResetEvent" event="c:ResetObjectiveEditView" action="{!c.resetEditComponent}"/>
+    <aura:handler name="EditObjectiveSucess" event="c:EditObjectiveSucess" action="{!c.refershComponent}"/>
+    <lightning:navigation aura:id="navService"/>
+    <ltng:require styles="{!$Resource.ObjQuickAction}"/>
+	    
+    
+    <aura:if isTrue="{!!v.isEdit}">
+        
+        <header class="slds-modal__header widthClass headerSize">
+            <h3 class="slds-text-heading--large">{!$Label.c.C360_ObjectiveList}</h3>
+        </header>
+        <div>
+            <div aura:id="Spnner" class="slds-hide" ><lightning:spinner variant="brand"  /></div>
+            
+            <br></br>
+           
+            <lightning:layout multipleRows="true">
+            	
+              <lightning:layoutItem padding="around-small" size="12">
+            <lightning:input type="toggle" name="upcomingobjective" aura:id="tglUpcomingbtn"  
+                 messageToggleActive="{!$Label.c.Upcoming}" messageToggleInactive="{!$Label.c.Active}" 
+                 onchange="{!c.getUpcomingObj}" class="slds-float_right"/>
+                    </lightning:layoutItem>
+            </lightning:layout>
+            
+            <br></br>
+            <c:ObjectiveActionListContainer objRecAccActive="{!v.objRec}" objRecAccUpcoming="{!v.objRecUpcoming}" objRecUsrActive ="{!v.objUsrActive}" objRecUsrUpcoming="{!v.objUsrUpcoming}" usObj="{!v.usObj}" showUpcoming="{!v.showUpcoming}" eventId="{!v.recordId}" ></c:ObjectiveActionListContainer>
+            
+        </div>
+        <br></br><br></br>
+        <div class="note-Msg" aura:id="NoteMsg">
+                {!$Label.c.DeclinedReasonNote}
+        </div>
+        <div>
+            <footer class="slds-modal__footer" style="background-color: white;">
+            <lightning:button variant= "Brand" label = "{!$Label.c.C360_New}" onclick="{!c.hNewRecord}"/>
+                
+            <!--<lightning:button variant= "Neutral" label = "{!$Label.c.C360_New}" onclick="{!c.hCreateRec}"/>-->
+            <lightning:button variant="Neutral" label="{!$Label.c.Back_Button}" onclick="{!c.hCancel}" />
+            </footer>
+        </div>
+    	
+    </aura:if>
+    <aura:if isTrue="{!v.isEdit}">
+    	
+           {!v.body}
+        
+    </aura:if>
+</aura:component>

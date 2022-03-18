@@ -1,0 +1,43 @@
+{{#ifDisplay 'Login.DsplReg'}}
+    <input type="button" class="btn btn-sm register cc_register registerNewBtn" value="{{pageLabelMap 'CCB2B_Header_Register'}}"/>
+{{/ifDisplay}}
+<div id="login_panel">
+    <div class="panel-body cc_body">
+        <div class="login_box">
+            <form id="loginFormDsk" class="col-lg-4 col-md-6 col-sm-6 col-xs-12 cc_login_form">
+                <div class="row">
+                    <p class="cc_login">{{pageLabelMap 'SiteLogin_HaveAccount'}}</p>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="emailField">{{pageLabelMap 'SiteLogin_UsernameEmail'}}</label>
+                            <input id="emailField" name="emailField" type="email" class="loginInput form-control cc_login_input" value="{{displayUsername}}" title="{{pageLabelMap 'SiteLogin_UsernameEmail'}}"/>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="passwordField">{{pageLabelMap 'SiteLogin_Password'}}</label>
+                            <input id="passwordField" name="passwordField" type="password" class="loginInput form-control cc_password_input"/>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <p class="cc_forgot_password"><a href="javascript:void(0);" class="forgotPass cc_forgot_pass">{{pageLabelMap 'ForgotPassword_ForgotPassword'}}</a></p>
+                    </div>
+
+                    <div class="col-md-12">
+                        <input type="button" id="send2Dsk" class="btn btn-sm cc_login_button col-xs-12" value="{{pageLabelMap 'Component_SiteHeader_Login'}}" />
+                    </div>
+                </div>
+                <div class="messagingSection-Error" style="display: none"></div>
+                <div class="messagingSection-Info" style="display: none"></div>
+                <div class="messagingSection-Warning" style="display: none"></div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p class="register_link"><a href="javascript:void(0);" class="register cc_register"><span class="register_text">{{pageLabelMap 'CCB2B_Register_Text'}} </span>{{pageLabelMap 'CCB2B_Register'}}</a></p>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

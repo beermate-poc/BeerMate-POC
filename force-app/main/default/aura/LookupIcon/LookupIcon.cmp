@@ -1,0 +1,14 @@
+<!--
+ - Created by alexandria.sanborn on 1/8/2019.
+ -->
+
+<aura:component description="LookupIcon">
+    <aura:attribute name="index" type="Integer"/>
+    <aura:attribute name="lookupObj" type="String"/>
+
+    <aura:registerEvent name="openModal" type="c:strike_evt" description="Fires an event that opens modal" />
+
+    <div style="cursor: pointer">
+        <lightning:icon iconName="utility:search" size="x-small" class="sl-search-icon" onclick="{!c.openModal}"/>
+    </div>
+</aura:component>

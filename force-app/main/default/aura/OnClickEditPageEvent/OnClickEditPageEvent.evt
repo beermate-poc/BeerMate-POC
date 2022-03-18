@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT" description="Fired when user clicks on edit" >
+	<aura:attribute name="clickedEdit" type="Boolean" default="false" />
+    <aura:attribute name="selectedObjectiveId" type="Id"/>
+</aura:event>

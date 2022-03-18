@@ -1,0 +1,31 @@
+<aura:component controller="AddObjectiveController" >
+	  <aura:attribute name="objType" type="String"/>
+      <aura:attribute name="index" type="Integer" />
+      <aura:attribute name="isMobile" type="Boolean" default="false"/>
+      <aura:attribute name="selectedRecord" type="String"/>
+      <aura:attribute name="objective" type="Object"/>
+      <aura:attribute name="shouldOpenEdit" type="Boolean" default="false"/>
+      <aura:attribute name="objectiveId" type="Id"/>
+
+      <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+      <aura:method name="closeAllMenus" action="{!c.closeAllMenus}"/>
+
+        <div aura:id="toggleMEdit" id="{!v.objType+v.index}" class="slds-dropdown-trigger slds-dropdown-trigger_click applyDropdown"  onclick="{!c.toggleMenu}">
+            <lightning:buttonIcon iconName="utility:switch" alternativeText="{!$Label.c.ObjectiveEditDropdown_Button_Text}" name="editButton"/>
+            <br />
+            <div aura:id="dropdown" class="slds-dropdown dropdownPosition" >
+                <ul class="slds-dropdown__list" role="menu">
+                    <li class="slds-dropdown__item" role="presentation">
+                        <a href="" role="menuitem" tabindex="0" onclick="{!c.setupObjEditFlags}" >
+                            <span class="slds-truncate" title="{!$Label.c.Edit}">{!$Label.c.Edit}</span>
+                        </a>
+                    </li>
+                    <li class="slds-dropdown__item" role="presentation">
+                        <a href="" role="menuitem" tabindex="-1" onclick="{!c.initiateDelete}" >
+                            <span class="slds-truncate" title="{!$Label.c.Delete}">{!$Label.c.Delete}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+</aura:component>

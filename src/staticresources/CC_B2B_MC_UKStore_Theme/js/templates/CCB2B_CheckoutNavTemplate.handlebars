@@ -1,0 +1,25 @@
+<div class="container">
+    <div class="col-xs-12">
+        <div class="alert_error minimumOrderWarning errorMsg" style="display:none">
+            <span class="fa fa-warning"></span>
+            <span class="msg">{{pageLabelMap 'CCB2B_MinimumOrderVal_Msg' (price (pageConfigMap 'sc.minorderval'))}}</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-offset-3 col-sm-6 col-sm-offset-3 col-sm-6 col-xs-offset-0 col-xs-12">
+            <ul class="nav nav-pills nav-justified checkoutNav hidden-print">
+                {{#each this.views}}
+                    <li class="{{#ifEquals @index ../index}}active{{else}}disabled{{/ifEquals}} {{#ifGreater ../index @index}} done backToPreviousStep {{/ifGreater}} cc_checkoutStep{{@index}} cc_checkoutStep">
+                        <a id="{{generateId 'ccb2b-co-nav-' title '-step'}}"><h4 class="list-group-item-heading">{{{this.title}}}</h4></a>
+                    </li>
+                {{/each}}
+                <li class="disabled cc_checkoutStepPayment cc_checkoutStep">
+                    <a><h4 class="list-group-item-heading">{{pageLabelMap 'CheckOut_PaymentStep'}}</h4></a>
+                </li>
+                <li class="disabled cc_checkoutStepOrderConfirmation cc_checkoutStep">
+                    <a><h4 class="list-group-item-heading">{{pageLabelMap 'CheckOut_OrderConfirmationStep'}}</h4></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

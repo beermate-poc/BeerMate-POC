@@ -1,0 +1,124 @@
+<div id="secnav cc_secnav">
+    {{#if (ifNotPageDisplay 'ccrz__CCChangePassword')}}
+    <button type="button" class="visible-xs mobileMenuButton btn" data-toggle="modal" data-target="#mobileMenuModal">
+        <span class="icon-menu"></span>
+    </button>
+        {{#if (ifNotPageDisplay 'ccrz__CheckoutNew')}}
+            {{#unless (hideOnPaymentStep)}}
+            <nav class="hidden-xs navbar navbar-default navbar-static-top cc_navbar">
+                <div class="container">
+                    <div id="navbar" class="navbar-collapse collapse cc_navbar_collapse">
+                        <ul class="nav navbar-nav cc_navbar-nav">
+                            {{#each .}}
+                                {{#if children}}
+                            <li class="dropdown cc_dropdown">
+                                <a id="{{generateId 'ccb2b-menu-' displayName}}" href="javascript:void(0);" class="dropdown-toggle cc_dropdown_toggle" data-toggle="dropdown" data-menuid="{{menuId}}" {{linkTarget openInNewWindow}} role="button" aria-haspopup="true" aria-expanded="false">{{displayName}}<span class="icon-arrow-down"></span></a>
+                                <ul class="dropdown-menu cc_dropdown-menu">
+                                    {{> subMenuItem}}
+                                </ul>
+                            </li>
+                            {{else}}
+                            {{#unless (compareIgnoreCase this.displayName (pageLabelMap 'CCB2B_Header_DealsMenuItem'))}}
+                                {{#ifEquals mType 'Category'}}
+                                    <li class="dropdown cc_dropdown" id="{{generateId 'ccb2b-menu-' displayName}}">{{categoryLink this 'cc_category' text=displayName}}</li>
+                                {{/ifEquals}}
+                                {{#ifEquals mType 'Product'}}
+                                <li class="dropdown cc_dropdown" id="{{generateId 'ccb2b-menu-' displayName}}">{{productLink this 'cc_product' text=displayName}}</li>
+                                {{/ifEquals}}
+                                {{#ifEquals mType 'HeaderURL'}}
+                                {{#ifEquals displayName 'Reorder'}}
+                                    {{#if (checkContactDisplayPermissions 'order_history')}}
+                                        <li class="dropdown cc_dropdown"><a id="{{generateId 'ccb2b-menu-' displayName}}" class="menuTypeURL cc_menu_type_url" href="javascript:void(0);" data-href="{{linkURL}}" data-menuid="{{menuId}}" {{linkTarget openInNewWindow}}>{{displayName}}</a></li>
+                                    {{/if}}
+                                {{else}}
+                                    <li class="dropdown cc_dropdown"><a id="{{generateId 'ccb2b-menu-' displayName}}" class="menuTypeURL cc_menu_type_url" href="javascript:void(0);" data-href="{{linkURL}}" data-menuid="{{menuId}}" {{linkTarget openInNewWindow}}>{{displayName}}</a></li>
+                                {{/ifEquals}}
+                                {{/ifEquals}}
+                                {{#ifEquals mType 'Drupal'}}
+                                <li class="dropdown cc_dropdown"><a id="{{generateId 'ccb2b-menu-' displayName}}" class="menuTypeURL cc_menu_type_url" href="javascript:void(0);" data-href="{{createDrupalLink linkURL}}" data-menuid="{{menuId}}" {{linkTarget openInNewWindow}}>{{displayName}}</a></li>
+                                {{/ifEquals}}
+                                <!--{{#ifEquals mType 'None'}}-->
+                                <!--<li class="dropdown cc_dropdown"><a href="javascript:void(0);" class="cc_display_name" data-menuid="{{menuId}}">{{displayName}}</a></li>-->
+                                <!--{{/ifEquals}}-->
+                            {{/unless}}
+                            {{#if (showDealsMenuItem this.displayName)}}
+                                {{#ifEquals mType 'Drupal'}}
+                                    <li class="dropdown cc_dropdown"><a id="{{generateId 'ccb2b-menu-' displayName}}" class="menuTypeURL cc_menu_type_url" href="javascript:void(0);" data-href="{{createDrupalLink linkURL}}" data-menuid="{{menuId}}" {{linkTarget openInNewWindow}}>{{displayName}}</a></li>
+                                {{/ifEquals}}
+                            {{/if}}
+                            {{/if}}
+                            {{/each}}
+                        </ul>
+                    </div><!--***************-->
+                </div>
+            </nav>
+            {{/unless}}
+        {{/if}}
+    <div class="modal fade cc_modal cc_change_locale_modal" id="mobileMenuModal" tabindex="-1" role="dialog" aria-labelledby="Locale picker">
+        <div class="modal-dialog modal-sm cc_modal_dialog" role="document">
+            <div class="modal-content cc_modal_content">
+                <div class="modal-body cc_modal_body">
+                    <nav class="navbar navbar-default navbar-static-top cc_navbar navbar-mobile">
+                        <div class="container">
+                            <div id="navbar">
+                                <div class="user_welcome"><span>&#160;<span>{{pageLabelMap 'CCB2B_Header_Hi'}}!</span><span class="invitation"> {{getUserName}}</span></span></div>
+                                <ul class="nav navbar-nav cc_navbar-nav">
+                                    {{#ifDisplay 'LS.Enabled'}}
+                                        <li class="dropdown cc_dropdown"><a id="ccb2b-menu-m-changelocale-link" class="switchLocale" href="javascript:void(0)">{{pageLabelMap 'CCB2B_Header_Menu_Change_Language'}}</a></li>
+                                    {{/ifDisplay}}
+                                    <li class="dropdown cc_dropdown"><a id="ccb2b-menu-m-myaccount-link" class="dropdown-item goToMyAccount" href="#" id="goToMyAccount"><span>{{pageLabelMap 'Header_MyAccount'}}</span></a></li>
+                                    {{#each .}}
+                                        {{#unless (compareIgnoreCase this.displayName (pageLabelMap 'CCB2B_Header_DealsMenuItem'))}}
+                                    {{#if children}}
+                                    <li class="dropdown cc_dropdown">
+                                        <a id="{{generateId 'ccb2b-menu-m-' displayName}}" href="{{linkURL}}" class="dropdown-toggle cc_dropdown_toggle" data-toggle="dropdown" data-menuid="{{menuId}}" {{linkTarget openInNewWindow}} role="button" aria-haspopup="true" aria-expanded="false">{{displayName}}<span class="icon-arrow-down"></span></a>
+                                        <ul class="dropdown-menu cc_dropdown-menu">
+                                            {{> subMenuItemMobile}}
+                                        </ul>
+                                    </li>
+                                    {{else}}
+                                    {{#ifEquals mType 'Category'}}
+                                        <li id="{{generateId 'ccb2b-menu-m-' displayName}}" class="dropdown cc_dropdown">{{categoryLink this 'cc_category' text=displayName}}</li>
+                                    {{/ifEquals}}
+                                    {{#ifEquals mType 'Product'}}
+                                    <li id="{{generateId 'ccb2b-menu-m-' displayName}}" class="dropdown cc_dropdown">{{productLink this 'cc_product' text=displayName}}</li>
+                                    {{/ifEquals}}
+                                    {{#ifEquals mType 'URL'}}
+                                    <li class="dropdown cc_dropdown"><a id="{{generateId 'ccb2b-menu-m-' displayName}}" class="menuTypeURL cc_menu_type_url" href="javascript:void(0);" data-href="{{linkURL}}" data-menuid="{{menuId}}" {{linkTarget openInNewWindow}}>{{displayName}}</a></li>
+                                    {{/ifEquals}}
+                                    {{#ifEquals mType 'Drupal'}}
+                                    <li class="dropdown cc_dropdown"><a id="{{generateId 'ccb2b-menu-' displayName}}" class="menuTypeURL cc_menu_type_url" href="javascript:void(0);" data-href="{{createDrupalLink linkURL}}" data-menuid="{{menuId}}" {{linkTarget openInNewWindow}}>{{displayName}}</a></li>
+                                    {{/ifEquals}}
+                                    {{#ifEquals mType 'HeaderURL'}}
+                                        {{#ifEquals displayName 'Reorder'}}
+                                            {{#if (checkContactDisplayPermissions 'order_history')}}
+                                                <li class="dropdown cc_dropdown"><a id="{{generateId 'ccb2b-menu-m-' displayName}}" class="menuTypeURL cc_menu_type_url" href="javascript:void(0);" data-href="{{linkURL}}" data-menuid="{{menuId}}" {{linkTarget openInNewWindow}}>{{displayName}}</a></li>
+                                            {{/if}}
+                                        {{else}}
+                                            <li class="dropdown cc_dropdown"><a id="{{generateId 'ccb2b-menu-m-' displayName}}" class="menuTypeURL cc_menu_type_url" href="javascript:void(0);" data-href="{{linkURL}}" data-menuid="{{menuId}}" {{linkTarget openInNewWindow}}>{{displayName}}</a></li>
+                                        {{/ifEquals}}
+                                    {{/ifEquals}}
+                                    {{#ifEquals mType 'None'}}
+                                    <li class="dropdown cc_dropdown"><a id="{{generateId 'ccb2b-menu-m-' displayName}}" href="javascript:void(0);" class="cc_display_name" data-menuid="{{menuId}}">{{displayName}}</a></li>
+                                    {{/ifEquals}}
+                                    {{/if}}
+                                        {{/unless}}
+                                        {{#if (showDealsMenuItem this.displayName)}}
+                                            {{#ifEquals mType 'Drupal'}}
+                                                <li class="dropdown cc_dropdown"><a id="{{generateId 'ccb2b-menu-' displayName}}" class="menuTypeURL cc_menu_type_url" href="javascript:void(0);" data-href="{{createDrupalLink linkURL}}" data-menuid="{{menuId}}" {{linkTarget openInNewWindow}}>{{displayName}}</a></li>
+                                            {{/ifEquals}}
+                                        {{/if}}
+                                    {{/each}}
+                                </ul>
+                                <div class="logout">
+                                    <a id="ccb2b-menu-m-logout-link" href="#logout" class="doLogout cc_do_logout">{{pageLabelMap 'Component_SiteHeader_Logout'}}</a>
+                                </div>
+                            </div><!--***************-->
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if}}
+</div>

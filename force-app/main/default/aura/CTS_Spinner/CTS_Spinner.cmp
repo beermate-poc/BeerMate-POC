@@ -1,0 +1,7 @@
+<aura:component >
+	<aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <div aura:id="divspn" class="slds-spinner_container">
+    	<lightning:spinner aura:id="spn" class="slds-hide" variant="brand"/>
+    </div>
+</aura:component>

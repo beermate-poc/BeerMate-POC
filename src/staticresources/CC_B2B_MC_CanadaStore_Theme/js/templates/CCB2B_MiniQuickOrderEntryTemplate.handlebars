@@ -1,0 +1,10 @@
+<div class="form-group cc_form_quickorderrow col-sm-4">
+    <div class="col-xs-8 quickordersku">
+        <label for="quickorder[{{safeQuote this}}].sku" class="sr-only">Enter SKU</label>
+        <input id="quickorder[{{safeQuote this}}].sku" type="text" class="form-control quickOrderField addToCartOnEnter sku-input cc_sku_input" placeholder="{{pageLabelMap 'QuickOrder_SKUPlaceholder'}}" name="quickorder[{{safeQuote this}}].sku" />
+    </div>
+    <div class="col-xs-4 quickorderqty">
+        <label for="quickorder[{{safeQuote this}}].qty" class="sr-only">Enter Quantity</label>
+        <input id="quickorder[{{safeQuote this}}].qty" type="text" value="1" maxlength="7" class="form-control addToCartOnEnter qty-input cc_qty_input" placeholder="{{pageLabelMap 'QuickOrder_QTYPlaceholder'}}" name="quickorder[{{safeQuote this}}].qty"/>
+    </div>
+</div>

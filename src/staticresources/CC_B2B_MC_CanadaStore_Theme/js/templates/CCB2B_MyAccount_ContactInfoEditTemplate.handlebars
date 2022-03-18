@@ -1,0 +1,276 @@
+
+<div class="panel panel-default cc_panel cc_myaccount_profile">
+    <div class="cc_body cc_myaccount_content">
+        <div class="error_update_contact cc_error_update_contact" style="display: none"></div>
+        {{#ifEquals this.commerceType "B2B"}}
+        <div class="panel panel-default cc_panel cc_myaccount_information">
+            <div class="panel-heading cc_heading">
+                <h3 id="ccb2b-ma-contactedit-account-title" class="panel-title cc_title">{{pageLabelMap 'MyAccount_Profile_Account_Information'}}</h3>
+            </div>
+            <div class="panel-body cc_body cc_myaccount_general">
+                <p class="myAccProfileNote cc_profile_note">
+                    {{pageLabelMap 'MyAccount_Profile_Note'}}
+                </p>
+                {{#ifDisplay 'reg.addlInf'}}
+                <p class="myAccProfileCompany cc_profile_company">
+                    <span class="cc_profile_company_label">{{pageLabelMap 'MyAccount_Profile_Company'}}&#58;</span>
+                    <span id="ccb2b-ma-contactedit-acc-company-field" class="cc_profile_company_valuel">{{accountBean.name}}</span>
+                </p>
+                {{/ifDisplay}}
+                <p class="myAccAccountGroup cc_profile_account_group">
+                    <span class="cc_profile_account_group_label">{{pageLabelMap 'MyAccount_Profile_Account_Group'}}&#58;</span>
+                    <span id="ccb2b-ma-contactedit-acc-group-field" class="cc_profile_account_group_value">{{accountBean.accountGroupName}}</span>
+                </p>
+                <p class="myAccProfilePhone cc_profile_phone">
+                    <span class="cc_profile_phone_label">{{pageLabelMap 'MyAccount_Profile_Phone'}}&#58;</span>
+                    <span id="ccb2b-ma-contactedit-acc-phone-field" class="cc_profile_phone_value">{{accountBean.phone}}</span>
+                </p>
+                <div class="row">
+                    <div class="col-md-6 myAccBillingAddr cc_billing_address">
+                        <span class="cc_profile_billing_label">{{pageLabelMap 'MyAccount_Profile_Account_Billing_Address'}}</span>
+                        <span id="ccb2b-ma-contactedit-acc-billaddr-field" class="cc_profile_billing_value">
+                            <div class="address_selection_display">
+                                {{#ifDisplay 'SO.DsplAddrName'}}
+                                    {{#if this.accountBean.billingAddress.firstName }}
+                                        <p class="cc_addr_name">
+                                            <span class="cc_firstname">{{this.accountBean.billingAddress.firstName}}&#160;</span>
+                                            {{#if this.accountBean.billingAddress.lastName }}
+                                                <span class="cc_lastname">{{this.accountBean.billingAddress.lastName}}</span>
+                                            {{/if}}
+                                        </p>
+                                    {{else}}
+                                        {{#if this.accountBean.billingAddress.lastName }}
+                                            <p class="cc_addr_name">
+                                               <span class="cc_lastname">{{this.accountBean.billingAddress.lastName}}</span>
+                                           </p>
+                                        {{/if}}
+                                    {{/if}}
+                                {{/ifDisplay}}
+                                {{#ifDisplay 'SO.DsplAddrCompany'}}
+                                    {{#if this.accountBean.billingAddress.companyName}}
+                                        <p class="cc_addr_company">{{this.accountBean.billingAddress.companyName}}</p>
+                                    {{/if}}
+                                {{/ifDisplay}}
+                                {{#if this.accountBean.billingAddress.address1}}
+                                    <span class="addr_line1 cc_addr_line">{{this.accountBean.billingAddress.address1}}</span><br/>
+                                {{else}}
+                                    {{#if this.accountBean.billingAddress.addressFirstline}}
+                                        <span class="addr_line1 cc_addr_line">{{this.accountBean.billingAddress.addressFirstline}}</span><br/>
+                                    {{/if}}
+                                {{/if}}
+
+                                {{#if this.accountBean.billingAddress.address2}}
+                                    <span class="addr_line2 cc_addr_line">{{this.accountBean.billingAddress.address2}}</span><br/>
+                                {{else}}
+                                    {{#if this.accountBean.billingAddress.addressSecondline}}
+                                        <span class="addr_line1 cc_addr_line">{{this.accountBean.billingAddress.addressSecondline}}</span><br/>
+                                    {{/if}}
+                                {{/if}}
+
+                                {{#if this.accountBean.billingAddress.address3}}
+                                    <span class="addr_line3 cc_addr_line">{{this.accountBean.billingAddress.address3}}</span><br/>
+                                {{else}}
+                                    {{#if this.accountBean.billingAddress.addressThirdline}}
+                                        <span class="addr_line1 cc_addr_line">{{this.accountBean.billingAddress.addressThirdline}}</span><br/>
+                                    {{/if}}
+                                {{/if}}
+                                <span class="cc_addr_city">{{this.accountBean.billingAddress.city}}</span>
+                                {{#if this.accountBean.billingAddress.state}}
+                                    <span class="cc_addr_state">{{this.accountBean.billingAddress.state}}</span>
+                                {{else}}
+                                    {{#if this.accountBean.billingAddress.stateCode}}
+                                        <span class="cc_addr_state">{{this.accountBean.billingAddress.stateCode}}</span>
+                                    {{else}}
+                                        {{#if this.accountBean.billingAddress.stateISOCode}}
+                                            <span class="cc_addr_state">{{this.accountBean.billingAddress.stateISOCode}}</span>
+                                        {{/if}}
+                                    {{/if}}
+                                {{/if}}
+                                <span class="cc_addr_postal">{{this.accountBean.billingAddress.postalCode}}</span><br/>
+                                <span class="cc_addr_country">{{this.accountBean.billingAddress.country}}</span><br/>
+                                <span class="cc_addr_extId">{{this.accountBean.billingAddress.partnerId}}</span>
+                            </div>
+                        </span>
+                    </div>
+                    <div class="col-md-6 myAccShippingAddr cc_shipping_address">
+                        <span class="cc_profile_shipping_label">{{pageLabelMap 'MyAccount_Profile_Account_Shipping_Address'}}</span>
+                        <span id="ccb2b-ma-contactedit-acc-shippaddr-field" class="cc_profile_shipping_value">
+                            <div class="address_selection_display">
+                                {{#ifDisplay 'SO.DsplAddrName'}}
+                                    {{#if this.accountBean.shippingAddress.firstName }}
+                                        <p class="cc_addr_name">
+                                            <span class="cc_firstname">{{this.accountBean.shippingAddress.firstName}}&#160;</span>
+                                            {{#if this.accountBean.shippingAddress.lastName }}
+                                                <span class="cc_lastname">{{this.accountBean.shippingAddress.lastName}}</span>
+                                            {{/if}}
+                                        </p>
+                                    {{else}}
+                                        {{#if this.accountBean.shippingAddress.lastName }}
+                                            <p class="cc_addr_name">
+                                               <span class="cc_lastname">{{this.accountBean.shippingAddress.lastName}}</span>
+                                           </p>
+                                        {{/if}}
+                                    {{/if}}
+                                {{/ifDisplay}}
+                                {{#ifDisplay 'SO.DsplAddrCompany'}}
+                                    {{#if this.accountBean.shippingAddress.companyName}}
+                                        <p class="cc_addr_company">{{this.accountBean.shippingAddress.companyName}}</p>
+                                    {{/if}}
+                                {{/ifDisplay}}
+                                {{#if this.accountBean.shippingAddress.address1}}
+                                    <span class="addr_line1 cc_addr_line">{{this.accountBean.shippingAddress.address1}}</span><br/>
+                                {{else}}
+                                    {{#if this.accountBean.shippingAddress.addressFirstline}}
+                                        <span class="addr_line1 cc_addr_line">{{this.accountBean.shippingAddress.addressFirstline}}</span><br/>
+                                    {{/if}}
+                                {{/if}}
+
+                                {{#if this.accountBean.shippingAddress.address2}}
+                                    <span class="addr_line2 cc_addr_line">{{this.accountBean.shippingAddress.address2}}</span><br/>
+                                {{else}}
+                                    {{#if this.accountBean.shippingAddress.addressSecondline}}
+                                        <span class="addr_line1 cc_addr_line">{{this.accountBean.shippingAddress.addressSecondline}}</span><br/>
+                                    {{/if}}
+                                {{/if}}
+
+                                {{#if this.accountBean.shippingAddress.address3}}
+                                    <span class="addr_line3 cc_addr_line">{{this.accountBean.shippingAddress.address3}}</span><br/>
+                                {{else}}
+                                    {{#if this.accountBean.shippingAddress.addressThirdline}}
+                                        <span class="addr_line1 cc_addr_line">{{this.accountBean.shippingAddress.addressThirdline}}</span><br/>
+                                    {{/if}}
+                                {{/if}}
+                                <span class="cc_addr_city">{{this.accountBean.shippingAddress.city}}</span>
+                                {{#if this.accountBean.shippingAddress.state}}
+                                    <span class="cc_addr_state">{{this.accountBean.shippingAddress.state}}</span>
+                                {{else}}
+                                    {{#if this.accountBean.shippingAddress.stateCode}}
+                                        <span class="cc_addr_state">{{this.accountBean.shippingAddress.stateCode}}</span>
+                                    {{else}}
+                                        {{#if this.accountBean.shippingAddress.stateISOCode}}
+                                            <span class="cc_addr_state">{{this.accountBean.shippingAddress.stateISOCode}}</span>
+                                        {{/if}}
+                                    {{/if}}
+                                {{/if}}
+                                <span class="cc_addr_postal">{{this.accountBean.shippingAddress.postalCode}}</span><br/>
+                                <span class="cc_addr_country">{{this.accountBean.shippingAddress.country}}</span><br/>
+                                <span class="cc_addr_extId">{{this.accountBean.shippingAddress.partnerId}}</span>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/ifEquals}}
+
+        <form id="myAccountForm" class="cc_edit_account_form">
+            <div class="panel panel-default cc_panel cc_myaccount_edit_information">
+                <div class="panel-heading cc_heading">
+                    <h3 id="ccb2b-ma-contactedit-contact-title" class="panel-title cc_title">{{pageLabelMap 'MyAccount_Profile_Contact_Information'}}</h3>
+                </div>
+                <div class="panel-body cc_body cc_myaccount_edit">
+                    {{#ifEquals this.commerceType "B2B"}}
+                    {{#if this.preventContactEdit}}
+                    <p class="myAccName cc_name">
+                        <span class="cc_profile_firstname_label">{{pageLabelMap 'MyAccount_Profile_FirstName'}}&#58;</span>
+                        <span id="ccb2b-ma-contactedit-con-firstname-field" class="cc_profile_firstname_value">{{contactBean.firstName}}</span>
+                    </p>
+                    <p class="myAccName cc_name">
+                        <span class="cc_profile_lastname_label">{{pageLabelMap 'MyAccount_Profile_LastName'}}&#58;</span>
+                        <span id="ccb2b-ma-contactedit-con-lastname-field" class="cc_profile_lastname_value">{{contactBean.lastName}}</span>
+                    </p>
+                    <p class="myAccPhone cc_acct_phone">
+                        <span class="cc_acct_phone_label">{{pageLabelMap 'MyAccount_Profile_Phone'}}&#58;</span>
+                        <span id="ccb2b-ma-contactedit-con-phone-field" class="cc_acct_phone_value">{{contactBean.phone}}</span>
+                    </p>
+                    {{else}}
+                    <div class="form-group">
+                        <label class="cc_contact_input_firstname_label" for="firstNameField">{{pageLabelMap 'MyAccount_Profile_FirstName'}}</label>
+                        <input id="firstNameField" type="text" class="form-control contactInput cc_contact_input_firstname" name="firstName" maxlength=40 value="{{contactBean.firstName}}" />
+                    </div>
+                    <div class="form-group">
+                        <label class="cc_contact_input_lastname_label" for="lastNameField">{{pageLabelMap 'MyAccount_Profile_LastName'}}</label>
+                        <input id="lastNameField" type="text" class="form-control contactInput cc_contact_input_lastname" name="lastName" maxlength=40 value="{{contactBean.lastName}}" />
+                    </div>
+                    <div class="form-group">
+                        <label class="cc_contact_input_phone_label" for="homePhoneField">{{pageLabelMap 'MyAccount_Profile_Phone_Edit'}}</label>
+                        <input id="homePhoneField" type="text" class="form-control contactInput cc_contact_input_phone" name="phone" maxlength=40 value="{{contactBean.phone}}" />
+                    </div>
+                    {{/if}}
+                    {{/ifEquals}}
+                </div>
+            </div>
+            <div class="panel panel-default cc_panel cc_myaccount_edit_user_information">
+                <div class="panel-heading cc_heading">
+                    <h3 id="ccb2b-ma-contactedit-user-title" class="panel-title cc_title">{{pageLabelMap 'MyAccount_Profile_User_Information'}}</h3>
+                </div>
+                <div class="cc_body cc_myaccount_edit_user">
+                    <div class="form-group col-md-12">
+                        <label class="shorter"><strong>{{pageLabelMap 'MyAccount_Profile_Username'}}:</strong></label>
+                        <span>{{username}}</span>
+                        <input id="username" type="hidden" class="form-control contactInput cc_contact_input_username" name="username" maxlength=40 value="{{username}}" />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="cc_contact_input_other_firstname_label" for="userFirstName">{{pageLabelMap 'MyAccount_Profile_FirstName'}}</label>
+                        <input id="userFirstName" type="text" class="form-control contactInput cc_contact_input_firstname" name="userFirstName" maxlength=40 value="{{userFirstName}}" />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="cc_contact_input_lastname_label" for="userLastName">{{pageLabelMap 'MyAccount_Profile_LastName'}}</label>
+                        <input id="userLastName" type="text" class="form-control contactInput cc_contact_input_lastname" name="userLastName" maxlength=40 value="{{userLastName}}" />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="cc_contact_input_phone_label" for="userPhone">{{pageLabelMap 'MyAccount_Profile_Phone_Edit'}}</label>
+                        <input id="userPhone" type="text" class="form-control contactInput cc_contact_input_phone" name="userPhone" maxlength=40 value="{{userPhone}}" />
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label class="cc_contact_input_email_label" for="email">{{pageLabelMap 'MyAccount_Profile_Email_Edit'}}</label>
+                        <input id="email" type="text" class="form-control contactInput cc_contact_input_email" name="emailAddress" value="{{emailAddress}}" maxlength=40 />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="cc_contact_input_language_label" for="language">{{pageLabelMap 'MyAccount_Profile_Language_Edit'}}</label>
+                        <select id="userLanguageSelect" name="language" value="{{this.language}}" class="form-control cc_user_language">
+                            {{#each this.languageList}}
+                            {{#ifEquals this.label ../language}}
+                            <option value="{{this.value}}" selected>{{this.label}}</option>
+                            {{else}}
+                            <option value="{{this.value}}">{{this.label}}</option>
+                            {{/ifEquals}}
+                            {{/each}}
+                        </select>
+                    </div>
+                    <div class="form-group hidden">
+                        <label class="cc_contact_input_currencycode_label" for="currencyCode">{{pageLabelMap 'MyAccount_Profile_Currency_Edit'}}</label>
+                        <select name="currencyCode" value="{{this.currencyCode}}" class="form-control cc_currency_code">
+                            {{#each this.currencyList}}
+                            {{#ifEquals this.value ../currencyCode}}
+                            <option value="{{this.value}}" selected>{{this.label}}</option>
+                            {{else}}
+                            <option value="{{this.value}}">{{this.label}}</option>
+                            {{/ifEquals}}
+                            {{/each}}
+                        </select>
+                    </div>
+                    {{#ifDisplay 'reg.tmZn'}}
+                    <div class="form-group col-md-6">
+                        <label class="cc_contact_input_timezone_label" for="timeZoneValue">{{pageLabelMap 'SiteRegistration_TimeZone_Edit'}}</label>
+                        <select name="timeZoneValue" value="{{this.timeZoneValue}}" class="timeZoneSelect form-control cc_currency_code">
+                            {{#each this.timeZoneOptions}}
+                            {{#ifEquals this.value ../timeZoneValue}}
+                            <option value="{{this.value}}" selected>{{this.label}}</option>
+                            {{else}}
+                            <option value="{{this.value}}">{{this.label}}</option>
+                            {{/ifEquals}}
+                            {{/each}}
+                        </select>
+                    </div>
+                    {{/ifDisplay}}
+                </div>
+            </div>
+        </form>
+        <div class="form-group pull-right text-right col-md-12">
+            <input id="ccb2b-ma-contact-cancel-button" type="button" class="btn btn-default btn-sm closeEditProfile cc_close_edit_profile" value="{{pageLabelMap 'Cancel'}}" />
+            <input id="ccb2b-ma-contact-save-button" type="button" class="btn primary_button btn-default btn-sm updateAccount cc_update_profile" value="{{pageLabelMap 'Save'}}" />
+        </div>
+    </div>
+</div>

@@ -1,0 +1,104 @@
+@media all and (max-width: 767px)
+{
+    .THIS .alignCTSHeader
+    {
+       display: flex;
+       justify-content: center;
+       align-content: center;
+       align-items: center;
+       margin: auto;
+    }
+    .THIS .alignTSLogo
+    {
+       display: flex;
+       justify-content: center;
+       align-content: center;
+       align-items: center;
+       margin: auto;
+    }
+    .THIS .listTitle .titleWrapper
+    {
+       display: none;
+    }
+}
+@media all and (min-width: 767px)
+{
+    .THIS .alignCTSHeader
+    {
+       float: left;
+    }
+    .THIS .alignTSLogo
+    {
+       float: right;
+    }
+}
+.THIS .listContent
+{
+    pointer-events: none;
+}
+.THIS .forceRecordLayout .cellContainer
+{
+    pointer-events: none;
+}
+.THIS .outputLookupLink
+{
+    color: unset;
+}
+.THIS .mainModal .slds-theme--info
+{
+    color: rgb(255, 255, 255);
+    background-color: rgb(194, 57, 52);
+}
+.THIS .orangeButton
+{
+    background-color: #FBAE17;
+    border-radius: 5px;
+    border: 2px solid transparent;
+    font-size: 14px;
+}
+
+.THIS .orangeButton:hover {
+    border: 2px solid #2A2A2A;
+}
+.THIS .borderStyle
+{
+    border-width: medium;
+    border-color: #164488;
+}
+.THIS .listViewTitle
+{
+    display: none;
+}
+.THIS .headerBar
+{
+    width: inherit;
+    background-color: #091F3F;
+    left: 0;
+    right: 0;
+    height: 60px;
+}
+.THIS .footerTicket{
+    text-align: center;
+    color: white;
+    background-color: #091F3F;
+    position: relative;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+.THIS .slds-spinner_container
+{
+    background: none;
+}
+.THIS .flowruntimeInputWrapper
+{
+    padding-bottom: 0;
+}
+.THIS .flowruntimeErrorText.errorText
+{
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+.THIS .flowruntimeRichTextWrapper
+{
+    margin-bottom: 0;
+}

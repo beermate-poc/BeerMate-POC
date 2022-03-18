@@ -1,0 +1,51 @@
+<!--UK Useful Home Page links to open apps and external sites-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global">    
+<aura:attribute name="orgUrl" type="String"/>
+<aura:attribute name="resUrl" type="String"/>
+    <div class="slds-grid slds-wrap">           
+        <div class="bgcolor slds-col slds-p-horizontal--medium slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-1 slds-p-around--small">
+             <div class="gridHeader truncation">
+                 <h2 id="header">
+                 <span class="slds-text-heading--small slds-truncate">{!$Label.c.C360_UK_Useful_Links}</span>
+                 </h2>
+        	 </div>
+           
+            <!--<a class="breakline" onclick="{!c.clickBP}">{!$Label.c.C360_BeerPointApp_Name}</a>-->
+            <a class="breakline" onclick="{!c.clickBV}">{!$Label.c.C360_BrandVideos_Name}</a>
+            <!--<a class="breakline" onclick="{!c.clickBWB}">{!$Label.c.C360_BuildingWithBeerApp_Name}</a>-->
+            <!--Iknow-->
+             <a class="breakline" onclick="{!c.clickIknow}">{!$Label.c.C360_IknowName}</a> 
+       <!--     <a onclick="{!c.clickBWB}">{!$Label.c.C360_BuildingWithBeerApp_Name}</a><br/>	-->
+            <a class="breakline" onclick="{!c.clickGpCal}">{!$Label.c.C360_GP_POR_Calculator}</a>   
+           
+            <h2>{!$Label.c.C360_Ireland}</h2>
+           	 <a class="breakline" onclick="{!c.clickCGA}">{!$Label.c.C360_CGA_Reports}</a>            
+            <h2>{!$Label.c.C360_UK_Off_trade}</h2>
+      <!--       <a onclick="{!c.clickOffTrade}">{!$Label.c.C360_Off_TradeWB}</a><br/>	-->
+             <a class="breakline" onclick="{!c.clickTrax}">{!$Label.c.C360_Trax_app}</a>
+             <a class="breakline"  onclick="{!c.click60Shop}">{!$Label.c.C360_60SecondShop_Name}</a>            
+           	<h2>{!$Label.c.C360_UK_On_trade}</h2>
+             <a class="breakline" onclick="{!c.clickYourDeal}">{!$Label.c.C360_YourDeal}</a>
+             <a class="breakline" onclick="{!c.clickMicro}">{!$Label.c.C360_MicroliseLinkName}</a>
+             <!--a class="breakline" onclick="{!c.clickReg}">{!$Label.c.C360_RegOTWB}</a>
+           	 <a class="breakline" onclick="{!c.clickNatOT}">{!$Label.c.C360_NatOT}</a-->
+            <a class="breakline" onclick="{!c.clickOne}">{!$Label.c.C360_OneOTWB}</a>
+            <a class="breakline" onclick="{!c.clickPbrief}">{!$Label.c.C360_PeriodBriefName}</a>
+            <a class="breakline" onclick="{!c.clickMDA}">{!$Label.c.C360_MDA_App}</a>
+             <a class="breakline" onclick="{!c.clickMDAWeb}">{!$Label.c.C360_MDAWebsite}</a>
+    <!--     <a onclick="{!c.clickYD}">{!$Label.c.C360_YDApp}</a><br/>
+             <a onclick="{!c.clickMM}">{!$Label.c.C360_MenuMaker}</a><br/>     -->        
+             <a class="breakline" onclick="{!c.clickMMBW}">{!$Label.c.C360_MMBW}</a>
+             <a class="breakline" onclick="{!c.hotLines}">{!$Label.c.C360_Hotlines}</a>
+             <!--<a class="breakline" onclick="{!c.guestAlesrange}">{!$Label.c.C360_GAR}</a>-->                  
+          	<h2>{!$Label.c.C360_OTCB}</h2>             
+          	 <a class="breakline" onclick="{!c.clickBNC}">{!$Label.c.C360_BeerNCider}</a>
+             <a class="breakline" onclick="{!c.clickWine}">{!$Label.c.C360_Wine}</a>	<!--Wine -->
+             <a class="breakline" onclick="{!c.clickSSR}">{!$Label.c.C360_SSR}</a>	<!--Spirit,Softs &	RTds-->
+            
+             <a class="breakline" onclick="{!c.caskNc}">{!$Label.c.C360_CaskNC}</a>
+        <!--   	 <a onclick="{!c.allergy}">{!$Label.c.C360_Allergy}</a><br/>         -->
+  
+        </div>
+    </div>
+ </aura:component>

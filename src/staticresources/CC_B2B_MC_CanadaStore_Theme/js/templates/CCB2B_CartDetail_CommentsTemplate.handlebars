@@ -1,0 +1,28 @@
+<div id="comments_{{sfid}}" class="modal fade cc_modal cc_cart_comments_modal" tabindex="-1" role="dialog" aria-labelledby="CartCommentsLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content cc_modal_content">
+            <div class="modal-header cc_modal_header">
+                <button type="button" class="close cc_close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&#215;</span></button>
+                <h4 class="modal-title cc_modal_title" id="CartCommentsLabel">
+                    {{#ifEquals this.pricingType 'external'}}
+                    {{#if extName}}
+                    {{displayProductName 'Aggregate_Display' displayProduct.sfdcName extName}}
+                    {{else}}
+                    {{displayProductName 'Aggregate_Display' displayProduct.sfdcName this.product.sfdcName }}
+                    {{/if}}
+                    {{else}}
+                    {{displayProductName 'Aggregate_Display' displayProduct.sfdcName this.product.sfdcName }}
+                    {{/ifEquals}}
+                </h4>
+            </div>
+            <div class="modal-body cc_modal_body">
+                <form id="commentsForm{{sfid}}" class="cc_comments_form">
+                    <textarea placeholder="{{pageLabelMap 'Field_Notes'}}" rows="4" name="note" class="commentField form-control cc_comment_field">{{comments}}</textarea>
+                </form>
+            </div>
+            <div class="modal-footer cc_modal_footer">
+                <input type="button" class="primary_button saveComment btn btn-default btn-sm cc_save_comment" data-id="{{sfid}}" value="{{pageLabelMap 'Save'}}"/>
+            </div>
+        </div>
+    </div>
+</div>

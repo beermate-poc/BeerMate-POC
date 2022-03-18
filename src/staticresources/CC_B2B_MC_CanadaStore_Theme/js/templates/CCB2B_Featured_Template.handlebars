@@ -1,0 +1,151 @@
+
+{{#if this.Spotlight}}
+<div class="panel panel-default cc_panel cc_spotlight_products">
+    <div class="panel-heading cc_heading">
+        <h3 class="panel-title cc_title">
+            {{#if this.crossSell}}
+            {{pageLabelMap 'CrossSell_AlsoConsider'}}
+            {{else}}
+            {{pageLabelMap 'Spotlight_Title'}}
+            {{/if}}
+        </h3>
+    </div>
+    <div class="panel-body cc_body">
+        {{#each this.Spotlight}}
+        <div class="row">
+            <div class="col-md-12">
+                {{productLink this.mockProduct 'cc_product_name_img' image=(displayImage this.mediaWrapper 'spot img-responsive center-block' alt=this.mockProduct.name dataId=this.mockProduct.sku)}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h5>
+                    {{productLink this.mockProduct 'cc_product_name'}}
+                </h5>
+                <p class="cc_sku">
+                    <span class="cc_sku_label">{{pageLabelMap 'CartInc_SKU'}}</span>&#160;
+                    <span class="cc_sku_value">{{this.mockProduct.sku}}</span>
+                </p>
+                {{#if this.primaryAttr}}
+                <span class="cc_attr_message">{{pageLabelMap 'ProductAttributes_PriceMessage'}}</span>
+                {{else}}
+                {{#if this.showNewSubscriptionSelection}}
+                <p class="price priceSubscription cc_price_subscription">
+                    <span class="cc_subscr_price">{{pageLabelMap 'Prod_SpotLightPrice' (price this.price) (price this.minSubPrice) (price this.maxSubPrice)}}</span>
+                </p>
+                {{else}}
+                <!--********************************************************-->
+                {{#if this.maxPrice}}
+                <p class="price cc_price">
+                    {{#if this.displayPrice}}
+                    <span class="price cc_price cc_display_price">{{pageLabelPrefixMap 'DisplayPrice_' this.displayPrice}}</span>
+                    {{else}}
+                    {{#ifbothPricesZero this.minPrice this.maxPrice}}
+                    <span class="cc_price_label">{{pageLabelMap 'CartInc_Price'}}:</span>
+                    <span class="cc_price_value">{{displayRangePrice 'ProductDetails_PriceRangeFormat' this.minPrice this.maxPrice}}</span>
+                    {{/ifbothPricesZero}}
+                    {{/if}}
+                </p>
+                {{else}}
+                {{#if this.displayPrice}}
+                <p class="price displayPrice cc_display_price">
+                    <span class="cc_display_price">{{pageLabelPrefixMap 'DisplayPrice_' this.displayPrice}}</span>
+                </p>
+                {{else}}
+                <p class="price cc_price">
+                    <span class="cc_price_label">{{pageLabelMap 'CartInc_Price'}}:</span>
+                    <span class="cc_price_value">{{price this.price}}</span>
+                </p>
+                {{/if}}
+                {{/if}}
+                {{#if this.isTierPriced}}
+                <div class="cc_prt_tool_tip_div cc_prt_tool_tip_div_spotLight" data-toggle="tooltip" title="{{pageLabelMap 'ProductPricingTiers_VolumeHover'}}">
+                    <span class="cc_prt_tool_tip_text cc_prt_tool_tip_text_spotLight">{{pageLabelMap 'ProductPricingTiers_VolumePricing'}}</span>
+                </div>
+                {{/if}}
+                {{/if}}
+                {{/if}}
+            </div>
+        </div>
+        <hr>
+        {{/each}}
+    </div>
+</div>
+{{/if}}<!--*******************************-->
+{{#if this.Featured}}
+<div class="panel panel-default cc_feeatured_products">
+    <div class="panel-heading cc_heading">
+        <h3 class="panel-title cc_title">
+            {{#if this.crossSell}}
+            {{pageLabelMap 'CrossSell_AlsoConsider'}}
+            {{else}}
+            {{pageLabelMap 'Featured_Title'}}
+            {{/if}}
+        </h3>
+    </div>
+    <div class="panel-body cc_body">
+            <div id="featureProductsCarousel">
+                {{#each this.Featured}}
+                    <div class="item">
+                        <div class="text-center">
+                            {{#if this.mediaWrapper}}
+                                {{productLink this.mockProduct 'cc_product_name_img' image=(displayImage this.mediaWrapper 'featured img-responsive center-block' alt=this.mockProduct.name dataId=this.mockProduct.sku)}}
+                            {{else}}
+                            <div class="placeholder-container">{{productLink this.mockProduct 'cc_product_name' image=(displayPlaceholderImage this)}}</div>
+                            {{/if}}
+                            <h3 class="product-title">
+                                {{productLink this.mockProduct 'cc_product_name'}}
+                            </h3>
+                            <p class="cc_sku">
+                                <span class="cc_sku_label">{{pageLabelMap 'CCB2B_Basket_Product_Number_Label'}}</span>&#160;
+                                <span class="cc_sku_value">{{this.mockProduct.sku}}</span>
+                            </p>
+                            {{#if this.primaryAttr}}
+                            <span class="cc_attr_message">{{pageLabelMap 'ProductAttributes_PriceMessage'}}</span>
+                            {{else}}
+                            {{#if this.showNewSubscriptionSelection}}
+                            <p class="price priceSubscription cc_price_subscription">
+                                <span class="cc_subscr_price">{{pageLabelMap 'Prod_SpotLightPrice' (price this.price) (price this.minSubPrice) (price this.maxSubPrice)}}</span>
+                            </p>
+                            {{else}}
+                            <!--********************************************************-->
+                            {{#if this.maxPrice}}
+                            <p class="price cc_price">
+                                {{#if this.displayPrice}}
+                                <span class="price cc_price cc_display_price">{{pageLabelPrefixMap 'DisplayPrice_' this.displayPrice}}</span>
+                                {{else}}
+                                {{#ifbothPricesZero this.minPrice this.maxPrice}}
+                                <span class="cc_price_label">{{pageLabelMap 'CartInc_Price'}}:</span>
+                                <span class="cc_price_value">{{displayRangePrice 'ProductDetails_PriceRangeFormat' this.minPrice this.maxPrice}}</span>
+                                {{/ifbothPricesZero}}
+                                {{/if}}
+                            </p>
+                            {{else}}
+                            {{#if this.displayPrice}}
+                            <p class="price displayPrice cc_display_price">
+                                <span class="cc_display_price">{{pageLabelPrefixMap 'DisplayPrice_' this.displayPrice}}</span>
+                            </p>
+                            {{else}}
+                            <p class="price cc_price">
+                                <span class="cc_price_value">{{price this.price}}</span>
+                                {{#if this.mockProduct.CCB2BPricePerLiter}}
+                                    <span class="price cc_price pricePerLiter">{{price this.mockProduct.CCB2BPricePerLiter}}{{pageLabelMap 'CCB2B_PricePerLiter'}}</span>
+                                {{/if}}
+                            </p>
+                            {{/if}}
+                            {{/if}}
+                            {{#if this.isTierPriced}}
+                            <div class="cc_prt_tool_tip_div cc_prt_tool_tip_div_spotLight" data-toggle="tooltip" title="{{pageLabelMap 'ProductPricingTiers_VolumeHover'}}">
+                                <span class="cc_prt_tool_tip_text cc_prt_tool_tip_text_spotLight">{{pageLabelMap 'ProductPricingTiers_VolumePricing'}}</span>
+                            </div>
+                            {{/if}}
+                            {{/if}}
+                            {{/if}}
+                        </div>
+                    </div>
+                    {{/each}}
+            </div>
+        </div>
+</div>
+{{/if}}<!--*******************************-->
+  

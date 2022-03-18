@@ -1,0 +1,37 @@
+<!--
+Author:         Nick Serafin
+Company:        Slalom, LLC
+Description:    Uses the installed package OrgHierarchy in order to create a Contact Hierarchy component by referencing a custom apex class
+Attributes:     recordId – Id of the Call Plan
+
+History
+<Date>      <Authors Name>     <Brief Description of Change>
+01/14/2017    Nick Serafin        Initial Creation
+-->
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId">
+	<aura:attribute name="recordId" type="String" />
+	<div class="slds-page-header">
+		<div class="slds-grid">
+			<div class="slds-col slds-has-flexi-truncate">
+				<div class="slds-media slds-no-space slds-grow">
+					<div class="slds-media__figure">
+						<span class="slds-icon_container slds-icon-standard-opportunity">
+							<lightning:icon iconName="standard:contact" size="large"/>
+						</span>
+					</div>
+					<div class="slds-media__body">
+						<div class="slds-text-align_center slds-text-heading--large">
+							{!$Label.c.Contact_Hierarchy_Title}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<kkltng:Hierarchy apexClassForData="ContactHierarchyController"
+		fetchFullData="true" 
+		apexInput="{!v.recordId}"
+		rootndclick="{!c.rootNodeClicked}"
+		ndclick="{!c.nodeClicked}"
+	/>
+</aura:component>

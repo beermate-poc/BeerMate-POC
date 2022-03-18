@@ -1,0 +1,1 @@
+<aura:event type="COMPONENT" description="Cancel applying objective to target list" />

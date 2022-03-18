@@ -1,0 +1,55 @@
+<div id='customOverlay' class='modal-backdrop fade in'></div>
+<div class="navbar-inverse cc_navbar-inverse">
+    <div class="container">
+        <div class="row cc_navbar_row">
+            <small>
+                <div {{#isLogoClickable}}id="logoURL"{{/isLogoClickable}} class="col-md-12 col-xs-12 cc_navbar_col_misc brandingSection">
+                    {{displayHeaderLogo}}
+                </div>
+            </small>
+            <ul id="localeString" class="list-inline navbar-nav cc_navbar_nav">
+                <li><a id="changeLocale" class="changeLocale cc_change_locale" href="javascript:void(0)">
+                    <span class={{#if (localeString)}}"locale-highlight"{{/if}}>{{pageLabelMap 'Loc_header_en_CA'}}</span> | <span <span class={{#unless (localeString)}}"locale-highlight"{{/unless}}>{{pageLabelMap 'Loc_header_fr_CA'}}</span>
+                </a></li>
+            </ul>
+            <div id="modalSecLocale">
+                <div class="modal fade cc_modal cc_change_locale_modal in" id="switcherMod" tabindex="-1" role="dialog"
+                    aria-labelledby="Locale picker" style="display: none; padding-right: 17px;">
+                    <div class="modal-dialog modal-sm cc_modal_dialog" role="document">
+                        <div class="modal-content cc_modal_content">
+                            <div class="modal-header cc_modal_header">
+                                <button type="button" class="close cc_close" data-dismiss="modal"
+                                    aria-label="Close"><span aria-hidden="true">×</span></button>
+                                <h4 class="modal-title cc_modal_title" id="myModalLabel">{{pageLabelMap
+                                    'LocaleSwitcher_Modal_Title'}}</h4>
+                            </div>
+                            <div class="modal-body cc_modal_body">
+                                <p>{{pageLabelMap 'LocaleSwitcher_Modal_Label'}}</p>
+                                <p class="note">{{pageLabelMap 'LocaleSwitcher_Modal_Note'}}</p>
+                                <table class="localeModalTable table table-hover table-bordered cc_locale_modal_table"
+                                    id="available_locales">
+                                    <tbody>
+                                        <tr class="cc_tr_locale  active" data-id="en_CA">
+                                            <td class="cc_td_locale">{{pageLabelPrefixMap 'Loc_global_' 'en_CA'}}</td>
+                                        </tr>
+                                        <tr class="cc_tr_locale " data-id="fr_CA">
+                                            <td class="cc_td_locale">{{pageLabelPrefixMap 'Loc_global_' 'fr_CA'}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer cc_modal_footer">
+                                <input type="button" id="setLocale"
+                                    class="btn btn-default btn-sm primary_button setLocale cc_set_locale" data-id=""
+                                    data-mode="" value="{{pageLabelMap 'LocaleSwitcher_Change'}}">
+                                <input type="button" id="cancelLocale"
+                                    class="btn btn-default btn-sm closeModal cc_close_modal" data-dismiss="modal"
+                                    data-id="" value="{{pageLabelMap 'LocaleSwitcher_Cancel'}}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

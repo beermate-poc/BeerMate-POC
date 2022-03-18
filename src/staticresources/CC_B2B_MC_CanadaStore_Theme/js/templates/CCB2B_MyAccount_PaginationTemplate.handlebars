@@ -1,0 +1,45 @@
+
+<div class="panel panel-default cc_panel cc_paginator">
+    <div class="panel-body cc_body">
+        <div class="row">
+            <div class="col-md-6 col-xs-12">
+                <div class="form-inline cc_form-inline cc_paginator_form">
+                    <label for="itemsPerPage" class="cc_items_per_page">
+                        <select id="itemsPerPage" class="form-control input-sm sizeAction cc_size_action">
+                            {{#each this.itemsPerPagePLValues}}
+                            <option value="{{safeQuote this}}" {{#ifEquals ../pageSize this}} selected {{/ifEquals}}>{{safeQuote this}}&#160;{{pageLabelMap 'CCB2B_MyAccount_Results_Label'}}</option>
+                            {{/each}}
+                        </select>
+                        <span class="caret {{getClassPerLocale}}"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-6 col-xs-12 text-right paginator">
+                <div class="text-right cc_current_page">
+                    {{#if hasPrevious}}
+                    <a href="#" class="paginationPrev previousAction pageAction cc_page_action"></a>
+                    {{else}}
+                    <span class="paginationPrev"></span>
+                    {{/if}}
+                    {{#for startPage endPage 1}}
+                    {{#ifEquals this ../currentPage}}
+                    <span class="currentPage">{{safeQuote this}}</span>
+                    {{else}}
+                    <a href="#" class="gotoPage cc_goto_page" data-id="{{safeQuote this}}">{{safeQuote this}}</a>
+                    {{/ifEquals}}
+                    {{/for}}
+                    {{#if hasNext}}
+                    <a href="#" class="paginationNext nextAction pageAction cc_page_action"></a>
+                    {{else}}
+                    <span class="paginationNext"></span>
+                    {{/if}}
+                </div>
+            </div>
+            <div class="col-md-12 col-xs-12 text-left">
+                <p class="cc_paginator_legend">
+                    {{pageLabelMap 'PaginatorItems'}} {{startItem}} - {{endItem}} {{pageLabelMap 'PaginatorOf'}} {{totalRecords}} {{pageLabelMap 'PaginatorTotal'}}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,20 @@
+.THIS {
+}
+.THIS.spinnerHolder{
+    position: relative;
+    display: inline-block;
+    margin-left: 15px;
+    width: 55px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+.THIS.slds-spinner_container {
+    position: inherit;
+}
+.THIS.attach-to-bottom{
+    position: absolute;
+    bottom: 40px;
+    
+    left: 420px;
+    width: 100%;
+}

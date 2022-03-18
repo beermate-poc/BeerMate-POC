@@ -1,0 +1,12 @@
+.THIS.slds-modal__container{
+    max-width: 200px !important;
+    width:300px !important;
+}
+
+.THIS .selected{
+    color:orange;
+}
+
+.THIS .boldLabel{
+ 	font-weight: bold;   
+}

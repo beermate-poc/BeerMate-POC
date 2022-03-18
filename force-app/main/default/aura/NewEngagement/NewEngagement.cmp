@@ -1,0 +1,376 @@
+<aura:component controller="CallLogUtility" implements="force:lightningQuickAction,force:appHostable"> 
+    <aura:attribute name="newObjective" type="Objective__c" default="{'sobjectType': 'Objective__c'}" />
+    <aura:attribute name="plannedObjectiveId" type="String" default="" />
+    <aura:attribute name="recordTypeName" type="String" />
+    <aura:attribute name="accountId" type="Id" />
+    <aura:attribute name="callLogId" type="Id" />
+    <aura:attribute name="showNewEngagement" type="boolean" />
+    <aura:attribute name="mobileCSS" type="String" default="slds-modal--form" />
+    <aura:attribute name="showToast" type="boolean" />
+    <aura:attribute name="loadObjectives" type="boolean" />
+    <aura:attribute name="showErrorToast" type="boolean" default="false"/>
+    <aura:attribute name="toastTitle" type="String" />
+    <aura:attribute name="toastMsg" type="String" />
+    <aura:attribute name="toastType" type="String" />
+    <aura:attribute name="mobile" type="boolean" default="false"/>
+    <aura:attribute name="disableSaveButton" type="boolean" default="false"/>
+    <aura:attribute name="showObjView" type="boolean"/>
+    <aura:attribute name="newRecord" type="String" />
+    <aura:attribute name="showNewEngagementAIF" type="boolean"/>
+    <aura:attribute name="subTypeValues" type="String[]" default="[]"/>
+    <aura:attribute name="selectedSampling" type="boolean" default="false"/>
+    <!-- MC:1701- Subtypes should be added on objectives instead of planned objectives -->
+    <aura:attribute name="subType" type="String"/>
+    <aura:handler name="init" action="{!c.init}" value="{!this}" />
+    <aura:attribute name="curTime" type="String"/>
+    <aura:attribute name="selectedSubType" type="String" />
+    <aura:handler name="change" value="{!v.newObjective}" action="{!c.setPlannedObjective}" />
+    <aura:handler name="plannedObjChanged" event="c:PlannedObjectiveSelected"
+    action="{!c.plannedObjectiveChanged}"/>
+    <lightning:spinner aura:id="spinner" class="slds-hide" alternativeText="Please wait..." />
+    <div class="slds-text-align__center">
+        <aura:if isTrue="{!v.showErrorToast}">
+            <c:Toast toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}"/>
+        </aura:if>
+    </div>
+    <aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone, $Browser.isAndroid)}">
+        <div class="" style="height:700px;">
+            <div class="">
+                <div class="modalStyle">
+                    <div class="mobileView">
+                        <div class="slds-float_left">
+                            <lightning:button class="slds-button" variant="neutral" onclick="{!c.closeNewEngagementModalMobile}" label="{!$Label.c.Cancel_Label}"/>
+                        </div>
+                        <div class="slds-float_right ipadStyle">
+                            <lightning:button class="slds-button" variant="brand" onclick="{!c.createNewObjective}" label="{!$Label.c.Save}" />
+                        </div>
+                        <h2 class="slds-text-heading--medium slds-text-align_center slds-truncate" title="{!$Label.c.Add_Engagement}">{!$Label.c.Schedule_an_Engagement}</h2>
+                    </div>
+                    <ui:scrollerWrapper class="scrollerSize">
+                        <div class="formContent">
+                            <h3 class="slds-section-title--divider">{!$Label.c.Engagement_Information}</h3>
+                            <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                                <div class="slds-form-element">
+                                    <lightning:select name="selectItem" label="{!$Label.c.Status}" required="true" value="{!v.newObjective.Status__c}" aura:id="statusSelectOptions" onchange="{!c.checkStatusChange}">
+                                        <option value="Not Started">{!$Label.c.Not_Started}</option>
+                                        <option value="In Progress">{!$Label.c.In_Progress}</option>
+                                        <option value="Committed">{!$Label.c.Committed}</option>
+                                        <option value="Executed">{!$Label.c.Executed}</option>
+                                        <option value="Declined">{!$Label.c.Declined}</option>
+                                        <option value="Not Applicable">{!$Label.c.Not_Applicable}</option>
+                                    </lightning:select>
+                                </div>
+                                <div class="slds-m-top--medium">
+                                    <c:MboComponent aura:id="plannedObjective" objectiveType="Engagement" selectedObjective="{!v.plannedObjectiveId}" />
+                                </div>
+                                <aura:if isTrue="{!v.subTypeValues.length > 0}">
+                                    <div class="slds-m-top--medium">
+                                        <lightning:select name="subTypeSelect" label="{!$Label.c.Sub_Type}" aura:id="subTypeSelect" value="{!v.selectedSubType}" required="{!(v.newObjective.Status__c == 'Committed' || v.newObjective.Status__c == 'Executed') ? true : false}">
+                                            <option value="">{!$Label.c.Default_Picklist_Select}</option>
+                                            <aura:iteration items="{!v.subTypeValues}" var="sub">
+                                                <option value="{!sub}" text="{!sub}" selected="{!sub == v.selectedSubType}"></option>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </div>
+                            </aura:if>
+                                <div class="slds-m-top--medium">
+                                    <lightning:input messageWhenValueMissing="{!$Label.c.Name_is_required}" label="{!$Label.c.Name_Of_Engagement}" name="EngagementName" required="true"
+                                        value="{!v.newObjective.Name}" aura:id="egageName" />
+                                </div>
+                                <div class="{!(v.newObjective.Status__c != 'Executed') ? 'slds-hide': 'slds-show slds-m-top--medium'}">                                 
+                                    <label class="slds-form-element__label">{!$Label.c.Objectives_Num_Engaged}</label>
+                                    <ui:inputNumber aura:id="noOfPeopleEng" value="{!v.newObjective.Number_of_People_Engaged__c}"/>
+                                </div>
+                                <div class="slds-m-top--medium" data-select="multi" data-scope="single" data-typeahead="true">
+                                    <div class="slds-form-element">
+                                        <!-- GB-7530  -->
+                                        <c:ProductSearch aura:id="brandSearch" object="Product__c" field="TrademarkBrandLongNme__c" searchValue="{!v.newObjective.Brands__c}" isRequired="{!or(v.newObjective.Status__c == 'Committed' ,v.newObjective.Status__c == 'Executed' ) ? True: false}"/>
+                                    </div>
+                                </div>
+                                <div>
+                                    <c:DatePicker aura:id="dtEgage" value="{!v.newObjective.Date__c}" label="{!$Label.c.Objectives_Engagement_Date}"
+                                        inputClass="slds-input" requiredAstrik="{!(v.newObjective.Status__c == 'Committed' || v.newObjective.Status__c == 'Executed') ? '*': ' '}" positionDate="datePickerRight"/>
+                                </div>
+                                
+                                
+                                
+                                <div class="dateTime-inputTime form-element form-element__control">
+                                <div class="input-has-icon input-has-icon--right" >
+                                <lightning:input type="time" name="timer" class="slds-timepicker" aura:id="timepick" value="{!v.curTime}"/>
+                                </div></div>
+                                
+                                
+                                
+                                <div class="slds-form-element slds-m-top--medium">
+                                    <fieldset class="slds-form-element slds-m-top--medium">
+                                        <legend class="slds-form-element__legend slds-form-element__label">
+                                            <aura:if isTrue="{!((v.newObjective.Status__c == 'Executed') || (v.newObjective.Status__c == 'Committed'))}">
+                                                <abbr class="slds-required" title="{!$Label.c.Required}">*</abbr>
+                                            </aura:if>
+                                            {!$Label.c.Objectives_Engagement_Type}
+                                        </legend>
+                                        <div class="slds-form-element__control slds-grid slds-m-left--none">
+										<div class="slds-col">
+                                             <div class="slds-list_horizontal" >
+                                                <lightning:input aura:id="samplingRadio" type="radio" label="{!$Label.c.Objectives_Sampling}" value="{!v.newObjective.Consumer_or_Waitstaff__c}" name="engagementType" onchange="{!c.toggleEngagementType}"/>
+                                            <lightning:helptext iconName="utility:info" content="{!$Label.c.Sampling_HelpText}" class="tooltip"/>
+                                            </div>
+                                            </div>
+                                            <div class="slds-col">
+                                                 <div class="slds-list_horizontal" >
+                                                <lightning:input aura:id="consumerRadio" type="radio" label="{!$Label.c.Consumption_Label}" value="{!v.newObjective.Consumer_or_Waitstaff__c}" name="engagementType" onchange="{!c.toggleEngagementType}"/>
+                                                <lightning:helptext iconName="utility:info" content="{!$Label.c.Consumer_HelpText}"  class="tooltip"/>
+                                                </div>
+                                                </div>
+                                            <div class="slds-col">
+                                                <lightning:input aura:id="waitstaffRadio" type="radio" label="{!$Label.c.Objectives_Waitstaff}" name="engagementType" onchange="{!c.toggleEngagementType}" value="{!v.newObjective.Consumer_or_Waitstaff__c}"/>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                <aura:if isTrue="{!(v.newObjective.Status__c == 'Executed' &amp;&amp; v.selectedSampling == true)}">
+                                 <div class="slds-form-element slds-m-top--medium">
+                                         <fieldset class="slds-form-element slds-m-top--medium">
+                                             <legend class="slds-form-element__legend slds-form-element__label">
+											  <aura:if isTrue="{!(v.newObjective.Status__c == 'Executed')}">
+											  <aura:if isTrue="{!v.selectedSampling}">
+                                                  <abbr class="slds-required" title="{!$Label.c.Required}">*</abbr>
+												   </aura:if>
+												  </aura:if>
+                                             </legend>
+                                             <div>
+                                                  <lightning:input aura:id="noOfConsumerSamp" type="number" label="{!$Label.c.Objectives_NoOfConsumer}" value="{!v.newObjective.Number_of_Consumers_Sampled__c}" name="sampling"/>
+                                             </div>
+                                              <legend class="slds-form-element__legend slds-form-element__label">
+                                                    <aura:if isTrue="{!(v.newObjective.Status__c == 'Executed')}">
+											  <aura:if isTrue="{!v.selectedSampling}">
+                                                  <abbr class="slds-required" title="{!$Label.c.Required}">*</abbr>
+												   </aura:if>
+												  </aura:if>
+                                             </legend>
+                                             <div>
+                                                  <lightning:input aura:id="dollarsSpent" type="number" formatter="currency" label="{!$Label.c.Objectives_DollarsSpent}" value="{!v.newObjective.Sampling__c}" name="sampling"/>
+                                             </div>
+                                        </fieldset>
+                                    </div>
+                                    </aura:if>
+                                <aura:if isTrue="{!v.newObjective.Status__c == 'Executed'}">
+                                   <div class="slds-form-element slds-m-top--medium">
+                                        <fieldset class="slds-form-element slds-m-top--medium">
+                                            <legend class="slds-form-element__legend slds-form-element__label">
+                                                <abbr class="slds-required" title="{!$Label.c.Required}">*</abbr>
+                                                {!$Label.c.Objectives_Executed_By}
+                                            </legend>
+                                            <div class="slds-form-element__control slds-grid slds-m-left--none">
+                                                <div class="slds-col">
+                                                    <lightning:input aura:id="individualRadio" type="radio" label="{!$Label.c.Objectives_Individual}" name="executedBy" onchange="{!c.toggleExecutedBy}" checked="true"/>
+                                                </div>
+                                                <div class="slds-col">
+                                                    <lightning:input aura:id="agencyRadio" type="radio" label="{!$Label.c.Objectives_Agency}" name="executedBy" onchange="{!c.toggleExecutedBy}"/>
+                                                </div>
+                                                <div class="slds-col">
+                        <!-- MC: 1864 - Logging a Call - Component Error - New Engagement -->
+                                                    <lightning:input aura:id="bothRadio" type="radio" label="{!$Label.c.Objectives_Both}" name="executedBy" onchange="{!c.toggleExecutedBy}"/>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </aura:if>
+                                <div class="slds-m-top--medium">
+                                    <lightning:textarea name="myTextArea" label="{!$Label.c.Engagement_Details}" maxlength="255" value="{!v.newObjective.Description__c}" aura:id="engageDetail"
+                                        />
+                                </div>
+                            </div>
+                            <div class="{!(v.newObjective.Status__c != 'Committed' &amp;&amp; v.newObjective.Status__c != 'Executed') ? 'slds-hide': 'slds-show'}">
+                                <h3 class="slds-section-title--divider">{!$Label.c.For_Your_Distributor_Label}</h3>
+                                <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                                    <div class="slds-form-element">
+                                        <c:DatePicker aura:id="dt" value="{!v.newObjective.Supporting_Materials_Delivery_Date__c}" label="{!$Label.c.Objectives_Supporting_Materials_Date}"
+                                            inputClass="slds-input"  positionDate="datePickerRight"/>
+                                    </div>
+                                    <div class="slds-form-element">
+                                        <lightning:textarea aura:id="requestMaterial" name="materialTextArea" label="{!$Label.c.Objective_CallLog_Materials_Requested}" maxlength="300" value="{!v.newObjective.Notes_for_Distributor__c}"
+                                            />
+                                    </div>
+                                </div>
+                            </div>
+                            <h3 class="slds-section-title--divider">{!$Label.c.Add_to_Dos}</h3>
+                            <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                                <div class="slds-form-element">
+                                    <c:AddToDos aura:id="addToDoSection" datePickerPosition="datePickerRightAdjustment"/>
+                                </div>
+                            </div>
+                        </div>
+                    </ui:scrollerWrapper>
+                </div>
+            </div>
+        </div>
+    <aura:set attribute="else">
+        <div class="" style="height:640px;">
+            <div role="dialog" tabindex="-1" class="{!v.mobileCSS + ' slds-modal ' + ' slds-fade-in-open '}">
+                <div class="slds-modal__container modalStyle">
+                    <div class="slds-modal__header">
+                        <h2 class="slds-text-heading--medium slds-truncate" title="New Contact">Schedule an Engagement</h2>
+                    </div>
+                    <ui:scrollerWrapper class="scrollerSize">
+                        <div class="slds-modal__content">
+                            <h3 class="slds-section-title--divider">{!$Label.c.Engagement_Information}</h3>
+                            <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                                <div class="slds-form-element">
+                                    <lightning:select name="selectItem" label="{!$Label.c.Status}" required="true" value="{!v.newObjective.Status__c}" aura:id="statusSelectOptions" onchange="{!c.checkStatusChange}">
+                                        <option value="Not Started">{!$Label.c.Not_Started}</option>
+                                        <option value="In Progress">{!$Label.c.In_Progress}</option>
+                                        <option value="Committed">{!$Label.c.Committed}</option>
+                                        <option value="Executed">{!$Label.c.Executed}</option>
+                                        <option value="Declined">{!$Label.c.Declined}</option>
+                                        <option value="Not Applicable">{!$Label.c.Not_Applicable}</option>
+                                    </lightning:select>
+                                </div>
+                                <div class="slds-m-top--medium">
+                                    <c:MboComponent aura:id="plannedObjective" objectiveType="Engagement" selectedObjective="{!v.plannedObjectiveId}"/>
+                                </div>
+                                <aura:if isTrue="{!v.subTypeValues.length > 0}">
+                                    <div class="slds-m-top--medium">
+                                        <lightning:select name="subTypeSelect" label="{!$Label.c.Sub_Type}" aura:id="subTypeSelect" value="{!v.selectedSubType}" required="{!(v.newObjective.Status__c == 'Committed' || v.newObjective.Status__c == 'Executed') ? true : false}">
+                                            <option value="">{!$Label.c.Sub_Type_Select}</option>
+                                            <aura:iteration items="{!v.subTypeValues}" var="sub">
+                                                <option value="{!sub}" text="{!sub}" selected="{!sub == v.selectedSubType}"></option>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </div>
+                                </aura:if>
+                                <div class="slds-m-top--medium">
+                                    <lightning:input messageWhenValueMissing="{!$Label.c.Name_is_required}" label="{!$Label.c.Objectives_Name_Engagement}" name="EngagementName" required="true"
+                                        value="{!v.newObjective.Name}" aura:id="egageName" />
+                                </div>
+                                <div class="{!(v.newObjective.Status__c != 'Executed') ? 'slds-hide': 'slds-show slds-m-top--medium'}">                                   
+                                    <label class="slds-form-element__label">{!$Label.c.Objectives_Num_Engaged}</label>
+                                    <ui:inputNumber aura:id="noOfPeopleEng" value="{!v.newObjective.Number_of_People_Engaged__c}"/>
+                                </div>
+                                <div class="slds-m-top--medium" data-select="multi" data-scope="single" data-typeahead="true">
+                                    <div class="slds-form-element">
+                                        <!-- GB-7530  -->
+                                        <c:ProductSearch aura:id="brandSearch" object="Product__c" field="TrademarkBrandLongNme__c" searchValue="{!v.newObjective.Brands__c}" isRequired="{!(v.newObjective.Status__c == 'Committed' || v.newObjective.Status__c == 'Executed' ) ? True: false}"/>
+                                    </div>
+                                </div>
+                                <div>
+                                    <c:DatePicker aura:id="dtEgage" value="{!v.newObjective.Date__c}" label="{!$Label.c.Objectives_Engagement_Date}"
+                                        inputClass="slds-input" requiredAstrik="{!(v.newObjective.Status__c == 'Committed' || v.newObjective.Status__c == 'Executed') ? '*': ' '}" positionDate="datePickerRight"/>
+                                  </div>
+                                <div class="dateTime-inputTime form-element form-element__control">
+                                <div class="input-has-icon input-has-icon--right" >
+                                <lightning:input type="time" name="timer" class="slds-timepicker" aura:id="timepick" value="{!v.curTime}" />
+                                </div></div>
+                                <div class="slds-form-element slds-m-top--medium">
+                                    <fieldset class="slds-form-element slds-m-top--medium">
+                                        <legend class="slds-form-element__legend slds-form-element__label">
+                                            <aura:if isTrue="{!(v.newObjective.Status__c == 'Executed' || v.newObjective.Status__c == 'Committed')}">
+                                                <abbr class="slds-required" title="{!$Label.c.Required}">*</abbr>
+                                            </aura:if>
+                                            {!$Label.c.Objectives_Engagement_Type}
+                                        </legend>
+                                            <div class="slds-form-element__control slds-grid slds-m-left--none">
+                                                  <!-- Add Sampling as Engagment type - GB-7530-->
+                                                 <div class="slds-col">
+                                                     <div class="slds-list_horizontal" >                                                         
+                                                    <lightning:input aura:id="samplingRadio" type="radio" label="{!$Label.c.Objectives_Sampling}" name="engagementType" onchange="{!c.toggleEngagementType}"/>
+                                                     <lightning:helptext iconName="utility:info" content="{!$Label.c.Sampling_HelpText}" class="tooltip"/>
+                                                     </div>
+                                                     </div>
+                                                <div class="slds-col">
+                                                    <div class="slds-list_horizontal" >
+                                                    <lightning:input aura:id="consumerRadio" type="radio" label="{!$Label.c.Consumption_Label}" name="engagementType" onchange="{!c.toggleEngagementType}"/>
+                                                    <lightning:helptext iconName="utility:info" content="{!$Label.c.Consumer_HelpText}" class="tooltip"/>
+                                                    </div>
+                                                    </div>
+                                                <div class="slds-col">
+                                                    <lightning:input aura:id="waitstaffRadio" type="radio" label="{!$Label.c.Objectives_Waitstaff}" name="engagementType" onchange="{!c.toggleEngagementType}"/>
+                                                </div>                                               
+                                            </div>
+                                    </fieldset>
+                                </div>
+                                  <!-- On selecting Sampling from Engagement type , two new fields
+											will get diplayed - GB-7530-->
+									<aura:if isTrue="{!(v.newObjective.Status__c == 'Executed' &amp;&amp; v.selectedSampling == true)}">
+                                    <div class="slds-form-element slds-m-top--medium">
+                                         <fieldset class="slds-form-element slds-m-top--medium">
+                                             <legend class="slds-form-element__legend slds-form-element__label">
+											  <aura:if isTrue="{!(v.newObjective.Status__c == 'Executed')}">
+											  <aura:if isTrue="{!v.selectedSampling}">
+                                                  <abbr class="slds-required" title="{!$Label.c.Required}">*</abbr>
+												   </aura:if>
+												  </aura:if>
+                                             </legend>
+                                             <div>
+                                                  <lightning:input aura:id="noOfConsumerSamp" type="number" label="{!$Label.c.Objectives_NoOfConsumer}" value="{!v.newObjective.Number_of_Consumers_Sampled__c}" name="sampling"/>
+                                             </div>
+                                              <legend class="slds-form-element__legend slds-form-element__label">
+                                                   <aura:if isTrue="{!(v.newObjective.Status__c == 'Executed')}">
+											  <aura:if isTrue="{!v.selectedSampling}">
+                                                  <abbr class="slds-required" title="{!$Label.c.Required}">*</abbr>
+												   </aura:if>
+												  </aura:if>
+                                             </legend>
+                                             <div>
+                                                  <lightning:input aura:id="dollarsSpent" type="number" formatter="currency" label="{!$Label.c.Objectives_DollarsSpent}" value="{!v.newObjective.Sampling__c}" name="sampling"/>
+                                             </div>
+                                        </fieldset>
+                                    </div>
+                                        </aura:if>
+                                <aura:if isTrue="{!v.newObjective.Status__c == 'Executed'}">
+                                   <div class="slds-form-element slds-m-top--medium">
+                                        <fieldset class="slds-form-element slds-m-top--medium">
+                                            <legend class="slds-form-element__legend slds-form-element__label">
+                                                <abbr class="slds-required" title="{!$Label.c.Required}">*</abbr>
+                                                {!$Label.c.Objectives_Executed_By}
+                                            </legend>
+                                            <div class="slds-form-element__control slds-grid slds-m-left--none">
+                                                <div class="slds-col">
+                                                    <lightning:input aura:id="individualRadio" type="radio" label="{!$Label.c.Objectives_Individual}" name="executedBy" onchange="{!c.toggleExecutedBy}" checked="true"/>
+                                                </div>
+                                                <div class="slds-col">
+                                                    <lightning:input aura:id="agencyRadio" type="radio" label="{!$Label.c.Objectives_Agency}" name="executedBy" onchange="{!c.toggleExecutedBy}"/>
+                                                </div>
+                                                <div class="slds-col">
+                                                    <lightning:input aura:id="bothRadio" type="radio" label="{!$Label.c.Objectives_Both}" name="executedBy" onchange="{!c.toggleExecutedBy}"/>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </aura:if>
+                                <div class="slds-m-top--medium">
+                                    <lightning:textarea name="myTextArea" label="{!$Label.c.Engagement_Details}" maxlength="255" value="{!v.newObjective.Description__c}" aura:id="engageDetail"
+                                        />
+                                </div>
+                            </div>
+                            <div class="{!(v.newObjective.Status__c != 'Committed' &amp;&amp; v.newObjective.Status__c != 'Executed') ? 'slds-hide': 'slds-show'}">
+                                <h3 class="slds-section-title--divider">{!$Label.c.For_Your_Distributor_Label}</h3>
+                                <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                                    <div class="slds-form-element">
+                                        <c:DatePicker aura:id="dt" value="{!v.newObjective.Supporting_Materials_Delivery_Date__c}" label="{!$Label.c.Objectives_Supporting_Materials_Date}"
+                                            inputClass="slds-input"  positionDate="datePickerRight"/>
+                                    </div>
+                                    <div class="slds-form-element">
+                                        <lightning:textarea aura:id="requestMaterial" name="materialTextArea" label="{!$Label.c.Objective_CallLog_Materials_Requested}" maxlength="300" value="{!v.newObjective.Notes_for_Distributor__c}"
+                                            />
+                                    </div>
+                                </div>
+                            </div>
+                            <h3 class="slds-section-title--divider">{!$Label.c.Add_to_Dos}</h3>
+                            <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                                <div class="slds-form-element">
+                                    <c:AddToDos aura:id="addToDoSection" datePickerPosition="datePickerRightAdjustment"/>
+                                </div>
+                            </div>
+                        </div>
+                    </ui:scrollerWrapper>
+                    <div class="slds-modal__footer mobileViewHeader">
+                        <lightning:button class="slds-button" variant="neutral" label="{!$Label.c.Cancel_Label}" onclick="{!c.closeNewEngagementModal}" />
+                        <lightning:button class="slds-button" variant="brand" label="{!$Label.c.Save}" onclick="{!c.createNewObjective}" disabled="{!v.disableSaveButton}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </aura:set>
+    </aura:if>
+</aura:component>

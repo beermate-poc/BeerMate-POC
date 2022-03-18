@@ -1,0 +1,103 @@
+<div id="mobileEmptyBasket" class="miniBasketSection {{#if (isListEmpty data.cartItems)}}emptyBasketMessage{{/if}}" {{#unless data.isVisible}}style="display:none" {{/unless}}>
+    <div class="cartItems row">
+    {{#if data}}
+        {{#if data.cartItems}}
+            {{#each data.cartItems}}
+                {{#if (gt ccrz__Quantity__c 0)}}
+                <div class="cartItem" data-id="{{Id}}">
+                    <div class="col-xs-3 itemImage">
+                        {{#if (isProductInPromo ccrz__Product__r.Id)}}
+                            <div class="isPromoBadge" data-category="{{promoCategory this.ccrz__Product__r.Id}}">{{pageLabelMap 'CCB2B_Product_ViewOffer_Badge'}}</div>
+                        {{/if}}
+                        {{#if EProductMediasS}}
+                            {{displayImage EProductMediasS 'img-responsive img-rounded cc_promo_img' alt=ccrz__Product__r.Name}}
+                        {{else}}
+                            {{displayPlaceholderImage this}}
+                        {{/if}}
+                    </div>
+                    <div class="col-xs-8 itemInfo">
+                        <p class="productName">{{{ccrz__Product__r.Name}}}</p>
+
+                        {{#ifEquals ccrz__Price__c 0}}
+                        <p class="freeFlag"><span class="freeIcon fa fa-warning"></span>{{pageLabelMap 'CCB2B_Free'}}</p>
+                        <p class="productQty">{{pageLabelMap 'CCB2B_Basket_Qty_Column'}}: {{ccrz__Quantity__c}}</p>
+                        {{else}}
+                        {{#if (checkContactDisplayPermissions 'pricing')}}
+                        <p class="productPrice">{{price ccrz__Price__c}}</p>
+                        {{/if}}
+                        <p class="productQty">{{pageLabelMap 'CCB2B_Basket_Qty_Column'}}: {{ccrz__Quantity__c}}</p>
+                        {{#if (checkContactDisplayPermissions 'pricing')}}
+                        <p class="productSubtotal">{{pageLabelMap 'CCB2B_Basket_Subtotal_Column'}}: {{price ccrz__SubAmount__c}}</p>
+                        {{/if}}
+                        {{/ifEquals}}
+                        {{#if this.CCB2B_Is_Substituted__c }}
+                            <div>
+                                <span class="circle-arrow"></span>
+                                <span class="item-promo-msg">
+                                    {{pageLabelMap 'CCB2B_Cart_CartItem_Substitution_Msg'}}
+                                </span>
+                            </div>
+                        {{/if}}
+                    </div>
+                    <div class="col-xs-1 itemRemove">
+                        <a id="{{generateId 'ccb2b-miniBasket-remove-' ccrz__Product__r.ccrz__SKU__c '-btn'}}" type="button" class="btn glyphicon removeItem glyphicon-trash btn-default btn-sm delete cc_delete" data-id="{{Id}}" data-sku="{{ccrz__Product__r.ccrz__SKU__c}}"></a>
+                    </div>
+                </div>
+                {{/if}}
+            {{/each}}
+            </div>
+
+            {{#if (checkContactDisplayPermissions 'pricing')}}
+            <div class="cartTotal row">
+                    <div class="col-md-12">
+                        <p id='ccb2b-miniBasket-total-field' class="text-center productsTotal">{{pageLabelMap 'CartInc_Total'}}: {{price data.cart.ccrz__SubtotalAmount__c}}</p>
+                    </div>
+            </div>
+            {{/if}}
+
+            <div class="row mb-pg-row">
+                <div class="col-md-12 ">
+                    <div class="mb-pg-wgt">
+                        <small class="mb-pg-msg">
+                            {{pageLabelMap 'CCB2B_MiniBasket_VolTracker_Msg'}} {{ data.ddate}}
+                        </small>
+                        <br>
+                        {{> progressTracker}}
+                    </div>
+                </div>
+            </div>
+
+            <div class="cartLink row">
+                    <div class="col-md-12 text-center">
+                        <button id="ccb2b-miniBasket-goToBasket-btn" class="btn primary_button btn-sm goToCart" type="submit">{{pageLabelMap 'CCB2B_GoToBasketCA'}}</button>
+                    </div>
+            </div>
+        {{else}}
+            <div class="col-md-12 text-center emptyMiniBasket">
+                <p class="emptyCart">{{pageLabelMap 'CCB2B_Basket_Empty_Msg'}}</p>
+            </div>
+        {{/if}}
+        <div class="col-md-12 text-center errorMsg errorSection" style="display:none">
+            <p class="emptyCart">{{pageLabelMap 'CCB2B_ClearCartError_Msg'}}</p>
+        </div>
+    {{else}}
+    <div class="col-md-12 text-center emptyMiniBasket">
+        <p>{{pageLabelMap 'CCB2B_MyAccount_NoItems_MyCart_Label'}}</p>
+    </div>
+    {{/if}}
+
+
+</div>
+<div id="confirmRemoveCartItem" class="modal fade cc_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content cc_modal_content">
+            <div class="modal-body cc_modal_body text-center">
+                <p>{{pageLabelMap 'CCB2B_ConfirmRemoveCartItemCA'}}</p>
+            </div>
+            <div class="modal-footer cc_modal_footer text-center">
+                <input type="button" class="btn btn-default btn-sm cc_rename_cart" data-dismiss="modal" value="{{pageLabelMap 'Cancel'}}"/>
+                <input type="button" class="btn primary_button btn-default btn-sm removeCartItem cc_rename_cart" value="{{pageLabelMap 'Ok'}}"/>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,63 @@
+<aura:component implements="force:appHostable" controller ="BMC_SampleOutletSelectionController">
+    <aura:attribute name="selectedLookUpRecord" type="sObject" default="{}"/>
+    <aura:attribute name="spointvalue" type="BMC_SOSStartingPoint__c" />
+    <aura:attribute name="onpremiseoutlet" type="Integer" />
+    <aura:attribute name="offpremiseoutlet" type="Integer" />
+    <aura:attribute name="annualVolume" type="Integer" />
+    <aura:attribute name="selectedPremise" type="String" />
+    <aura:attribute name="selectedChannel" type="String" />
+    <aura:attribute name="mylabel" type="List"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="codeRequired" type="boolean" default="true"/>
+    
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <div style ="background:white ;padding:20px">
+        <aura:if isTrue="{!v.showSpinner}">
+            <lightning:spinner />
+        </aura:if>   
+        <div>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <c:BMC_CustomLookup  objectAPIName="Account" IconName="standard:account" requiredAstrik="{!(v.codeRequired == true) ? '*': ' '}"
+                                        selectedRecord="{!v.selectedLookUpRecord}" 
+                                        label="{!$Label.c.BMC_SOS_DistributorName}" />
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:input type="number" value="{!v.onpremiseoutlet}" placeholder="Enter the number of on-premise outlets" label="{!$Label.c.BMC_SOS_OnPremiseLocation}" required="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:input type="number" value="{!v.offpremiseoutlet}" placeholder="Enter the number of off-premise outlets" label="{!$Label.c.BMC_SOS_OffPremiseLocation}" required="true" />  
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:input type="number" value="{!v.annualVolume}" placeholder="Enter Minimum Annual Volume in CEs from all distributors" label="{!$Label.c.BMC_SOS_AnnualVolume}" required="true" />
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:select aura:id="premiseType" label="{!$Label.c.BMC_SOS_RecordType}" 
+                                      value="{!v.selectedPremise}" required="true">
+                        <option value="{!$Label.c.BMC_SOS_ALL}">{!$Label.c.BMC_SOS_ALL}</option>
+                        <option value="{!$Label.c.BMC_SOS_Independent}">{!$Label.c.BMC_SOS_Independent}</option>
+                        <option value="{!$Label.c.BMC_SOS_Chain}">{!$Label.c.BMC_SOS_Chain}</option>
+                    </lightning:select>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:select aura:id="channelType" label="{!$Label.c.BMC_SOS_ChannelType}" 
+                                      value="{!v.selectedChannel}" required="true">
+                        <option value="{!$Label.c.BMC_SOS_ALL}">{!$Label.c.BMC_SOS_ALL}</option>
+                        <aura:iteration items="{!v.mylabel}" var="channellabel">
+                            <option value="{!channellabel}">{!channellabel}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+        <div class="slds-align--absolute-center">
+            <lightning:button  aura:id="MySampleOutlet" type="submit" label="{!$Label.c.BMC_SOS_OutletButton}" onclick ="{!c.getAccountDetails}" />
+        </div>
+    </div>
+</aura:component>

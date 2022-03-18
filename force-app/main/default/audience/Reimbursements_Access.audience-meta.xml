@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Audience xmlns="http://soap.sforce.com/2006/04/metadata">
+    <audienceName>Reimbursements Access</audienceName>
+    <container>Partner Portal</container>
+    <criteria>
+        <criterion>
+            <criteriaNumber>1</criteriaNumber>
+            <criterionValue>
+                <entityField>Contact.$Contact.PDE_Passport_Services__c</entityField>
+                <entityType>User</entityType>
+                <fieldValue>Reimbursements</fieldValue>
+            </criterionValue>
+            <operator>Includes</operator>
+            <type>FieldBased</type>
+        </criterion>
+        <criterion>
+            <criteriaNumber>2</criteriaNumber>
+            <criterionValue>
+                <profile>admin</profile>
+            </criterionValue>
+            <operator>Equal</operator>
+            <type>Profile</type>
+        </criterion>
+    </criteria>
+    <formulaFilterType>AnyCriterionMatches</formulaFilterType>
+    <isDefaultAudience>false</isDefaultAudience>
+    <targets>
+        <target>
+            <groupName>9b49ba8e-01b7-4e6b-8916-bb218a2ca8d6$#$50cb8b12-86bc-4de4-85d5-679d36d9d0ed</groupName>
+            <priority>1</priority>
+            <targetType>ExperienceVariation</targetType>
+            <targetValue>Home_CMS_Single_Item_3_Component</targetValue>
+        </target>
+        <target>
+            <groupName>22188047-c8e6-4b32-b224-aa233e72c500</groupName>
+            <priority>1</priority>
+            <targetType>ExperienceVariation</targetType>
+            <targetValue>Reimbursements_Reimbursements_Page</targetValue>
+        </target>
+    </targets>
+</Audience>

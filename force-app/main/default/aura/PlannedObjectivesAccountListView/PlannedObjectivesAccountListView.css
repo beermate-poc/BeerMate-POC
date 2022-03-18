@@ -1,0 +1,43 @@
+.THIS .addAnObjective {
+    background-color: #f5b324; /* Green */
+    border: none;
+    color: black;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+@media screen and (min-width: 0px) and (max-width: 768px) {
+  .THIS #targetTable {
+    display: none;
+  }
+}
+@media screen and (min-width: 769px) {
+  .THIS #tableSizeMessage {
+    display: none;
+  }
+}
+.THIS #targetTable {
+  background: rgb(255, 255, 255);
+}
+.THIS th {
+  width:3.25rem !important;
+  height: 3.5rem !important;
+  border-bottom: 1px solid rgb(221, 219, 218);
+  background-color: rgb(250, 250, 249);
+}
+.THIS td{
+  height: 3.2rem !important;
+  border-bottom: 1px solid rgb(221, 219, 218);
+}
+.THIS .address{
+  padding-left: 25px !important;
+}
+.THIS .tableStyling{
+  table-layout:fixed !important;
+  width: 33.3% !important;
+}
+.THIS .textHeading{
+  font-size: 1rem !important;
+}

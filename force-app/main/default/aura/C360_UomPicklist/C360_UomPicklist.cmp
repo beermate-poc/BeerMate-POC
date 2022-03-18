@@ -1,0 +1,20 @@
+<aura:component controller="C360_ProductDetails" implements="flexipage:availableForRecordHome,force:hasRecordId,flexipage:availableForAllPageTypes,force:appHostable,force:lightningQuickAction" access="global" >
+<aura:handler name = "init" value="{!this}" action="{!c.doInit}"/>
+<aura:attribute name="recordId" type="Id" />
+<aura:attribute name="selctUom" type="String"/> 
+<aura:attribute name="orderTypeCA" type="Boolean"/>        
+<aura:attribute name="options" type="List"/>
+<aura:attribute name="opUomMap" type="Map"/>
+<aura:attribute name="ordType" type="Order[]"/>
+     <lightning:select name="selectUOM" aura:id="selectUOM" >
+        <aura:if isTrue="{!v.orderTypeCA}">
+           <option text="{!$Label.c.UOMValue_Each}" value="{!$Label.c.UOMValue_Each}"/>
+           <aura:set attribute="else">
+             <aura:iteration items="{!v.options}" var="item" >   
+            <option text="{!item.label}" value="{!item.value}" selected="{!item.value==v.selctUom?item.value:item.selected}"	></option>
+        </aura:iteration>
+           </aura:set>
+         </aura:if>    
+    </lightning:select>
+    
+</aura:component>

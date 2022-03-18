@@ -1,0 +1,4 @@
+<aura:event type="Component" description="Event template">
+<aura:attribute name="DashboardLink" type="String"/>
+<aura:attribute name="showDashboard" type="boolean" default="false"/>
+</aura:event>

@@ -1,0 +1,67 @@
+<div class="panel panel-default cc_panel cc_myaccount_mysubscriptions">
+    <div class="panel-heading cc_heading">
+        <h3 class="panel-title cc_title">{{pageLabelMap 'MyAccount_MySubscriptions'}}</h3>
+    </div>
+
+    <div class="panel-body cc_body cc_myaccount_content">
+        <div class="messagingSection-subscription-Error" style="display: none"></div>
+        <div class="messagingSection-subscription-Info" role="alert" style="display: none">
+            <button type="button" class="close cc_close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&#215;</span></button>
+        </div>
+        {{#if this.subscriptionList}}
+        <div class="orderPaginationSec" />
+        <div class="table-responsive collapsible_table">
+            <table id="subscriptionTable" class="table cc_table cc_mysubscriptions_table">
+                <tr class="cc_table_header_row">
+                    <th class="cc_table_header">
+                        <span class="cc_table_header_subscription_id">{{pageLabelMap 'MyAccount_MySubscription_Id'}}</span>
+                    </th>
+                    <th class="cc_table_header">
+                        <span class="cc_table_header_subscription_prod_name">{{pageLabelMap 'MyAccount_MySubscription_Product'}}</span>
+                    </th>
+                    <th class="cc_table_header">
+                        <span class="cc_table_header_subscription_recurring_price">{{pageLabelMap 'MyAccount_MySubscription_RecurringPrice'}}</span>
+                    </th>
+                    <th class="cc_table_header">
+                        <span class="cc_table_header_subscription_status">{{pageLabelMap 'MyAccount_MySubscription_Status'}}</span>
+                    </th>
+                    {{#ifDisplay 'shact.subs'}}
+                    <th class="cc_table_header text-right">
+                        <span class="cc_table_header_subscription_actions"></span>
+                    </th>
+                    {{/ifDisplay}}
+                </tr>
+                {{#each this.subscriptionList}}
+                <tr class="myAccOrderRows cc_table_row">
+                    <td class="cc_table_col" data-label="{{pageLabelMap 'MyAccount_MySubscription_Id'}}:">
+                        <span class="cc_col_subscription_id">{{name}}</span>
+                    </td>
+                    <td class="cc_table_col" data-label="{{pageLabelMap 'MyAccount_MySubscription_Product'}}:">
+                      <span class="cc_col_subscription_prod_name">
+                       {{productLink subProduct 'cc_prod_link'}}
+                      </span>
+                    </td>
+                    <td class="cc_table_col" data-label="{{pageLabelMap 'MyAccount_MySubscription_RecurringPrice'}}:">
+                        <span class="cc_col_subscription_recurring_price"><a href="#" data-id="{{sfid}}" class="gotoSubscriptionDetails cc_goto_subscription_details">{{price topRecurringPrice currencyIsoCode}}</a></span>
+                    </td>
+                    <td class="cc_table_col" data-label="{{pageLabelMap 'MyAccount_MySubscription_Status'}}:">
+                        <span class="cc_col_subscription_status"><a href="#" data-id="{{sfid}}" class="gotoSubscriptionDetails cc_goto_subscription_details">{{pageLabelPrefixMap 'SUBSST_' subStatus}}</a></span>
+                    </td>
+                    {{#ifDisplay 'shact.subs'}}
+                    <td class="cc_table_col text-right" nowrap="true">
+                        <a id="{{generateId 'ccb2b-ma-subsc-view-' sfid '-link'}}" href="#" data-id="{{sfid}}" class="gotoSubscriptionDetails cc_goto_subscription_details">{{pageLabelMap 'CCB2B_MyAccount_View_Label'}}</a>
+                        {{#if canCancel }}
+                        <input type="button" class="promptCancel btn btn-default btn-sm cc_prompt_cancel" data-id="{{@index}}" data-mode="Cancel" value="{{pageLabelMap 'MyAccount_MySubscriptions_Cancel'}}"/>&#160;
+                        {{/if}}
+                    </td>
+                    {{/ifDisplay}}
+                </tr>
+                {{/each}}
+            </table>
+        </div>
+        {{else}}
+        <p class="noItemsInfo">{{pageLabelMap 'CCB2B_MyAccount_NoItems_MySubscription_Label'}}</p>
+        {{/if}}
+        <div id="modalSec"></div>
+    </div>
+</div>

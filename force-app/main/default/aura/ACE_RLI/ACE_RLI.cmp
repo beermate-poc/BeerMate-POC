@@ -1,0 +1,214 @@
+<aura:component controller="ReimbursementLineItemController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:availableForFlowScreens" access="global" >
+   <aura:attribute name="reimbursementLines" type="list" />
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="errors" type="Object" default="[]"/>
+    <aura:attribute name="errorMessages" type="String[]" />
+    <aura:attribute name="currentFieldSelected" type="String" />
+    <aura:attribute name="currentRowSelected" type="String" />
+
+   <aura:attribute name="spendTypeOptions" type="String[]" />
+   <aura:attribute name="reasonCodeOptions" type="String[]" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.Init}" />
+
+    <aura:handler name="selectRecord" event="c:strike_evt" action="{!c.updateRow}" />
+    <aura:handler name="openModal" event="c:strike_evt" action="{!c.openModal}" />
+
+    <lightning:card title="">
+        <div class="slds">
+            <div class="slds-table--header-fixed_container" style="height:300px;">
+                <div class="slds-scrollable" style="height:100%; width:100%;">
+                    <table class="slds-table slds-table_bordered slds-table--header-fixed slds-table slds-table_bordered slds-table_col-bordered slds-table_resizable-cols" border="1" frame="void" rules="rows">
+                        <thead>
+                        <tr border="1">
+                            <th class="slds-text-heading_small"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Ln#</div></th>
+                            <th   class="slds-text-heading_small"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Line Item Name</div></th>
+                            <th   class="slds-text-heading_small "><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Spend Category</div></th>
+                            <th class="slds-text-heading_small"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Expenditure</div></th>
+                            <th  class="slds-wrap slds-text-heading_small"><div class="slds-p-vertical_small  slds-align_absolute-center">Reimbursement</div></th>
+                            <th  class="slds-text-heading_small"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Tax Pd</div></th>
+                            <th  class="slds-text-heading_small"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Vendors</div></th>
+                            <th class="slds-text-heading_small"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Comments</div></th>
+                            <th  class="slds-text-heading_small"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Reimb %</div></th>
+                            <th class="slds-text-heading_small"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Reason Code</div></th>
+                            <th  class="slds-text-heading_small"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Spend Type</div></th>
+                            <th class="slds-text-heading_small"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Internal Order</div></th>
+                            <th class="slds-text-heading_small"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">IO Brand</div></th>
+                            <th class="slds-text-heading_small"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Branded</div></th>
+                        </tr>
+                        </thead>
+                        <aura:iteration items="{!v.reimbursementLines}" var="lineItem" indexVar="idx">
+                            <tr >
+                                <td style="width:5%">
+                                    <div class="slds-align_absolute-center">
+                                        {!lineItem.line.ACE_Line_Item_Index__c}
+                                    </div>
+                                </td>
+                                <td style="width:25%" class="slds-rich-text-area__content slds-grow slds-cell-wrap">
+                                    <div class="slds-align_absolute-left" style="width:100%">
+                                        {!lineItem.line.Title}</div>
+                                </td>
+                                <td style="width:13%" class="slds-rich-text-area__content slds-grow slds-cell-wrap"><div class="slds-align_absolute-left">
+                                        {!lineItem.line.ACE_Spend_Category__c}</div>
+                                </td>
+                                <td style="width:13%" class="slds-rich-text-area__content slds-grow slds-cell-wrap"><div class="slds-align_absolute-center">
+                                        <ui:outputCurrency value="{!lineItem.line.ACE_Total_Expenditure__c}" />
+                                </div>
+                                </td>
+                                <td style="width:13%" class="slds-rich-text-area__content slds-grow slds-cell-wrap"><div class="slds-align_absolute-center">
+                                        <ui:outputCurrency value="{!lineItem.line.ACE_Requested_Reimbursement__c}" />
+                                </div>
+                                </td>
+                                <td style="width:6%" class="slds-rich-text-area__content slds-grow slds-cell-wrap"><div class="slds-align_absolute-center">
+                                        {!lineItem.line.ACE_Tax_Pd__c}</div>
+                                </td>
+                                <td style="width:15%" class="slds-rich-text-area__content slds-grow slds-cell-wrap"><div class="slds-align_absolute-left">
+                                        {!lineItem.line.ACE_Vendors_Used__c}</div>
+                                </td>
+                                <td style="column-width:5%"   class="slds-rich-text-area__content slds-grow slds-cell-wrap">
+                                    <div class="slds-align_absolute-left">
+                                        <textarea rows="1" onchange="{!c.updateComments}" id="{!lineItem.line.ACE_Line_Item_Index__c}">
+                                            {!lineItem.line.ACE_Comments__c}
+                                        </textarea>
+                                     </div>
+                                </td>
+                                <td style="width:8%" class="slds-rich-text-area__content slds-grow slds-cell-wrap"><div class="slds-align_absolute-center">
+
+                                    <aura:if isTrue="{!lineItem.line.ACE_Reimbursement_Percent__c > 0}">
+                                        <lightning:formattedNumber value="{!lineItem.line.ACE_Reimbursement_Percent__c/100}" style="percent" maximumFractionDigits="0" minimumFractionDigits="0"/>
+                                    </aura:if>
+                                </div>
+                                </td>
+                                <td class="slds-rich-text-area__content slds-grow slds-cell-wrap"><div class="slds-align_absolute-left">
+                                    <lightning:select name="{!idx}" value="{!lineItem.line.ACE_Reason_Code__c}" onchange="{!c.changeReasonCode}"  class="slds-align_absolute-center">
+                                            <option value="">--Select Reason Code--</option>
+                                            <aura:iteration var="rcOpt" items="{!v.reasonCodeOptions}">
+                                                <option text="{!rcOpt}" value="{!rcOpt}" selected="{!lineItem.line.ACE_Reason_Code__c == rcOpt}"/>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </div>
+                                </td>
+
+                                <td >
+                                    <span style="slds-align_absolute-left">
+                                        <lightning:select name="{!idx}" value="{!lineItem.line.ACE_Spend_Type__c}" onchange="{!c.updateSpendType}"  class="slds-align_absolute-center">
+                                            <option value="">--Select Spend Type--</option>
+                                          
+                                            <aura:iteration var="stOpt" items="{!v.spendTypeOptions}">
+                                                <option text="{!stOpt.ACE_Spend_Type_Name__c}" value="{!stOpt.Id}" selected="{!lineItem.line.ACE_Spend_Type__c == stOpt.Id}"/>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </span>
+                                </td>
+                                <td style="width:15%">
+                                    <div class="slds-align_absolute-center">
+                                        <c:LookupIcon index="{!idx}" lookupObj="Internal_Order__c"/>
+                                    	<aura:if isTrue="{!lineItem.line.Internal_Order__c != null}">
+                                                <span class="slds-pill slds-pill_link">
+                                                  <a href="{!'/' + lineItem.line.Internal_Order__c}" target="_blank" class="slds-pill__action" title="{!lineItem.internalOrderNumber}">
+                                                    <span class="slds-pill__label">{!lineItem.internalOrderNumber}</span>
+                                                  </a>
+                                                  <button id="{!idx}" class="slds-button slds-button_icon slds-button_icon slds-pill__remove" title="Remove" onclick="{! c.handleIORemove }">
+                                                      X
+                                                    <span class="slds-assistive-text">Remove</span>
+                                                  </button>
+                                                </span>
+                                    	</aura:if>
+                                    </div>
+                                </td>
+
+                                <td style="width:8%" class="slds-rich-text-area__content slds-grow slds-cell-wrap">
+                                    <div class="slds-align_absolute-center">
+                                        {!lineItem.brand}</div>
+                                </td>
+                                <td style="width:8%" class="slds-rich-text-area__content slds-grow slds-cell-wrap"><div class="slds-align_absolute-center">
+                                    <aura:if isTrue="{!lineItem.brand == '9999' || lineItem.brand == '9998'}">
+                                        <c:LookupIcon index="{!idx}" lookupObj="ACE_Profit_Center__c"/>  
+                                            <aura:if isTrue="{!lineItem.brandWC != null}">
+                                                <span class="slds-pill slds-pill_link">
+                                                     <a href="" class="slds-pill__action" title="{!lineItem.brandWC}">
+                                                    <span class="slds-pill__label">{!lineItem.brandWC}</span>
+                                                  </a>
+                                               
+                                                  <button id="{!idx}" class="slds-button slds-button_icon slds-button_icon slds-pill__remove" title="Remove" onclick="{! c.handleBrandWCRemove }">
+                                                      X
+                                                    <span class="slds-assistive-text">Remove</span>
+                                                  </button>
+                                              </span>
+                                    </aura:if>
+                                    
+                                    </aura:if></div>
+                                </td>
+                            </tr>
+                        </aura:iteration>
+
+                    </table>
+                </div>
+            </div>
+            <div align="center">
+                <lightning:button label="{!$Label.c.ACE_saveApproveAndRelease}"  onclick="{!c.saveLineItems}"/>
+            </div>
+        </div>
+
+    </lightning:card>
+
+    <c:strike_modal aura:id="Internal_Order__c-modal"
+                    title="Select Value"
+                    primaryButtonLabel="Ok"
+                    secondaryButtonLabel="Cancel"
+                    showHeader="true"
+                    showFooter="false"
+                    showClose="true"
+                    showModal="false"
+                    size="large">
+        <c:strike_lookup
+                        aura:id="Internal_Order__c"
+                        fieldToDisp="Internal Order Number"
+                        label="Internal Order"
+                        object="ACE_Internal_Order__c"
+                        searchField="ACE_Internal_Order_Nbr__c,ACE_Internal_Order_Desc__c,ACE_Applicant_IO_Owner__c"
+                        columnsToDisp="ACE_Order_Status__c,ACE_Internal_Order_Nbr__c,ACE_Internal_Order_Desc__c,ACE_Applicant_IO_Owner__c,ACE_MgmtUnitCd__c,ACE_Budget_Owner__c,ACE_Brand_Cd__c"
+                        dontDisp="ACE_Brand_Cd__c"
+                        placeholder="Search Internal Orders"
+                        order="ACE_Internal_Order_Nbr__c"
+                        limit="25"
+                        loadingMessage="Loading..."
+                        errorMessage="Invalid input" />
+    </c:strike_modal>
+
+    <c:strike_modal aura:id="ACE_Profit_Center__c-modal"
+                    title="Select Value"
+                    primaryButtonLabel="Ok"
+                    secondaryButtonLabel="Cancel"
+                    showHeader="true"
+                    showFooter="false"
+                    showClose="true"
+                    showModal="false"
+                    size="large">
+        <c:strike_lookup
+                aura:id="ACE_Profit_Center__c"
+                fieldToDisp="Profit Center ID"
+                label="Brand Lookup"
+                object="ACE_Profit_Center__c"
+                searchField="ACE_Profit_Center_CodeName__c,ACE_Profit_Center_ID__c"
+                columnsToDisp="ACE_Profit_Center_CodeName__c,ACE_Profit_Center_ID__c"
+                placeholder="Search Brands"
+                order="ACE_Profit_Center_CodeName__c"
+                limit="25"
+                loadingMessage="Loading..."
+                errorMessage="Invalid input" />
+    </c:strike_modal>
+    <c:strike_modal
+            aura:id="errorMessages"
+            title="Errors"
+            showHeader="true"
+            showFooter="false"
+            showClose="true"
+            showModal="false">
+        <aura:iteration items="{!v.errorMessages}" var="error" >
+            <ul>
+                <li>{!error}</li>
+            </ul>
+        </aura:iteration>
+    </c:strike_modal>
+</aura:component>

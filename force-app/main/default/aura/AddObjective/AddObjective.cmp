@@ -1,0 +1,221 @@
+<!--
+Author:         Jacqueline Passehl
+Company:        Slalom, LLC
+Description:    A parent component to hold the CreateNewPersonalObjective and TargetUserObjective components
+Attributes:     onObjectiveTab - to determine which child component tab the user is currently looking at
+				personalObjValidateError - to determine if there is a validation error on the CreateNewPersonalObjective component
+				errorsOverall - to determine if there is an error on either tab (personalObjValidateError or targetUserValidateError) is for errors on those indivdual components
+				objectiveId - returned from the insert records method in order for creation of a junction object between user and objective
+				objective,plannedObjective,objectiveType, plannedObjType,Title, and Department fields -  are all needed for
+				parameters to the insert records function-linked to attributes in CreateNewPersonalObjective
+				applyTargetUsers - this holds the value of if the toggle switch is on or off from TargetUserObjective 
+				shouldDisableInput - this is true if the user that created objective being true is not the same as the logged 					   in user
+History
+<Date>      <Authors Name>     <Brief Description of Change>
+1/30/2018    Jacqueline       Initial Creation
+-->
+<aura:component controller="AddObjectiveController">
+
+	<aura:attribute name="onObjectiveTab" type="Boolean"  default="true"/>
+	<aura:attribute name="errorsOverall" type="Boolean" default="false"/>
+	<aura:attribute name="objectiveId" type="Integer"/>
+
+	<aura:attribute name="personalObjValidateError" type="Boolean"/>
+	<aura:attribute name="targetUserValidateError" type="Boolean"/>
+	<aura:attribute name="isSharedObjective" type="Boolean" default="false"/>
+
+	<aura:attribute name="editingObjective" type="Boolean"/>
+
+	<aura:attribute name="objective" type="Objective__c"/>
+	<aura:attribute name="plannedObjective" type="Planned_Objective__c" default="{'sobjectType': 'Planned_Objective__c'}"/>
+	<aura:attribute name="duplicatePlannedObjective" type="Planned_Objective__c" default="{'sobjectType': 'Planned_Objective__c'}" />
+	<aura:attribute name="duplicateFound" type="Boolean"/>
+	<aura:attribute name="objectiveType" type="String" />
+	<aura:attribute name="plannedObjType" type="String" default="Personal"/>
+
+	<aura:attribute name="titleField" type="String[]"/>
+	<aura:attribute name="departmentField" type="String[]"/>
+	<aura:attribute name="applyTargetUsers" type="Boolean" default="true"/>
+	<aura:attribute name="returnedJunctionObjs" type="Object[]" default="[]"/>
+	<aura:attribute name="numOfUsers" type="Integer" default="0"/>
+	<aura:attribute name="delegateUserId" type="String"/>
+	<aura:attribute name="shouldDisableInput" type="Boolean"/>
+	<aura:attribute name="shouldOpenEdit" type="Boolean"/>
+	<aura:attribute name="userRole" type="String" default=''/>
+	<aura:attribute name="selectedMBOId" type="Id" default=''/>
+	<aura:attribute name="MBOobject" type="Planned_Objective__c" default="{'sobjectType': 'Planned_Objective__c'}"/>
+
+	<!-- MC-1738 Registering RetainUserState_ObjectiveTab event that is used to requery the data for the tables  -->
+	<aura:registerEvent name="retainUserState_ObjectiveTab" type="c:RetainUserState_ObjectiveTab"/>
+
+	<aura:handler name="change" value="{!v.editingObjective}" action="{!c.handleEditing}"/>
+	<aura:handler name="change" value="{!v.duplicateFound}" action="{!c.duplicateObjHandler}"/>
+	
+     <aura:attribute name="calledFromVF" type="boolean" default="false"/>
+     <aura:attribute type="Id" name="wthId" />
+    
+	<aura:if isTrue="{!or($Browser.isPhone, $Browser.isTablet)}">
+		<div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-show" aura:id="addObjectiveModal">
+				<div class="slds-p-around--medium ">
+					<div class="modalStyle">
+						<div class="mobileView">
+							<div class="slds-float_left">
+								<button class="slds-button slds-button--neutral" onclick="{!c.closeModal}">{!$Label.c.Cancel_Label}</button>
+							</div>
+							<div class="slds-float_right">
+								<button class="slds-button slds-button--neutral slds-button--brand" onclick="{!c.saveObjective}" disabled="{!v.shouldDisableInput}">{!$Label.c.Save}</button>
+							</div>
+							<aura:if isTrue="{!v.editingObjective == False}">
+								<div class="slds-text-heading--large">
+									<h2 class="slds-text-heading--medium">{!$Label.c.Add_An_Objective}</h2>
+								</div>
+							</aura:if>
+							<aura:if isTrue="{!v.editingObjective == True}">
+								<aura:if isTrue="{!v.objective.Created_Via_MBO__c == False}">
+									<div class="slds-text-heading--medium slds-text-align_center">
+										<h2 class="slds-text-heading--medium">{!$Label.c.Edit}&nbsp;{!v.objective.Planned_Objective__r.Name}</h2>
+									</div>
+									<aura:set attribute="else">
+										<div class="slds-text-heading--medium slds-text-align_center">
+											<h2 class="slds-text-heading--medium">{!$Label.c.Edit}&nbsp;{!v.objective.Name}</h2>
+										</div>
+									</aura:set>
+								</aura:if>
+							</aura:if>
+						</div>
+						<div class="slds-p-around--medium">
+							<ui:scrollerWrapper class="scrollerSize">
+								<!--Inside Modal Content-->
+									<div class="slds-tabs_default slds-sub-tabs formContent">
+										<ul class="slds-tabs_default__nav" role="tablist">
+											<li class="slds-tabs_default__item slds-sub-tabs__item slds-grid slds-grid_vertical-align-center slds-active" aura:id="objectivesDetailTab" role="presentation" onclick="{!c.objectivesDetailClick}">
+												<a aria-controls="subtab-tabpanel-01" aria-selected="true" class="slds-tabs_default__link slds-p-horizontal_xx-small" href="javascript:void(0);" id="subtab-tabitem-01" role="tab" tabindex="0">
+													<span class="slds-truncate" title="{!$Label.c.Objective_Details_Tab}">{!$Label.c.Objective_Details_Tab}</span>
+												</a>
+											</li>
+											<div class="{!v.isSharedObjective == false ? 'slds-hide' : ''}">
+												<div class="{!and(v.shouldDisableInput, v.editingObjective) ? 'slds-hide' : ''}">
+													<li class="slds-tabs_default__item slds-sub-tabs__item slds-grid slds-grid_vertical-align-center" aura:id="targetUserTab" role="presentation" onclick="{!c.targetUserClick}">
+														<a aria-controls="subtab-tabpanel-02" aria-selected="false" class="slds-tabs_default__link slds-p-horizontal_xx-small" href="javascript:void(0);" id="subtab-tabitem-02" role="tab" tabindex="-1">
+															<span class="slds-truncate" title="{!$Label.c.Objective_Target_User_Tab}">{!$Label.c.Objective_Target_User_Tab}</span>
+														</a>
+													</li>
+												</div>
+											</div>
+										</ul>
+										<div class="slds-tabs_default__content slds-show" aura:id="objectiveDetailContent" role="tabpanel" aria-labelledby="subtab-tabitem-01"> 
+											<!--Objectives Details Content-->
+											<c:CreateNewPersonalObjective aura:id="personalObjective" errorsFound="{!v.personalObjValidateError}" newObjective="{!v.objective}" plannedObjective="{!v.plannedObjective}" objectiveType="{!v.objectiveType}" plannedObjType="{!v.plannedObjType}" editingObjective="{!v.editingObjective}" isSharedObjective="{!v.isSharedObjective}" toggleApplyUsers="{!v.applyTargetUsers}" shouldDisableInput="{!v.shouldDisableInput}" userRole="{!v.userRole}" selectedMBOId="{!v.selectedMBOId}" MBOobject="{!v.MBOobject}" numOfUsers="{!v.numOfUsers}" duplicatePlannedObjective="{!v.duplicatePlannedObjective}" duplicateFound="{!v.duplicateFound}"/>
+											<!--End Objectives Details Content-->
+
+										</div>
+										<div class="slds-tabs_default__content slds-hide" aura:id="targetUserContent" role="tabpanel" aria-labelledby="subtab-tabitem-02">
+											<!--Target User Content-->
+											<c:TargetUserObjective aura:id="targetUserObj" objective="{!v.objective}" titleFilter="{!v.titleField}" departmentFilter="{!v.departmentField}" toggleApplyUsers="{!v.applyTargetUsers}" objectiveId="{!v.objectiveId}" errorsFound="{!v.targetUserValidateError}" plannedObjType="{!v.plannedObjType}" editingObjective="{!v.editingObjective}" isSharedObjective="{!v.isSharedObjective}" delegateUserId="{!v.delegateUserId}" userRole="{!v.userRole}" numOfUsers="{!v.numOfUsers}"  />
+											<!--End Target User Content-->
+										</div>
+									</div>
+								<!--End Inside Modal Content-->
+							</ui:scrollerWrapper>
+						</div>
+					</div>
+				</div>
+			</div>
+		<aura:set attribute="else">
+			<div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal" aura:id="addObjectiveModal">
+				<div class = "desktopCSS">
+					<div class="slds-modal_medium">
+						<div class="slds-modal__container">
+							<aura:if isTrue="{!v.editingObjective == False}">
+								<div class="slds-modal__header">
+									<h2 class="slds-text-heading--medium">{!$Label.c.Add_An_Objective}</h2>
+								</div>
+							</aura:if>
+							<aura:if isTrue="{!v.editingObjective == True}">
+								<aura:if isTrue="{!v.objective.Created_Via_MBO__c == False}">
+									<div class="slds-modal__header">
+										<h2 class="slds-text-heading--medium">{!$Label.c.Edit}&nbsp;{!v.objective.Planned_Objective__r.Name}</h2>
+									</div>
+									<aura:set attribute="else">
+										<div class="slds-modal__header">
+											<h2 class="slds-text-heading--medium">{!$Label.c.Edit}&nbsp;{!v.objective.Name}</h2>
+										</div>
+									</aura:set>
+								</aura:if>
+							</aura:if>
+							<div class="slds-modal__content slds-p-around--medium" aura:id="addObjectiveContent">
+								<ui:scrollerWrapper class="scrollerSize">
+									<!--Inside Modal Content-->
+									<div class="slds-tabs_default slds-sub-tabs">
+										<ul class="slds-tabs_default__nav" role="tablist">
+											<li class="slds-tabs_default__item slds-sub-tabs__item slds-grid slds-grid_vertical-align-center slds-active" aura:id="objectivesDetailTab" role="presentation" onclick="{!c.objectivesDetailClick}">
+												<a aria-controls="subtab-tabpanel-01" aria-selected="true" class="slds-tabs_default__link slds-p-horizontal_xx-small" href="javascript:void(0);" id="subtab-tabitem-01" role="tab" tabindex="0">
+													<span class="slds-truncate" title="{!$Label.c.Objective_Details_Tab}">{!$Label.c.Objective_Details_Tab}</span>
+												</a>
+											</li>
+											<div class="{!v.isSharedObjective == false ? 'slds-hide' : ''}">
+												<div class="{!and(v.shouldDisableInput, v.editingObjective) ? 'slds-hide' : ''}">
+													<li class="slds-tabs_default__item slds-sub-tabs__item slds-grid slds-grid_vertical-align-center" aura:id="targetUserTab" role="presentation" onclick="{!c.targetUserClick}">
+														<a aria-controls="subtab-tabpanel-02" aria-selected="false" class="slds-tabs_default__link slds-p-horizontal_xx-small" href="javascript:void(0);" id="subtab-tabitem-02" role="tab" tabindex="-1">
+															<span class="slds-truncate" title="{!$Label.c.Objective_Target_User_Tab}">{!$Label.c.Objective_Target_User_Tab}</span>
+														</a>
+													</li>
+												</div>
+											</div>
+										</ul>
+										<div class="slds-tabs_default__content slds-show" aura:id="objectiveDetailContent" role="tabpanel" aria-labelledby="subtab-tabitem-01"> 
+											<!--Objectives Details Content-->
+											<c:CreateNewPersonalObjective aura:id="personalObjective" errorsFound="{!v.personalObjValidateError}" newObjective="{!v.objective}" plannedObjective="{!v.plannedObjective}" objectiveType="{!v.objectiveType}" plannedObjType="{!v.plannedObjType}" editingObjective="{!v.editingObjective}" isSharedObjective="{!v.isSharedObjective}" toggleApplyUsers="{!v.applyTargetUsers}" shouldDisableInput="{!v.shouldDisableInput}" delegateUserId="{!v.delegateUserId}" userRole="{!v.userRole}" selectedMBOId="{!v.selectedMBOId}" MBOobject="{!v.MBOobject}" numOfUsers="{!v.numOfUsers}" duplicatePlannedObjective="{!v.duplicatePlannedObjective}" duplicateFound="{!v.duplicateFound}" calledFromVF="{!v.calledFromVF}"/>
+												<!--End Objectives Details Content-->
+										</div>
+										<lightning:spinner aura:id="spinner" class="slds-hide" alternativeText="Please wait..." />
+										<div class="slds-tabs_default__content slds-hide" aura:id="targetUserContent" role="tabpanel" aria-labelledby="subtab-tabitem-02">
+											<!--Target User Content-->
+											<c:TargetUserObjective aura:id="targetUserObj" objective="{!v.objective}" titleFilter="{!v.titleField}" departmentFilter="{!v.departmentField}" toggleApplyUsers="{!v.applyTargetUsers}" objectiveId="{!v.objectiveId}" errorsFound="{!v.targetUserValidateError}" plannedObjType="{!v.plannedObjType}" editingObjective="{!v.editingObjective}" isSharedObjective="{!v.isSharedObjective}" delegateUserId="{!v.delegateUserId}" userRole="{!v.userRole}" numOfUsers="{!v.numOfUsers}"/>
+												<!--End Target User Content-->
+										</div>
+									</div>
+									<!--End Inside Modal Content-->
+								</ui:scrollerWrapper>
+							</div>
+							<div class="slds-modal__footer">
+								<aura:if isTrue="{!v.calledFromVF == True}">
+                                <button class="slds-button slds-button--neutral slds-truncate slds-cell-wrap" onclick="{!c.closeModal}">Cancel and Apply Target List to Existing Objective</button>
+                                <button class="slds-button slds-button--neutral slds-button--brand slds-truncate slds-cell-wrap" onclick="{!c.saveObjective}" disabled="{!v.shouldDisableInput}">Create New Objective and Apply Target List</button>
+                               <aura:set attribute="else">
+                                <button class="slds-button slds-button--neutral" onclick="{!c.closeModal}">{!$Label.c.Cancel_Label}</button>
+                                <button class="slds-button slds-button--neutral slds-button--brand" onclick="{!c.saveObjective}" disabled="{!v.shouldDisableInput}">{!$Label.c.Save}</button>
+                                </aura:set>
+                                </aura:if>
+                                
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div aura:id="addObjectiveModalBackdrop" class="slds-backdrop"></div>
+			<div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal" aura:id="duplicatePrompt">
+				<div class="slds-modal__container">
+					<div class="slds-modal__header slds-theme_warning">
+						<lightning:buttonIcon iconName="utility:close" variant="bare-inverse" size="large" alternativeText="Close" class="slds-modal__close"
+							onclick="{!c.promptCancel}" />
+							<h2 class="slds-text-heading--medium">{!$Label.c.Objective_Conflict}</h2>
+						</div>
+						<div class="slds-modal__content slds-p-around--medium">
+							<p>{!$Label.c.Objective_Conflicts_With}:<br />
+							{!$Label.c.Type}: {!v.duplicatePlannedObjective.Planned_Objective_Type__c}<br />
+							{!$Label.c.Name}: {!v.duplicatePlannedObjective.Name}<br />
+							{!$Label.c.Create_Objectives_Start_Date}: {!v.duplicatePlannedObjective.Start_Date__c}<br />
+							{!$Label.c.Deadline_Apply_Objectives} {!v.duplicatePlannedObjective.End_Date__c}<br />
+						</p>
+					</div>
+					<div class="slds-modal__footer">
+						<button class="slds-button slds-button--neutral" onclick="{!c.promptCancel}">{!$Label.c.Cancel_Label}</button>
+						<button class="slds-button slds-button--neutral slds-button--brand" onclick="{!c.promptSave}">{!$Label.c.Save_Anyway}</button>
+					</div>
+				</div>
+			</div>
+			<div aura:id="duplicateModalBackdrop" class="slds-backdrop"></div>
+		</aura:set>
+	</aura:if>
+</aura:component>

@@ -1,0 +1,160 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId,lightning:actionOverride,force:lightningQuickActionWithoutHeader,force:appHostable" controller="CTS_NewBarRecordLineServerController" >
+    <aura:attribute name="BarRecordLine" type="C360_Bar_Record_Line__c" default="{'sobjectType':'C360_Bar_Record_Line__c' , 'C360_Through_the_Bar__c':'NO'}"/>
+    <aura:attribute name="BarRec" type="Object"/>
+    <aura:attribute name="FieldAccess" type="Map"/>
+    <aura:attribute name="ErrorMsg" type="String"/>
+    <aura:attribute name="BrandName" type="String"/>
+    <aura:attribute name="iniVar" type="Boolean"/>
+    <aura:attribute name="lineId" type="String" default=""/>
+    <aura:attribute name="barrecId" type="String" default=""/>
+    <aura:attribute name="Isrender" type="Boolean"/>
+    <aura:attribute name="Isclone" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="change" value="{!v.BarRecordLine.C360_Brand__c}" action="{!c.handleChange}"/> 
+   
+       
+	<div >
+        <c:CTS_Spinner />
+    </div>    
+	
+	<div class="slds-modal__header">
+		<strong>{!$Label.c.CTS_Create_New_Bar_Record_Line}</strong>
+	</div> 
+	<div class="error-Msg" aura:id="ErrorMsg">
+		{!v.ErrorMsg}
+	</div>
+     
+    <lightning:layout class="slds-wrap">
+                                
+                 <aura:renderIf isTrue="{!v.FieldAccess.C360_Position__c}">               
+                     <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        <span style="color:red;">* </span>{!$Label.c.CTS_Position}
+                        <force:inputField aura:id="Position" value="{!v.BarRecordLine.C360_Position__c}" required="true"></force:inputField>
+                     </lightning:layoutItem>
+                 </aura:renderIf>				
+                                    
+                 <aura:renderIf isTrue="{!v.FieldAccess.C360_Bar_Record__c}">
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                       {!$Label.c.CTS_Bar_Record}
+                                                
+                       <div aura:id="divtagbarRec">
+                           {!v.BarRec.Name}                                     
+                       </div>
+                       		
+                    </lightning:layoutItem>
+                </aura:renderIf>
+                                    
+                <aura:renderIf isTrue="{!v.FieldAccess.C360_Brand__c}">
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        <span style="color:red;">* </span>{!$Label.c.CTS_Brand}
+                        <div aura:id="divtag1" class="slds-input slds-combobox__input slds-combobox__input-value slds-hide">
+                           {!v.BarRecordLine.C360_Brand__r.Name}
+                                                            
+                           <lightning:button class="slds-float_right" variant="base" onclick="{!c.toggleDisplay}" title="Remove">
+                               X
+                           </lightning:button>
+                       </div>
+                       <div  aura:id="divtag2">
+                           <force:inputField value="{!v.BarRecordLine.C360_Brand__c}" aura:id="brandid" required="true"/>
+                       </div>	
+                        
+                        <div aura:id="error" class="brand-ErrorMsg">
+                            {!$Label.c.CTS_Please_Fill_the_Brand_value}
+                        </div>
+                    </lightning:layoutItem>
+                </aura:renderIf>
+                                    
+                <aura:renderIf isTrue="{!v.FieldAccess.C360_Customer_Selling_Price__c}">                
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                        {!$Label.c.CTS_Customer_Selling_Price}
+                        <force:inputField aura:id="CustSelling" value="{!v.BarRecordLine.C360_Customer_Selling_Price__c}" ></force:inputField>
+                    </lightning:layoutItem>
+                </aura:renderIf>     
+                
+               
+                <aura:renderIf isTrue="{!v.FieldAccess.C360_Display_Type__c}">      
+                <lightning:layoutItem flexibility="auto" padding="horizontal-small" size="12">
+                  <lightning:recordEditForm class="full-width" aura:id="edit" recordId="" objectApiName="C360_Bar_Record_Line__c">  
+                    
+                        <div class="slds-grid slds-wrap slds-gutters">
+                          <div class="slds-col slds-small-size_1-of-1 slds-large-size_1-of-2 displayType-Padding" >
+                               <span style="color:red;">* </span>{!$Label.c.CTS_Display_Type}
+                              <lightning:inputField fieldName="C360_Display_Type__c" aura:id="Displaytype" onchange="{!c.setDisplaytype}" variant="label-hidden" />
+                          </div>                    
+                          <div class="slds-col slds-small-size_1-of-1 slds-large-size_1-of-2 displayType-Padding" >
+                              {!$Label.c.CTS_Display_Sub_Type}
+                              <lightning:inputField fieldName="CTS_Display_Sub_Type__c"  aura:id="DisplaySubtype" onchange="{!c.setDisplaysubtype}" variant="label-hidden" />
+                          </div>
+                        </div>                 
+                   </lightning:recordEditForm>            
+                </lightning:layoutItem> 
+                </aura:renderIf>     
+                                
+                            
+                                    
+                <aura:renderIf isTrue="{!v.FieldAccess.C360_Through_the_Bar__c}">                
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                         {!$Label.c.CTS_Through_the_Bar}
+                         <force:inputField aura:id="ThroughtheBar" value="{!v.BarRecordLine.C360_Through_the_Bar__c}"></force:inputField>
+                                             
+                    </lightning:layoutItem>
+                </aura:renderIf>				
+                                    
+                  
+                <aura:renderIf isTrue="{!v.FieldAccess.CTS_Cooling_type__c}">                
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                         {!$Label.c.CTS_Cooling_Type}
+                         <force:inputField aura:id="CoolingType" value="{!v.BarRecordLine.CTS_Cooling_type__c}"></force:inputField>
+                                            
+                    </lightning:layoutItem>
+                </aura:renderIf>				
+                                    
+                               
+                                    
+                <aura:renderIf isTrue="{!v.FieldAccess.C360_Handle_type__c}">                
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                         {!$Label.c.CTS_Handle_Type}
+                         <force:inputField aura:id="HandleType" value="{!v.BarRecordLine.C360_Handle_type__c}"></force:inputField>
+                                             
+                    </lightning:layoutItem>
+                </aura:renderIf>				
+                                     
+                <aura:renderIf isTrue="{!v.FieldAccess.CTS_Default_Lineset__c}">               
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                         {!$Label.c.CTS_LineSet}
+                         <force:inputField aura:id="LineSet" value="{!v.BarRecordLine.CTS_Default_Lineset__c}"></force:inputField>
+                                             
+                    </lightning:layoutItem>
+                </aura:renderIf>				
+                                   
+                <aura:renderIf isTrue="{!v.FieldAccess.CTS_Gas_Type__c}">                
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                         {!$Label.c.CTS_Gas_Type}
+                         <force:inputField aura:id="GasType" value="{!v.BarRecordLine.CTS_Gas_Type__c}"></force:inputField>
+                                             
+                    </lightning:layoutItem>
+                </aura:renderIf>          
+                
+                <aura:renderIf isTrue="{!v.FieldAccess.CTS_Out_of_Spec__c}">                
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="{! $Browser.isDesktop ? '6' : '12' }">
+                         {!$Label.c.CTS_Out_of_Spec}
+                         <force:inputField aura:id="Out_of_Spec" value="{!v.BarRecordLine.CTS_Out_of_Spec__c}"></force:inputField>
+                                             
+                    </lightning:layoutItem>
+                </aura:renderIf>          
+               
+    </lightning:layout>		
+                     
+    <lightning:flow aura:id="flowData"  class="scrollcontent" />           
+       
+    <div class="error-Msg" aura:id="ErrorMsg">
+                 {!v.ErrorMsg}
+    </div>	
+	 <div class="slds-modal__footer">
+		 <lightning:buttonGroup class="slds-align--absolute-center">
+			 <lightning:button label="{!$Label.c.CTS_Cancel}" onclick="{!c.handleClick}" variant="destructive"/>
+			 <lightning:button label="{!$Label.c.CTS_Save}" onclick="{!c.handleClick}" variant="brand"/>
+		 </lightning:buttonGroup>	      
+	 </div>
+			
+</aura:component>

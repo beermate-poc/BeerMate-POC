@@ -1,0 +1,30 @@
+.THIS .noBorderTop{
+    border-top: none !important;
+}
+.THIS tr{
+    border-top: 5px solid rgb(216, 221, 230);
+}
+.THIS .title{
+    font-weight: bold;
+    word-break: break-all;
+}
+@media (max-width: 1025px){
+ 	.THIS.scrollerSize{
+    	height: 460px;
+	}
+}
+@media (max-width: 769px){
+ 	.THIS.scrollerSize{
+    	height: 650px;
+	}
+}
+@media (max-width: 415px){
+ 	.THIS.scrollerSize{
+    	height: 380px;
+	}
+}
+@media (max-width: 376px){
+ 	.THIS.scrollerSize{
+    	height: 320px;
+	}
+}

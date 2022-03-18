@@ -1,0 +1,48 @@
+<div class="col-xs-12 col-sm-6">
+    <div class="btn-group dropdown form-group">
+        <button id="ccb2b-favourites-details-addtofav-btn" type="button" class="btn btn-default btn-sm dropdown-toggle addAllToWishlistButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="addToWishLabel">{{pageLabelMap 'CCB2B_FavouritesDetails_Move'}}</span>
+            <span class="caret"></span>
+            <span class="sr-only">{{pageLabelMap 'Wishlist_ToggleDropdown'}}</span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropWish">
+            {{#each this.models}}
+                <li><a id="{{generateId 'ccb2b-favourites-details-fav-' attributes.sfid '-select'}}" href="javascript:void(0);" class="pickWishSelect" data-id="{{attributes.sfid}}" data-method="move">{{{attributes.name}}}</a></li>
+            {{/each}}
+            <li role="separator" class="divider"></li>
+            <li>
+                <div class="row center-block">
+                    <div class="col-xs-12">
+                        <label for="ccb2b-favourites-details-newfavname-input" class="sr-only">{{pageLabelMap 'Wishlist_EnterName'}}</label>
+                        <input id="ccb2b-favourites-details-newfavname-input" type="text" maxlength="255" class="newListName form-control" placeholder="{{pageLabelMap 'MyAccount_Name'}}"/>
+                    </div>
+                </div>
+            </li>
+            <li><a id="ccb2b-favourites-details-createnewfav-btn" href="javascript:void(0);" class="pickWishSelect createNewWish" data-id="-1" data-method="move">{{pageLabelMap 'Action_CreateWishlist'}}</a></li>
+        </ul>
+    </div>
+</div>
+<div class="col-xs-12 col-sm-6">
+    <div class="btn-group dropdown form-group">
+        <button id="ccb2b-favourites-details-addtofav-btn" type="button" class="btn btn-default btn-sm dropdown-toggle addAllToWishlistButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="addToWishLabel">{{pageLabelMap 'CCB2B_FavouritesDetails_Copy'}}</span>
+            <span class="caret"></span>
+            <span class="sr-only">{{pageLabelMap 'Wishlist_ToggleDropdown'}}</span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropWish">
+            {{#each this.models}}
+                <li><a id="{{generateId 'ccb2b-favourites-details-fav-' attributes.sfid '-select'}}" href="javascript:void(0);" class="pickWishSelect" data-id="{{attributes.sfid}}" data-method="copy">{{{attributes.name}}}</a></li>
+            {{/each}}
+            <li role="separator" class="divider"></li>
+            <li>
+                <div class="row center-block">
+                    <div class="col-xs-12">
+                        <label for="ccb2b-favourites-details-newfavname-input" class="sr-only">{{pageLabelMap 'Wishlist_EnterName'}}</label>
+                        <input id="ccb2b-favourites-details-newfavname-input" type="text" maxlength="255" class="newListName form-control" placeholder="{{pageLabelMap 'MyAccount_Name'}}"/>
+                    </div>
+                </div>
+            </li>
+            <li><a id="ccb2b-favourites-details-createnewfav-btn" href="javascript:void(0);" class="pickWishSelect createNewWish" data-id="-1" data-method="copy">{{pageLabelMap 'Action_CreateWishlist'}}</a></li>
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,80 @@
+<div class="row cartSummarySection">
+    <div class="col-md-4 col-sm-6 col-xs-8 pull-right items_summary">
+    {{#if (checkContactDisplayPermissions 'pricing')}}
+        <ul class="checkout list-unstyled cc_checkout  row">
+            <li class="grand_total cc_grand_total">
+                <span class="cc_label col-md-7 col-sm-6 col-xs-6 text-left">{{pageLabelMap 'CartInc_Subtotal'}}</span>
+                <span id="ccb2b-basket-subtotal-field" class="col-md-5 col-sm-6 col-xs-6 cc_value text-right amountToRight">{{{price totalAmount}}}</span>
+            </li>
+            <li class="taxes_summary">
+                <span class="cc_label col-md-7 col-sm-6 col-xs-6 text-left">{{pageLabelMap 'CCB2B_Tax'}}</span>
+                <span id="ccb2b-co-review-tax-field" class="cc_value col-md-5 col-sm-6 col-xs-6 text-right">{{price (calculateTax totalAmount 'uk')}}</span>
+            </li>
+            <li class="cart_total_amount cc_cart_total_amount">
+                <span class="cc_label col-md-7 col-sm-6 col-xs-6 text-left">{{pageLabelMap 'CartInc_Total'}}</span>
+                <span id="ccb2b-co-review-total-field" class="text-right col-md-5 col-sm-6 col-xs-6 cc_value amountToRight">{{price (getPriceWithTaxes totalAmount 'uk')}}</span>
+            </li>
+            <li class="totalsmessagingSection cc_total_messaging_section"></li>
+        </ul>
+    {{/if}}
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6 col-xs-12 cc_action_totals">
+        {{#if false }}
+        {{#ifDisplay 'C.EmailAnon'}}
+        <a href="#emailModal" id="emailCartLink" class="pull-right cc_email_cart_link" data-toggle="modal"><button class="btn btn-default btn-sm remove cc_email_cart_link_button" type="button" >{{pageLabelMap 'CartOrderEmailer_Header'}}</button></a>
+        {{/ifDisplay}}
+        {{else}}
+        {{#ifDisplay 'C.EnableEmailCart'}}
+        <a href="#emailModal" id="emailCartLink" class="cc_email_cart_link pull-right" data-toggle="modal"><button class="btn btn-default btn-sm remove cc_email_cart_link_button" type="button" >{{pageLabelMap 'CartOrderEmailer_Header'}}</button></a>
+        {{/ifDisplay}}
+        {{/if}}
+        <!--************-->
+        {{#if false }}
+        {{#ifDisplay 'rfq.GuestUser'}}
+        <button class="btn btn-default btn-sm remove cc_rfq_link_button pull-right" data-toggle="modal" data-target="#rfqModal" type="button" >{{pageLabelMap 'CartRFQForm_Header'}}</button>
+        {{/ifDisplay}}
+        {{else}}
+        {{#ifDisplay 'rfq.LoggedIn'}}
+        <button class="btn btn-default btn-sm remove cc_rfq_link_button pull-right" data-toggle="modal" data-target="#rfqModal" type="button" >{{pageLabelMap 'CartRFQForm_Header'}}</button>
+        {{/ifDisplay}}
+        {{/if}}
+        <!--************-->
+    </div>
+    <div class="col-lg-12 col-md-6 col-xs-12 cc_action_totals">
+        <div class="text-right">
+            <button id="ccb2b-basket-continueshopping-btn" class="btn primary_button btn-sm continueShoppingButton cc_continue_shopping_button" name="" type="button" >{{pageLabelMap 'CartInc_ContinueShopping'}}</button>
+            <button id="ccb2b-basket-clear-btn" class="btn btn-default btn-sm clearCartButton" name="" type="button" aria-hidden="true">{{pageLabelMap 'ProductAttributesCart_RemoveAll'}}</button>
+            {{#if false }}
+            {{ else }}
+                {{#ifDisplay 'WL.PkrOn'}}
+                    <button id="ccb2b-basket-createfavlist-btn" class="btn btn-default btn-sm cc_create_cart_wishlist" data-toggle="modal" data-target="#wishMod" name="" type="button" >{{pageLabelMap 'Create_Cart_Wishlist'}}</button>
+                {{/ifDisplay}}
+            {{/if}}
+            <button id="ccb2b-basket-update-btn" disabled="true" class="readonlyBtn btn btn-default btn-sm updateCartButton cc_update_cart_button" name="" type="button" >{{pageLabelMap 'CartInc_Update'}}</button>
+            {{#if this.ECartItemsS}}
+            {{#ifNotEquals this.ECartItemsS.models.length 0}}
+            {{#if this.allowCheckout}}
+            {{#ifEquals this.preventCheckout false}}
+            <button id="ccb2b-basket-continuecheckout-btn" type="button" class="hidden-xs hidden-sm primary_button btn btn-default btn-sm processToCheckout stopStickyBasketCheckpoint cc_checkout_btn readonlyBtn" disabled="disabled">{{pageLabelMap 'CartInc_Checkout'}}</button>
+            {{/ifEquals}}
+            {{/if}}
+            {{/ifNotEquals}}
+            {{/if}}
+        </div>
+    </div>
+</div>
+<div id="confirmClearCart" class="modal fade cc_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content cc_modal_content">
+            <div class="modal-body cc_modal_body text-center">
+                <p>{{pageLabelMap 'CCB2B_ConfirmClearCart'}}</p>
+            </div>
+            <div class="modal-footer cc_modal_footer text-center">
+                <input type="button" class="btn btn-default btn-sm" data-dismiss="modal" value="{{pageLabelMap 'Cancel'}}"/>
+                <input type="button" class="btn primary_button btn-default btn-sm clearCart cc_clear_all" value="{{pageLabelMap 'Ok'}}"/>
+            </div>
+        </div>
+    </div>
+</div>

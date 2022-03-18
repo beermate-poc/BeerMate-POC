@@ -1,0 +1,46 @@
+<project name="BeerMate" default="prepareStaticResourcesZip" basedir="." xmlns:sf="antlib:com.salesforce">
+	<property name="sf.sessionId" value=""/>
+	<property name="sf.maxPoll" value="5000"/>
+	<condition property="sf.sessionId" value="">
+		<not>
+			<isset property="sf.sessionId"/>
+		</not>
+	</condition>
+	<record name="deployment.log"/>
+
+	<taskdef name="executeApex" classname="classes.AnonymousApex" classpath="AnonymousApex.jar">
+		<classpath>
+			<pathelement location="ant-salesforce.jar"/>
+		</classpath>
+	</taskdef>
+
+	<taskdef resource="com/salesforce/antlib.xml" uri="antlib:com.salesforce">
+		<classpath>
+			<pathelement location="ant-salesforce.jar"/>
+		</classpath>
+	</taskdef>
+
+	<target name="prepareStaticResourcesZip">
+		<exec executable="cmd">
+			<arg value="/c"/>
+			<arg value="minimalize.bat"/>
+			<arg value="-p"/>
+		</exec>
+		<ant antfile="Compiler.xml" target="zipAndCompressECommerce"/>
+	</target>
+
+	<!-- <target name="deployCodeCheckOnly" depends="prepareStaticResourcesZip">
+		<echo>deployCodeCheckOnly_${sf.username}</echo>
+		<sf:deploy username="${sf.username}" password="${sf.password}"
+				   sessionId="${sf.sessionId}" serverurl="${sf.serverurl}" maxPoll="${sf.maxPoll}"
+				   deployRoot="../src" logType="Detail" checkOnly="true"/>
+	</target> -->
+
+	<!-- <target name="deployCode" depends="prepareStaticResourcesZip">
+		<echo>deployCode_${sf.username}</echo>
+		<sf:deploy username="${sf.username}" password="${sf.password}"
+				   sessionId="${sf.sessionId}" serverurl="${sf.serverurl}" maxPoll="${sf.maxPoll}"
+				   deployroot="../src">
+		</sf:deploy>
+	</target> -->
+</project>

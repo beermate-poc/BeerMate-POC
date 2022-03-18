@@ -1,0 +1,15 @@
+.THIS .modalStyle{
+    justify-content:flex-start;
+}
+.THIS .mobileView{
+    display:none;
+}
+.THIS.mainHeader{
+    background:#FAFAF9;
+}
+.THIS {
+    background:#fff
+}
+.THIS .slds-modal__footer{
+    text-align: center;
+}

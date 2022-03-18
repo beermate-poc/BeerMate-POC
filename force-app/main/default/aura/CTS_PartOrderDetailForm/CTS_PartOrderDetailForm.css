@@ -1,0 +1,21 @@
+.THIS .heightclass{
+    height: auto;
+}
+.THIS.bgcolor{
+    background-color: rgb(243, 242, 242);
+}
+
+.THIS .error-Msg{
+    color:red !important;
+    font-size:14px !important;
+    text-align:center !important;
+    background: antiquewhite !important;
+    overflow: auto;
+}
+.THIS.error-Msg2{
+    color:red !important;
+    font-size:14px !important;
+    text-align:center !important;
+    background: antiquewhite !important;
+    overflow: auto;
+}

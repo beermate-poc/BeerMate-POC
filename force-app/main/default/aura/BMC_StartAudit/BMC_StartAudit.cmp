@@ -1,0 +1,44 @@
+<aura:component controller="BMC_RetailQualityController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="today" type="Date" default=""/>
+    <aura:attribute name="accountRec" type="Account" default=""/>
+    <aura:attribute name="distributorList" type="String[]"/>
+    <aura:attribute name="distributorDefault" type="Id" default=""/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="recordSaveError" type="String" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="showErrorToast" type="boolean" default="false"/>
+    <aura:attribute name="toastTitle" type="String" />
+    <aura:attribute name="toastMsg" type="String" />
+    <aura:attribute name="toastType" type="String" />
+    
+    
+    <div class="slds-text-align__center">
+        <aura:if isTrue="{!v.showErrorToast}">
+            <c:Toast toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}"/>
+        </aura:if>
+    </div>
+    
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner />
+    </aura:if> 
+    <lightning:button  class="slds-float_left" variant="Neutral" type="{!$Label.c.BMC_CancelButton}" name="{!$Label.c.BMC_CancelButton}" label="{!$Label.c.BMC_CancelButton}" onclick="{!c.backtoRecordpg}"/>
+    
+    
+    <lightning:button  class="slds-float_right" variant="brand" type="{!$Label.c.BMC_Save}"  label="{!$Label.c.BMC_Save}" onclick="{!c.saveretailAudit}"/> 
+    <!-- <aura:if isTrue="{!v.showSpinner}"/> 
+    <lightning:spinner />
+    </aura:if> -->
+    <br/><br/><br/> 
+    <h1 class="slds-page-header__title">{!$Label.c.BMC_RetailOutlet} </h1>
+    {!v.accountRec.Name}
+    <br/>
+    <!-- <ui:inputDate aura:id="auditDate" label="Audit Date" value="{!v.newretailAudit.BMC_Audit_Date__c}" displayDatePicker="true" /> -->
+    <c:DatePicker aura:id="auditDate" inputClass="slds-input"  value="{!v.today}" label="{!$Label.c.BMC_AuditDate}" requiredAstrik="*"/>
+    <lightning:select name="distributorId" label="{!$Label.c.BMC_Distributor}" aura:id="distributorId" value="{!v.distributorDefault}">
+        <option value="{!$Label.c.BMC_SelectDistributor}">{!$Label.c.BMC_SelectDistributor}</option>
+        <aura:iteration items="{!v.distributorList}" var="option">
+            <option value="{!option.id}" selected="{!option.id==v.distributorDefault}">{!option.name}</option>
+        </aura:iteration>
+    </lightning:select>
+</aura:component>

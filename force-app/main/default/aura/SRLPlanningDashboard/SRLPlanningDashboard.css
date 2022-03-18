@@ -1,0 +1,55 @@
+@media (max-width: 1025px){
+ .THIS.scrollerSize{
+    height: 660px;
+}
+
+}
+
+@media (max-width: 769px){
+ .THIS.scrollerSize{
+    height: 910px;
+}
+
+}
+
+@media (max-width: 736px){
+ .THIS.scrollerSize{
+    height: 285px;
+}
+
+}
+
+@media (max-width: 415px){
+ .THIS.scrollerSize{
+    height: 610px;
+}
+
+}
+
+@media (max-width: 413px){
+ .THIS.scrollerSize{
+    height: 315px;
+}
+
+}
+
+@media (max-width: 376px){
+ .THIS.scrollerSize{
+    height: 700px;
+}
+
+}
+
+@media (max-width: 361px){
+ .THIS.scrollerSize{
+    height: 440px;
+}
+
+}
+
+@media (max-width: 321px){
+ .THIS.scrollerSize{
+    height: 440px;
+}
+
+}

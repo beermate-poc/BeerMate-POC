@@ -1,0 +1,15 @@
+<aura:component controller="HomePageLinksController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <aura:handler name="init" action="{!c.init}" value="{!this}" />
+	<aura:attribute name="userId" type="Id" default="" />
+	<aura:attribute name="SAMLID" type="String" default="" />
+    <aura:if isTrue="{!$Browser.isTablet || $Browser.isPhone}">
+		<div class="slds-grid slds-wrap">
+			<div class="slds-col slds-p-horizontal--medium slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-1 slds-p-around--small">
+				 <div class="slds-box slds-box--small slds-theme--shade slds-text-align--center"><ui:outputURL value="{!$Label.c.PvP_SR_Mobile + v.SAMLID}" label="{!$Label.c.Performance_vs_Plan_Label}" target="_blank"  /> </div>
+			</div>
+			<div class="slds-col slds-p-horizontal--medium slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-1 slds-p-around--small">
+				<div class="slds-box slds-box--small slds-theme--shade slds-text-align--center"><ui:outputURL value="{!$Label.c.X45_5_5_SR_Mobile + v.userId}" label="{!$Label.c.Forty_Five_Five_Label}" target="_blank"  /> </div>
+			</div>
+		</div>
+    </aura:if>
+</aura:component>

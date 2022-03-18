@@ -1,0 +1,278 @@
+<div class="panel panel-default cc_panel cc_myaccount_mywishlists_container">
+    <div class="panel-heading cc_heading">
+        <h3 class="panel-title cc_title">{{pageLabelMap 'MyAccount_MyWishlist'}}</h3>
+    </div>
+    <div class="panel-body cc_body">
+        <div class="cc_wishlist_heading row">
+            <div class="col-sm-12">
+                <h4 class="cc_wishlist_name">{{this.name}}</h4>
+                {{#if this.note}}
+                <span class="cc_wishlist_note_label">{{pageLabelMap 'Field_Notes'}}&#58;</span>
+                <span class="cc_wishlist_note">{{this.note}}</span>
+                {{/if}}
+                <p class="cc_wishlist_active">
+                    <span class="cc_wishlist_active_label">{{pageLabelMap 'Heading_Active'}}&#58;</span>
+                    <span class="cc_wishlist_active_value">{{#ifEquals isActive true}} <span class="glyphicon glyphicon-ok"></span> {{else}} <span class="glyphicon glyphicon-remove"></span>{{/ifEquals}}</span>
+                </p>
+            </div>
+            <div class="col-sm-6 search-section">
+                <input id="ccb2b-ma-fa-search-input" type="text" class="form-control input-text searchFavInput" name="searchFavProducts" value="" placeholder="{{pageLabelMap 'Search'}}">
+                <input id="ccb2b-ma-fa-search-button" type="button" class="btn btn-default btn-sm searchFavProducts" value="{{pageLabelMap 'Search'}}">
+            </div>
+            <div class="col-sm-6 text-right">
+                {{#if groupedItems}}
+                    <div class="filter-by-catalog-section {{#if selectedLayout}} {{#ifNotEquals selectedLayout 'table'}}invisible{{/ifNotEquals}}{{/if}}">
+                    <select id="ccb2b-wishlist-catalog" class="form-control catalog_control">
+                        <option {{#ifEquals selectedCatalogFilter 'All'}}checked{{/ifEquals}} value="All">{{pageLabelMap 'MyAccount_MyWishlist_All_Catalogs'}}</option>
+                        {{#eachInMap groupedItems}}
+                            <option {{#ifEquals selectedCatalogFilter key}}checked{{/ifEquals}}  value="{{{key}}}">{{{key}}}</option>
+                        {{/eachInMap}}
+                    </select>
+                    <span class="caret"></span>
+                </div>
+                {{/if}}
+                <button id="wishlist-detaillayout-button" data-layout="detail" class="btn btn-default btn-sm changeLayout cc_layout_option {{#if selectedLayout}}{{#ifEquals selectedLayout 'detail'}}active disabled{{/ifEquals}}{{/if}}"><span class="fa fa-th-list fa-lg" aria-hidden="true"></span></button>
+                <button id="wishlist-tablelayout-button" data-layout="table" class="btn btn-default btn-sm changeLayout cc_layout_option {{#if selectedLayout}}{{#ifEquals selectedLayout 'table'}}active disabled{{/ifEquals}}{{else}}active disabled{{/if}}"><span class="fa fa-table fa-lg" aria-hidden="true"></span></button>
+            </div>
+
+            <div class="col-sm-12 price_disclaimer">
+                <p>{{pageLabelMap 'CCB2B_FinalPricing_Disclaimer_Info'}}</p>
+            </div>
+            <div class="col-sm-12 text-right printListSection hidden-print">
+                <button id="ccb2b-favourites-print-list" class="btn btn-default btn-sm printList">{{pageLabelMap 'CCB2B_FavouritesDetails_PrintList'}}</button>
+            </div>
+            {{#ifDisplay 'WL.DsplAddCart' }}
+                {{#if (checkContactDisplayPermissions 'create_cart')}}
+                    <div class="col-sm-12 text-right">
+                        <button type="button" class="addAllToBasket btn primary_button btn-default btn-sm" disabled="disabled">{{pageLabelMap 'Component_MiniwishList_AddAllToCart'}}</button>
+                    </div>
+                {{/if}}
+            {{/ifDisplay}}
+        </div>
+
+        {{#if itemData}}
+            <!-- Search - no result -->
+            <div class="search-no-result hidden">{{pageLabelMap 'CCB2B_MyAccount_SearchNoResult_MyWishlist_Msg'}}</div>
+            <!-- Detail layout -->
+            <div class="wishlist-detail-section {{#if selectedLayout}}{{#ifNotEquals selectedLayout 'detail'}}hidden{{/ifNotEquals}}{{else}} hidden {{/if}}">
+                {{#each this.itemData}}
+                <div class="row cc_wishlist_item" data-sku="{{prodBean.sku}}" data-name="{{prodBean.name}}">
+                    <div class="col-md-2">
+                        <div class="cc_wishlist_image">
+                            {{#if (isProductOOS this.prodBean.sku)}}
+                                <div class="isOOSBadge">{{pageLabelMap 'CCB2B_OOS_Product_Badge'}}</div>
+                            {{/if}}
+                            {{#if mediaWrapper}}
+                                {{productLink this.prodBean 'cc_prod_link' image=(displayImage this.mediaWrapper 'accountWish img-responsive' alt=this.prodBean.name dataId=this.prodBean.sku)}}
+                            {{else}}
+                                {{productLink this.prodBean 'cc_product_name' image=(displayPlaceholderImage this)}}
+                            {{/if}}
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <p class="item_title cc_wishlist_item_title">
+                            <span class="name-elem" data-original-data="{{prodBean.name}}">{{productLink this.prodBean 'cc_prod_link'}}</span>
+                        </p>
+                        <div class="sku cc_sku">
+                            {{#ifDisplay 'WL.DsplAddtlSku'}}
+                            <span class="cc_label">{{pageLabelMap 'CCB2B_Basket_Product_Number_Label'}}</span>
+                            <span class="cc_value sku-elem" data-original-data="{{prodBean.sku}}">{{prodBean.sku}}</span>
+                            {{/ifDisplay}}
+                        </div>
+                        {{#ifDisplay 'WL.DsplShortDesc' }}
+                        <p class="cc_short_desc">{{{this.prodBean.shortDesc}}}</p>
+                        {{/ifDisplay}}
+                    </div>
+                    <div class="col-md-3">
+                        <div class="cart_item wishFinder cc_wish_finder" data-sku="{{this.prodBean.sku}}" data-sfid="{{prodBean.sfid}}">
+                            {{#if this.showPricing}}
+                                {{#ifDisplay 'WL.DsplPricing' }}
+                                    {{#if this.price}}
+                                        {{#if (checkContactDisplayPermissions 'pricing')}}
+                                            <div class="price_block cc_price_block">
+                                                <p class="price cc_price text-left">
+                                                    <span class="value cc_value">{{{price this.price}}}</span>
+                                                    {{#if (ifOriginalPrice this.prodBean.CCB2BOriginalPrice this.price)}}
+                                                        <span class="cc_price originalPrice">{{price this.prodBean.CCB2BOriginalPrice}}</span>
+                                                    {{/if}}
+                                                </p>
+                                            </div>
+                                        {{/if}}
+                                    {{/if}}
+                                    {{#if this.isTierPriced}}
+                                    <div class="cc_prt_tool_tip_div cc_prt_tool_tip_div_mywl" data-toggle="tooltip" title="{{pageLabelMap 'ProductPricingTiers_VolumeHover'}}">
+                                        <span class="cc_prt_tool_tip_text cc_prt_tool_tip_text_mywl">{{pageLabelMap 'ProductPricingTiers_VolumePricing'}}</span>
+                                    </div>
+                                    {{/if}}
+                                {{/ifDisplay}}
+                                {{#ifDisplay 'WL.DsplAvlb'}}
+                                    {{#ifEquals this.inventory 0}}
+                                    <div class="inventory cc_inventory">
+                                        <span class="cc_label">{{pageLabelMap 'ProductDetail_NotAvailable1'}}</span>
+                                        <span class="cc_value">{{pageLabelMap 'ProductDetail_NotAvailable2'}}</span>
+                                    </div>
+                                    {{/ifEquals}}
+                                {{/ifDisplay}}
+                                <input type="hidden" value="{{this.inventory}}" id="qtyAvail_{{this.prodBean.id}}" name="qtyAvail_{{this.prodBean.id}}" />
+                                {{#if this.canAddtoCart}}
+                                    {{#ifDisplay 'WL.DsplAddCart' }}
+                                        {{#if (checkContactDisplayPermissions 'create_cart')}}
+                                            <div class="form-group">
+                                                <div class="input-group cc_input_group hidden-print">
+                                                    <span class="input-group-btn cc_input_group_btn">
+                                                         <input data-sfid={{prodBean.sfid}} data-type="remove" id="{{generateId 'ccb2b-wishlist-detail-minus-' prodBean.sfid '-btn'}}" type="button" value="{{pageLabelMap 'Prod_QtyDecrSingle'}}" class="btn btn-default btn-sm minus cc_minus manageQty{{#if (isProductOOS this.prodBean.sku)}} disabled" disabled="disabled"{{else}}"{{/if}} ">
+                                                    </span>
+                                                    <input data-sfid={{prodBean.sfid}} data-sku={{prodBean.sku}} data-id="{{generateId 'ccb2b-wishlist-detail--qty-' prodBean.sfid '-input'}}" id="{{prodBean.sfid}}_detail_qtyEntry" type="text" name="qty" value="0" class="input-text entry plus_minus form-control input-sm cc_entry{{#if (isProductOOS this.prodBean.sku)}} disabled" disabled="disabled"{{else}}"{{/if}} " maxlength="7" />
+                                                    <span class="input-group-btn cc_input_group_btn">
+                                                          <input data-sfid={{prodBean.sfid}} data-type="add" id="{{generateId 'ccb2b-wishlist-detail--plus-' prodBean.sfid '-btn'}}" type="button" value="{{pageLabelMap 'Prod_QtyIncrSingle'}}" class="btn btn-default btn-sm plus cc_plus manageQty{{#if (isProductOOS this.prodBean.sku)}} disabled" disabled="disabled"{{else}}"{{/if}} ">
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="messagingSection-Warning-{{prodBean.sfid}} invalid_qty_msg" style="display: none"></div>
+                                            <div class="messagingSection-Info-{{prodBean.sfid}}" style="display: none"></div>
+                                            <div class="messagingSection-Error-{{prodBean.sfid}}" style="display: none"></div>
+                                            <p class="cc_wishlist_action hidden-print">
+                                                <button type="button" id="{{prodBean.sfid}}_detail_addToCart" class="btn primary_button btn-default btn-sm addItemToCart cc_add_item" data-id="{{uid}}">{{pageLabelMap 'Component_MiniwishList_AddToCart'}}</button>
+                                            </p>
+                                        {{/if}}
+                                    {{/ifDisplay}}
+                                {{/if}}
+                            {{/if}}
+                            <div class="addToWishlist wishButtons cc_wish_buttons hidden-print"></div>
+                        </div>
+                        {{#if ../isRO}}
+                            &#160;
+                            {{else}}
+                            <div><span type="button" class="glyphicon glyphicon-trash deleteItem cc_delete hidden-print" data-id="{{uid}}" data-pid="{{parentId}}"></span> </div>
+                         {{/if}}
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+
+            <!-- Table layout -->
+            <div class="wishlist-table-section {{#if selectedLayout}} {{#ifNotEquals selectedLayout 'table'}}hidden{{/ifNotEquals}}{{/if}}">
+                {{#if groupedItems}}
+                    {{#eachInMap groupedItems}}
+                        <div data-catalog="{{{key}}}" class="catalog-group">
+                            <div class="col-md-12 group-section">
+                                {{{key}}}
+                            </div>
+                            <div class="table-responsive collapsible_table">
+                                <table class="table cc_table wishlistTable">
+                                    <tr class="cc_table_header_row ">
+                                        <th class="cc_table_header name"><span class="cc_table_header_name">{{pageLabelMap 'MyAccount_MyWishlist_Name_Col'}}</span></th>
+                                        <th class="cc_table_header sku"><span class="cc_table_header_sku">{{pageLabelMap 'MyAccount_MyWishlist_SKU_Col'}}</span></th>
+                                        <th class="cc_table_header rows"><span class="cc_table_header_rows">{{pageLabelMap 'MyAccount_MyWishlist_Rows_Col'}}</span></th>
+                                        <th class="cc_table_header rows"><span class="cc_table_header_rows">{{pageLabelMap 'MyAccount_MyWishlist_Cases_Pallet'}}</span></th>
+                                        {{#ifDisplay 'WL.DsplAddCart' }}
+                                            {{#if (checkContactDisplayPermissions 'create_cart')}}
+                                                {{#if (checkContactDisplayPermissions 'pricing')}}
+                                                    <th class="cc_table_header catalog"><span class="cc_table_header_catalog">{{pageLabelMap 'MyAccount_MyWishlist_Catalog_Col'}}</span></th>
+                                                    <th class="cc_table_header contract"><span class="cc_table_header_contract">{{pageLabelMap 'MyAccount_MyWishlist_Contract_Col'}}</span></th>
+                                                {{/if}}
+                                                <th class="cc_table_header qty hidden-print"><span class="cc_table_header_qty">{{pageLabelMap 'MyAccount_MyWishlist_Qty_Col'}}</span></th>
+                                            {{/if}}
+                                        {{/ifDisplay}}
+                                        <th class="cc_table_header add"></th>
+                                        <th class="cc_table_header remove"></th>
+                                    </tr>
+                                    {{#each value}}
+                                        <tr class="myAccFavRow wishFinder cc_table_row cc_wishlist_item" data-sku="{{prodBean.sku}}" data-sfid="{{prodBean.sfid}}" data-name="{{prodBean.name}}">
+                                            <td class="cc_table_col name" data-label="{{pageLabelMap 'MyAccount_MyWishlist_Name_Col'}}:">
+                                                <span class="name-elem" data-original-data="{{prodBean.name}}">{{productLink this.prodBean 'cc_prod_link'}}</span>
+                                                {{#if (isProductOOS this.prodBean.sku)}}<span class="unavailable">{{pageLabelMap 'CCB2B_OOS_Product_Badge'}}</span>{{/if}}
+                                            </td>
+                                            <td class="cc_table_col sku" data-label="{{pageLabelMap 'MyAccount_MyWishlist_SKU_Col'}}:">
+                                                <span class="cc_value sku-elem" data-original-data="{{prodBean.sku}}">{{prodBean.sku}}</span>
+                                            </td>
+                                            <td class="cc_table_col rows" data-label="{{pageLabelMap 'MyAccount_MyWishlist_Rows_Col'}}:">
+                                                <span class="cc_value">{{#if casesPerRow}}{{casesPerRow}}{{else}}-{{/if}}</span>
+                                            </td>
+                                            <td class="cc_table_col rows" data-label="{{pageLabelMap 'MyAccount_MyWishlist_Cases_Pallet'}}:">
+                                                <span class="cc_value">{{#if casesPerPallet}}{{casesPerPallet}}{{else}}-{{/if}}</span>
+                                            </td>
+                                            {{#if this.canAddtoCart}}
+                                                {{#ifDisplay 'WL.DsplAddCart' }}
+                                                    {{#if (checkContactDisplayPermissions 'create_cart')}}
+                                                        {{#if (checkContactDisplayPermissions 'pricing')}}
+                                                            <td class="cc_table_col catalog" data-label="{{pageLabelMap 'MyAccount_MyWishlist_Catalog_Col'}}:">
+                                                                {{#if (ifOriginalPrice this.prodBean.CCB2BOriginalPrice this.price)}}
+                                                                    <span class="cc_price originalPrice">{{#if this.prodBean.CCB2BOriginalPrice}}{{price this.prodBean.CCB2BOriginalPrice}}{{else}} - {{/if}}</span>
+                                                                {{else}} -
+                                                                {{/if}}
+                                                            </td>
+                                                            <td class="cc_table_col contract" data-label="{{pageLabelMap 'MyAccount_MyWishlist_Contract_Col'}}:">
+                                                                <span class="cc_value">{{price this.price}}</span>
+                                                            </td>
+                                                        {{/if}}
+                                                    <td class="cc_table_col qty hidden-print">
+                                                        <div class="form-group">
+                                                            <div class="input-group cc_input_group">
+                                                                <span class="input-group-btn cc_input_group_btn">
+                                                                     <input data-sfid={{prodBean.sfid}} data-type="remove" id="{{generateId 'ccb2b-wishlist-table-minus-' prodBean.sfid '-btn'}}" type="button" value="{{pageLabelMap 'Prod_QtyDecrSingle'}}" class="btn btn-default btn-sm minus cc_minus manageQty{{#if (isProductOOS this.prodBean.sku)}} disabled" disabled="disabled"{{else}}"{{/if}} ">
+                                                                </span>
+                                                                <input data-sfid={{prodBean.sfid}} data-sku={{prodBean.sku}} data-id="{{generateId 'ccb2b-wishlist-table-qty-' prodBean.sfid '-input'}}" id="{{prodBean.sfid}}_table_qtyEntry" type="text" name="qty" value="0" class="input-text entry plus_minus form-control input-sm cc_entry{{#if (isProductOOS this.prodBean.sku)}} disabled" disabled="disabled"{{else}}"{{/if}}" maxlength="7" />
+                                                                <span class="input-group-btn cc_input_group_btn">
+                                                                      <input data-sfid={{prodBean.sfid}} data-type="add" id="{{generateId 'ccb2b-wishlist-table-plus-' prodBean.sfid '-btn'}}" type="button" value="{{pageLabelMap 'Prod_QtyIncrSingle'}}" class="btn btn-default btn-sm plus cc_plus manageQty{{#if (isProductOOS this.prodBean.sku)}} disabled" disabled="disabled"{{else}}"{{/if}} ">
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="messagingSection-Warning-{{prodBean.sfid}} invalid_qty_msg" style="display: none"></div>
+                                                        <div class="messagingSection-Info-{{prodBean.sfid}}" style="display: none"></div>
+                                                        <div class="messagingSection-Error-{{prodBean.sfid}}" style="display: none"></div>
+                                                    </td>
+                                                    {{/if}}
+                                                {{/ifDisplay}}
+                                            {{/if}}
+                                            <td class="cc_table_col add">
+                                                {{#if this.canAddtoCart}}
+                                                    {{#ifDisplay 'WL.DsplAddCart' }}
+                                                        {{#if (checkContactDisplayPermissions 'create_cart')}}
+                                                            <p class="cc_wishlist_action">
+                                                            <button type="button" id="{{prodBean.sfid}}_table_addToCart" class="add-with-qty btn primary_button btn-default btn-sm addItemToCart cc_add_item {{#if (isProductOOS prodBean.sku)}} disabled" disabled="disabled"{{else}}"{{/if}} data-id="{{uid}}">{{pageLabelMap 'Component_MiniwishList_AddToCart'}}</button>
+                                                            </p>
+                                                        {{/if}}
+                                                    {{/ifDisplay}}
+                                                {{/if}}
+                                                <div class="addToWishlist wishButtons cc_wish_buttons"></div>
+                                            </td>
+                                            <td class="cc_table_col remove text-right">
+                                                {{#if ../../isRO}} &#160;
+                                                {{else}}
+                                                    <div><span type="button" class="glyphicon glyphicon-trash deleteItem cc_delete" data-id="{{uid}}" data-pid="{{parentId}}"></span> </div>
+                                                {{/if}}
+                                            </td>
+                                        </tr>
+                                    {{/each}}
+                                </table>
+                            </div>
+                        </div>
+                    {{/eachInMap}}
+                {{/if}}
+            </div>
+        {{else}}
+            <p id="ccb2b-ma-fav-detail-noitem-label" class="noItemsInfo">{{pageLabelMap 'CCB2B_MyAccount_NoProducts_MyWishlist_Msg'}}</p>
+        {{/if}}
+    </div>
+</div>
+<div id="confirmLeavePage" class="modal fade cc_modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content cc_modal-content">
+            <div class="modal-body cc_modal_body text-center">
+                <h3>{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_Heading'}}</h3>
+                <p>{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_Content'}}</p>
+            </div>
+            <div class="modal-footer cc_modal_footer text-center">
+                <div>
+                    <input id="ccb2b-ma-favourites-confirm-leaving-page-no-button" type="button" class="{{#if (isLang 'FR')}}confirmModalFr{{/if}} btn closeModal" data-dismiss="modal" value="{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_GoBack'}}"/>
+                    <p>{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_GoBack_Info'}}</p>
+                </div>
+                <div>
+                    <input id="ccb2b-ma-favourites-confirm-leaving-page-yes-button" type="button" class="{{#if (isLang 'FR')}}confirmModalFr{{/if}} btn primary_button confirmLeaving" value="{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_Continue'}}"/>
+                    <p>{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_Continue_Info'}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

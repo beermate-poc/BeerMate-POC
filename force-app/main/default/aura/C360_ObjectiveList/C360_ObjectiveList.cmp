@@ -1,0 +1,175 @@
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId,force:hasSObjectName" controller="C360_ObjectiveListController">   
+    <aura:attribute name="recTypeIds" type="String" description="This is uesd for record Id" />
+    <aura:attribute name="entId" type="String" description="This is used for event Id" access="GLOBAL"/>
+    <aura:attribute name="accId" type="String" description="This is uesd for account Id" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>   
+    <aura:handler event="force:showToast" action="{!c.saveSuccessHandle}"/>
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+    <aura:attribute name="objeciveId" type="String" description="This is uesd for recent objective record Id" />
+    <aura:attribute name="usObj" type="Boolean" description="This is used to for US obj" />
+    <aura:attribute name="newObj" type="Boolean" default='false' description="This is used to for US obj" />
+    
+    <aura:attribute name="isOffPrem" type="Boolean" default="false" />
+    <aura:handler name="copyRecord" event="c:CopyRecord" action="{!c.copyRecord}" />
+    <aura:attribute name="featureCopy" type="Objective__c" default="{'sobjectType': 'Objective__c'}"/>
+    <aura:attribute name="engagementCopy" type="Objective__c" default="{'sobjectType': 'Objective__c'}"/>
+    <aura:attribute name="merchandiseCopy" type="Objective__c" default="{'sobjectType': 'Objective__c'}"/>
+    <aura:attribute name="callLogId" type="Id" />
+    <aura:attribute name="recordName" type="String"/>
+    <aura:attribute name="RecTypeID" type="Id"/>
+    
+   	<aura:attribute name="isEdit" type="Boolean" default="false" />
+    <aura:attribute name="objRec" type="Objective__c[]" />
+    <aura:handler name="EditPageResetEvent" event="c:ResetObjectiveEditView" action="{!c.resetEditComponent}"/>
+    
+    <ltng:require styles="{!$Resource.ObjQuickAction}"/>
+    
+    
+    <aura:if isTrue="{!!v.isEdit}">
+        
+        <header class="slds-modal__header widthClass headerSize">
+            <h3 class="slds-text-heading--large">{!$Label.c.C360_ObjectiveList}</h3>
+        </header>
+        <div>
+            <div aura:id="Spnner" class="slds-hide" ><lightning:spinner variant="brand"  /></div>
+            
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer" >
+                <thead id="dataHeader">
+                    <tr class="slds-text-title_caps">
+                        <th scope="col">
+                            <div class="slds-truncate"  title="Edit" >{!$Label.c.C360_Edit}</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Name" >{!$Label.c.C360_ObjName}</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Status">{!$Label.c.C360_Status}</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate text-Algin-Class" title="Execution Type">{!$Label.c.C360_ExecutionType}</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate text-Algin-Class" title="EndDate">{!$Label.c.C360_EndDate}</div>
+                        </th>
+                        <aura:if isTrue="{!v.usObj}">
+                            <th scope="col">
+                                <div class="slds-truncate text-Algin-Class" title="Selling Story"></div>
+                            </th>
+                        </aura:if>
+                    </tr>
+                </thead>
+                <tbody id="dataContainer">
+                    <aura:iteration items="{!v.objRec}" var="obj">
+                        <tr class="slds-hint-parent">
+                            <td scope="row" class="borderR">
+                                <div class="slds-truncate">                                
+                                    <a aura:id="editIds" onclick="{!c.editClick}" data-key="{!obj.Id}">{!$Label.c.C360_Edit}</a>
+                                </div>
+                            </td>
+                            <td scope="row" class="borderR">
+                                <div class="slds-truncate slds-cell-wrap" style="width:250px">
+                                    <span class="">{!obj.Name}</span>                           
+                                </div>
+                            </td>
+                            <td scope="row" class="borderR">
+                                <div class="slds-truncate">
+                                    <span class="">{!obj.Status__c}</span>
+                                </div>
+                            </td>
+                            <td scope="row" style="text-align: left;">
+                                <div class="slds-truncate">
+                                    <aura:if isTrue="{!v.usObj}">
+                                        <span class="">{!obj.RecordType.Name}</span>
+                                        <aura:set attribute="else">
+                                            <span class="">{!obj.C360_Execution_Type__c}</span>
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </td> 
+                            <td scope="row" style="text-align: left;">
+                                <div class="slds-truncate">
+                                    <aura:if isTrue="{!v.usObj}">
+                                        <span class=""><lightning:formattedDateTime value="{!obj.End_Time__c}"  month="2-digit" year="numeric"  day="2-digit" hour="2-digit" minute="2-digit"/></span>
+                                        <aura:set attribute="else">
+                                            <span class="">{!obj.C360_Planned_Objective_End__c}</span>
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </td>
+                            <aura:if isTrue="{!v.usObj}">
+                                <td scope="row" class="borderR">
+                                    <div class="slds-truncate">
+                                        <aura:if isTrue="{!obj.Smart_Objective__c}">
+                                         <!-- <lightning:formattedUrl value="{!$Label.c.GS_Selling_Story+obj.External_Key__c}" target="_blank" label="{!$Label.c.GS_Selling_Story_Label}"/>-->
+                                                   <lightning:button variant="base" label="{!$Label.c.GS_Selling_Story_Label}" title="Base action" value="{!obj.External_Key__c}" onclick="{!c.navigateTosellingstoryLink}"/>
+                                       
+                                        </aura:if>
+                                    </div>
+                                </td> 
+                            </aura:if>
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+        </div>
+        <br></br><br></br>
+        <div>
+        <aura:if isTrue="{!v.usObj}">
+            <div class="slds-dropdown-trigger slds-dropdown-trigger_click" aura:id="dropdownMenu">
+                <lightning:button variant="Brand" label="{!$Label.c.New_Objective}" iconName="utility:down" iconPosition="right" onclick="{!c.handleObjectiveMenuClick}"  />
+                <div class="slds-dropdown slds-dropdown_left slds-dropdown_actions">
+                    <ul class="slds-dropdown__list" role="menu">
+                        <aura:if isTrue="{!v.isOffPrem}" >
+                            <li class="slds-dropdown__item" role="display">
+                                <a onclick="{!c.newDisplay}" role="menuitem" tabindex="-1">
+                                    <span class="slds-truncate" title="{!$Label.c.Add_Display}">{!$Label.c.Display}</span>
+                                </a>
+                            </li>
+                        </aura:if>
+                        <li class="slds-dropdown__item" role="presentation">
+                            <a onclick="{!c.newEngagement}" role="menuitem" tabindex="-1">
+                                <span class="slds-truncate" title="{!$Label.c.Add_Engagement}">{!$Label.c.Engagement}</span>
+                            </a>
+                        </li>
+                        <li class="slds-dropdown__item" role="presentation">
+                            <a onclick="{!c.newFeature}" role="menuitem" tabindex="0">
+                                <span class="slds-truncate" title="{!$Label.c.Add_Feature}">{!$Label.c.Feature}</span>
+                            </a>
+                        </li>
+                        <li class="slds-dropdown__item" role="presentation">
+                            <a onclick="{!c.newMerchandise}" role="menuitem" tabindex="-1">
+                                <span class="slds-truncate" title="{!$Label.c.Add_Merchandise}">{!$Label.c.Merchandise}</span>
+                            </a>
+                        </li>
+                        <li class="slds-dropdown__item" role="presentation">
+                            <a onclick="{!c.newPlacement}" role="menuitem" tabindex="-1">
+                                <span class="slds-truncate" title="{!$Label.c.Add_Placement}">{!$Label.c.Placement}</span>
+                            </a>
+                        </li>
+                        <!-- Removed Space Option from Dropdown as part of GB-10486
+                        <aura:if isTrue="{!v.isOffPrem}" >
+                            <li class="slds-dropdown__item" role="presentation">
+                                <a onclick="{!c.newSpace}" role="menuitem" tabindex="-1">
+                                    <span class="slds-truncate" title="{!$Label.c.Add_Space}">{!$Label.c.Space}</span>
+                                </a>
+                            </li>
+                        </aura:if>
+						-->
+                    </ul>
+                </div>
+            </div>
+            <aura:set attribute="else">
+                <lightning:button variant= "Brand" label = "{!$Label.c.C360_New}" onclick="{!c.hNewRecord}"/>
+            </aura:set>
+        </aura:if>
+        <!--  <lightning:button variant= "Brand" label = "{!$Label.c.C360_New}" onclick="{!c.hNewRecord}"/>-->
+        <lightning:button variant="Neutral" label="{!$Label.c.Cancel_Label}" onclick="{!c.hCancel}" />
+    </div>
+    	
+    </aura:if>
+    <aura:if isTrue="{!v.isEdit}">
+    	
+           {!v.body}
+        
+    </aura:if>
+</aura:component>

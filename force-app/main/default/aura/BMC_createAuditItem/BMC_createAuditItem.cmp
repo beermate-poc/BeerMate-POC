@@ -1,0 +1,176 @@
+<!--
+   @Author Accenture
+   @name BMC_createAuditItem
+   @CreateDate  9/13/2018
+   @Description Component for creating Audit Items.
+   @Version <1.0>
+  -->
+<aura:component implements="force:appHostable,force:lightningQuickActionWithoutHeader" controller="BMC_RetailQualityController">
+    <aura:attribute name="newauditItem" type="BMC_Audit_Item__c" default="{	'sobjectType': 'BMC_Audit_Item__c'}"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="showAudit" type="boolean"/>
+    <aura:attribute name="showEditaudit" type="boolean" default="false"/>
+    <aura:attribute name="brandPackId" type="Id" />
+    <aura:attribute name="editAuditId" type="Id" />
+    <aura:attribute name="editAuditObj" type="BMC_Audit_Item__c" />
+    <aura:attribute name="brandPackname" type="String" />
+    <aura:attribute name="codeDate" type="Date" default=""/>
+    <aura:attribute name="previousLocation" type="String" /> 
+    <aura:attribute name="repackValue" type="String" /> 
+    <aura:attribute name="damageValue" type="String" /> 
+    <aura:attribute name="previousUOM" type="String" /> 
+    <aura:attribute name="manufactureDate" type="boolean" default="false"/>
+    <aura:attribute name="outofRotation" type="boolean" default="false"/>
+    <aura:attribute name="codeRequired" type="boolean" default="true"/>
+    <aura:attribute name="recordId" type="Id" />   
+    <aura:attribute name="refreshBrandPack" type="boolean"/>
+    <aura:attribute name="saveAndScan" type="boolean" default="false"/>
+    <aura:attribute name="validateFields" type="boolean" default="true"/>
+    <aura:attribute name="resultFound" type="boolean" default="true"/>
+    <aura:attribute name="openAddPackage" type="boolean" default="false"/>
+    <aura:attribute name="listOfSearchRecords" type="List" description=" Records which are returned from apex class"/>
+    <aura:attribute name="searchKeyWord" type="string"/>
+    <aura:attribute name="selectedRecord" type="sObject" default="{}" description="To Store SELECTED sObject Record"/>
+    <aura:attribute name="location" type="List[]"/>
+    <aura:attribute name="uomlst" type="List[]"/>
+    <aura:attribute name="damagelst" type="List[]"/>
+    <aura:attribute name="repackList" type="List[]"/>
+    <aura:handler name="change" value="{!v.showEditaudit}" action="{!c.refreshPacklist}" />
+    <aura:handler name="change" value="{!v.saveAndScan}" action="{!c.saveauditItem}" />
+    <aura:handler name="change" value="{!v.brandPackId}" action="{!c.refreshAuditItm}" />
+    <aura:attribute name="auditItemList" type="BMC_Audit_Item__c"/>
+    <aura:attribute name="createPack" type="boolean" default="false"/>
+    <aura:attribute name="auditRecord" type="Object" 
+                    description="A simplified view record object to be displayed"/>
+    <aura:attribute name="recordSaveError" type="String" 
+                    description="An error message bound to force:recordData"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="showErrorToast" type="boolean" default="false"/>
+    <aura:attribute name="toastTitle" type="String" />
+    <aura:attribute name="toastMsg" type="String" />
+    <aura:attribute name="toastType" type="String" />
+    
+    <aura:attribute name="scanPage" type="Boolean" default="true"/>
+    <aura:attribute name="selectedLookUpRecord" type="sObject" default="{}"/>
+    <aura:attribute name="clearResult" type="Boolean" default="false" />
+    <aura:attribute name="initUom" type="String" />
+    <aura:attribute name="fromButton" type="boolean" default="false"/>
+    
+    <div class="slds-text-align__center">
+        <aura:if isTrue="{!v.showErrorToast}">
+            <c:Toast toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}"/>
+        </aura:if>
+    </div>
+    
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner />
+    </aura:if>   
+    <aura:if isTrue="{! !v.showEditaudit}">
+        <lightning:card title="">
+            <ui:scrollerWrapper class="wrapperClass">  
+                <p class="slds-p-horizontal_small">
+                    
+                    <force:recordData aura:id="auditRec" 
+                                      layoutType="COMPACT"  
+                                      targetError="{!v.recordSaveError}"
+                                      targetRecord="{!v.newauditItem}"
+                                      targetFields="{!v.auditRecord}"
+                                      mode="EDIT"
+                                      />
+                    <span>{!v.brandPackname}</span><br/>
+                    <lightning:select aura:id="location" name="{!$Label.c.BMC_Location}" label="{!$Label.c.BMC_Location}" value="{!v.previousLocation}" required="true">
+                        <option value="">{!$Label.c.BMC_None}</option>
+                        <aura:iteration items="{!v.location}" var="loc">
+                            <option value="{!loc}" selected="{!v.previousLocation == loc}">{!loc}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                    <div class = "slds-grid slds-gutters">
+                        <div class="slds-col slds-col slds-size_1-of-2">
+                            <c:DatePicker requiredAstrik="{!(v.codeRequired == true) ? '*': ' '}" aura:id="auditDate" inputClass="slds-input"  value="{!v.codeDate}" label="{!$Label.c.BMC_Code_Date}" >
+                                <ui:outputDate value="{!v.BMC_Code_Date__c}"/> 
+                            </c:DatePicker>
+                        </div>
+                        <div class="slds-col slds-gutters">
+                            <lightning:input type="tel" name="{!$Label.c.BMC_Quantity}" label="{!$Label.c.BMC_Quantity}" value="{!v.auditRecord.BMC_UI_Quantity__c}" required="true">	
+                                {!v.BMC_UI_Quantity__c}
+                            </lightning:input>
+                        </div>
+                    </div>
+                    <div class = "slds-grid">
+                        <lightning:input type="checkbox" label="{!$Label.c.BMC_No_Manufacture_Date}" name="{!$Label.c.BMC_No_Manufacture_Date}" value="{!v.auditRecord.BMC_No_Manufacture_Date__c}" checked="{!v.manufactureDate}" onchange="{!c.setcodedateRqrd}"/>
+                        <lightning:input type="checkbox" label="{!$Label.c.BMC_Out_of_Rotation}" name="{!$Label.c.BMC_Out_of_Rotation}" value="{!v.auditRecord.BMC_Out_of_Rotation__c}" checked="{!v.outofRotation}"/>
+                    </div>
+                    <lightning:select aura:id="uom" name="{!$Label.c.BMC_UOM}" label="{!$Label.c.BMC_UOM}" value="{!v.initUom}" required="true">
+                        <option value="">{!$Label.c.BMC_None}</option>
+                        <aura:iteration items="{!v.uomlst}" var="uomVal">
+                            <option value="{!uomVal}" selected="{!v.initUom == uomVal}">{!uomVal}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                    <lightning:select aura:id="repack" name="{!$Label.c.BMC_Repack}" label="{!$Label.c.BMC_Repack}" value="{!v.repackValue}">
+                        <option value="">{!$Label.c.BMC_None}</option>
+                        <aura:iteration items="{!v.repackList}" var="repackVal">
+                            <option value="{!repackVal}" >{!repackVal}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                    <lightning:select aura:id="delete" name="{!$Label.c.BMC_Damaged}" label="{!$Label.c.BMC_Damaged}" value="{!v.damageValue}">
+                        <option value="">{!$Label.c.BMC_None}</option>
+                        <aura:iteration items="{!v.damagelst}" var="damageVal">
+                            <option value="{!damageVal}" >{!damageVal}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                    <c:BMC_CustomLookup initUom="{!v.initUom}" recordId="{!v.recordId}" clearResult="{!v.clearResult}" objectAPIName="BMC_Retail_Quality_Audit_Brand_Pack__c"  selectedRecord="{!v.selectedLookUpRecord}" 
+                                        label="SCAN"  resultFound="{!v.resultFound}" searchKeyWord="{!v.searchKeyWord}" listOfSearchRecords="{!v.listOfSearchRecords}" saveAndScan="{!v.saveAndScan}" openAddPackage="{!v.openAddPackage}" scanPage="true" showAudit="{!v.showAudit}" brandPackId="{!v.brandPackId}" brandPackname="{!v.brandPackname}"/> <br/>
+                    <center> <lightning:button  class="slds-wrap" variant="brand" type="{!$Label.c.BMC_NextDate}" name="{!$Label.c.BMC_NextDate}" label="{!$Label.c.BMC_NextDate}" onclick="{!c.saveandNew}"/>
+                        <lightning:button  class="slds-wrap" variant="brand" type="{!$Label.c.BMC_NextPackage}" name="{!$Label.c.BMC_NextPackage}" label="{!$Label.c.BMC_NextPackage}" onclick="{!c.saveauditItem}"/>
+                        <lightning:button  variant="Neutral" type="{!$Label.c.BMC_CancelButton}" name="{!$Label.c.BMC_CancelButton}" label="{!$Label.c.BMC_CancelButton}" onclick="{!c.navigateBack}"/>
+                    </center> 
+                    <!-- Display Lightning Data Service errors -->
+                    <aura:if isTrue="{!not(empty(v.recordSaveError))}">
+                        <div class="recordError">
+                            {!v.recordSaveError}</div>
+                    </aura:if>
+                </p>  
+                <br/>
+                <table class="mobile-styling ">
+                    <thead>
+                        <tr>
+                            <th scope="col"> {!$Label.c.BMC_Code_Date} </th> 
+                            <th scope="col"> {!$Label.c.BMC_QTY} </th>                         
+                            <th scope="col"><span class="label-truncate" >{!$Label.c.BMC_Location}</span></th>                                             
+                            <th scope="col"> {!$Label.c.BMC_UOM}</th>
+                            <th scope="col"> {!$Label.c.BMC_GSEdit} </th>                                               
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.auditItemList}" var="auditItem">
+                            <tr>
+                                <td style="min-width: 90px;" data-label="{!$Label.c.BMC_Code_Date}">                               
+                                    <ui:outputDate value="{!auditItem.BMC_Code_Date__c}"/> 
+                                </td>  
+                                <td data-label="{!$Label.c.BMC_Quantity}">
+                                    {!auditItem.BMC_UI_Quantity__c}
+                                </td> 
+                                <td style="min-width: 8px;max-width: 10px;" data-label="{!$Label.c.BMC_Location}">
+                                    <div class="text-truncate">{!auditItem.BMC_Location__c} </div>
+                                </td>               
+                                <td style="min-width: 8px;max-width: 10px;" data-label="{!$Label.c.BMC_UOM}">
+                                    <div class="text-truncate">{!auditItem.BMC_UOM__c}</div>
+                                </td>                              
+                                <td data-label="Edit">
+                                    <div data-id="{!auditItem.Id}" >
+                                        <lightning:button class="icon" value="{!auditItem.Id}" iconName="action:edit" onclick="{!c.openEditAudit}" />
+                                    </div>
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>               
+            </ui:scrollerWrapper>
+        </lightning:card>
+        <aura:set attribute="else">
+            <c:BMC_EditAuditItem showEditaudit="{!v.showEditaudit}" editAuditObj="{!v.editAuditObj}" location="{!v.location}"
+                                 uomlst="{!v.uomlst}" damagelst="{!v.damagelst}" repackList="{!v.repackList}"/> 
+        </aura:set>
+    </aura:if>
+</aura:component>

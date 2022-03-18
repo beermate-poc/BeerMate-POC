@@ -1,0 +1,69 @@
+<aura:component controller="ACE_LineItemCreate" implements= "flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="newLineItem" type="PartnerFundClaim" default="{	'sobjectType': 'PartnerFundClaim'}"/>
+    <aura:attribute name="showSuccess" type="Boolean" default="false" />
+    <aura:attribute name="showErrorToast" type="boolean" default="false"/>
+    <aura:attribute name="toastMsg" type="String" />
+    <aura:attribute name="refreshLineItems" type="boolean" />
+    <aura:attribute name="Taxpaid" type="String[]" default=" "/>
+    <aura:attribute name="spendCategory" type="String[]" default=" "/>
+    <aura:attribute name="lineIdx" type="Integer" />
+    <aura:attribute name="showEditLineItem" type="boolean"/>
+    <aura:attribute name="showCreateLineItem" type="boolean"/>
+    <lightning:spinner aura:id="spinner" alternativeText="Saving Data..." class="slds-hide"/>
+	<aura:handler event="aura:waiting" action="{!c.handleShowSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.handleHideSpinner}"/> 
+    <aura:attribute name="isSpinner" type="boolean" default="false"/>
+    <aura:html tag="style">
+       
+            .slds-modal__close {
+        		display:none
+            }
+            
+        
+      
+    
+    
+    </aura:html>
+    
+    <div class="slds-text-align__center">
+
+        <aura:if isTrue="{!v.showSuccess}" >
+            <ui:message title="Success!" severity="confirm" closable="true">
+                A line item was created.
+            </ui:message>
+        </aura:if>
+
+        <aura:if isTrue="{!v.showErrorToast}">
+            <ui:message aura:id="errorMsg" title="Error" severity="error" closable="true" >
+                {!v.toastMsg}
+            </ui:message>
+        </aura:if>
+        <br></br>
+        <div class="slds-modal__content slds-p-around_large" id="modal-content-id-1">
+            S/No: {!v.lineIdx}
+            <lightning:input label="{!$Label.c.ACE_ReimbursementName}" value="{!v.newLineItem.Title}" name="Name" aura:id="name" />
+            <lightning:select aura:id="category" name="category" label="{!$Label.c.ACE_SpendCategory}">
+                <option value="">{!$Label.c.Default_Picklist_Select}</option>
+                <aura:iteration items="{!v.spendCategory}" var="category">
+                    <option value="{!category}" text="{!category}" selected="{!category == v.newLineItem.ACE_Spend_Category__c}"></option>
+                </aura:iteration>
+            </lightning:select>	    
+            <lightning:input label="{!$Label.c.ACE_TotalExpenditure}" aura:id="totalExpenditure" value="{!v.newLineItem.ACE_Total_Expenditure__c}" name="Expend"/>
+            <lightning:select aura:id="tax" name="tax" label="{!$Label.c.ACE_TaxPaid}">
+                <option value="">{!$Label.c.Default_Picklist_Select}</option>
+                <aura:iteration items="{!v.Taxpaid}" var="tax">
+                    <option value="{!tax}" text="{!tax}" selected="{!tax == v.newLineItem.ACE_Tax_Pd__c}"></option>
+                </aura:iteration>
+            </lightning:select>	
+            <lightning:input label="{!$Label.c.ACE_VendorsUsed}" aura:id="vendorsUsed" value="{!v.newLineItem.ACE_Vendors_Used__c}" name="VendorsUsed"/>
+            <lightning:input label="{!$Label.c.ACE_comments}" value="{!v.newLineItem.ACE_Comments__c}" name="Comments"/>
+            <br></br>
+            <div class="slds-modal__footer slds-button slds-align_absolute-center ">
+                <lightning:button class="slds-button" variant="neutral" aura:id="CancelButton" label="{!$Label.c.ACE_Close}" onclick="{!c.cancelModal}" />
+                <lightning:button class="slds-button" disabled="{!v.isSpinner}" variant="brand" aura:id="saveNextButton" label="Save and Next" onclick="{!c.saveReimbursLineItem}" />
+            </div>
+        </div>
+    </div>
+</aura:component>

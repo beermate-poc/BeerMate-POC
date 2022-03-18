@@ -1,0 +1,221 @@
+<aura:component controller="C360_ProductDetails" implements="flexipage:availableForRecordHome,force:hasRecordId,flexipage:availableForAllPageTypes,force:appHostable,force:lightningQuickActionWithoutHeader,lightning:isUrlAddressable" access="global">
+    <aura:dependency resource="markup://force:navigateToSObject" type="EVENT"/>
+    <aura:attribute name="pageReference" type="Object"/>
+    <lightning:navigation aura:id="navService"/> 
+    <ltng:require  
+                  styles="{!$Resource.C360_CSS}"/> 
+    
+    <aura:attribute name="aprod" type="C360_AccountProducts__c"
+                    default="{'sObjectType' : 'C360_AccountProducts__c'}" />
+    <aura:attribute name="ordProd" type="C360_Order_Product__c"
+                    default="{'sObjectType' : 'C360_Order_Product__c'}" />
+    <aura:attribute name="ordType" type="Order[]"/>
+    <aura:attribute name="productName" type="String"/>
+    <aura:attribute name="productSku" type="String"/>
+    <aura:attribute name="brandFamilyDes" type="String"/>
+    <aura:attribute name="liquidTypeDes" type="String"/>
+    <aura:attribute name="prodList" type="List" />
+    <aura:attribute name="ordProdList" type="List" />
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="passedFromBeerLoss" type="Boolean" default="false"/>
+    <aura:attribute name="bLossDesc" type="String"/>
+    <aura:attribute name="descBefore" type="String"/>
+    <aura:attribute name="rCodeoptions" type="List"/>
+    <aura:attribute name="option1" type="List"/>
+    <aura:attribute name="option2" type="List"/>
+    <aura:attribute name="opList" type="List"/>
+    <aura:attribute name="opUom" type="List"/>
+    <aura:attribute name="opUomMap" type="Map"/>
+    <aura:attribute name="quantity" type="String"/>
+    <aura:attribute name="casePerRow" type="String"/>
+    <aura:attribute name="casePerPallet" type="String"/>
+    <aura:handler name = "init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name ="idLst" type="object[]" />
+    <aura:attribute name="openViewCart" type="Boolean" default="false"/>
+    <aura:attribute name="openViewCart2" type="Boolean" default="false"/>
+    <aura:registerEvent name="navigateEvent" type="c:C360_NavigateEvent"/>
+    <aura:attribute name="record" type="sObject" />
+    <aura:attribute name="fields" type="String[]"/>
+    <aura:attribute name="isNoneValue" type="boolean"/>
+    <aura:handler name="change" value="{!v.pageReference}" action="{!c.onPageReferenceChange}"/>
+    <div class="slds-box_x-small slds-theme__default font style slds-border_bottom">
+        <h1><b>{!$Label.c.C360_ProductFilter}</b></h1>
+    </div>
+    <lightning:layoutItem size="12" class="layoutItem">
+        <table class="slds-table slds-table_cell-buffer" aura:id="tab1">
+            <tr>
+                <td scope="col">
+                    <!--Product Name filter -->
+                    <lightning:input label="{!$Label.c.C360_ProductName}" class="slds-input_height"
+                                     value="{! v.productName}" 
+                                     />
+                </td>
+                <td scope="col">
+                    <!--Product SKU Id filter -->
+                    <lightning:input label="{!$Label.c.C360_ProductID_SKU}" class="slds-input_height"
+                                     value="{! v.productSku}" pattern="^[1-9][0-9]*" messageWhenPatternMismatch="{!$Label.c.C360_SKU_Numeric_Error}" type="tel" 
+                                     />
+                </td>
+            </tr>
+            <tr>
+                <td scope="col">
+                    <!--Brand Family Description Filter -->
+                    <lightning:select aura:id="BFmlyDesc" name="bfdSelect" label="{!$Label.c.C360_BFD}" >	
+                        <option>{!$Label.c.C360_None}</option>
+                        <aura:iteration items="{! v.option1}" var="opt" indexVar="key">
+                            <option value="{! opt.key}" text="{! opt.value}" />		
+                        </aura:iteration>
+                    </lightning:select>	
+                </td>
+                <td scope="col">
+                    <lightning:select aura:id="LiquidTypDesc" name="ltdSelect" label="{!$Label.c.C360_Liquid_Type_Description}">
+                        <option>{!$Label.c.C360_None}</option>
+                        <aura:iteration items="{! v.option2}" var="opt">
+                            <option text="{! opt.key}" value="{! opt.value}"/>
+                        </aura:iteration>
+                    </lightning:select>
+                </td>
+            </tr>
+            <!--Beer Loss Description Filter -->
+            <tr>
+                <td scope="col" class="{!v.passedFromBeerLoss==True?'':'slds-hide'}">
+                    <lightning:textarea aura:id="BeerLossDesc" name="bld" label="{!$Label.c.CTS_BeerLossDesc}" value="{!v.bLossDesc}"/>
+                </td>
+            </tr>
+        </table>
+        <!--Search button-->
+        <center style="margin-right: 115px;">  	
+            <lightning:button label="{!$Label.c.Search}" title="Search action" onclick="{! c.displayProducts}" />
+        </center>
+    </lightning:layoutItem>	
+    <!-- Product records displayed after searching -->
+    <div class="slds-box_x-small slds-theme__default font style slds-border_bottom">
+        <h1><b>{!$Label.c.C360_ProductList}</b></h1>
+    </div>
+    <div class="slds-scrollable table_container" style="height:auto;"> 
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer" aura:id="tab" >
+            <thead>
+                <tr>  
+                    <th scope="col">{!$Label.c.C360_LineItemType}</th>
+                    <th scope="col" class="{!v.ordType[0].RecordType.Name=='Indirect Order'?'slds-hide':''}">{!$Label.c.C360_Order_UOM}</th>
+                    <th scope="col">{!$Label.c.C360_Quantity}</th>
+                    <th scope="col" class="{!v.passedFromBeerLoss==True?'':'slds-hide'}">{!$Label.c.CTS_ReasonCode}</th>
+                    <th scope="col">{!$Label.c.C360_ProductName}</th>
+                    <th scope="col" class="slds-cell-wrap">{!$Label.c.C360_ProductID_SKU}</th>
+                    <!-- POC if Canada, hide ABV-->
+                   	<th scope="col">{!$Label.c.ABV_Liquid_desc}</th>
+                    
+                   <!-- <th scope="col">{!$Label.c.C360_Base_UOM}</th>
+                    <th scope="col" class="slds-cell-wrap">{!$Label.c.C360_Liquid_Type_Description}</th>-->
+                    <!-- POC if UK, hide Cases per row n pallet-->
+                    <th scope="col" class="slds-cell-wrap slds-cell-shrink">{!$Label.c.Case_Row_Pallet}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <aura:iteration items="{!v.prodList}" var="plist" indexVar="key" >	
+                    <tr>  
+                        <!-- Select checkbox	-->
+                        <!-- LineItem picklist -->
+                        <td scope="col">
+                            <!--       <select name="selectLit" aura:id="selectLit" data-id="{!plist.Id}" 	onchange="{!c.checked}" /> -->
+                            <lightning:select name="selectLit" aura:id="selectLit" > 
+                                <aura:if isTrue="{!or(v.ordType[0].Type=='CA Standard',v.isNoneValue==true)}">
+                                    <option>{!$Label.c.C360_None}</option>
+                                </aura:if>
+                                <aura:iteration items="{! v.opList}" var="op">
+                                    <option value="{!op.value}" text="{!op.label}" selected="{!v.ordType[0].Type=='CA Standard'?op.value=='Promo/Display':op.selected}" id="opId"></option>
+                                </aura:iteration>  
+                            </lightning:select>
+                        </td>   
+                        <td scope="col" class="{!v.ordType[0].RecordType.Name=='Indirect Order'?'slds-hide':''}" data-global-id="{! globalId }">
+                        	<c:C360_UomPicklist recordId="{!plist.Id}" opUomMap="{!v.opUomMap}" ordType="{!v.ordType}" aura:Id="selectUOM"/>
+                        </td>  
+                        <!--      </select>	-->
+                        <!-- Quantity input field -->
+                        <td scope="col" >
+                            <div class="quantity-style">
+                                <!--    		<aura:iteration items="{! v.prodList}" var="qty">		-->
+                                <lightning:input label="" pattern="^[1-9][0-9]*" aura:id="{!'index' + key}" 
+                                                 value="" class="slds-input_height"  min="1" 
+                                                 messageWhenPatternMismatch="{!$Label.c.C360_QtyValidMsg}" type="tel"
+                                                 />	<!--   data-id = "{!plist.Id}" onblur="{!c.onChanged}" onchange="{!c.validateQuantity}" -->
+                                <!--    		</aura:iteration>		-->
+                            </div>	
+                        </td>
+                        <!-- Reason Code LOV input field -->
+                        <td scope="col" class="{!v.passedFromBeerLoss==True?'':'slds-hide'}">
+                            <lightning:select aura:id="{!'reasonCode' + key}" > 
+                                <option value="">{!$Label.c.C360_None}</option>
+                                <aura:iteration items="{! v.rCodeoptions}" var="rCode">
+                                    <option value="{!rCode.value}" text="{!rCode.label}"></option>
+                                </aura:iteration>  
+                            </lightning:select>
+                        </td>
+                        <td scope="col" class="slds-cell-wrap">{!plist.Name}</td>
+                        <td scope="col" class="slds-cell-wrap" >{!plist.C360_Product_ID_SKU__c}</td>
+                        <!-- POC if Canada, hide ABV-->
+                    	
+                            <td scope="col">{! plist.C360_ABV_Alcohol_by_Volume__c +'/'+ plist.C360_Liquid_Type_Description__c}</td>
+                       
+                        <!--<aura:if isTrue="{!plist.C360_Country__c =='Canada'}">
+                            <td scope="col" class="slds-cell-wrap">{! plist.C360_Base_Unit_of_Measure_Desc__c}</td> 
+                        </aura:if> 
+                        <aura:if isTrue="{!plist.C360_Country__c =='UKI'}">
+                            <td scope="col" class="slds-cell-wrap">{! plist.C360_Sales_UOM_Desc__c}</td>
+                        </aura:if>
+                        <aura:if isTrue="{!and(plist.C360_Country__c!='UKI',plist.C360_Country__c!='Canada')}">
+                            <td scope="col" class="slds-cell-wrap">{!plist.C360_Base_Unit_of_Measure_Desc__c}</td>
+                        </aura:if>-->
+                        <!--<td scope="col" class="slds-cell-wrap">{! plist.C360_Liquid_Type_Description__c}</td>-->        		
+                        <!-- POC if UK, hide Cases per row n pallet-->
+                        
+                            <td scope="col" class="slds-cell-wrap slds-cell-shrink">{! plist.C360_Cases_per_Row__c +'/'+ plist.C360_Cases_per_Pallet__c }</td>
+                         
+                         <td class="slds-cell-shrink" style="display:none" >
+                            <ui:inputCheckbox aura:id="checkBox" label="" text="{!plist.Id}"  />
+                        </td>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table> 
+    </div>		<!--  //extra div -->
+    <br/><br/>  
+    <center>     
+        <lightning:button label="{!$Label.c.C360_Back}" title="Back" onclick="{!c.back}" />		
+        <lightning:button label="{!$Label.c.C360_AddToCart}" aura:id="addTCart" title="Add to Cart action" onclick="{! c.addToCart}" disabled="true"/>
+        <lightning:button label="{!$Label.c.C360_ViewCart}" title="View Cart action" onclick="{! c.viewCart}"  />
+    </center>  
+    <aura:if isTrue="{!v.openViewCart}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1"
+                 class="slds-modal slds-fade-in-open slds-modal_medium">
+            <div class="slds-modal__container modal-width" > <!--style="width: 95%;" -->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          size="large"
+                                          onclick="{! c.closeModel}"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                 <h2 id="modal-heading-01" class="slds-text-heading_small slds-hyphenate">{!$Label.c.C360_ViewCart}</h2>	
+                </header>
+                <div class="slds-modal__content slds-p-around_large" id="modal-content-id-1"> <!--style="padding-top: 5px;"-->
+                    <c:C360_AddProducts_ViewCart recordId="{!v.recordId}" ordType="{!v.ordType}" passedFromBeerLoss= "{!v.passedFromBeerLoss}" aura:Id="viewCart" opUomMap="{!v.opUomMap}"/>
+                </div>
+                <footer class="slds-modal__footer footer-hgt"> <!--style="height:50px;" -->
+                    <!-- <button class="slds-button slds-button_brand" onclick="{!c.closeModel}">Back</button> -->
+                    <lightning:button label="{!$Label.c.C360_Back}" title="Back" onclick="{!c.closeModel}" />  
+                    <!--VALIDATE- Fetch Price and ConfirmDeliveryDate from ECC 
+   and display errors from ECC if any -->
+                    <lightning:button label="{!$Label.c.C360_Update}" title="Update" onclick="{!c.updateOrdProdval}" />
+                    <!-- SUBMIT- records are sent to ECC as submitted
+    (edit n save the records that are added to cart)
+    and then locked for editing -->
+                    <lightning:button label="{!$Label.c.C360_Validate}" title="Validate" onclick="{!c.validateOrder}" class="{!v.ordType[0].RecordType.Name=='Indirect Order'?'slds-hide':''}" />                   
+                    <lightning:button label="{!$Label.c.C360_Submit}" title="Submit" onclick="{!c.createDirectOrder}" class="{!v.ordType[0].RecordType.Name=='Indirect Order'?'slds-hide':''}" />
+                    <lightning:button label="{!$Label.c.C360_Complete}" title="Complete" onclick="{!c.createInDirectOrder}" class="{!v.ordType[0].RecordType.Name=='Direct Order'?'slds-hide':''}" /> 
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+</aura:component>

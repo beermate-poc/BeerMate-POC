@@ -1,0 +1,51 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionwithoutheader" controller="C360_AssignObjSalesStrucController">
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>     
+    <aura:attribute name="terrRec" type="C360_Territory_Mapping__c[]" description="The data returned by the Apex controller." />
+    <aura:attribute name="terrlist" type="list" />
+    <header class="slds-modal__header widthClass">
+    	<h2 class="slds-text-heading--large">{!$Label.c.C360_Assign_Objectives_To_Users_By_Sales_Structure}</h2>
+    </header>
+    <div>
+    	<table class="slds-table slds-table_bordered slds-table_cell-buffer" >
+			<thead id="dataHeader">
+				<tr class="slds-text-title_caps">
+                    <th scope="col">
+                        <ui:inputCheckbox aura:id="allIds" change="{!c.hselAllRec}"/>
+                    </th>
+                    <th scope="col">
+                    	<div class="slds-truncate" title="User">{!$Label.c.C360_User}</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate text-Algin-Class" title="Territory">{!$Label.c.C360_Territory}</div>
+                    </th>
+				</tr>
+			</thead>
+			<tbody id="dataContainer">
+				<aura:iteration items="{!v.terrRec}" var="terr">
+                	<tr class="slds-hint-parent">
+                        <td scope="row" class="borderR">
+                        	<div class="slds-truncate">
+                                <ui:inputCheckbox text="{!terr.Id}" aura:id="selectedIds" value="" change="{!c.hselRec}"/>                            </div>
+                        </td>
+                    	<td scope="row" class="borderR">
+                        	<div class="slds-truncate">
+                            	<span class="">{!terr.C360_CRM_TerrID_Employee_Txt__c}</span>
+                            </div>
+                        </td>
+                        <td scope="row" style="text-align: center;">
+                        	<div class="slds-truncate">
+                            	<span class="">{!terr.C360_CRM_TerrID_Txt__c}</span>  
+                            </div>
+                        </td>          
+                	</tr>
+                </aura:iteration>
+			</tbody>
+		</table>
+    </div>
+    <br/><br/>
+    <div class="slds-form-element btn-Algin-Class" >
+    	<lightning:button label="{!$Label.c.Save}" onclick="{!c.hCreateObj}" name="Save" variant="brand" />
+        <lightning:button label="{!$Label.c.C360_SaveNew}" aura:id="SaveNew" name="SaveNew" variant="brand" onclick="{!c.handleCor}"/>
+        <lightning:button label="{!$Label.c.Cancel_Label}" name="Cancel" variant="neutral" onclick="{!c.hCancel}" />
+	</div>       
+</aura:component>

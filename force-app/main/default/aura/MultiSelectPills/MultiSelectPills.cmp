@@ -1,0 +1,109 @@
+<!--
+Author:			Nick Serafin
+Company:		Slalom, LLC
+Description:	Dynamic component to return list of items for selection based on a search key
+Attributes:		object – String to hold sObject to be used for soql query
+				field – String to hold field to be returned in search query
+				filterField – String to hold field used in where clause to filter soql query
+				label - String to hold label of field
+				placeholder - String to hold the placehodler text for the search field
+				searchValue - String to hold the search value sent by user
+				results - List to hodl results from search
+				loading - Boolean to handle a loading state
+				noResults - Boolean to handle no results being returned
+				showMenu - Boolean to handle display of results menu
+				selectedAnswers - List to hold previously selected answers to exclude them from the results 					   returned
+Event Registered: SearchValueChange - register the c:SearchValueChange event to send when a selection is made
+History
+<Date>      <Authors Name>     <Brief Description of Change>
+1/8/2017    Nick Serafin        Initial Creation
+-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" controller="MultiSelectPillsController">
+	<aura:dependency resource="markup://lightning:input" />
+	<aura:registerEvent name="SearchValueChange" type="c:SearchValueChange"/>
+    <aura:attribute name="object" type="String" />
+    <aura:attribute name="field" type="String" />
+    <aura:attribute name="filterField" type="String" />
+    <aura:attribute name="label" type="String" default="" />
+    <aura:attribute name="placeholder" type="String" default="" />
+    <aura:attribute name="searchValue" type="String" default="" />
+    <aura:attribute name="results" type="Object[]" default="[]" />
+    <aura:attribute name="loading" type="Boolean" default="false" />
+    <aura:attribute name="noResults" type="Boolean" default="false" />
+    <aura:attribute name="showMenu" type="Boolean" default="true" />
+    <aura:attribute name="selectedAnswers" type="String[]" default="[]"/>
+    <aura:attribute name="disabled" type="Boolean" default="false" />
+    <aura:attribute name="readOnlyAnswers" type="String" default="" />
+    <aura:handler name="change" value="{!v.selectedAnswers}" action="{!c.setupReadOnlyAnswers}" />
+
+	<div class="slds-form-element">
+		<aura:if isTrue="{!v.disabled}">
+	    	<lightning:input label="{!v.label == null ? ' ' : v.label}" name="fieldValue" value="{!v.readOnlyAnswers}" disabled="true"/>
+	    	<aura:set attribute="else">
+	    		<label class="slds-form-element__label" for="combobox-unique-id">{!v.label == null ? ' ' : v.label}</label>
+	    		<div class="slds-form-element__control">
+			      	<div class="slds-combobox_container slds-has-inline-listbox">
+			        	<div id="listbox-unique-id1" role="listbox" aria-orientation="horizontal" class="containerPills">
+			          		<ul class="slds-listbox slds-listbox_inline" role="group" aria-label="{!$Label.c.Selected_Options}">
+			          			<aura:iteration items="{!v.selectedAnswers}" var="ans" indexVar="idx">
+				            		<li role="presentation" class="slds-listbox__item selectedPills">
+						              	<span class="slds-pill" role="option" tabindex="0">
+						                	<span class="slds-pill__label">{!ans}</span>
+						                	<span class="slds-icon_container slds-pill__remove" title="{!$Label.c.Remove}">
+						                  		<span id="close" data-record="{!idx}" title="{!$Label.c.Close}" onclick="{!c.removePill}">
+                                                    <!-- MC-1853: Not able to apply Objectives to the Targeted User -->
+                                                    <lightning:icon iconName="utility:close" size="small"/>
+								        			<span class="slds-assistive-text">{!$Label.c.Close}</span>
+								      			</span>
+						                  		<span class="slds-assistive-text">{!$Label.c.MultiSelectPills_Remove_Text}</span>
+						                	</span>
+						              	</span>
+						            </li>
+					           	</aura:iteration>
+			    				<li role="presentation" class="slds-listbox__item selectedPills">
+							        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+							          	<div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+							            	<input aura:id="inputSearch" type="text" class="slds-input slds-combobox__input" id="combobox-unique-id1" aria-autocomplete="list" aria-controls="listbox-unique-id" autocomplete="off" role="textbox" placeholder="{!v.placeholder}" value="{!v.searchValue}" onkeyup="{!c.onSearchChange}"/>
+							          	</div>
+								        <aura:if isTrue="{! or( or( and(v.results.length > 0, v.showMenu), v.loading), v.noResults ) }">
+								            <div id="listbox-unique-id2" role="listbox">
+								                <!-- Loading Spinner when fetching records -->
+								                <div aura:id="autoCompleteSpinner" class="slds-spinner_container slds-hide">
+								                    <div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+								                        <span class="slds-assistive-text">{!$Label.c.Loading}</span>
+								                        <div class="slds-spinner__dot-a"></div>
+								                        <div class="slds-spinner__dot-b"></div>
+								                    </div>
+								                </div>
+								                <ul class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid" role="presentation">
+								                    <!-- No Results Found -->
+								                    <aura:if isTrue="{!v.noResults}">
+								                        <li role="presentation" class="slds-listbox__item">
+								                            <div class="slds-media__body" style="padding: 5px 20px">
+								                                <div class="slds-lookup__result-text">{!$Label.c.MultiSelectPills_No_Results}</div>
+								                            </div>
+								                        </li>
+								                    </aura:if>
+								                    <!-- Result Iterations -->
+								                    <aura:iteration items="{!v.results}" var="result">
+								                        <li role="presentation" class="slds-listbox__item">
+								                            <span aura:id="{!result.id}" id="{!result.id}" class="slds-lookup__item-action slds-media resultSpan" role="option" onclick="{!c.onSelectOption}">
+								                                <div class="slds-media__body">
+								                                    <div class="slds-lookup__result-text">{!result.name}</div>
+								                                </div>
+								                            </span>
+								                        </li>
+								                    </aura:iteration>
+								                </ul>
+								            </div>
+								        </aura:if>
+						          	</div>
+			          			</li>
+			          		</ul>
+			        	</div>
+		      		</div>
+	  			</div>
+	  		</aura:set>
+	    </aura:if>
+	</div>
+</aura:component>

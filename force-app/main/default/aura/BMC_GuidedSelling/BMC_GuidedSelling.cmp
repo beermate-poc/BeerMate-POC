@@ -1,0 +1,501 @@
+<!--
+Author:       Ankita Shanbhag
+Company:      Accenture
+Description:  Component to show Objectives, Surveys, ToD's, Prior Calls, Contacts
+-->
+<aura:component controller="GuidedSellingController" implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader,force:appHostable" access="global">
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="callogId" type="Id" />
+    <aura:attribute name="contactId" type="Id" />
+    <aura:attribute name="callDate" type="Date" />
+    <aura:attribute name="endCallLog" type="boolean" />
+    <aura:attribute name="objectiveRecordsToCompare" type="Objective__c[]" /> 
+    <aura:attribute name="callLogRec" type="Call_Log__c" />
+    <aura:attribute name="objective" type="Object"/>
+    <aura:attribute name="notesdata" type="Object"/>
+    <aura:attribute name="notescolumns" type="List"/>
+    <aura:attribute name="surveydata" type="Object"/>
+    <aura:attribute name="surveycolumns" type="List"/>
+    <aura:attribute name="objectivedata" type="Object"/>
+    <aura:attribute name="objectivecolumns" type="List"/>
+    <aura:attribute name="distributionAtRiskData" type="Object"/>
+    <aura:attribute name="distributionAtRiskColumns" type="List"/>
+    <aura:attribute name="summarydata" type="Object"/>
+    <aura:attribute name="summarycolumns" type="List"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:attribute name="showNewToDo" type="boolean" default="false" />
+    <aura:attribute name="newToDo" type="boolean" default="false" /> 
+    <aura:attribute name="showNewObjective" type="boolean" default="false" /> 
+    <aura:attribute name="newContact" type="boolean" default="false" />
+    <aura:attribute name="gsloadToDos" type="boolean" default="false" />
+    <aura:attribute name="showToast" type="boolean" default="false"/>
+    <aura:attribute name="toastTitle" type="String" />
+    <aura:attribute name="toastMsg" type="String" />
+    <aura:attribute name="toastType" type="String" />
+    <aura:attribute name="refershContacts" type="boolean" />
+    <aura:attribute name="showCreateContact" type="boolean" />
+    <aura:attribute name="showEditContact" type="boolean" />
+    <aura:attribute name="showObjectivesMob" type="boolean" default="false"/>
+    <aura:attribute name="refresh" type="boolean" default="false"/>
+    <aura:handler name="change" value="{!v.refresh}" action="{!c.refreshSurveyTab}" />
+    <aura:attribute name="contactToGS" type="Contact"/>
+    <aura:handler name="change" value="{!v.gsloadToDos}" action="{!c.handleSaveToDo}" />
+    <aura:handler name="change" value="{!v.contactToGS}" action="{!c.getEditContact}" />
+    <aura:attribute name="desktop" type="boolean"/>
+    <aura:attribute name="accountRec" type="Account" />
+    <aura:attribute name="DashboardLink" type="String"/>
+    <aura:attribute name="showDashboard" type="boolean" default="false"/>
+    <aura:attribute name="showGuidedSellingComponent" type="boolean" default="true"/>
+    <aura:attribute name="onPremiseOutletDashboard" type="String" />
+    <aura:attribute name="offPremiseOutletDashboard" type="String" />
+    <!--<aura:attribute name="consumerDashboard" type="String" />-->
+    <aura:attribute name="smpFlag" type="String" />
+    <aura:attribute name="isOffPrem" type="Boolean" default="false" />
+    <aura:attribute name="showSummary" type="Boolean" default="false" />
+    <aura:attribute name="showNewPlacementAIF" type="boolean" default="false"/> 
+    <aura:attribute name="createPost" type="boolean" default="false"/> 
+    <aura:unescapedHtml value="{!v.modalStyle}"/>
+    <lightning:navigation aura:id="navService" /> 
+    <aura:attribute name="showCallLogMob" type="Boolean" default="false"/>
+    <aura:attribute name="pageReference" type="Object"/>
+    <aura:attribute name="showPostChatter" type="boolean" default="false"/>
+    <aura:handler name="change" value="{!v.showPostChatter}" action="{!c.closePostChatter}" />
+    <!-- Attributes related to New placement Component-->
+    <aura:handler event="c:BMC_ObjectiveEvent" action="{!c.handleApplicationEvent}"/>
+    <aura:attribute name="showCreateObj" type="boolean" default="false"/>
+    <aura:attribute name="objectName" type="String"/>
+    <aura:attribute name="smartSkuOpp" type="SmartSKUs__c" default="{'sobjectType': 'SmartSKUs__c'}"/>
+    <aura:attribute name="chainMandate" type="Chain_Mandate__c" default="{'sobjectType': 'Chain_Mandate__c'}"/>
+    <aura:attribute name="smartSKUBrandPackage" type="string"/>
+    <aura:attribute name="refreshObj" type="Boolean" default="false"/>
+    <aura:attribute name="refreshTabset" type="Boolean" default="false"/>
+    <aura:attribute name="distributionLabel" type="String"/>
+    <aura:attribute name="surveysLabel" type="String"/>
+    <aura:attribute name="todosLabel" type="String"/>
+    <aura:attribute name="priorCallLabel" type="String"/>
+    <aura:attribute name="selectedTab" type="String" default="tab1"/>
+    <aura:handler name="change" value="{!v.selectedTab}" action="{!c.selectTab}"/>
+    <!-- Attributes realted to display Planogram Live Date-->
+    <aura:handler name="planoLiveEvent" event="c.BMC_GSPlanoLiveDateEvt" action="{!c.showLiveDate}"/> 
+    <aura:attribute name="displayPlanoLive" type="Boolean" default="false" />
+    <aura:attribute name="getLiveDate" type="Date" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner />
+    </aura:if> 
+    <lightning:spinner aura:id="spinner" class="slds-hide" alternativeText="Please wait..." size="medium" />
+    <div class="slds-text-align__center">
+        <aura:if isTrue="{!v.showToast}">
+            <c:Toast toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}"/>
+        </aura:if>
+    </div>
+    <aura:if isTrue="{!v.showGuidedSellingComponent}">
+        <aura:if isTrue="{!v.showSummary}">
+            <lightning:card>
+                <div class="slds-text-heading_medium slds-text-align_center">{!$Label.c.Call_Log_Summary}</div>
+                <lightning:accordion aura:id="summary"> 
+                    <lightning:layout horizontalAlign="center">
+                        <lightning:layoutItem size="8">
+                            <ui:outputDate class="" value="{!v.callLogRec.Call_Start_Date__c}" format="EEEE, MMM dd"/>&nbsp;{!v.callLogRec.BMC_Calllog_Started_By__c}
+                            <lightning:textarea disabled="true" value="{!v.callLogRec.Objective_History_Call_Summary__c}" label="Objective Summary"/>
+                            <lightning:textarea aura:id="userSummary" disabled="false" value="{!v.callLogRec.Call_Summary__c}" label="Call Log Summary"/>
+                            <lightning:button class="slds-button slds-align_absolute-center" variant="brand" label="{!$Label.c.Save_and_End}" onclick="{!c.saveCallSummary}" aura:id="saveButton" />    
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:accordion> 
+            </lightning:card>
+            <aura:set attribute="else">
+                <aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+                    <aura:if isTrue="{!v.showCallLogMob}">
+                        <c:CallLog recordId="{!v.recordId}" showCallLogMob="{!v.showCallLogMob}" callLogRec="{!v.callLogRec}" callLogId="{!v.callogId}" isOffPrem="{!v.isOffPrem}"/>
+                        <aura:set attribute="else">
+			<aura:if isTrue="{!($Browser.isPhone)}">
+                            <div>
+                                <lightning:card>
+                                    <div class="slds-grid">
+                                        <div class="action slds-col"  style = "text-align:center;" onclick="{!c.checkOut}" >
+                                            <lightning:icon iconName="custom:custom111" size="medium" alternativeText="Navigate to New To Do" class="mBuuton  slds-col"/>
+                                            <span class="label bBody truncate mLable" dir="ltr">{!$Label.c.BMC_GS_CheckOut}</span> <span class="assistiveText"></span>
+                                        </div>
+                                        <div class="action slds-col"  style = "text-align:center;" onclick="{!c.navigatetoCallLog}" >
+                                            <lightning:icon iconName="custom:custom48" size="medium" alternativeText="Navigate to Call log" class="mBuuton  slds-col"/>
+                                            <span class="label bBody truncate mLable" dir="ltr">{!$Label.c.BMC_GSAddObjectives}</span> <span class="assistiveText"></span>
+                                        </div>
+                                        <div class="action slds-col"  style = "text-align:center;" onclick="{!c.createNewToDo}" >
+                                            <lightning:icon iconName="custom:custom18" size="medium" alternativeText="New To Do" class="mBuuton slds-col"/>
+                                            <span class="label bBody truncate mLable" dir="ltr">{!$Label.c.To_Dos}</span> <span class="assistiveText"></span>
+                                        </div>                    
+                                        <div class="action slds-col"  style = "text-align:center;" onclick="{!c.createContact}" >
+                                            <lightning:icon iconName="custom:custom15" size="medium" alternativeText="Create Contacct" class="mBuuton"/>
+                                            <span class="label bBody truncate mLable" dir="ltr">{!$Label.c.BMC_GSContacts} </span> <span class="assistiveText"></span>
+                                        </div>
+                                        <div class="action slds-col"  style = "text-align:center;" onclick="{!c.createChatterPost}" >
+                                            <lightning:icon iconName="standard:post" size="medium" alternativeText="Chatter Post" class="mBuuton"/>
+                                            <span class="label bBody truncate mLable" dir="ltr">post</span> <span class="assistiveText"></span>
+                                        </div>
+                                    </div>
+                                </lightning:card>
+                            </div>
+                            </aura:if>
+                            
+                            <div>
+                                <lightning:card >
+                                    <aura:set attribute="title">
+                                        <div class="slds-media slds-no-space slds-grow">
+                                            <div class="slds-media__figure">
+                                                <lightning:icon iconName="standard:account" alternativeText="{!v.accountRec.Name}" />
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <h1 class="slds-page-header__title slds-m-right--medium slds-align-middle slds-truncate">{!v.accountRec.Name}</h1>
+                                            </div>
+                                        </div>
+                                        <!-- Content here-->
+                                        <lightning:layout horizontalAlign="space">
+                                            <lightning:layoutItem >
+                                              <!--  <p class="slds-text-title  slds-m-bottom- -xx-small">{!$Label.c.Call_Log_Dashboard_Header}</p>
+                                                <p class="{!v.isOffPrem == false ? 'slds-text-body- -regular' : 'slds-hide'}">
+                                                    <lightning:button variant="base" label="Outlet Performance" title="Base action" onclick="{!c.navigateToOnPremDashboard}"/>
+                                                </p>
+                                                <p class="{!v.isOffPrem ? 'slds-text-body- -regular' : 'slds-hide'}" >
+                                                    <lightning:button variant="base" label="Outlet Performance" title="Base action" onclick="{!c.navigateToOffPremDashboard}"/>
+                                                </p>-->
+                                                    <p class="slds-text-title  slds-m-bottom--xx-small">{!$Label.c.Access_Building_With_Beer}</p>
+                                                    <p class="slds-text-body--small">
+                                                        <div class="uiOutputRichText slds-text-align_center" linkify="true" onclick="{!c.bwbClicked}">
+                                                            <aura:unescapedHtml value="{!v.callLogRec.Access_Building_with_Beer__c}"/>
+                                                        </div>
+                                                    </p>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem >
+                                                <aura:if isTrue="{!v.displayPlanoLive}"> 
+                                                    <p class="slds-text-title  slds-m-bottom--xx-small">Planogram Live Date</p>
+                                                    <p class="slds-text-body--small">
+                                                        <ui:outputDate  value="{!v.getLiveDate}"/>
+                                                        <!--<ui:outputText value="{!v.getLiveDate}"/> -->
+                                                    </p>
+                                                </aura:if>
+                                            </lightning:layoutItem>
+                                        </lightning:layout>
+                                        <p class="slds-p-horizontal--medium slds-small-show-only ">
+                                            <div class="slds-tile">
+                                                <div class="slds-tile__detail slds-text-body--small">
+                                                    <dl class="slds-list--horizontal slds-wrap slds-grid">
+                                                        <!--<dt class="slds-item- -label slds-text-color- -weak slds-truncate">{!$Label.c.Call_Log_Dashboard_Header}:</dt>
+                                                        <dd class="slds-item- -detail slds-truncate">
+                                                            <p class="{!v.isOffPrem == false ? 'slds-text-body- -regular' : 'slds-hide'}" >
+                                                                <lightning:button variant="base" label="Outlet Performance" title="Base action" onclick="{!c.navigateToOnPremDashboard}"/>
+                                                            </p>
+                                                            <p class="{!v.isOffPrem ? 'slds-text-body- -regular' : 'slds-hide'}" >
+                                                                <lightning:button variant="base" label="Outlet Performance" title="Base action" onclick="{!c.navigateToOffPremDashboard}"/>
+                                                            </p>
+                                                        </dd>-->
+                                                        <dt class="slds-item--label slds-text-color--weak slds-truncate">{!$Label.c.Access_Building_With_Beer}:</dt>
+                                                        <dd class="slds-item--detail slds-truncate">
+                                                            <div class="uiOutputRichText" linkify="true" onclick="{!c.bwbClicked}">
+                                                                <aura:unescapedHtml value="{!v.callLogRec.Access_Building_with_Beer__c}"/>
+                                                            </div>
+                                                        </dd>
+                                                    </dl>
+                                                </div>
+                                            </div>
+                                        </p>
+                                        <!-- Ends Here-->
+                                    </aura:set>    
+                                </lightning:card>
+                            </div>    
+                            <aura:if isTrue="{!v.refreshTabset}">
+                                <lightning:card >
+                                    <p class="slds-p-horizontal_small">
+                                        <lightning:tabset aura:id="tabs" selectedTabId="{!v.selectedTab}">
+                                            <lightning:tab label="{!$Label.c.BMC_GSObjectivesTab}" id="tab1" onactive="{!c.fetchAllObjectives}">
+                                                <aura:if isTrue="{!v.showObjectivesMob}">
+                                                    <div style="height:900px" class="slds-scrollable_y">
+                                                        <c:BMC_GSObjectives  recordId="{!v.recordId}" callogId="{!v.callogId}" isOffPrem="{!v.isOffPrem}" refreshObj="{!v.refreshObj}" /> <!--getLiveDate="{v.getLiveDate}" displayPlanoLive ="{v.displayPlanoLive}"  -->
+                                                    </div>
+                                                </aura:if>
+                                            </lightning:tab>
+                                            
+                                            <lightning:tab label="{!v.distributionLabel}" id="tab2" onactive="{!c.dontShowQuickAction}">
+                                                <div style="height:900px" class="slds-scrollable_y">
+                                                    <c:BMC_GSDistributionTable data="{!v.distributionAtRiskData}" columns="{!v.distributionAtRiskColumns}"/>
+                                                </div>
+                                            </lightning:tab>
+                                            
+                                            <lightning:tab label="{!v.surveysLabel}" id="tab3" onactive="{!c.dontShowQuickAction}">
+                                                <c:BMC_GSSurveyTable data="{!v.surveydata}" columns="{!v.surveycolumns}" recordId="{!v.recordId}" refresh="{!v.refresh}"/>
+                                            </lightning:tab>
+                                            
+                                            <lightning:tab label="{!$Label.c.BMC_Call_Notes}" id="tab4" onactive="{!c.showNewToDoQuick}">
+                                                 <lightning:accordion>
+                                                <lightning:accordionSection label="{!$Label.c.Summary_Notes}">
+                                                <lightning:textarea name="Summary Notes" value="{!v.callLogRec.Call_Summary__c}" label="{!$Label.c.Summary_Notes}" maxlength="1000"  aura:id="summaryText" class="sumTab" variant="label-hidden" />
+                                                <br></br><lightning:button variant="brand" label="{!$Label.c.Save}" onclick="{!c.saveSummaryNotes}" class="sumTab"  /> 
+                                                
+                                                 </lightning:accordionSection>
+                                            </lightning:accordion>
+                                            <lightning:accordion>
+                                                <lightning:accordionSection name="To Do" label="{!v.todosLabel}" >
+                                                    <c:RecentToDos aura:id="todo" accountId="{!v.recordId}" gsloadToDos="{!v.gsloadToDos}" />
+                                            </lightning:accordionSection>
+                                            </lightning:accordion>
+                                            </lightning:tab>
+                                            
+                                            <lightning:tab label="{!v.priorCallLabel}" id="tab5" onactive="{!c.dontShowQuickAction}">
+                                                <c:BMC_GSPriorCallsTable data="{!v.summarydata}" columns="{!v.summarycolumns}" /> 
+                                            </lightning:tab>
+                                            
+                                            <lightning:tab label="{!$Label.c.BMC_GSContacts}" id="tab6" onactive="{!c.fecthContacts}">   
+                                                <c:BMC_GSContactTab recordId="{!v.recordId}" refershContacts="{!v.refershContacts}" showCreateContact="{!v.showCreateContact}" contactToGS="{!v.contactToGS}"/>
+                                            </lightning:tab>
+                                            
+                                        </lightning:tabset>
+                                    </p>
+                                </lightning:card> 
+                            </aura:if>
+                            <div class="mobileView ">
+			    <aura:if isTrue="{!($Browser.isIPad)}">	              
+                                <footer class="actionButtons oneActionBar oneCenterStage" >
+                                    <div class="actionButtonsWrapper">
+                                        <div class="action" onclick="{!c.checkOut}" >
+                                            <lightning:icon iconName="custom:custom111" size="medium" alternativeText="Navigate to New To Do" class="mBuuton"/>
+                                            <span class="label bBody truncate mLable" dir="ltr">{!$Label.c.BMC_GS_CheckOut}</span> <span class="assistiveText"></span>
+                                        </div>
+                                        <div class="action" onclick="{!c.navigatetoCallLog}" >
+                                            <lightning:icon iconName="custom:custom48" size="medium" alternativeText="Navigate to Call log" class="mBuuton"/>
+                                            <span class="label bBody truncate mLable" dir="ltr">{!$Label.c.BMC_GSAddObjectives}</span> <span class="assistiveText"></span>
+                                        </div>
+                                        <div class="action" onclick="{!c.createNewToDo}" >
+                                            <lightning:icon iconName="custom:custom18" size="medium" alternativeText="New To Do" class="mBuuton"/>
+                                            <span class="label bBody truncate mLable" dir="ltr">{!$Label.c.To_Dos}</span> <span class="assistiveText"></span>
+                                        </div>                    
+                                        <div class="action" onclick="{!c.createContact}" >
+                                            <lightning:icon iconName="custom:custom15" size="medium" alternativeText="Create Contacct" class="mBuuton"/>
+                                            <span class="label bBody truncate mLable" dir="ltr">{!$Label.c.BMC_GSContacts} </span> <span class="assistiveText"></span>
+                                        </div>
+                                        <div class="action" onclick="{!c.createChatterPost}" >
+                                            <lightning:icon iconName="standard:post" size="medium" alternativeText="Chatter Post" class="mBuuton"/>
+                                            <span class="label bBody truncate mLable" dir="ltr">post</span> <span class="assistiveText"></span>
+                                        </div>
+                                    </div>
+                                </footer>
+				</aura:if>
+                            </div>
+                            
+                        </aura:set>
+                    </aura:if>
+                </aura:if>
+                <aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+                    
+                    <aura:set attribute="else">	 
+                        <div>
+                            <lightning:card >
+                                <aura:set attribute="title">
+                                    <div class="slds-media slds-no-space slds-grow">
+                                        <div class="slds-media__figure">
+                                            <lightning:icon iconName="standard:account" alternativeText="{!v.accountRec.Name}" />
+                                        </div>
+                                        <div class="slds-media__body">
+                                            <h1 class="slds-page-header__title slds-m-right--medium slds-align-middle slds-truncate">{!v.accountRec.Name}</h1>
+                                        </div>
+                                    </div>
+                                </aura:set>
+                                <!--<div class="slds-media-header">
+                     <div class ="slds-media">
+                         <span class="slds-icon_container slds-icon-standard-action_list_component" title="Test">
+                             <svg class="slds-icon slds-page-header__icon" aria-hidden="true">
+                            </span>
+                        </div>
+                    </div>
+                    <div class="slds-media__body">
+           <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="{!v.accountRec.Name}">
+      </h1>
+        </div>-->
+                                
+                                <aura:set attribute="actions">
+                                    <aura:if isTrue="{!v.showNewObjective}">
+                                        <lightning:button variant="brand" label="{!$Label.c.BMC_GSAddObjectives}" title="{!$Label.c.BMC_GSAddObjectives}" onclick="{!c.navigatetoCallLog}"/>
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.newToDo}">
+                                        <lightning:button variant="brand" label="{!$Label.c.To_Dos}" title="{!$Label.c.To_Dos}" onclick="{!c.createNewToDo}"/>
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.newContact}">
+                                        <lightning:button variant="brand" label="{!$Label.c.BMC_GSNewContact}" title="{!$Label.c.BMC_GSNewContact}" onclick="{!c.createContact}" />
+                                    </aura:if>
+                                    <lightning:button variant="brand" label="{!$Label.c.BMC_GS_CheckOut}" title="{!$Label.c.BMC_GS_CheckOut}" onclick="{!c.checkOut}" />
+                                </aura:set>
+                                <p class="slds-p-horizontal--medium slds-small-show">
+                                    <ul class="slds-grid slds-page-header__detail-row cardStyle">
+                                        <li class="slds-page-header__detail-block">
+					<!-- <p class="slds-text-title  slds-m-bottom- -xx-small">{!$Label.c.Call_Log_Dashboard_Header}</p>
+                                            <p class="{!v.isOffPrem == false ? 'slds-text-body- -regular' : 'slds-hide'}" >
+                                                <lightning:button variant="base" label="Outlet Performance" title="Base action" onclick="{!c.navigateToOnPremDashboard}"/>
+                                            </p>
+                                            <p class="{!v.isOffPrem ? 'slds-text-body- -regular' : 'slds-hide'}" >
+                                                <lightning:button variant="base" label="Outlet Performance" title="Base action" onclick="{!c.navigateToOffPremDashboard}"/>
+                                            </p>
+                                        </li>
+                                        <li class="slds-page-header__detail-block">-->
+                                            <p class="slds-text-title  slds-m-bottom--xx-small">{!$Label.c.Access_Building_With_Beer}</p>
+                                            <p class="slds-text-body--regular">
+                                                <div class="uiOutputRichText" linkify="true" onclick="{!c.bwbClicked}">
+                                                    <aura:unescapedHtml value="{!v.callLogRec.Access_Building_with_Beer__c}"/>
+                                                </div>
+                                            </p>
+                                        </li>
+                                        <aura:if isTrue="{!v.displayPlanoLive}"> 
+                                            <li class="slds-page-header__detail-block">
+                                                <p class="slds-text-title  slds-m-bottom--xx-small">Planogram Live Date</p>
+                                                <p class="slds-text-body--regular">
+                                                    <ui:outputDate  value="{!v.getLiveDate}"/>
+                                                </p>
+                                            </li>
+                                        </aura:if>
+                                    </ul>
+                                </p>
+                                
+                                <p class="slds-p-horizontal--small slds-small-show-only ">
+                                    <div class="slds-tile">
+                                        <div class="slds-tile__detail slds-text-body--small">
+                                            <dl class="slds-list--horizontal slds-wrap slds-grid">
+                                               <!-- <dt class="slds-item- -label slds-text-color- -weak slds-truncate">{!$Label.c.Call_Log_Dashboard_Header}:</dt>
+                                                <dd class="slds-item- -detail slds-truncate">
+                                                    <p class="{!v.isOffPrem == false ? 'slds-text-body- -regular' : 'slds-hide'}" >
+                                                        <lightning:button variant="base" label="Outlet Performance" title="Base action" onclick="{!c.navigateToOnPremDashboard}"/> 
+                                                    </p>
+                                                    <p class="{!v.isOffPrem ? 'slds-text-body- -regular' : 'slds-hide'}" >
+                                                        
+                                                    </p>
+                                                </dd> -->
+                                                <dt class="slds-item--label slds-text-color--weak slds-truncate">{!$Label.c.Access_Building_With_Beer}:</dt>
+                                                <dd class="slds-item--detail slds-truncate">
+                                                    <div class="uiOutputRichText" linkify="true" onclick="{!c.bwbClicked}">
+                                                        <aura:unescapedHtml value="{!v.callLogRec.Access_Building_with_Beer__c}"/>
+                                                    </div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </p>
+                            </lightning:card>
+                        </div>
+                        <aura:if isTrue="{!v.refreshTabset}">
+                            <lightning:card >
+                                <p class="slds-p-horizontal_small">
+                                    <lightning:tabset aura:id="tabs" selectedTabId="{!v.selectedTab}">
+                                        
+                                        <lightning:tab label="{!$Label.c.BMC_GSObjectivesTab}" id="tab1" onactive="{!c.fetchAllObjectives}">
+                                            <div style="height:900px" class="slds-scrollable_y">
+                                                <c:BMC_GSObjectives recordId="{!v.recordId}" callogId="{!v.callogId}" isOffPrem="{!v.isOffPrem}" refreshObj="{!v.refreshObj}" /> <!-- getLiveDate="{v.getLiveDate}" displayPlanoLive ="{v.displayPlanoLive}"   --> 
+                                            </div>
+                                        </lightning:tab>
+                                        
+                                        <lightning:tab label="{!v.distributionLabel}" id="tab2" onactive="{!c.dontShowQuickAction}">
+                                            <div style="height:900px" class="slds-scrollable_y">
+                                                <c:BMC_GSDistributionTable data="{!v.distributionAtRiskData}" columns="{!v.distributionAtRiskColumns}"/>
+                                            </div>
+                                        </lightning:tab>
+                                        
+                                        <lightning:tab label="{!v.surveysLabel}" id="tab3" onactive="{!c.dontShowQuickAction}">
+                                            <c:BMC_GSSurveyTable data="{!v.surveydata}" columns="{!v.surveycolumns}" recordId="{!v.recordId}" refresh="{!v.refresh}"/>
+                                        </lightning:tab>
+                                        
+                                        <lightning:tab label="{!$Label.c.BMC_Call_Notes}" id="tab4" onactive="{!c.showNewToDoQuick}">
+                                            <lightning:accordion>
+                                                <lightning:accordionSection label="{!$Label.c.Summary_Notes}">
+                                                    <lightning:textarea name="Summary Notes" value="{!v.callLogRec.Call_Summary__c}" maxlength="1000"  aura:id="summaryText" class="sumTab" label="{!$Label.c.Summary_Notes}" variant="label-hidden"/>
+                                                    <br></br><lightning:button variant="brand" label="{!$Label.c.Save}" onclick="{!c.saveSummaryNotes}" class="sumTab"  />
+                                                    
+                                                </lightning:accordionSection>
+                                            </lightning:accordion>
+                                            <lightning:accordion>
+                                                <lightning:accordionSection name="To Do" label="{!v.todosLabel}" >
+                                                    <c:RecentToDos aura:id="todo" accountId="{!v.recordId}"  gsloadToDos="{!v.gsloadToDos}" />
+                                                </lightning:accordionSection>
+                                            </lightning:accordion>
+                                        </lightning:tab>
+                                        
+                                        <lightning:tab label="{!v.priorCallLabel}" id="tab5" onactive="{!c.dontShowQuickAction}">
+                                            <c:BMC_GSPriorCallsTable data="{!v.summarydata}" columns="{!v.summarycolumns}" /> 
+                                        </lightning:tab>
+                                        
+                                        <lightning:tab label="{!$Label.c.BMC_GSContacts}" id="tab6" onactive="{!c.fecthContacts}">
+                                            <c:BMC_GSContactTab recordId="{!v.recordId}" refershContacts="{!v.refershContacts}" showCreateContact="{!v.showCreateContact}" contactToGS="{!v.contactToGS}"/>
+                                        </lightning:tab>
+                                        
+                                    </lightning:tabset>
+                                </p>
+                            </lightning:card>
+                        </aura:if>
+                    </aura:set>
+                </aura:if>
+                <aura:if isTrue="{!v.showNewToDo}">
+                    <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open modalHeight " aura:id="newToDoModal">
+                        <aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+                            <div >
+                                <div class="slds-modal__content slds-p-around--medium">
+                                    <c:BMC_GSNewTodo accountId="{!v.recordId}" callLogId="{!v.callogId}" showNewToDo="{!v.showNewToDo}" gsloadToDos="{!v.gsloadToDos}"/>
+                                </div>
+                            </div>
+                            <aura:set attribute="else">
+                                <div class="slds-modal__container ">
+                                    <div class="slds-modal__content slds-p-around--medium">
+                                        <c:BMC_GSNewTodo accountId="{!v.recordId}" callLogId="{!v.callogId}" showNewToDo="{!v.showNewToDo}" gsloadToDos="{!v.gsloadToDos}"/>
+                                    </div>
+                                </div>
+                            </aura:set>
+                        </aura:if>
+                        
+                    </div>
+                    <div class="slds-backdrop slds-backdrop--open"></div>
+                </aura:if>
+                <aura:if isTrue="{!v.showCreateContact}">
+                    <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open modalHeight " aura:id="newContactModal">
+                        <aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+                            <div >
+                                <div class="slds-modal__content slds-p-around--medium">
+                                    <c:BMC_GSContact accountId="{!v.recordId}" showCreateContact="{!v.showCreateContact}" refershContacts="{!v.refershContacts}" newContact="{!v.contactToGS}"/>
+                                </div>
+                            </div>
+                            <aura:set attribute="else">
+                                <div class="slds-modal__container ">
+                                    <div class="slds-modal__content slds-p-around--medium">
+                                        <c:BMC_GSContact accountId="{!v.recordId}" showCreateContact="{!v.showCreateContact}" refershContacts="{!v.refershContacts}" newContact="{!v.contactToGS}"/>
+                                    </div>
+                                </div>
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                    <div class="slds-backdrop slds-backdrop--open"></div>
+                </aura:if>
+                <aura:if isTrue="{!v.createPost}">
+                    <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open modalHeight " aura:id="postModal">
+                        <div class="slds-modal__container ">
+                            <div class="slds-modal__content slds-p-around--medium">
+                                <c:BMC_GSChatterPost accrec="{!v.accountRec}" showPostChatter="{!v.showPostChatter}"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-backdrop slds-backdrop--open"></div>
+                </aura:if>
+                <aura:if isTrue="{!v.showCreateObj}">
+                    <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open modalHeight " aura:id="postModal">
+                        <div class="slds-modal__container ">
+                            <div class="slds-modal__content slds-p-around--medium">
+                                <c:BMC_GSNewPlacement callogId="{!v.callogId}" showCreateObj="{!v.showCreateObj}" chainMandate="{!v.chainMandate}" smartSkuOpp="{!v.smartSkuOpp}" objectName="{!v.objectName}" isOffPrem="{!v.isOffPrem}" recordId="{!v.recordId}" refreshObj="{!v.refreshObj}"/>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-backdrop slds-backdrop--open"></div>
+                </aura:if>
+                
+            </aura:set>
+        </aura:if> 
+    </aura:if>
+    <div class="iframeClass">
+        <aura:if isTrue="{!v.showDashboard}">
+            <iframe aura:id="vfFrame" height="650px" width="100%" src="{!v.DashboardLink}" />    
+        </aura:if>
+    </div>
+</aura:component>

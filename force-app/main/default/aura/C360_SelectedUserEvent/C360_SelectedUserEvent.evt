@@ -1,0 +1,4 @@
+<!--Component Event to communicate data between  C360_AssignObjectives_To_Users and C360_customLookupResult-->
+<aura:event type="COMPONENT" description="by this event we will pass the selected account to the  parent component">
+    <aura:attribute name="userByEvent" type="User"/>
+</aura:event>

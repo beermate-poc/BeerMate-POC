@@ -1,0 +1,65 @@
+<div class="panel panel-default cc_panel cc_myaccount_outlet">
+    <div class="cc_body cc_myaccount_content">
+        {{#ifEquals this.commerceType "B2B"}}
+            <div class="panel panel-default cc_panel cc_myaccount_information">
+                <div class="panel-heading cc_heading">
+                    <h3 class="panel-title cc_title">{{pageLabelMap 'CCB2B_MyAccount_MyOutlet_OutletInformation'}}</h3>
+                </div>
+                <div class="panel-body cc_body cc_myaccount_general">
+                    {{#if accountBean.c360SAPID}}
+                        <p class="myAccMyOutlet cc_profile_my_outlet">
+                            <label class="cc_profile_my_outlet_label">{{pageLabelMap 'ACCOUNT_NUMBER'}}&#58;</label>
+                            <br><span class="cc_profile_my_outlet_value">{{accountBean.c360SAPID}}</span>
+                        </p>
+                    {{/if}}
+                    {{#if deliveryInfo}}
+                        <p class="myAccMyOutlet cc_profile_my_outlet">
+                            <label class="cc_profile_my_outlet_label">{{pageLabelMap
+                                    'CCB2B_MyAccount_MyOutlet_DeliveryDays'}}&#58;</label>
+                            <br>
+                                {{#each deliveryInfo.deliveryDays}}
+                                    {{parseDeliveryDay this~}}
+                                    {{#unless @last}}&#44;&#32;{{/unless}}
+                                {{/each}}
+                        </p>
+                    {{/if}}
+                    {{#if deliveryInfo.cutOffTime}}
+                        <p class="myAccMyOutlet cc_profile_my_outlet">
+                            <label class="cc_profile_my_outlet_label">{{pageLabelMap
+                                    'CCB2B_MyAccount_MyOutlet_CutOffTime'}}&#58;</label>
+                            <br><span class="cc_profile_my_outlet_value">{{deliveryInfo.standardCutOffTime}}</span>
+                        </p>
+                    {{/if}}
+                    {{#if accountBean.c360F1Name}}
+                        <p class="myAccMyOutlet cc_profile_my_outlet">
+                            <label class="cc_profile_my_outlet_label">{{pageLabelMap
+                                    'CCB2B_MyAccount_MyOutlet_AccManagerName'}}&#58;</label>
+                            <br><span class="cc_profile_my_outlet_value">{{accountBean.c360F1Name}}</span>
+                        </p>
+                    {{/if}}
+                    {{#if accountBean.c360TelesalesName}}
+                        <p class="myAccMyOutlet cc_profile_my_outlet">
+                            <label class="cc_profile_my_outlet_label">{{pageLabelMap
+                                    'CCB2B_MyAccount_MyOutlet_SalesServiceManagerName'}}&#58;</label>
+                            <br><span class="cc_profile_my_outlet_value">{{accountBean.c360TelesalesName}}</span>
+                        </p>
+                    {{/if}}
+                    <p class="cc_addr_name">
+                        <label class="cc_profile_billing_label">{{pageLabelMap 'CheckOut_BillingAddress'}}</label>
+                    </p>
+                    {{#ifDisplay 'SO.DsplAddrCompany'}}
+                        <p class="cc_addr_billing">{{> addressDisplay (getBillingAddress this.accountBean.billingAddress this.accountBean.name)}}</p>
+                    {{/ifDisplay}}
+                    <p class="cc_addr_name">
+                        <label class="cc_profile_shipping_label">{{pageLabelMap 'CheckOut_ShippingAddress'}}</label>
+                    </p>
+                    {{#ifDisplay 'SO.DsplAddrCompany'}}
+                        {{#if this.accountBean.shippingAddress}}
+                            <span class="cc_addr_shipping">{{> addressDisplay (getDeliveryAddress this.accountBean.billingAddress this.accountBean.name)}}</span><br/>
+                        {{/if}}
+                    {{/ifDisplay}}
+                </div>
+            </div>
+        {{/ifEquals}}
+    </div>
+</div>

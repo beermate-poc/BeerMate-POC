@@ -1,0 +1,21 @@
+<aura:component >
+    <aura:attribute name="pageNumber" type="Integer" default="1"/>
+    <aura:attribute name="pageSize" type="Integer" default="25"/>
+    <aura:attribute name="isLastPage" type="Boolean" default="false"/>
+    <aura:attribute name="resultSize" type="Integer" default="0"/>
+   
+    
+    <aura:registerEvent name="updatePage" type="c:strike_evt" description="Fires an event that notifies when new page is selected" />
+    
+    <lightning:layoutItem padding="around-small" flexibility="auto">
+        <lightning:button label="Prev" iconName="utility:chevronleft" iconPosition="left"
+                          onclick="{!c.onPrev}" disabled="{! v.pageNumber == 1}"/>
+        <span class="slds-p-horizontal_small">
+            Page {!v.pageNumber} | Showing records from {! ((v.pageNumber-1)*v.pageSize)+' to '+((v.pageNumber-1)*v.pageSize+v.resultSize)}
+        </span>
+       
+            <lightning:button label="Next" iconName="utility:chevronright" iconPosition="right" 
+                          disabled="{! v.isLastPage}" onclick="{!c.onNext}"/>
+ 
+    </lightning:layoutItem>
+</aura:component>

@@ -1,0 +1,52 @@
+.THIS {
+}
+
+.THIS .firstRow{
+    height:50px;
+}
+
+.THIS .ltd-wdt{
+    width:70px;
+}
+
+.THIS .qty-wdt{
+    width:90px;
+}
+.THIS .qty1-wdt{
+    width:65px;
+}
+.THIS .ht{
+    height: 15rem;
+}
+@media only screen and (device-width: 768px) {  
+	.THIS .rsn-wdt{
+    width:150px;
+	}
+    .THIS .slds-table.slds-table_bordered.slds-table_cell-buffer{
+        font-size: x-small;
+        width: calc(50% - 30px);
+    }
+    
+}
+
+@media only screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait) {
+.THIS .rsn-wdt{
+    width:150px;
+	}
+.THIS .slds-table.slds-table_bordered.slds-table_cell-buffer{
+        font-size: x-small;
+        width: calc(50% - 30px);
+    }
+     
+}
+
+@media only screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape) {
+ .THIS .rsn-wdt{
+    width:150px;
+	}
+.THIS .slds-table.slds-table_bordered.slds-table_cell-buffer{
+        font-size: x-small;
+        width: calc(50% - 30px);
+    }
+	
+}

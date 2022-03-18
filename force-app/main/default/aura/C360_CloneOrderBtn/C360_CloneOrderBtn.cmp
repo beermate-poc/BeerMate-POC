@@ -1,0 +1,51 @@
+<aura:component controller="C360_OrderClonebtnController" implements="force:hasRecordId,force:lightningQuickActionwithoutheader,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome" access="global">
+    <!--use boolean attribute for Store true/false value,
+    make default to "false" so modal box are not display on the load of component. 
+    --> 
+    <aura:attribute name="cloneopen" type="boolean" default="false"/>
+    <aura:attribute name="createable" type="boolean" default="false"/>
+    <aura:attribute name="nocloneopen" type="boolean" default="false"/>
+    <aura:attribute name="recordId" type="ID" />
+    <aura:handler name = "init" value="{!this}" Action="{!c.doInit}"/>
+    <ltng:require 
+    styles="{!$Resource.slds222 + '/assets/styles/lightning-design-system-ltng.css'}"/>
+    <!--Use "slds-m-around_xx-large" class to add standard X-Large padding to the component--> 
+
+        
+        <!--Use aura:if tag to display Model Box, on the bese of conditions. [isOpen boolean attribute] -->   
+        <aura:if isTrue="{!v.cloneopen}">
+            
+            <!--###### MODAL BOX Start######--> 
+                    <!--###### MODAL BOX BODY Part Start######-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <p><b>{!$Label.c.C360_Clone_Order}</b>
+                        </p>
+                    </div>
+            		<div class="slds-align_absolute-center">
+                        <lightning:button  variant="brand" 
+                                          label="Yes"
+                                          title="Clone"
+                                          onclick="{! c.clone }"/>
+                        <lightning:button  variant="neutral" 
+                                          label="No"
+                                          title="Cancel"
+                                          onclick="{! c.closeModel }"/>
+                        </div>
+            <!--###### MODAL BOX Part END Here ######-->
+        </aura:if>
+           <aura:if isTrue="{!v.nocloneopen}">
+               <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                  <span class="slds-assistive-text">error</span>
+                  <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small" title="Description of icon when needed">
+                    <lightning:icon iconName="utility:error" size="small" alternativeText="error"/>
+                  </span>
+                     <h2>{!$Label.c.C360_clone_access}</h2>
+				</div>
+               <footer class="slds-modal__footer">
+                     <lightning:button  variant="neutral" 
+                                          label="Close"
+                                          title="Cancel"
+                                          onclick="{!c.closeError}"/>
+               </footer>    
+			</aura:if>
+</aura:component>

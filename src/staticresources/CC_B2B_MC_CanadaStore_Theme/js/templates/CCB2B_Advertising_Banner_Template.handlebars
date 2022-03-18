@@ -1,0 +1,25 @@
+<div class="advertisingSection col-md-12">
+    {{#each this}}
+        <div class="col-md-12">
+            {{#if productR}}
+                <img class="goToPDP" onclick="goToProductDetailPage(event)" alt="{{sfdcName}}" data-sku= "{{productR.SKU}}" src="{{image 'Attachment' attachmentsS.[0].sfid}}"/>
+            {{else}}
+                {{#if categoryR}}
+                    <img class="goToPLP" onclick="goToProductListPage(event)" alt="{{sfdcName}}" data-category= "{{categoryR.sfid}}" src="{{image 'Attachment' attachmentsS.[0].sfid}}"/>
+                {{else}}
+                    {{#if externalLink}}
+                        <a href="{{externalLink}}" target="{{#if newWindow}}_blank{{/if}}">
+                            <img src="{{image 'Attachment' attachmentsS.[0].sfid}}" alt="{{sfdcName}}"/>
+                        </a>
+                    {{else}}
+                        {{#if isDownload }}
+                            <a href="{{downloadUri}}" target="_blank" class="promoLink promo_desk promo_dwnld cc_promo_link"><img src="{{image 'Attachment' attachmentsS.[0].sfid}}" alt="{{sfdcName}}" class="promoLink promo_desk promo_dwnld img-responsive cc_promo_img"/></a>
+                        {{else}}
+                            <img src="{{image 'Attachment' attachmentsS.[0].sfid}}" alt="{{sfdcName}}" class="noLink promo_desk promo_nolink img-responsive cc_promo_img"/>
+                        {{/if}}
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        </div>
+    {{/each}}
+</div>

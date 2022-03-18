@@ -1,0 +1,51 @@
+<div class="remindersSection">
+    <div id="ccb2b-ma-shipping-delivery-head" class="panel-heading cc_heading">
+        <h4 id="ccb2b-ma-delivery-title" class="panel-title cc_title">{{pageLabelMap 'CCB2B_MyAccount_DeliveryParameters_By_Date'}}</h4>
+        <a id="ccb2b-ma-delivery-faqlink" href="{{pageConfigMap 'sc.deliveryfaq'}}">{{pageLabelMap 'CCB2B_MyAccount_DeliveryParameters_Faq'}}</a>
+    </div>
+
+    <div class="cc_myaccount_delivery_parameters_info">
+    {{#each this.deliveryParameters.deliveryCalendar}}
+    
+            <p id="ccb2b-ma-shipping-deliverymethodmsg-label" class="cc_ship_guide_text">
+                <label class="cc_ship_guide_text">{{pageLabelMap 'CCB2B_MyAccount_DeliveryParameters_DeliveryDate' deliveryDate}}</label>
+            </p>
+    
+            <p id="ccb2b-ma-shipping-deliverymethodmsg-label" class="cc_ship_guide_text">
+                {{pageLabelMap 'CCB2B_MyAccount_DeliveryParameters_DeliveryDay'}}
+                {{parseDeliveryDay deliveryDay}}
+            </p>
+
+            <p id="ccb2b-ma-shipping-deliverymethodmsg-label" class="cc_ship_guide_text">
+                {{pageLabelMap 'CCB2B_MyAccount_DeliveryParameters_DeliveryCutOffDay'}} {{parseDeliveryDay cutOffDay}}
+            </p>
+            
+            <p id="ccb2b-ma-shipping-deliverymethodmsg-label" class="cc_ship_guide_text">
+                {{pageLabelMap 'CCB2B_MyAccount_DeliveryParameters_DeliveryCutOffTime'}} {{cutOffTime}}
+            </p>
+            <p id="ccb2b-ma-shipping-deliverymethodmsg-label" class="cc_ship_guide_text">
+                {{pageLabelMap 'CCB2B_Checkout_DeliveryInformation_MinimumOrderVolume_Name'}} {{minimumOrderVolume}} {{pageLabelMap 'CCB2B_MyAccount_DeliveryParameters_MinimumOrder_Equiv_Cases'}}
+                <span class="cc_ship_note_mark">*</span>
+            </p>
+
+            <p id="ccb2b-ma-shipping-deliverymethodmsg-label" class="cc_ship_guide_text">
+                {{pageLabelMap 'CCB2B_Checkout_DeliveryInformation_Frequency_Name'}}
+                {{#if deliveryFrequency}}
+                    {{#ifLessThan deliveryFrequency 5}}
+                        {{pageLabelPrefixMap 'CCB2B_Checkout_DeliveryInformation_Frequency_' (upperCase deliveryFrequency)}}
+                    {{else}}
+                        {{pageLabelMap 'CCB2B_Checkout_DeliveryInformation_Frequency_xWeeks' deliveryFrequency}}
+                    {{/ifLessThan}}
+                {{/if}}
+            </p>
+            
+
+        </br>
+    {{/each}}
+    </div>
+    
+    <div class="cc_myaccount_delivery_parameters_info_foot">
+        <p class="cc_ship_note_mark">{{pageLabelMap 'CCB2B_MyAccount_DeliveryParameters_MinimumOrder_Note'}}</p>
+    </div>
+    
+</div>

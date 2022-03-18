@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>CC_B2B_MC_UKStore_Theme</members>
+        <members>CC_B2B_MC_DefaultStore_Theme</members>
+        <members>CC_B2B_MC_CanadaStore_Theme</members>
+        <name>StaticResource</name>
+    </types>
+    <version>53.0</version>
+</Package>

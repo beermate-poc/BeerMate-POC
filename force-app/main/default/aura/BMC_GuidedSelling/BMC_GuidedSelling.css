@@ -1,0 +1,23 @@
+.THIS .mBuuton{
+    display: inline-block;
+    border-radius: 60px;
+    box-shadow: 0px 0px 2px #FFF;
+}
+
+.THIS .mLable{
+    color: rgb(84, 105, 141);
+    display: block;
+    font-size: .625rem;
+    font-weight: 400;
+    font-weight: 400;
+    margin-top: .125rem;
+}
+@media all and (max-width: 980px) {
+.THIS .slds-modal__container {
+        width:75%!important;
+	}
+}
+
+.THIS .objectiveTab{
+     color: red !important;
+}

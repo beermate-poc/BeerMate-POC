@@ -1,0 +1,57 @@
+<!--
+Author:         Dan Zebrowski
+Company:        Slalom, LLC
+Description:    Displays dropdown menu with the options to apply objectives to an account or to a targeted list
+Attributes:     objective – current objective
+                objType - type of objective - shared, current, upcoming
+                index – current index of the aura iteration that creates this component
+                objectiveId - The id of the selected objective
+                showMyObjectives - boolean flag to show main objective lists on the page
+                showApplyObjectives - boolean flag to show the apply objectives page
+                sharedObjective - boolean flag to control if we are using a shared objective in PlannedObjectivesAccountListView component
+                showEditObjective - boolean flag to control viewing objective edit view in ObjectiveListView component
+                isTargetListComponent - boolean flag to control which objective apply component to display in ObjectiveListView
+                isMobile - boolean flag denoting if the mobile view is active
+Event Handlers: init – sets up the initial objective lists and the hasDSMRole boolean flag
+                CloseMenus - closes the apply objective menus that have been opened
+History
+<Date>      <Authors Name>     <Brief Description of Change>
+-->
+<aura:component >
+    <aura:attribute name="objective" type="Object"/>
+    <aura:attribute name="objType" type="String"/>
+    <aura:attribute name="index" type="Integer" />
+    <aura:attribute name="selectedRecord" type="String"/>
+    <aura:attribute name="sharedObjective" type="Boolean" />
+    <aura:attribute name="showEditObjective" type="Boolean" />
+    <aura:attribute name="showMyObjectives" type="Boolean" />
+    <aura:attribute name="showApplyObjectives" type="Boolean" />
+    <aura:attribute name="objectiveId" type="Id" />
+    <aura:attribute name="isTargetListComponent" type="Boolean" />
+    <aura:attribute name="isMobile" type="Boolean" default="false"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:registerEvent name="CloseMenus" type="c:CloseMenus"/>
+    <aura:handler event="c:CloseMenus" action="{!c.closeApplyMenus}"/>
+    <aura:method name="closeAllMenus" action="{!c.closeAllMenus}"/>
+    <!-- MC-1738 Registering RetainUserState_ObjectiveTab event that is used to requery the data for the tables  -->
+    <aura:registerEvent name="ShowObjectiveListView" type="c:ShowObjectiveListView"/> 
+    
+        <div aura:id="toggleM" id="{!v.objType+v.index}" class="slds-dropdown-trigger slds-dropdown-trigger_click applyDropdown"  onclick="{!c.toggleMenu}">
+            <lightning:buttonIcon iconName="utility:threedots" alternativeText="Close" name="applyButton"/>
+            <br />
+            <div aura:id="dropdown" class="slds-dropdown dropdownPosition" >
+                <ul class="slds-dropdown__list" role="menu">
+                    <li class="slds-dropdown__item" role="presentation">
+                        <a href="" role="menuitem" tabindex="0" onclick="{!c.navigateToApplyToAccount}">
+                            <span class="slds-truncate" title="{!$Label.c.ObjectiveListItem_Apply_Target_List}">{!$Label.c.ObjectiveListItem_Apply_Target_List}</span>
+                        </a>
+                    </li>
+                    <li class="slds-dropdown__item" role="presentation">
+                        <a href="" role="menuitem" tabindex="-1" onclick="{!c.navigateToApplyToTargetList}">
+                            <span class="slds-truncate" title="{!$Label.c.ObjectiveListItem_Apply_Accounts}">{!$Label.c.ObjectiveListItem_Apply_Accounts}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+</aura:component>

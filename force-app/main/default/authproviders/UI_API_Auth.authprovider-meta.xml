@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AuthProvider xmlns="http://soap.sforce.com/2006/04/metadata">
+    <consumerKey>3MVG9szVa2RxsqBbl1eOh0r9KwnNY033pe7AZ6RA9lKudtGXYYlqcWWm7d1Hbe1YSAaqFtWN3PXbyhHFNER7P</consumerKey>
+    <consumerSecret>iyit8/FNtepxoVhwl2yGl2u22+F6TtX+</consumerSecret>
+    <friendlyName>UI API Auth</friendlyName>
+    <includeOrgIdInIdentifier>true</includeOrgIdInIdentifier>
+    <providerType>Salesforce</providerType>
+    <sendAccessTokenInHeader>false</sendAccessTokenInHeader>
+    <sendClientCredentialsInHeader>false</sendClientCredentialsInHeader>
+    <sendSecretInApis>true</sendSecretInApis>
+</AuthProvider>

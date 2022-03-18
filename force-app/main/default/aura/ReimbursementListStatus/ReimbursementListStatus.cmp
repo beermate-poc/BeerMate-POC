@@ -1,0 +1,46 @@
+<aura:component controller = "ReimbursementStatusController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:availableForFlowScreens" access="global" >
+	 <aura:attribute name="reimbursements" type="List" />
+    <aura:attribute name="baseURL" type="String" />
+    <aura:attribute name="listViewId" type="String" />
+        <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+        <!-- Use a data table from the Lightning Design System: https://www.lightningdesignsystem.com/components/data-tables/ -->
+    <div class="slds-box">
+    <div class="slds-m-top_medium slds-m-bottom_x-medium">
+        <h2 class="slds-text-heading_medium slds-m-bottom_medium">
+            Pending Reimbursements
+        </h2>
+    </div>    
+    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_fixed-layout">
+          
+            
+            <thead>
+             <!-- <tr>
+              <th>Pending Reimbursements</th>
+              </tr> -->
+            <tr class="slds-text-heading_label">
+              
+              <th scope="col"><div class="slds-truncate" title="Name">Title</div></th>
+              <th scope="col"><div class="slds-truncate" title="Status">Status</div></th>
+              
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Use the Apex model and controller to fetch server side data -->
+            <aura:iteration items="{!v.reimbursements}" var="reimbursement">
+                <tr>
+                    <th scope="row"><div class="slds-truncate" title="{!reimbursement.Title}"> <a href="{!v.baseURL+'partnerfundclaim/'+ reimbursement.Id +'/detail'}">{!reimbursement.Title}</a></div></th>
+                    <td><div class="slds-truncate" title="{!reimbursement.ACE_Reimbursement_Status__c}">{!reimbursement.ACE_Reimbursement_Status__c}</div></td>
+            </tr>
+            </aura:iteration>
+          </tbody>
+            
+        </table>
+        <tfoot>
+            <tr>
+               
+              <!--  <a class="slds-button" href="{!v.baseURL+'partnerfundclaim/PartnerFundClaim/Default?PartnerFundClaim-filterId='+ v.listViewId}">View All</a> -->
+                <a class="slds-button" href="{!v.baseURL+'partnerfundclaim/PartnerFundClaim/Default?PartnerFundClaim-filterId='+ v.listViewId +'&amp;PartnerFundClaim'}">View All</a>
+                </tr>
+            </tfoot>
+    </div>
+      </aura:component>

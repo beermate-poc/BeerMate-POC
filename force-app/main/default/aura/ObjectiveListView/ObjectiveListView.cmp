@@ -1,0 +1,889 @@
+<!--
+Author:         Brian Mansfield
+Company:        Slalom, LLC
+Description:    Shows the coe, manager, and personal objectives for the user.  Gives ability to assign out objectives to accounts and create new planned objectives
+Attributes:     coeObjectivesList – List of coe objectives
+				managerObjectivesList - List of manager objectives
+				personalObjectivesList – List of personal objectives
+				assignByMeObjectivesList - List of objectives assigned by the logged in user
+				objectiveId - The id of the selected objective
+				showMyObjectives - boolean flag to show main objective lists on the page
+				showApplyObjectives - boolean flag to show the apply objectives page
+				hasManagerRole - boolean flag to determine if user has the manager role
+Event Handlers: init – sets up the initial objective lists and the hasDSMRole boolean flag
+				cancelApplyObjective - closes the apply objective modal
+History
+<Date>      <Authors Name>     <Brief Description of Change>
+6/26/2017    Nick Serafin        added shared objective tab
+2/22/2018    Nick Serafin        revamped ObjectiveListView to use new Coe, Personal,									Manager, and Assign by me tables
+-->
+<aura:component controller="ObjectiveListViewController" implements="force:appHostable,flexipage:availableForAllPageTypes" access="global">
+	<aura:attribute name="coeObjectivesList" type="Object[]"/>
+	<aura:attribute name="managerObjectivesList" type="Object[]"/>
+	<aura:attribute name="personalObjectivesList" type="Object[]"/>
+	<aura:attribute name="assignByMeObjectivesList" type="Object[]"/>
+	<aura:attribute name="objectiveId" type="Id" />
+	<aura:attribute name="showMyObjectives" type="Boolean" default="true"/>
+	<aura:attribute name="showApplyObjectives" type="Boolean" default="false"/>
+	<aura:attribute name="hasManagerRole" type="Boolean" default="true" />
+	<aura:attribute name="sharedObjective" type="Boolean" default="false" />
+	<aura:attribute name="editingObjective" type="Boolean" default="false"/>
+	<aura:attribute name="objectiveObj" type="Objective__c" />
+	<aura:attribute name="showCreatePersonal" type="Boolean" default="false" />
+	<aura:attribute name="isTargetListComponent" type="Boolean" />
+	<aura:attribute type="String" name="coeSortField"  />
+	<aura:attribute type="String" name="managerSortField"  />
+	<aura:attribute type="String" name="personalSortField"  />
+	<aura:attribute type="String" name="assignByMeSortField"  />
+	<aura:attribute type="Boolean" name="coeSortAsc" />
+	<aura:attribute type="Boolean" name="managerSortAsc"  />
+	<aura:attribute type="Boolean" name="personalSortAsc"  />
+	<aura:attribute type="Boolean" name="assignByMeSortAsc"  />
+ 	<aura:attribute type="String" name="tabvalue" default="current"/>
+	<aura:attribute type="Boolean" name="filterDateColumnDeadline" default="true" />
+	<aura:attribute type="Boolean" name="expiredFilter" default="false" />
+	<aura:attribute name="selectedRecord" type="String"/>
+	<aura:attribute name="shouldOpenEdit" type="Boolean" default="false"/>
+	<aura:attribute name="userRole" type="String" default=''/>
+    
+    <aura:attribute name="calledFromVF" type="boolean" default="false"/>
+    <aura:attribute type="Id" name="wthId" />
+
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<aura:handler name="cancelApplyObjective" event="c:cancelApplyObjectiveToTargetListEvt"
+	action="{!c.closeApplyObjectiveModal}"/>
+	<aura:handler name="setTab" event="c:SetObjectiveTab" action="{!c.doInit}"/>
+	<aura:handler name="change" value="{!v.shouldOpenEdit}" action="{!c.openObjectiveEditModal}"/>
+	<!-- MC-1738 Registering RetainUserState_ObjectiveTab event that is used to requery the data for the tables  -->
+	<aura:handler name="retainUserState_ObjectiveTab" event="c:RetainUserState_ObjectiveTab" action="{!c.retainState}"/>
+	<aura:handler name="ShowObjectiveListView" event="c:ShowObjectiveListView" action="{!c.showClass}"/>
+
+	<lightning:spinner aura:id="spinner" class="slds-hide" alternativeText="Please wait..." />
+
+	<div class="container" onclick="{!c.closeApplyMenus}">
+	<div aura:id="showObjectiveList" class=" tabsStyle slds-tabs--default__content slds-show">
+		<aura:if isTrue="{!v.showMyObjectives}">
+			<div class="slds-page-header slds-page-header--object-home">
+				<div class="slds-grid">
+					<div class="slds-col slds-has-flexi-truncate">
+						<div class="slds-media slds-no-space slds-grow">
+							<div class="slds-media__figure">
+								<span class="slds-icon_container">
+									<lightning:icon iconName="custom:custom18"/>
+								</span>
+							</div>
+							<div class="slds-media__body">
+								<h1 class="slds-page-header__title slds-p-right--x-small">
+									<button class="slds-button slds-button--reset slds-type-focus slds-truncate" aria-haspopup="true">
+									<span class="slds-grid slds-has-flexi-truncate slds-grid--vertical-align-center">
+									<span class="slds-truncate" style="margin-right:10px">{!$Label.c.Objectives}</span>
+									</span>
+									</button>
+								</h1>
+							</div>
+						</div>
+					</div>
+					<div class="{!or($Browser.isPhone, $Browser.isTablet) ? 'slds-hide' : 'slds-col slds-no-flex slds-grid slds-align-top slds-p-bottom--xx-small'}">
+						<div class="slds-button-group" role="group">
+							<button class="slds-button slds-button--neutral" onclick="{!c.createNewObjective}">{!$Label.c.Add_Objective}</button>
+							<button class="slds-button slds-button--neutral" onclick="{!c.openHelpMeUrl}">{!$Label.c.Help_Me}</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="slds-tabs--default">
+				<div class="slds-clearfix">
+					<ul class="slds-tabs--default__nav slds-float_left" role="tablist">
+						<li onclick="{!c.assignToMeClick}" aura:id="assignToMeTab" class="slds-tabs--default__item slds-active" title="{!$Label.c.Objective_Tab_Assigned_To_Me}" role="presentation"><a class="slds-tabs--default__link" href="javascript:void(0);" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item">{!$Label.c.Objective_Tab_Assigned_To_Me}</a></li>
+						<aura:if isTrue="{!v.hasManagerRole}">
+							<li onclick="{!c.assignByMeClick}" aura:id="assignByMeTab" class="slds-tabs--default__item" title="{!$Label.c.Objective_Tab_Assigned_By_Me}" role="presentation"><a class="slds-tabs--default__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-2" id="tab-default-2__item">{!$Label.c.Objective_Tab_Assigned_By_Me}</a></li>
+						</aura:if>
+					</ul>
+					<ul class="slds-float_right slds-p-right--x-small">
+						<li  aura:id="finalvalue" value="{!v.tabvalue}" >
+							<lightning:buttonGroup class="slds-p-around--x-small">
+								<lightning:button aura:id="filterBtn" label="{!$Label.c.Objective_Tab_Current_Filter}" onclick="{!c.handleFilterClick}" variant="brand" value="current"/>
+								<lightning:button aura:id="filterBtn" label="{!$Label.c.Objective_Tab_Upcoming_Filter}" onclick="{!c.handleFilterClick}" value="upcoming"/>
+								<lightning:button aura:id="filterBtn" label="{!$Label.c.Objective_Tab_Expired_Filter}" onclick="{!c.handleFilterClick}" value="expired"/>
+							</lightning:buttonGroup>
+						</li>
+					</ul>
+				</div>
+				<div aura:id="assignToMeContent" class=" tabsStyle slds-tabs--default__content slds-show" role="tabpanel" aria-labelledby="tab-default-1__item">
+					<ul class="slds-accordion">
+						<li class="slds-accordion__list-item">
+							<section aura:id="coeSection" class="slds-accordion__section">
+								<div class="slds-accordion__summary" onclick="{!c.handleAccordionClick}" data-record="coe">
+									<h3 class="slds-text-heading_small slds-accordion__summary-heading">
+										<button aura:id="coeBtn" aria-controls="accordion-details-01" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action">
+											<lightning:icon aura:id="coeSwitch" iconName="utility:chevronright" size="x-small" class="slds-show"/>
+											<lightning:icon aura:id="coeSwitch" iconName="utility:chevrondown" size="x-small" class="slds-hide"/>
+											<span class="slds-truncate slds-p-left--small" title="{!$Label.c.ObjectiveListView_COE_Objectives}">{!$Label.c.ObjectiveListView_COE_Objectives} (<ui:outputNumber value="{!v.coeObjectivesList.length}" />)</span>
+										</button>
+									</h3>
+								</div>
+								<div aria-hidden="true" class="slds-accordion__content" id="accordion-details-01">
+									<table class="{!or($Browser.isPhone, $Browser.isTablet) ? 'mobileStyling tableStyling' : 'slds-table slds-table--bordered slds-table--cell-buffer slds-table--fixed-layout'}" role="grid">
+										<thead>
+											<tr class="slds-text-title--caps">
+												<th scope="col" style="width:100px;">
+													<div onclick="{!c.coeSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Name}" data-record="Name/coe">{!$Label.c.ObjectiveListView_Name}
+														<aura:if isTrue="{!v.coeSortField == 'Name'}">
+															<span>
+																<aura:if isTrue="{!v.coeSortAsc}">
+																	&#8593;
+																	<aura:set attribute="else">
+																		&#8595;
+																	</aura:set>
+																</aura:if>
+															</span>
+														</aura:if>
+													</div>
+												</th>
+												<th scope="col" class="slds-cell-shrink">
+													<div onclick="{!c.coeSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Type}" data-record="RecordType,Name/coe/recordType">{!$Label.c.ObjectiveListView_Type}
+														<aura:if isTrue="{!v.coeSortField == 'RecordType,Name'}">
+															<span>
+																<aura:if isTrue="{!v.coeSortAsc}">
+																	&#8593;
+																	<aura:set attribute="else">
+																		&#8595;
+																	</aura:set>
+																</aura:if>
+															</span>
+														</aura:if>
+													</div>
+												</th>
+												<th scope="col" class="slds-cell-shrink">
+													<div onclick="{!c.coeSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Targeted}" data-record="targeted/coe/count">{!$Label.c.ObjectiveListView_Targeted}
+														<aura:if isTrue="{!v.coeSortField == 'targeted'}">
+															<span>
+																<aura:if isTrue="{!v.coeSortAsc}">
+																	&#8593;
+																	<aura:set attribute="else">
+																		&#8595;
+																	</aura:set>
+																</aura:if>
+															</span>
+														</aura:if>
+													</div>
+												</th>
+												<th scope="col" class="slds-cell-shrink">
+													<div onclick="{!c.coeSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Achieved}" data-record="achieved/coe/count">{!$Label.c.ObjectiveListView_Achieved}
+														<aura:if isTrue="{!v.coeSortField == 'achieved'}">
+															<span>
+																<aura:if isTrue="{!v.coeSortAsc}">
+																	&#8593;
+																	<aura:set attribute="else">
+																		&#8595;
+																	</aura:set>
+																</aura:if>
+															</span>
+														</aura:if>
+													</div>
+												</th>
+												<aura:if isTrue="{!v.filterDateColumnDeadline}">
+													<th scope="col" class="slds-cell-shrink">
+														<div onclick="{!c.coeSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Deadline}" data-record="End_Date__c/coe/relationship">{!$Label.c.ObjectiveListView_Deadline}
+															<aura:if isTrue="{!v.coeSortField == 'End_Date__c'}">
+																<span>
+																	<aura:if isTrue="{!v.coeSortAsc}">
+																		&#8593;
+																		<aura:set attribute="else">
+																			&#8595;
+																		</aura:set>
+																	</aura:if>
+																</span>
+															</aura:if>
+														</div>
+													</th>
+													<aura:set attribute="else">
+														<th scope="col" class="slds-cell-shrink">
+															<div onclick="{!c.coeSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_StartDate}" data-record="Start_Date__c/coe/relationship">{!$Label.c.ObjectiveListView_StartDate}
+																<aura:if isTrue="{!v.coeSortField == 'Start_Date__c'}">
+																	<span>
+																		<aura:if isTrue="{!v.coeSortAsc}">
+																			&#8593;
+																			<aura:set attribute="else">
+																				&#8595;
+																			</aura:set>
+																		</aura:if>
+																	</span>
+																</aura:if>
+															</div>
+														</th>
+													</aura:set>
+												</aura:if>
+												<aura:if isTrue="{!v.expiredFilter == false}">
+													<th scope="col" class="slds-cell-shrink">
+														<div class="slds-truncate" title="{!$Label.c.ObjectiveListView_Apply_Accounts}">{!$Label.c.ObjectiveListView_Apply}</div>
+													</th>
+												</aura:if>
+											</tr>
+										</thead>
+										<tbody>
+											<aura:iteration items="{!v.coeObjectivesList}" var="coe" indexVar="idx">
+												<tr scope="row">
+													<aura:if isTrue="{!coe.objective.Created_Via_MBO__c == False}">
+													<td data-label="NAME" class="slds-truncate">
+														<a href="javascript:void(0);" data-record="{!coe.objective.Id + 'coe'}" onclick="{!c.openObjectiveEditModal}">
+															{!coe.objective.Planned_Objective__r.Name}
+														</a>
+													</td>
+													<aura:set attribute="else">
+														<td data-label="NAME" class="slds-truncate">
+														<a href="javascript:void(0);" data-record="{!coe.objective.Id + 'coe'}" onclick="{!c.openObjectiveEditModal}">
+															{!coe.objective.Name}
+														</a>
+													</td>
+													</aura:set>
+													</aura:if>
+													<td data-label="TYPE" class="slds-truncate">{!coe.objective.RecordType.Name}</td>
+													<td data-label="Target Accounts" class="slds-truncate">{!coe.targeted}</td>
+													<td data-label="ACHIEVED" class="slds-truncate">{!coe.achieved}</td>
+													<aura:if isTrue="{!v.filterDateColumnDeadline}">
+														<td data-label="DEADLINE" class="slds-truncate">
+															<ui:outputDate value="{!coe.objective.Planned_Objective__r.End_Date__c}" format="M/D/YYYY" />
+														</td>
+														<aura:set attribute="else">
+															<td data-label="START DATE" class="slds-truncate">
+																<ui:outputDate value="{!coe.objective.Planned_Objective__r.Start_Date__c}" format="M/D/YYYY" />
+															</td>
+														</aura:set>
+													</aura:if>
+													<aura:if isTrue="{!v.expiredFilter == false}">
+														<td class="slds-truncate" style="overflow:unset">
+															<aura:if isTrue="{!v.hasManagerRole}">
+																<div data-record="{!coe.objective.Id}" onclick="{!c.navigateToComponent}">
+																	<lightning:buttonIcon iconName="utility:add" variant="bare" />
+																</div>
+																<aura:set attribute="else">
+																	<span data-record="{!'coe' + idx}" onclick="{!c.setSelectedAttribute}">
+																		<c:ObjectiveListItem aura:id="objCmp" objType="coe" objective="{!coe.objective}" isTargetListComponent="{!v.isTargetListComponent}" objectiveId="{!v.objectiveId}" index="{!idx}" showMyObjectives="{!v.showMyObjectives}" showApplyObjectives="{!v.showApplyObjectives}" showEditObjective="{!v.showEditObjective}" selectedRecord="{!v.selectedRecord}" />
+																	</span>
+																</aura:set>
+															</aura:if>
+														</td>
+													</aura:if>
+												</tr>
+											</aura:iteration>
+										</tbody>
+										<aura:if isTrue="{!empty(v.coeObjectivesList)}">
+											<aura:if isTrue="{!v.expiredFilter == false}">
+												<td colspan="6">
+													<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_info themeInfo" role="alert">
+														<span class="slds-assistive-text">info</span>
+														<span class="slds-icon_container slds-icon-utility-user slds-m-right_x-small">
+														</span>
+														<h2>{!$Label.c.ObjectiveListViewNoRecords}</h2>
+													</div>
+												</td>
+												<aura:set attribute="else">
+													<td colspan="5">
+														<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_info themeInfo" role="alert">
+															<span class="slds-assistive-text">info</span>
+															<span class="slds-icon_container slds-icon-utility-user slds-m-right_x-small">
+															</span>
+															<h2>{!$Label.c.ObjectiveListViewNoRecords}</h2>
+														</div>
+													</td>
+												</aura:set>
+											</aura:if>
+										</aura:if>
+									</table>
+								</div>
+							</section>
+						</li>
+						<li class="slds-accordion__list-item">
+							<section aura:id="managerSection" class="slds-accordion__section">
+								<div class="slds-accordion__summary" onclick="{!c.handleAccordionClick}" data-record="manager">
+									<h3 class="slds-text-heading_small slds-accordion__summary-heading">
+										<button aura:id="managerBtn" aria-controls="accordion-details-02" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action">
+											<lightning:icon aura:id="managerSwitch" iconName="utility:chevronright" size="x-small" class="slds-show"/>
+											<lightning:icon aura:id="managerSwitch" iconName="utility:chevrondown" size="x-small" class="slds-hide"/>
+											<span class="slds-truncate slds-p-left--small" title="{!$Label.c.ObjectiveListView_Manager_Objectives}">{!$Label.c.ObjectiveListView_Manager_Objectives} (<ui:outputNumber value="{!v.managerObjectivesList.length}" />)</span>
+									  </button>
+									</h3>
+								</div>
+								<div aria-hidden="true" class="slds-accordion__content" id="accordion-details-02">
+								<table class="{!or($Browser.isPhone, $Browser.isTablet) ? 'mobileStyling tableStyling' : 'slds-table slds-table--bordered slds-table--cell-buffer slds-table--fixed-layout'}" role="grid">
+									<thead>
+										<tr class="slds-text-title--caps">
+											<th scope="col" style="width:100px;">
+												<div onclick="{!c.managerSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Name}" data-record="Name/manager">{!$Label.c.ObjectiveListView_Name}
+													<aura:if isTrue="{!v.managerSortField == 'Name'}">
+														<span>
+															<aura:if isTrue="{!v.managerSortAsc}">
+																&#8593;
+																<aura:set attribute="else">
+																	&#8595;
+																</aura:set>
+															</aura:if>
+														</span>
+													</aura:if>
+												</div>
+											</th>
+											<th scope="col" class="slds-cell-shrink">
+												<div onclick="{!c.managerSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Type}" data-record="RecordType,Name/manager/recordType">{!$Label.c.ObjectiveListView_Type}
+													<aura:if isTrue="{!v.managerSortField == 'RecordType,Name'}">
+														<span>
+															<aura:if isTrue="{!v.managerSortAsc}">
+																&#8593;
+																<aura:set attribute="else">
+																	&#8595;
+																</aura:set>
+															</aura:if>
+														</span>
+													</aura:if>
+												</div>
+											</th>
+											<th scope="col" class="slds-cell-shrink">
+												<div onclick="{!c.managerSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Origin}" data-record="CreatedBy/manager">{!$Label.c.ObjectiveListView_Origin}
+													<aura:if isTrue="{!v.managerSortField == 'CreatedBy'}">
+														<span>
+															<aura:if isTrue="{!v.managerSortAsc}">
+																&#8593;
+																<aura:set attribute="else">
+																	&#8595;
+																</aura:set>
+															</aura:if>
+														</span>
+													</aura:if>
+												</div>
+											</th>
+											<th scope="col" class="slds-cell-shrink">
+												<div onclick="{!c.managerSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Targeted}" data-record="targeted/manager/count">{!$Label.c.ObjectiveListView_Targeted}
+													<aura:if isTrue="{!v.managerSortField == 'targeted'}">
+														<span>
+															<aura:if isTrue="{!v.managerSortAsc}">
+																&#8593;
+																<aura:set attribute="else">
+																	&#8595;
+																</aura:set>
+															</aura:if>
+														</span>
+													</aura:if>
+												</div>
+											</th>
+											<th scope="col" class="slds-cell-shrink">
+												<div onclick="{!c.managerSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Achieved}" data-record="achieved/manager/count">{!$Label.c.ObjectiveListView_Achieved}
+													<aura:if isTrue="{!v.managerSortField == 'achieved'}">
+														<span>
+															<aura:if isTrue="{!v.managerSortAsc}">
+																&#8593;
+																<aura:set attribute="else">
+																	&#8595;
+																</aura:set>
+															</aura:if>
+														</span>
+													</aura:if>
+												</div>
+											</th>
+											<aura:if isTrue="{!v.filterDateColumnDeadline}">
+												<th scope="col" class="slds-cell-shrink">
+													<div onclick="{!c.managerSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Deadline}" data-record="End_Date__c/manager/relationship">{!$Label.c.ObjectiveListView_Deadline}
+														<aura:if isTrue="{!v.managerSortField == 'End_Date__c'}">
+															<span>
+																<aura:if isTrue="{!v.managerSortAsc}">
+																	&#8593;
+																	<aura:set attribute="else">
+																		&#8595;
+																	</aura:set>
+																</aura:if>
+															</span>
+														</aura:if>
+													</div>
+												</th>
+												<aura:set attribute="else">
+													<th scope="col" class="slds-cell-shrink">
+														<div onclick="{!c.managerSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_StartDate}" data-record="Start_Date__c/manager/relationship">{!$Label.c.ObjectiveListView_StartDate}
+															<aura:if isTrue="{!v.managerSortField == 'Start_Date__c'}">
+																<span>
+																	<aura:if isTrue="{!v.managerSortAsc}">
+																		&#8593;
+																		<aura:set attribute="else">
+																			&#8595;
+																		</aura:set>
+																	</aura:if>
+																</span>
+															</aura:if>
+														</div>
+													</th>
+												</aura:set>
+											</aura:if>
+											<aura:if isTrue="{!v.expiredFilter == false}">
+												<th scope="col" class="slds-cell-shrink">
+													<div class="slds-truncate" title="{!$Label.c.ObjectiveListView_Apply_Accounts}">{!$Label.c.ObjectiveListView_Apply}</div>
+												</th>
+											</aura:if>
+										</tr>
+									</thead>
+									<tbody>
+										<aura:iteration items="{!v.managerObjectivesList}" var="manager" indexVar="idx">
+											<tr class="slds-hint-parent">
+												<aura:if isTrue="{!manager.objective.Created_Via_MBO__c == False}">
+												<td data-label="NAME" class="slds-truncate">
+													<a href="javascript:void(0);" data-record="{!manager.objective.Id + 'manager'}" onclick="{!c.openObjectiveEditModal}">
+														{!manager.objective.Planned_Objective__r.Name}
+													</a>
+												</td>
+												<aura:set attribute="else">
+													<td data-label="NAME" class="slds-truncate">
+													<a href="javascript:void(0);" data-record="{!manager.objective.Id + 'manager'}" onclick="{!c.openObjectiveEditModal}">
+														{!manager.objective.Name}
+													</a>
+												</td>
+												</aura:set>
+												</aura:if>
+												<td data-label="TYPE" class="slds-truncate">{!manager.objective.RecordType.Name}</td>
+												<td data-label="Origin" class="slds-truncate">{!manager.objective.CreatedBy.Name}</td>
+												<td data-label="Target Accounts" class="slds-truncate">{!manager.targeted}</td>
+												<td data-label="ACHIEVED" class="slds-truncate">{!manager.achieved}</td>
+												<aura:if isTrue="{!v.filterDateColumnDeadline}">
+													<td data-label="DEADLINE" class="slds-truncate">
+														<ui:outputDate value="{!manager.objective.Planned_Objective__r.End_Date__c}" format="M/D/YYYY" />
+													</td>
+													<aura:set attribute="else">
+														<td data-label="START DATE" class="slds-truncate">
+															<ui:outputDate value="{!manager.objective.Planned_Objective__r.Start_Date__c}" format="M/D/YYYY" />
+														</td>
+													</aura:set>
+												</aura:if>
+												<aura:if isTrue="{!v.expiredFilter == false}">
+													<td class="slds-truncate" style="overflow:unset">
+														<aura:if isTrue="{!v.hasManagerRole}">
+															<div data-record="{!manager.objective.Id}" onclick="{!c.navigateToComponent}">
+																<lightning:buttonIcon iconName="utility:add" variant="bare" />
+															</div>
+															<aura:set attribute="else">
+																<span data-record="{!'manager' + idx}" onclick="{!c.setSelectedAttribute}">
+																	<c:ObjectiveListItem aura:id="objCmp" objType="manager" objective="{!manager.objective}" isTargetListComponent="{!v.isTargetListComponent}" objectiveId="{!v.objectiveId}" index="{!idx}" showMyObjectives="{!v.showMyObjectives}" showApplyObjectives="{!v.showApplyObjectives}" showEditObjective="{!v.showEditObjective}" selectedRecord="{!v.selectedRecord}" />
+																</span>
+															</aura:set>
+														</aura:if>
+													</td>
+												</aura:if>
+											</tr>
+										</aura:iteration>
+									</tbody>
+									<aura:if isTrue="{!empty(v.managerObjectivesList)}">
+										<aura:if isTrue="{!v.expiredFilter == false}">
+											<td colspan="7">
+												<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_info themeInfo" role="alert">
+													<span class="slds-assistive-text">info</span>
+													<span class="slds-icon_container slds-icon-utility-user slds-m-right_x-small">
+													</span>
+													<h2>{!$Label.c.ObjectiveListViewNoRecords}</h2>
+												</div>
+											</td>
+											<aura:set attribute="else">
+												<td colspan="6">
+													<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_info themeInfo" role="alert">
+														<span class="slds-assistive-text">info</span>
+														<span class="slds-icon_container slds-icon-utility-user slds-m-right_x-small">
+														</span>
+														<h2>{!$Label.c.ObjectiveListViewNoRecords}</h2>
+													</div>
+												</td>
+											</aura:set>
+										</aura:if>
+									</aura:if>
+								</table>
+							</div>
+						</section>
+					</li>
+					 <li class="slds-accordion__list-item">
+						<section aura:id="personalSection" class="slds-accordion__section">
+								<div class="slds-accordion__summary" onclick="{!c.handleAccordionClick}" data-record="personal">
+									<h3 class="slds-text-heading_small slds-accordion__summary-heading">
+										<button aura:id="personalBtn" aria-controls="accordion-details-03" aria-expanded="false" class="slds-button slds-button_reset slds-accordion__summary-action">
+											<lightning:icon aura:id="personalSwitch" iconName="utility:chevronright" size="x-small" class="slds-show"/>
+											<lightning:icon aura:id="personalSwitch" iconName="utility:chevrondown" size="x-small" class="slds-hide"/>
+											<span class="slds-truncate slds-p-left--small" title="{!$Label.c.ObjectiveListView_Personal_Objectives}">{!$Label.c.ObjectiveListView_Personal_Objectives} (<ui:outputNumber value="{!v.personalObjectivesList.length}" />)</span>
+									  </button>
+									</h3>
+								</div>
+								<div aria-hidden="true" class="slds-accordion__content" id="accordion-details-03">
+								<table class="{!or($Browser.isPhone, $Browser.isTablet) ? 'mobileStyling tableStyling' : 'slds-table slds-table--bordered slds-table--cell-buffer slds-table--fixed-layout'}" role="grid">
+									<thead>
+									<tr class="slds-text-title--caps">
+										<th scope="col" style="width:100px;">
+											<div onclick="{!c.personalSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Name}" data-record="Name/personal">{!$Label.c.ObjectiveListView_Name}
+												<aura:if isTrue="{!v.personalSortField == 'Name'}">
+													<span>
+														<aura:if isTrue="{!v.personalSortAsc}">
+															&#8593;
+															<aura:set attribute="else">
+																&#8595;
+															</aura:set>
+														</aura:if>
+													</span>
+												</aura:if>
+											</div>
+										</th>
+										<th scope="col" class="slds-cell-shrink">
+											<div onclick="{!c.personalSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Type}" data-record="RecordType,Name/personal/recordType">{!$Label.c.ObjectiveListView_Type}
+												<aura:if isTrue="{!v.personalSortField == 'RecordType,Name'}">
+													<span>
+														<aura:if isTrue="{!v.personalSortAsc}">
+															&#8593;
+															<aura:set attribute="else">
+																&#8595;
+															</aura:set>
+														</aura:if>
+													</span>
+												</aura:if>
+											</div>
+										</th>
+										<th scope="col" class="slds-cell-shrink">
+											<div onclick="{!c.personalSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListViewGoal}" data-record="Objective_Goal__c/personal">{!$Label.c.ObjectiveListViewGoal}
+												<aura:if isTrue="{!v.personalSortField == 'Objective_Goal__c'}">
+													<span>
+														<aura:if isTrue="{!v.personalSortAsc}">
+															&#8593;
+															<aura:set attribute="else">
+																&#8595;
+															</aura:set>
+														</aura:if>
+													</span>
+												</aura:if>
+											</div>
+										</th>
+										 <th scope="col" class="slds-cell-shrink">
+											<div onclick="{!c.personalSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Targeted}" data-record="targeted/personal/count">{!$Label.c.ObjectiveListView_Targeted}
+												<aura:if isTrue="{!v.personalSortField == 'targeted'}">
+													<span>
+														<aura:if isTrue="{!v.personalSortAsc}">
+															&#8593;
+															<aura:set attribute="else">
+																&#8595;
+															</aura:set>
+														</aura:if>
+													</span>
+												</aura:if>
+											</div>
+										</th>
+										<th scope="col" class="slds-cell-shrink">
+											<div onclick="{!c.personalSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Achieved}" data-record="achieved/personal/count">{!$Label.c.ObjectiveListView_Achieved}
+												<aura:if isTrue="{!v.personalSortField == 'achieved'}">
+													<span>
+														<aura:if isTrue="{!v.personalSortAsc}">
+															&#8593;
+															<aura:set attribute="else">
+																&#8595;
+															</aura:set>
+														</aura:if>
+													</span>
+												</aura:if>
+											</div>
+										</th>
+										<aura:if isTrue="{!v.filterDateColumnDeadline}">
+											<th scope="col" class="slds-cell-shrink">
+												<div onclick="{!c.personalSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Deadline}" data-record="End_Date__c/personal/relationship">{!$Label.c.ObjectiveListView_Deadline}
+													<aura:if isTrue="{!v.personalSortField == 'End_Date__c'}">
+														<span>
+															<aura:if isTrue="{!v.personalSortAsc}">
+																&#8593;
+																<aura:set attribute="else">
+																	&#8595;
+																</aura:set>
+															</aura:if>
+														</span>
+													</aura:if>
+												</div>
+											</th>
+											<aura:set attribute="else">
+												<th scope="col" class="slds-cell-shrink">
+													<div onclick="{!c.personalSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_StartDate}" data-record="Start_Date__c/personal/relationship">{!$Label.c.ObjectiveListView_StartDate}
+														<aura:if isTrue="{!v.personalSortField == 'Start_Date__c'}">
+															<span>
+																<aura:if isTrue="{!v.personalSortAsc}">
+																	&#8593;
+																	<aura:set attribute="else">
+																		&#8595;
+																	</aura:set>
+																</aura:if>
+															</span>
+														</aura:if>
+													</div>
+												</th>
+											</aura:set>
+										</aura:if>
+										<aura:if isTrue="{!v.expiredFilter == false}">
+											<th scope="col" class="slds-cell-shrink">
+												<div class="slds-truncate" title="{!$Label.c.ObjectiveListView_Apply_Accounts}">{!$Label.c.ObjectiveListView_Apply}</div>
+											</th>
+										</aura:if>
+										<!--Column for ObjectiveEditDropdown-->
+										<th scope="col" class="slds-cell-shrink">
+											<div class="slds-truncate" title=""></div>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<aura:iteration items="{!v.personalObjectivesList}" var="personal" indexVar="idx">
+										<tr scope="row">
+											<aura:if isTrue="{!personal.objective.Created_Via_MBO__c == False}">
+											<td data-label="NAME" class="slds-truncate">
+												<a href="javascript:void(0);" data-record="{!personal.objective.Id + 'personal'}" onclick="{!c.openObjectiveEditModal}">
+													{!personal.objective.Planned_Objective__r.Name}
+												</a>
+											</td>
+											<aura:set attribute="else">
+												<td data-label="NAME" class="slds-truncate">
+												<a href="javascript:void(0);" data-record="{!personal.objective.Id + 'personal'}" onclick="{!c.openObjectiveEditModal}">
+													{!personal.objective.Name}
+												</a>
+											</td>
+											</aura:set>
+											</aura:if>
+											<td data-label="TYPE" class="slds-truncate">{!personal.objective.RecordType.Name}</td>
+											<td data-label="GOAL" class="slds-truncate">{!personal.objective.Objective_Goal__c}</td>
+											<td data-label="TARGET ACCOUNTS" class="slds-truncate">{!personal.targeted}</td>
+											<td data-label="ACHIEVED" class="slds-truncate">{!personal.achieved}</td>
+											<aura:if isTrue="{!v.filterDateColumnDeadline}">
+												<td data-label="DEADLINE" class="slds-truncate">
+													<ui:outputDate value="{!personal.objective.Planned_Objective__r.End_Date__c}" format="M/D/YYYY" />
+												</td>
+												<aura:set attribute="else">
+													<td data-label="START DATE" class="slds-truncate">
+														<ui:outputDate value="{!personal.objective.Planned_Objective__r.Start_Date__c}" format="M/D/YYYY" />
+													</td>
+												</aura:set>
+											</aura:if>
+											<aura:if isTrue="{!v.expiredFilter == false}">
+												<td class="slds-truncate" style="overflow:unset">
+													<aura:if isTrue="{!v.hasManagerRole}">
+														<div data-record="{!personal.objective.Id}" onclick="{!c.navigateToComponent}">
+															<lightning:buttonIcon iconName="utility:add" variant="bare" />
+														</div>
+														<aura:set attribute="else">
+															<span data-record="{!'personal' + idx}" onclick="{!c.setSelectedAttribute}">
+																<c:ObjectiveListItem aura:id="objCmp" objType="personal" objective="{!personal.objective}" isTargetListComponent="{!v.isTargetListComponent}" objectiveId="{!v.objectiveId}" index="{!idx}" showMyObjectives="{!v.showMyObjectives}" showApplyObjectives="{!v.showApplyObjectives}" showEditObjective="{!v.showEditObjective}" selectedRecord="{!v.selectedRecord}" />
+															</span>
+														</aura:set>
+													</aura:if>
+												</td>
+												<td scope="col" class="slds-cell-shrink">
+													<span data-record="{!'editingPersonal' + idx}" onclick="{!c.setSelectedAttribute}">
+													<c:ObjectiveEditDropdown aura:id="objEditCmp" objType="editingPersonal" index="{!idx}" objective="{!personal.objective}" selectedRecord="{!v.selectedRecord}" shouldOpenEdit="{!v.shouldOpenEdit}" objectiveId="{!v.objectiveId}"/>
+													</span>
+												</td>
+											</aura:if>
+										</tr>
+									</aura:iteration>
+								</tbody>
+									<aura:if isTrue="{!empty(v.personalObjectivesList)}">
+										<aura:if isTrue="{!v.expiredFilter == false}">
+											<td colspan="8">
+												<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_info themeInfo" role="alert">
+													<span class="slds-assistive-text">info</span>
+													<span class="slds-icon_container slds-icon-utility-user slds-m-right_x-small">
+													</span>
+													<h2>{!$Label.c.ObjectiveListViewNoRecords}</h2>
+												</div>
+											</td>
+											<aura:set attribute="else">
+												<td colspan="7">
+													<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_info themeInfo" role="alert">
+														<span class="slds-assistive-text">info</span>
+														<span class="slds-icon_container slds-icon-utility-user slds-m-right_x-small">
+														</span>
+														<h2>{!$Label.c.ObjectiveListViewNoRecords}</h2>
+													</div>
+												</td>
+											</aura:set>
+										</aura:if>
+									</aura:if>
+								</table>
+							</div>
+						</section>
+					</li>
+				</ul>
+			</div>
+			<aura:if isTrue="{!v.hasManagerRole}">
+				<div aura:id="assignedByMeContent" class=" tabsStyle slds-tabs--default__content slds-hide" role="tabpanel" aria-labelledby="tab-default-2__item">
+					<div class="assignedByMeTable">
+						<table class="{!or($Browser.isPhone, $Browser.isTablet) ? 'mobileStyling tableStyling' : 'slds-table slds-table--bordered slds-table--cell-buffer slds-table--fixed-layout'}" role="grid">
+							<thead>
+								<tr class="slds-text-title--caps">
+									<th scope="col" style="width:100px;">
+										<div onclick="{!c.assignByMeSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Name}" data-record="Name/assignByMe">{!$Label.c.ObjectiveListView_Name}
+											<aura:if isTrue="{!v.assignByMeSortField == 'Name'}">
+												<span>
+													<aura:if isTrue="{!v.assignByMeSortAsc}">
+														&#8593;
+														<aura:set attribute="else">
+															&#8595;
+														</aura:set>
+													</aura:if>
+												</span>
+											</aura:if>
+										</div>
+									</th>
+									<th scope="col" class="slds-cell-shrink">
+										<div onclick="{!c.assignByMeSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Type}" data-record="RecordType,Name/assignByMe/recordType">{!$Label.c.ObjectiveListView_Type}
+											<aura:if isTrue="{!v.assignByMeSortField == 'RecordType,Name'}">
+												<span>
+													<aura:if isTrue="{!v.assignByMeSortAsc}">
+														&#8593;
+														<aura:set attribute="else">
+															&#8595;
+														</aura:set>
+													</aura:if>
+												</span>
+											</aura:if>
+										</div>
+									</th>
+									<th scope="col" class="slds-cell-shrink">
+										<div onclick="{!c.assignByMeSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListViewGoal}" data-record="Objective_Goal__c/assignByMe">{!$Label.c.ObjectiveListViewGoal}
+											<aura:if isTrue="{!v.assignByMeSortField == 'Objective_Goal__c'}">
+													<span>
+													<aura:if isTrue="{!v.assignByMeSortAsc}">
+														&#8593;
+														<aura:set attribute="else">
+															&#8595;
+														</aura:set>
+													</aura:if>
+												</span>
+											</aura:if>
+										</div>
+									</th>
+									<th scope="col" class="slds-cell-shrink">
+										<div onclick="{!c.assignByMeSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Targeted}" data-record="targeted/assignByMe/count">{!$Label.c.ObjectiveListView_Targeted}
+											<aura:if isTrue="{!v.assignByMeSortField == 'targeted'}">
+												<span>
+													<aura:if isTrue="{!v.assignByMeSortAsc}">
+														&#8593;
+														<aura:set attribute="else">
+															&#8595;
+														</aura:set>
+													</aura:if>
+												</span>
+											</aura:if>
+										</div>
+									</th>
+									<th scope="col" class="slds-cell-shrink">
+										<div onclick="{!c.assignByMeSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_Achieved}" data-record="achieved/assignByMe/count">{!$Label.c.ObjectiveListView_Achieved}
+											<aura:if isTrue="{!v.assignByMeSortField == 'achieved'}">
+												<span>
+													<aura:if isTrue="{!v.assignByMeSortAsc}">
+														&#8593;
+														<aura:set attribute="else">
+															&#8595;
+														</aura:set>
+													</aura:if>
+												</span>
+											</aura:if>
+										</div>
+									</th>
+									<aura:if isTrue="{!v.filterDateColumnDeadline}">
+										<th scope="col" class="slds-cell-shrink">
+											<div onclick="{!c.assignByMeSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_End_Date}" data-record="End_Date__c/assignByMe/relationship">{!$Label.c.ObjectiveListView_Deadline}
+												<aura:if isTrue="{!v.assignByMeSortField == 'End_Date__c'}">
+													<span>
+														<aura:if isTrue="{!v.assignByMeSortAsc}">
+															&#8593;
+															<aura:set attribute="else">
+																&#8595;
+															</aura:set>
+														</aura:if>
+													</span>
+												</aura:if>
+											</div>
+										</th>
+										<aura:set attribute="else">
+											<th scope="col" class="slds-cell-shrink">
+												<div onclick="{!c.assignByMeSortColumn}" class="slds-truncate noselect" title="{!$Label.c.ObjectiveListView_StartDate}" data-record="Start_Date__c/assignByMe/relationship">{!$Label.c.ObjectiveListView_StartDate}
+													<aura:if isTrue="{!v.assignByMeSortField == 'Start_Date__c'}">
+														<span>
+															<aura:if isTrue="{!v.assignByMeSortAsc}">
+																&#8593;
+																<aura:set attribute="else">
+																	&#8595;
+																</aura:set>
+															</aura:if>
+														</span>
+													</aura:if>
+												</div>
+											</th>
+										</aura:set>
+									</aura:if>
+									<!--Column for ObjectiveEditDropdown-->
+									<th scope="col" class="slds-cell-shrink">
+										<div class="slds-truncate" title=""></div>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<aura:iteration items="{!v.assignByMeObjectivesList}" var="assign" indexVar="idx">
+									<tr scope="row">
+										<aura:if isTrue="{!assign.objective.Created_Via_MBO__c == False}">
+											<td data-label="NAME" class="slds-truncate">
+												<a href="javascript:void(0);" data-record="{!assign.objective.Id + 'assignByMe'}" onclick="{!c.openObjectiveEditModal}">
+													{!assign.objective.Planned_Objective__r.Name}
+												</a>
+											</td>
+											<aura:set attribute="else">
+												<td data-label="NAME" class="slds-truncate">
+													<a href="javascript:void(0);" data-record="{!assign.objective.Id + 'assignByMe'}" onclick="{!c.openObjectiveEditModal}">
+														{!assign.objective.Name}
+													</a>
+												</td>
+											</aura:set>
+										</aura:if>
+										<td data-label="TYPE" class="slds-truncate">{!assign.objective.RecordType.Name}</td>
+										<td data-label="GOAL" class="slds-truncate">{!assign.objective.Objective_Goal__c}</td>
+										<td data-label="Target Accounts" class="slds-truncate">{!assign.targeted}</td>
+										<td data-label="ACHIEVED" class="slds-truncate">{!assign.achieved}</td>
+										<aura:if isTrue="{!v.filterDateColumnDeadline}">
+											<td data-label="DEADLINE" class="slds-truncate">
+												<ui:outputDate value="{!assign.objective.Planned_Objective__r.End_Date__c}" format="M/D/YYYY" />
+											</td>
+											<aura:set attribute="else">
+												<td data-label="START DATE" class="slds-truncate">
+													<ui:outputDate value="{!assign.objective.Planned_Objective__r.Start_Date__c}" format="M/D/YYYY" />
+												</td>
+											</aura:set>
+										</aura:if>
+											<td scope="col" class="slds-cell-shrink">
+												<span data-record="{!'editingAssignByMe' + idx}" onclick="{!c.setSelectedAttribute}">
+													<c:ObjectiveEditDropdown aura:id="objEditCmp" objType="editingAssignByMe" index="{!idx}" objective="{!assign.objective}" selectedRecord="{!v.selectedRecord}" shouldOpenEdit="{!v.shouldOpenEdit}" objectiveId="{!v.objectiveId}"/>
+												</span>
+											</td> 
+									</tr>
+								</aura:iteration>
+								</tbody>
+								<aura:if isTrue="{!empty(v.assignByMeObjectivesList)}">
+									<td colspan="7">
+										<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_info themeInfo" role="alert">
+											<span class="slds-assistive-text">info</span>
+											<span class="slds-icon_container slds-icon-utility-user slds-m-right_x-small">
+											</span>
+											<h2>{!$Label.c.ObjectiveListViewNoRecords}</h2>
+										</div>
+									</td>
+								</aura:if>
+							</table>
+						</div>
+					</div>
+				</aura:if>
+			<div class="slds-p-bottom_xx-large"></div>
+			</div>
+		</aura:if>
+		</div>
+		<aura:if isTrue="{!v.showApplyObjectives}">
+			<div aura:id="componentDisplay">
+				<aura:if isTrue="{!v.isTargetListComponent}">
+					<c:applyObjectiveToTargetListCmp aura:id="targetListComponent" objectiveId="{!v.objectiveId}" />
+					<aura:set attribute="else">
+						<c:PlannedObjectivesAccountListView selectedObjectiveId="{!v.objectiveId}" sharedObjective="{!v.sharedObjective}"/>
+					</aura:set>
+				</aura:if>
+			</div>
+		</aura:if>
+		<aura:if isTrue="{!v.showCreatePersonal}">
+			<c:AddObjective aura:id="addObjective" objective="{!v.objectiveObj}" editingObjective="{!v.editingObjective}" shouldOpenEdit="{!v.shouldOpenEdit}" userRole="{#v.userRole}" calledFromVF="{!v.calledFromVF}" wthId="{!v.wthId}"/>
+		</aura:if>
+	</div>
+</aura:component>

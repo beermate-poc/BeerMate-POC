@@ -1,0 +1,66 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" controller="AddingSmartSKUToDGFController" >
+	<aura:attribute name="ErrorMsg" type="String"/>
+    <aura:attribute name="calculatorRec" type="Calculations__c" default="{'sobjectType': 'Calculations__c'}" />
+    <aura:attribute name="options" type="List" access="PRIVATE"/>
+    <aura:attribute name="selectedSKUValue" type="String" access="PRIVATE"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <ltng:require styles="{!$Resource.ObjQuickAction}"/>
+    <div>                
+    	<div class="spinnerHolder slds-hide" aura:id="divspn">
+        	<lightning:spinner aura:id="spn" alternativeText="Loading" size="medium" variant="brand"/>
+        </div>
+        <header class="slds-modal__header">         
+        	<h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Add_Update_Smart_SKU}</h2>           
+        </header>
+        <div class="error-Msg" aura:id="ErrorMsg">
+        	{!v.ErrorMsg}
+        </div>
+        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+ 
+        	<lightning:recordEditForm aura:id="smartSKUEditForm" recordId="{!v.recordId}" objectApiName="Calculations__c" >
+            <lightning:messages />
+                        
+                            
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem padding="around-small" size="12">
+                	<lightning:select name="smartSKUID" label="{!$Label.c.SmartSKU_Projections}" aura:id="smartSKUID" value="{!v.selectedSKUValue}" >
+                        <option value="">-- None --</option>
+                        <aura:iteration items="{!v.options}" var="option">
+                            <option text="{!option.label}" value="{!option.id}" selected="{!option.selected}"/>
+                        </aura:iteration>
+                    </lightning:select>
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small" size="{!$Browser.isDesktop? '6':'12'}">
+                	<lightning:inputField aura:id="Units_per_Case" fieldName="Units_per_Case__c" required="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small" size="{!$Browser.isDesktop? '6':'12'}">
+                	<lightning:inputField aura:id="Case_Cost" fieldName="Case_Cost__c" required="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small" size="{!$Browser.isDesktop? '6':'12'}">
+                	<lightning:inputField aura:id="Listed_Retail_Price" fieldName="Listed_Retail_Price__c" required="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small" size="{!$Browser.isDesktop? '6':'12'}">
+                	<lightning:inputField aura:id="CE_s_90_Days" fieldName="CE_s_90_Days__c" required="true"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+                            
+                        
+            			
+            </lightning:recordEditForm>
+                                        
+       </div>
+                
+       <div class="error-Msg" aura:id="ErrorMsg">
+           {!v.ErrorMsg}
+       </div>
+       <footer>
+       		<lightning:buttonGroup class="slds-float_right">
+                <lightning:button label="{!$Label.c.CTS_Cancel}" onclick="{!c.handleCancel}" variant="neutral"/>
+                <lightning:button aura:id="saveButton" variant="brand" label="{!$Label.c.Save}" title="{!$Label.c.Save}" onclick="{!c.onSave}" disabled="false" />
+                            
+        	</lightning:buttonGroup>
+       </footer>
+     </div>
+</aura:component>

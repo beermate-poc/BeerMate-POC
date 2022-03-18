@@ -1,0 +1,18 @@
+<div class="modal fade cc_modal cc_myaccount_orders_modal" id="cancelMod_{{sfid}}" tabindex="-1" role="dialog" aria-labelledby="CancelMod">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content cc_modal_content">
+            <div class="modal-body cc_modal_body">
+                {{#ifEquals this.mode 'Edit'}}
+                <p class="cc_edit_prompt">{{pageLabelMap 'Edit_Prompt'}}</p>
+                {{else}}
+                <p class="cc_cancel_prompt">{{pageLabelMap 'Cancel_Prompt'}}</p>
+                {{/ifEquals}}
+            </div>
+            <div class="modal-footer">
+                <input id="ccb2b-ma-orders-cancelorder-no-button" type="button" class="btn closeModal" data-id="{{sfid}}" value="{{pageLabelMap 'Dialog_No'}}"/>
+                <input id="ccb2b-ma-orders-cancelorder-yes-button" type="button" class="btn btn primary_button ordercancel" data-id="{{sfid}}" data-mode="{{mode}}" value="{{pageLabelMap 'Yes'}}"/>
+            </div>
+        </div>
+    </div>
+</div>
+  

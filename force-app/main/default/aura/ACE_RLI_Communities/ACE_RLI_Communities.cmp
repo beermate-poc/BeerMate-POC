@@ -1,0 +1,132 @@
+<aura:component controller="ReimburseLineItemControllerCommunities" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:availableForFlowScreens" access="global" >
+    <aura:attribute name="reimbursementHeader" type="PartnerFundClaim" />
+    <aura:attribute name="reimbursementLines" type="Object[]" />
+    <aura:attribute name="errors" type="Object" default="[]"/>
+    <aura:attribute name="spendCategory" type="String[]"/>
+    <aura:attribute name="taxPaid" type="String[]" />
+    <aura:handler name="init" value="{!this}" action="{!c.Init}" />
+
+    
+    <lightning:card title="">    
+        <div class="slds">
+            <p>Spend Category and Requested Reimbursement cannot be adjusted simultaneously. If one of the fields is disabled and you would like to edit it, either change the other field back to the original value or click to save.</p>
+            <div class="slds-table--header-fixed_container" style="height:300px;">	
+                <div class="slds-scrollable" style="height:100%; width:100%;"> 
+               
+                    <table class="slds-table_bordered slds-table--header-fixed slds-table slds-table_col-bordered slds-table_resizable-cols" border="1" frame="void" rules="rows">    
+                        <thead>	
+                            <tr border="1">
+                                <th class="slds-text-heading_small " style="width:5%"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Ln#</div></th>
+                                <th class="slds-text-heading_small"   style="width:25%"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Line Item Name</div></th>
+                                <th class="slds-text-heading_small "   style="width:13%"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Spend Category</div></th>
+                                <th class="slds-text-heading_small"   style="width:13%"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Expenditure</div></th>
+                                <th class="slds-wrap slds-text-heading_small" style="width:13%"><div class="slds-p-vertical_small  slds-align_absolute-center">Reimbursement</div></th>
+                                <th class="slds-text-heading_small"   style="width:6%"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Tax Pd</div></th>
+                                <th class="slds-text-heading_small"  style="width:15%"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Vendors</div></th>
+                                <th class="slds-text-heading_small"  style="width:20%"><div class="slds-p-vertical_small slds-wrap slds-align_absolute-center">Comments</div></th>
+                            </tr>
+                        </thead>
+                        
+                        <aura:iteration items="{!v.reimbursementLines}" var="reimbursementLine" indexVar="idx">
+                            <tr>
+                                <td>
+                                    <div class="slds-align_absolute-center" >
+                                    {!reimbursementLine.line.ACE_Line_Item_Index__c}
+                                    </div>
+                                </td>
+                                <td class="slds-rich-text-area__content">
+                                    <div style="width:100%" class="slds-float_left slds-rich-text-area__content  slds-grid slds-grid--vertical-align-center">
+                                        <aura:if isTrue="{!v.reimbursementHeader.ACE_Reimbursement_Status__c == 'Open' || v.reimbursementHeader.ACE_Reimbursement_Status__c == 'AwaitingAdditionalData' }" >
+                                            <ui:inputText  value="{!reimbursementLine.line.Title}"/>
+                                            <aura:set attribute="else">
+                                                <ui:outputText value="{!reimbursementLine.line.Title}"/>
+                                            </aura:set>
+                                        </aura:if>
+
+                                    </div>
+                                </td>
+                                <td class="slds-rich-text-area__content">
+                                    <div id="{!idx}" >
+                                    <aura:if isTrue="{!v.reimbursementHeader.ACE_Reimbursement_Status__c == 'Open' || v.reimbursementHeader.ACE_Reimbursement_Status__c == 'AwaitingAdditionalData' }" >
+                                        <lightning:select class="slds-align_absolute-center" value="{!reimbursementLine.line.ACE_Spend_Category__c}" disabled="{!reimbursementLine.line.ACE_Requested_Reimbursement__c != reimbursementLine.origRequestedReimbursement}">
+                                            <aura:iteration items="{!v.spendCategory}" var="cat">
+                                                <option value="{!cat}">{!cat}</option>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                        <aura:set attribute="else">
+                                            <ui:outputText class="slds-align_absolute-center" value="{!reimbursementLine.line.ACE_Spend_Category__c}"/>
+                                        </aura:set>
+                                    </aura:if>
+                                    </div>
+
+                           
+                                </td>
+                                <td class="slds-rich-text-area__content">
+                                    
+                                    <aura:if isTrue="{!v.reimbursementHeader.ACE_Reimbursement_Status__c == 'Open' || v.reimbursementHeader.ACE_Reimbursement_Status__c == 'AwaitingAdditionalData' }" >
+                                        <ui:inputCurrency class="slds-align_absolute-center" value="{!reimbursementLine.line.ACE_Total_Expenditure__c}"/>
+                                        <aura:set attribute="else">
+                                            <ui:outputCurrency class="slds-align_absolute-center" value="{!reimbursementLine.line.ACE_Total_Expenditure__c}" />
+                                        </aura:set>
+                                    </aura:if>
+                                  
+                                </td>
+                                <td class="slds-rich-text-area__content">
+                                    <aura:if isTrue="{!v.reimbursementHeader.ACE_Reimbursement_Status__c == 'Open' || v.reimbursementHeader.ACE_Reimbursement_Status__c == 'AwaitingAdditionalData' }" >
+                                        <ui:inputCurrency class="slds-align_absolute-center" value="{!reimbursementLine.line.ACE_Requested_Reimbursement__c}" disabled="{!reimbursementLine.line.ACE_Spend_Category__c != reimbursementLine.origSpendCategory}"/>
+                                        <aura:set attribute="else">
+                                            <ui:outputCurrency value="{!reimbursementLine.line.ACE_Requested_Reimbursement__c}"/>
+                                        </aura:set>
+                                    </aura:if>
+                                  
+                              
+                                </td>
+                                <td class="slds-rich-text-area__content">
+                                  
+                                    <aura:if isTrue="{!v.reimbursementHeader.ACE_Reimbursement_Status__c == 'Open' || v.reimbursementHeader.ACE_Reimbursement_Status__c == 'AwaitingAdditionalData' }" >
+                                        <lightning:select label="" value="{!reimbursementLine.line.ACE_Tax_Pd__c}" class="slds-align_absolute-center">
+                                            <aura:iteration items="{!v.taxPaid}" var="opt">
+                                                <option label="{!opt}" value="{!opt}"/>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                        <aura:set attribute="else">
+                                            <ui:outputText value="{!reimbursementLine.line.ACE_Tax_Pd__c}" />
+                                        </aura:set>
+                                    </aura:if>
+
+                                    
+                                </td>
+                                <td class="slds-rich-text-area__content"><div class="slds-align_absolute-left">
+                                    <aura:if isTrue="{!v.reimbursementHeader.ACE_Reimbursement_Status__c == 'Open' || v.reimbursementHeader.ACE_Reimbursement_Status__c == 'AwaitingAdditionalData' }" >
+                                        <ui:inputText value="{!reimbursementLine.line.ACE_Vendors_Used__c}"/>
+                                        <aura:set attribute="else">
+                                            <ui:outputText value="{!reimbursementLine.line.ACE_Vendors_Used__c}"/>
+                                        </aura:set>
+                                    </aura:if>
+                                    </div>
+                                </td>
+                                <td class="slds-rich-text-area__content"><div class="slds-align_absolute-left">
+                                    <aura:if isTrue="{!v.reimbursementHeader.ACE_Reimbursement_Status__c == 'Open' || v.reimbursementHeader.ACE_Reimbursement_Status__c == 'AwaitingAdditionalData' }" >
+                                        <textarea rows="1" onchange="{!c.updateComments}" id="{!reimbursementLine.line.ACE_Line_Item_Index__c}">
+                                            {!reimbursementLine.line.ACE_Comments__c}
+                                        </textarea>
+                                       
+                                        <aura:set attribute="else">
+                                            <ui:outputTextArea value="{!reimbursementLine.line.ACE_Comments__c}"/>
+                                        </aura:set>
+                                    </aura:if>
+                                    </div>
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </table>
+                </div>
+            </div>
+            <div align="center">
+                <aura:if isTrue="{!v.reimbursementHeader.ACE_Reimbursement_Status__c == 'Open' || v.reimbursementHeader.ACE_Reimbursement_Status__c == 'AwaitingAdditionalData' }" >
+                    <lightning:button label="{!$Label.c.ACE_saveApproveAndRelease}"  onclick="{!c.saveLineItems}"/>
+                </aura:if>
+            </div>
+        </div>      
+    </lightning:card>
+</aura:component>

@@ -1,0 +1,39 @@
+<div>
+    {{#ifEquals data.isCart true}}
+        {{#ifNotEquals deliveryInfo.movPercentage 0}}
+            <div class="up-triangle" style="{{data.mtoo}};"></div>
+        {{/ifNotEquals}}
+        <div class="down-triangle"></div>
+    {{/ifEquals}}
+
+    <div class="progress progress-widget">
+
+        <div class="bullet primary-color" style="{{ data.testcir }};">
+
+                <small class="progress-txt {{#ifEquals data.testval '100%'}} pct-hundred{{/ifEquals}}" style=" {{#ifEquals data.testlen 3}}padding-left:0.45rem;{{/ifEquals}} {{#ifEquals data.testlen 2}}padding-left:0.9rem;{{/ifEquals}}">
+                    {{ data.testval }}
+                </small>
+
+
+        </div>
+
+        <div class="progress-bar" style="width:{{ data.test }};">
+        </div>
+
+    </div>
+
+    {{#ifEquals data.isCart true}}
+
+        {{#ifNotEquals deliveryInfo.movPercentage 0}}
+        <div class="mtoo-text" style="{{data.mtootext}};">
+            <small>{{pageLabelMap 'CCB2B_MTOO_VolTracker_Lbl'}}</small>
+        </div>
+        {{/ifNotEquals}}
+
+        <div class="mtd-text">
+            <small>{{pageLabelMap 'CCB2B_MTD_VolTracker_Lbl'}} {{data.ddate}}</small>
+        </div>
+
+    {{/ifEquals}}
+
+</div>

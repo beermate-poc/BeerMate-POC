@@ -1,0 +1,38 @@
+<aura:component controller="C360_CaptureCallDetails" implements="force:hasRecordId,force:lightningQuickActionwithoutheader,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome" access="global">
+	
+    <!--declare events handlers-->
+     <aura:handler name="init" value="{!this}" action="{!c.intiateCall}"/>
+     <aura:handler event="force:refreshView" action="{!c.refreshPage}"/>
+   <!-- <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+     <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>-->
+    <aura:attribute name="message" type="String" default=""/>
+     <aura:attribute name="messageType" type="String" default="info"/>
+      <aura:attribute name="statusCheck" type="Boolean" default="false"/>
+
+<aura:attribute name="isError" type="Boolean" default="false"/>
+    <!--Spinner-->
+    <!--<center> <ui:spinner aura:id="spinner"/> </center>-->
+        <aura:if isTrue="{!v.statusCheck}">
+           <ui:inputTextArea aura:id="eventNote" label="{!$Label.c.C360_Call_Note_Summary}"  maxlength="255"  rows="5" />
+           <lightning:button name="Save" label="{!$Label.c.Save}" variant="brand" onclick="{!c.UpdateEvent}"/> 
+       </aura:if>
+    <aura:if isTrue="{!!v.statusCheck}">
+     <div data-aura-rendered-by="565:0" class="forceDotsSpinner" data-aura-class="forceDotsSpinner">
+         <!--<lightning:spinner variant="brand" class="slds-hide" aura:id="spinner" size="Medium" />-->
+         <div class="slds-spinner_medium slds-spinner slds-spinner_brand " role="status" data-aura-rendered-by="566:0"><span class="slds-assistive-text" data-aura-rendered-by="567:0">Loading...</span><div class="slds-spinner__dot-a" data-aura-rendered-by="569:0"></div><div class="slds-spinner__dot-b" data-aura-rendered-by="570:0"></div></div>
+	</div>
+    </aura:if>    
+    
+    <aura:attribute name="showToast" type="Boolean" default="false"/>
+	<aura:attribute name="toastTitle" type="String" />
+	<aura:attribute name="toastMsg" type="String" />
+	<aura:attribute name="toastType" type="String" />
+    
+   <div class="slds-text-align__center">
+   
+    <aura:if isTrue="{!v.showToast}">
+      
+      <c:C360_ToastforMobile toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}" recordId="{!v.recordId}"/>
+    </aura:if>
+        </div>
+</aura:component>

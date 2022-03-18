@@ -1,0 +1,155 @@
+<!--
+Author:			Nick Serafin
+Company:		Slalom, LLC
+Description:	Handles the creation of Target Account Criteria for survey assignments
+Attributes:		numOfAccounts – number of accounts that match filters
+				saveExistingCriteria – Boolean to check what tab the user is on
+				filterValidation – Boolean to to set whether to validate inputs
+				targetName - String to hold name of target user criteria 
+				validationMessage - String to hold validation message
+				filterDescription - String to hold description of target user criteria
+				fieldMap - Map to hold account fields
+				searchKey - String to hold user search value for existing target criteria list
+				fieldCount - Number of filter fields
+				targetCriteriaList - List to hold existing target user criteria record
+				saveDisabled - Boolean to disable save button
+				viewMoreDisabled - Boolean to determine whether or not to enable the view more button
+				viewMoreFiltering - Boolean to determine wether filtering is happening on account of clicking "View More" or not
+				pageNumber - Number of page for sets of records to display
+				pageSize - Number of records to show each time the view more button is clicked
+
+Event Handlers: init – sets up initial list of existing target user criteria records
+				valueChanged - Event to validate filter values onchange of a filter
+History
+<Date>      <Authors Name>     <Brief Description of Change>
+8/8/2017    Nick Serafin        Updated component to reflect apex controller changes
+-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" controller="TargetCriteriaController">
+	<aura:attribute name="numOfAccounts" type="Integer" default="0"/>
+	<aura:attribute name="saveExistingCriteria" type="Boolean" default="true"/>
+	<aura:attribute name="filterValidation" type="Boolean" default="true" />
+	<aura:attribute name="targetName" type="String" />
+	<aura:attribute name="validationMessage" type="String" />
+	<aura:attribute name="filterDescription" type="String" />
+	<aura:attribute name="fieldMap" type="Map" />
+	<aura:attribute name="searchKey" type="String" default="" />
+	<aura:attribute name="fieldCount" type="Integer" default="3" />
+	<aura:attribute name="targetCriteriaList" type="Object[]" />
+	<aura:attribute name="saveDisabled" type="Boolean" default="true" />
+	<aura:attribute name="viewMoreDisabled" type="Boolean" default="false" />
+	<aura:attribute name="viewMoreFiltering" type="Boolean" default="true"/>
+
+	<aura:attribute name="pageNumber" type="Integer" default="1"/>
+	<aura:attribute name="pageSize" type="Integer" default="10"/>
+	
+
+	<aura:handler name="init" action="{!c.init}" value="{!this}" />
+	<aura:handler name="valueChanged" event="c:SearchValueChange" action="{!c.updateAccountNumber}" />
+
+	<lightning:spinner aura:id="spinner" class="slds-show" alternativeText="Please wait..." />
+
+	<div aura:id="accountCriteriaModal">
+		<div>
+			<div>
+				<div class="slds-tabs--scoped">
+					<ul class="slds-tabs--scoped__nav" role="tablist">
+						<li onclick="{!c.existingCriteriaClick}" aura:id="existingTab" class="slds-tabs--scoped__item slds-active" title="{!$Label.c.TargetAccountCri_Search_Existing}" role="presentation"><a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-scoped-1" id="tab-scoped-1__item">{!$Label.c.Add_From_Existing_Tab}</a></li>
+						<li onclick="{!c.newCriteriaClick}" aura:id="newTab" class="slds-tabs--scoped__item" title="{!$Label.c.TargetAccountCri_Create_New}" role="presentation"><a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-2" id="tab-scoped-2__item">{!$Label.c.Create_New_Tab}</a></li>
+					</ul>
+					<div aura:id="existingContent" class="slds-tabs--scoped__content slds-show" role="tabpanel" aria-labelledby="tab-scoped-1__item">
+						<div class="slds-grid slds-p-around--medium">
+							<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2 slds-p-bottom--medium">
+								<div class="slds-size--8-of-12 slds-float--left">
+									<lightning:input label="{!$Label.c.Filter}" name="searchBar" value="{!v.searchKey}" placeholder="{!$Label.c.Enter_Search_Value}"/>
+								</div>
+								<div class="slds-size--4-of-12 slds-float--left buttonPadding">
+									<lightning:button class="slds-button" variant="brand" label="Search" onclick="{!c.searchKeyChange}" /> 
+								</div>
+							</div>
+						</div>
+						<div id="normalExistingList" class="slds-p-around--medium">
+							<table class="slds-table slds-table--bordered slds-table--cell-buffer slds-table--fixed-layout" role="grid">
+								<thead>
+									<tr class="slds-text-title--caps">
+										<th scope="col" style="width:50px;">
+											<div class="slds-truncate" title="{!$Label.c.Target_Name}">{!$Label.c.Target_Name}</div>
+										</th>
+										<th scope="col" class="slds-cell-shrink">
+											<div class="slds-truncate slds-p-left--x-small" title="{!$Label.c.User_Filters}">{!$Label.c.User_Filters}</div>
+										</th>
+										<th scope="col" class="slds-cell-shrink">
+											<div class="slds-truncate" title="{!$Label.c.Number_of_Accounts}">{!$Label.c.Number_of_Accounts}</div>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<aura:iteration items="{!v.targetCriteriaList}" var="tar">
+										<tr scope="row">
+											<td data-label="TARGET NAME" class="slds-truncate">
+												<div class="slds-form-element">
+													<div class="slds-form-element__control">
+														<label for="{!'tar' + tar.tarCriteriaObj.Id}">
+															
+															<span class="slds-radio--faux"></span>
+															<span class="slds-form-element__label slds-truncate">{!tar.tarCriteriaObj.Name}</span>
+														</label>
+													</div>
+												</div>
+											</td>
+											<td data-label="USER FILTER" class="slds-truncate slds-cell-wrap">{!tar.tarCriteriaObj.Filter_Description__c}</td>
+											<td data-label="NUMBER OF ACCOUNTS" class="slds-truncate"><ui:outputNumber value="{!tar.recordCount}" /></td>
+										</tr>
+									</aura:iteration>
+								</tbody>
+								<tfoot>
+									<td colspan="1"></td>
+									<td>
+										<aura:if isTrue="{!v.targetCriteriaList.length > 0}">
+											<lightning:button disabled="{!v.viewMoreDisabled}" class="slds-button" variant="brand" label="{!$Label.c.ViewMore}" onclick="{!c.getNextPage}" />
+										</aura:if>
+									</td>
+									<td colspan="1"></td>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+					<div aura:id="newContent" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-2__item">
+						<ui:scrollerWrapper class="scrollerSizeAdd">
+							<ui:message aura:id="validationMessage" severity="error" closable="false" class="slds-hide slds-text-align--center">
+								{!v.validationMessage}
+							</ui:message>
+							<div class="slds-grid slds-wrap slds-p-around--medium">
+								<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2 slds-p-bottom--medium">
+									<lightning:input label="{!$Label.c.Target_Name_Label}" name="targetName" value="{!v.targetName}" placeholder="{!$Label.c.Enter_Name}" onchange="{!c.enableSaveButton}"/>
+								</div>
+								<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2 slds-text-align--right slds-p-bottom--medium">
+									<label class="slds-form-element__label">{!$Label.c.Number_of_Accounts_Label}&nbsp;<ui:outputNumber value="{!v.numOfAccounts}" /></label>
+								</div>
+								<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-1 slds-large-size--1-of-2">
+									<lightning:input label="{!$Label.c.Filter_Description_Label}" name="filterDescription" value="{!v.filterDescription}" placeholder="{!$Label.c.Enter_Description}"/>
+								</div>
+							</div>
+							<div class="slds-form--compound slds-p-around--medium">
+								<div class="slds-form-element__group">
+									<label class="slds-form-element__label">{!$Label.c.Account_Filters}</label>
+									<c:FilterComponent aura:id="filterRow" object="Account" fieldCount="1"/>
+									<c:FilterComponent aura:id="filterRow" object="Account" fieldCount="2"/>
+									<c:FilterComponent aura:id="filterRow" object="Account" fieldCount="3"/>
+									<div aura:id="dynamicRows">
+										{!v.body}
+									</div>
+									<lightning:button variant="base" label="{!$Label.c.Add_Another_Filter}" onclick="{!c.addFilter}"/>
+								</div>
+							</div>
+						</ui:scrollerWrapper>
+					</div>
+				</div>
+			</div>
+			<aura:if isTrue="{!v.saveExistingCriteria == false}">
+			<div class="slds-modal__footer">
+				<lightning:button disabled="{!v.saveDisabled}" class="slds-button" variant="brand" label="{!$Label.c.Save}" onclick="{!c.saveAccountCriteria}" aura:id="saveButton" />
+			</div>
+			</aura:if>
+		</div>
+	</div>
+</aura:component>

@@ -1,0 +1,24 @@
+.THIS .label-hidden > label {
+    display: none;
+}
+.THIS .table-test thead th span {
+background-color: #54698D;
+color: white;
+}
+.THIS .btn-color{
+background-color: #54698D;
+color: white;
+}
+.THIS .txt-header-color{
+background-color: white;
+font-weight: 400;
+color: #54698D;
+}
+
+.THIS.customCardClass > header.slds-card__header.slds-grid{
+    padding-top:0px;
+}
+
+.THIS header.slds-card__header.slds-grid{
+    padding-top:0px;
+}

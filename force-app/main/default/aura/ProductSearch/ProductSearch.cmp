@@ -1,0 +1,168 @@
+<!--
+Company:        Slalom, LLC
+Description:    Type Ahead search component to return list of brands
+-->
+<aura:component controller="ProductSearchApexController">
+    <aura:dependency resource="markup://lightning:input" />
+    <!-- Bubble up select information -->
+    <aura:registerEvent name="setSearchAttr" type="c:SearchValueChange"/>
+    
+    <aura:method name="initPackage" action="{!c.initializePackageFromTemplate}" >
+        <aura:attribute name="productId" type="Id" />
+    </aura:method>
+    
+    <!-- Search Filters -->
+    <aura:attribute name="object" type="String" />
+    <aura:attribute name="field" type="String" />
+    <aura:attribute name="subField" type="String" />
+    <aura:attribute name="label" type="String" default="{!$Label.c.Brand}" />
+    <aura:attribute name="packageLabel" type="String" default="{!$Label.c.Select_a_Package}" />
+    <aura:attribute name="Identifier" type="String" default="" />
+    <aura:attribute name="filters" type="Map[]" />
+    <aura:attribute name="placeholder" type="String" default="" />
+    <aura:attribute name="packages" type="String[]" default=""/>
+    
+    <aura:attribute name="isDisablePkg" type="boolean" default="true"/>
+    <aura:attribute name="isFromObjectivesPage" type="boolean" default="false"/>
+    <aura:attribute name="showPkg" type="boolean"/>
+    <aura:attribute name="selectedPkgId" type="id"/>
+    <aura:attribute name="isRequired" type="boolean" default="true"/>
+    <aura:attribute name="isOffPremise" type="boolean" default="false"/>
+    
+    
+    <!-- Aggregate Filter - Displays next to result Result (#) -->
+    <!-- Pass in a aggregate query and it will add the aggregate next to the result records using the field with the alias id to determine relationship
+             Use id as the alias for the groupingfield relationship and displayField for the returned field to display next to the result
+             The controller will add in the list of Ids at the end of the where clause string -->
+    <aura:attribute name="aggregateSELECT" type="String" />
+    <aura:attribute name="aggregateFROM" type="String" />
+    <aura:attribute name="aggregateWHERE" type="Map[]" default="{}" />
+    <aura:attribute name="aggregateGROUPBY" type="String" />
+    <aura:attribute name="aggregateRECORDTYPE" type="String" />
+    <aura:attribute name="isDisabled" type="boolean" default="false"/>
+    
+    <!-- Search piece -->
+    <aura:attribute name="searchValue" type="String" default="" />
+    <aura:attribute name="results" type="Object[]" default="[]" />
+    <aura:attribute name="selectedId" type="Id" default='' />
+    
+    <!-- Event Attributes -->
+    <aura:attribute name="loading" type="Boolean" default="false" />
+    <aura:attribute name="noResults" type="Boolean" default="false" />
+    <aura:attribute name="showMenu" type="Boolean" default="true" />
+    
+    <!-- Converts the Lookup Autocomplete to inline form design -->
+    <aura:attribute name="inline" type="Boolean" default="false" />
+    <aura:attribute name="fromScreen" type="String" default=" " />
+    <aura:attribute name="fromLabel" type="String" default=" " />
+    <aura:attribute name="requiredAstrik" type="String" description="determines if we make this field required"/> 
+    
+    <aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+        <div class="" data-select="single" >
+            <aura:if isTrue="{!v.fromScreen=='chainActivity'}">
+                    <label class="slds-form-element__label"><abbr class="slds-required" title="{!$Label.c.Required}">{!v.requiredAstrik}</abbr>{!v.fromLabel}</label>
+                </aura:if>
+            <lightning:input  aura:id="theLookup" autocomplete="off"  required="{!v.isRequired}" type="{!v.isDisabled == true ? 'String' : 'search'}" name="LightningLookup" label="{!v.label == null ? ' ' : v.label}" value="{!v.searchValue}" onchange="{!c.onSearchChange}" placeholder="{!v.placeholder}" disabled="{!v.isDisabled}" messageWhenValueMissing="{!$Label.c.Brand_is_Required}" />
+            <aura:if isTrue="{! or( or( and(v.results.length > 0, v.showMenu), v.loading), v.noResults ) }">
+                <div class="">
+                    
+                    <!-- Loading Spinner when fetching records -->
+                    <div aura:id="autoCompleteSpinner" class="slds-spinner_container slds-hide">
+                        <div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+                            <span class="slds-assistive-text">Loading</span>
+                            <div class="slds-spinner__dot-a"></div>
+                            <div class="slds-spinner__dot-b"></div>
+                        </div>
+                    </div>
+                    
+                    <ul class="" role="listbox">
+                        
+                        <!-- No Results Found -->
+                        <aura:if isTrue="{!v.noResults}">
+                            <li role="presentation">
+                                <div class="slds-media__body" style="padding: 5px 20px">
+                                    <div class="">{!$Label.c.Product_Search_No_Results}</div>
+                                </div>
+                            </li>
+                        </aura:if>
+                        
+                        <!-- Result Iterations -->
+                        <aura:iteration items="{!v.results}" var="result">
+                            <li role="presentation">
+                                <span aura:id="{!result.id}" id="{!result.id}" class="slds-media lookupPlaceholder" role="option" onclick="{!c.onSelectOption}">
+                                    <div class="slds-media__body">
+                                        <div class="">{!result.name + ' ' + result.aggregateDisplay}</div>
+                                        <aura:if isTrue="{!v.subField != null}">
+                                            <span class="slds-text-body--small">{!v.subField}: {!result.subFieldValue}</span>
+                                        </aura:if>
+                                    </div>
+                                </span>
+                            </li>
+                        </aura:iteration>
+                        
+                    </ul>
+                    
+                </div>
+            </aura:if>
+        </div>
+        <aura:set attribute="else">
+            <div class="slds-lookup slds-is-open" data-select="single" >
+                <aura:if isTrue="{!v.fromScreen=='chainActivity'}">
+                    <label class="slds-form-element__label"><abbr class="slds-required" title="{!$Label.c.Required}">{!v.requiredAstrik}</abbr>{!v.fromLabel}</label>
+                </aura:if>
+                <lightning:input  autocomplete="off"  aura:id="theLookup"  required="{!v.isRequired}" type="{!v.isDisabled == true ? 'String' : 'search'}" name="LightningLookup" label="{!v.label == null ? ' ' : v.label}" value="{!v.searchValue}" onchange="{!c.onSearchChange}" placeholder="{!v.placeholder}" disabled="{!v.isDisabled}" messageWhenValueMissing="{!$Label.c.Brand_is_Required}" />
+                <aura:if isTrue="{! or( or( and(v.results.length > 0, v.showMenu), v.loading), v.noResults ) }">
+                    <div class="slds-lookup__menu">
+                        
+                        <!-- Loading Spinner when fetching records -->
+                        <div aura:id="autoCompleteSpinner" class="slds-spinner_container slds-hide">
+                            <div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+                                <span class="slds-assistive-text">Loading</span>
+                                <div class="slds-spinner__dot-a"></div>
+                                <div class="slds-spinner__dot-b"></div>
+                            </div>
+                        </div>
+                        
+                        <ul class="slds-lookup__list" role="listbox">
+                            
+                            <!-- No Results Found -->
+                            <aura:if isTrue="{!v.noResults}">
+                                <li role="presentation">
+                                    <div class="slds-media__body" style="padding: 5px 20px">
+                                        <div class="slds-lookup__result-text">{!$Label.c.Product_Search_No_Results}</div>
+                                    </div>
+                                </li>
+                            </aura:if>
+                            
+                            <!-- Result Iterations -->
+                            <aura:iteration items="{!v.results}" var="result">
+                                <li role="presentation">
+                                    <span aura:id="{!result.id}" id="{!result.id}" class="slds-lookup__item-action slds-media lookupPlaceholder" role="option" onclick="{!c.onSelectOption}">
+                                        <div class="slds-media__body">
+                                            <div class="slds-lookup__result-text">{!result.name + ' ' + result.aggregateDisplay}</div>
+                                            <aura:if isTrue="{!v.subField != null}">
+                                                <span class="slds-lookup__result-meta slds-text-body--small">{!v.subField}: {!result.subFieldValue}</span>
+                                            </aura:if>
+                                        </div>
+                                    </span>
+                                </li>
+                            </aura:iteration>
+                            
+                        </ul>
+                        
+                    </div>
+                </aura:if>
+            </div>
+        </aura:set>
+    </aura:if>
+    <br />
+    <div class="{!v.showPkg ? '' : 'slds-hide'}">
+        
+        <lightning:select name="select" label="{!v.packageLabel}" required="true" disabled="{!v.isDisablePkg}" aura:id="selectOptions" value="{!v.selectedPkgId}" messageWhenValueMissing="{!$Label.c.Package_is_Required}">
+            <option value="">{!$Label.c.Package_Select_Default_Value}</option>
+            <aura:iteration items="{!v.packages}" var="pkg">
+                <option value="{!pkg.id}" text="{!pkg.name}" selected="{!pkg.id == v.selectedPkgId}"></option>
+            </aura:iteration>
+        </lightning:select>
+    </div>
+</aura:component>

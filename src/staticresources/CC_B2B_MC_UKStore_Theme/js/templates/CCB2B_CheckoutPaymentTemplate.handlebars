@@ -1,0 +1,55 @@
+<div class="paymentContainer">
+    <div class="cc_payment_details">
+        <div class="row">
+            <div class="col-sm-offset-3 col-sm-6 col-sm-offset-3 col-sm-6 col-xs-offset-0 col-xs-12">
+                <ul class="nav nav-pills nav-justified checkoutNav hidden-print">
+                    <li class="disabled  done  cc_checkoutStep0 cc_checkoutStep">
+                        <a><h4 class="list-group-item-heading">{{pageLabelMap 'CCB2B_Checkout_Shipping_Info_Step'}}</h4></a>
+                    </li>
+                    <li class="disabled done cc_checkoutStep1 cc_checkoutStep">
+                        <a><h4 class="list-group-item-heading">{{pageLabelMap 'CheckOut_ReviewStep'}}</h4></a>
+                    </li>
+                    <li class="active cc_checkoutStepPayment cc_checkoutStep">
+                        <a><h4 class="list-group-item-heading">{{pageLabelMap 'CheckOut_PaymentStep'}}</h4></a>
+                    </li>
+                    <li class="disabled cc_checkoutStepOrderConfirmation cc_checkoutStep">
+                        <a><h4 class="list-group-item-heading">{{pageLabelMap 'CheckOut_OrderConfirmationStep'}}</h4></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="panel panel-default cc_panel payment_section">
+            <div class="panel-heading cc_heading">
+                <h3 class="panel-title cc_title">{{pageLabelMap 'CCB2B_Checkout_Payment_Header'}}</h3>
+            </div>
+            <div class="panel-body cc-body">
+                <p class="payment_information">{{pageLabelMap 'CCB2B_Checkout_Payment_Info1'}}</p>
+                <p class="payment_information">{{pageLabelMap 'CCB2B_Checkout_Payment_Info2'}}</p>
+                <p class="payment_information">{{pageLabelMap 'CCB2B_Checkout_Payment_Info3'}}</p>
+            </div>
+            <!-- Payment section -->
+            <div class="paymentLinkSection">
+                <a style="display:none" href="#" id="worldpayPaymentTrigger" class="button"></a>
+                <div id='worldpayPayment'></div>
+            </div>
+            <div class="col-md-offset-2 col-md-8 col-sm-offset-0 col-sm-12">
+                <div id="CCB2B_PaymentTokensComponent"></div>
+            </div>
+            <div class="col-md-12 text-center">
+                <div id="ccb2b-co-payment-pn-button" class="btn btn-default paynow_button primary_button payNow">{{pageLabelMap 'CCB2B_Checkout_Payment_PayButton'}}</div>
+                <div style="display:none" class="paymentError">{{pageLabelMap 'CCB2B_Checkout_Payment_ErrorPayment'}}</div>
+                <span style="display:none" class="errorDescBtn" data-toggle="collapse" data-target="#errorDesc" aria-expanded="false" aria-controls="errorDesc">
+                    <span class="errorDescLabel">{{pageLabelMap 'CCB2B_Checkout_Payment_FailureDetailsPayment'}}</span>
+                    <span class="icon-arrow-down"></span>
+                </span>
+                <div class="collapse errorDesc" id="errorDesc">
+                    <div class="paymentError errorDesc">{{pageLabelMap 'CCB2B_Checkout_Payment_ErrorPayment'}}</div>
+                </div>
+            </div>
+            <div class="col-md-12 text-center">
+                <p class="payment_disclaimer text-center">&#42;&#42;{{pageLabelMap 'CCB2B_Checkout_Payment_Disclaimer'}}&#42;&#42;</p>
+            </div>
+        </div>
+    </div>
+</div>

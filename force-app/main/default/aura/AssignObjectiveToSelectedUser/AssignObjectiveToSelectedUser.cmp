@@ -1,0 +1,152 @@
+<aura:component controller="AddObjectiveController">
+
+	<aura:attribute name="editingObjective" type="Boolean" />
+	<aura:attribute name="isSharedObjective" type="Boolean" default="false"/>
+	<aura:attribute name="currentUsers" type="Object[]"/>
+	<aura:attribute name="allUsers" type="Object[]"/>
+	<aura:attribute name="titleFilter" type="String[]" default="[]"/>
+	<aura:attribute name="departmentFilter" type="String[]" default="[]"/>
+    <aura:attribute name="state" type="String[]" default="[]"/>
+    <aura:attribute name="managerFilter" type="String[]" default="[]"/>
+    <aura:attribute name="mySalesTeam" type="boolean" default="false"/>
+    <aura:attribute name="country" type="String"/>
+    <aura:attribute name="Number_Of_Objective" type="Integer" default="1"/>
+	<aura:attribute name="toggleApplyUsers" type="Boolean" default="false"/>
+	<aura:attribute name="objective" type="Objective__c"/>
+	<aura:attribute name="objectiveId" type="Integer"/>
+	<aura:attribute name="userIdList" type="Integer[]"/>
+	<aura:attribute name="errorsFound" type="Boolean" default="false"/>
+	<aura:attribute name="plannedObjType" type="String" />
+	<aura:attribute name="numOfUsers" type="Integer" default="0"/>
+	<aura:attribute name="userRole" type="String"/>
+	<aura:attribute name="delegateUserId" type="String"/>
+    
+ 
+	<aura:attribute name="viewMoreDisabled" type="Boolean" default="true" />
+	<aura:attribute name="pageNumber" type="Integer" default="1"/>
+	<aura:attribute name="pageSize" type="Integer" default="100"/>
+	<aura:attribute name="viewMoreFiltering" type="Boolean" default="true"/>
+
+    
+
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<aura:handler event="c:SearchValueChange" action="{!c.filterUserList}"/>
+	<aura:handler name="change" value="{!v.editingObjective}" action="{!c.handleEditing}"/>
+
+	<aura:method name="saveObjective" action="{!c.saveObjective}">
+    	<aura:attribute name="ObjectiveId" type="String" default=""/> 
+	</aura:method>
+
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    
+	<aura:if isTrue="{!v.editingObjective == False}">
+
+		<div class="{!v.isSharedObjective == false ? 'slds-hide' : ''}">
+		<!--Target User Content-->
+       <c:MultiSelectPills aura:id="title" field="Title" object="User" label="{!$Label.c.Target_User_Title}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Title_Placeholder}"/>
+        <c:MultiSelectPills aura:id="State" field="State" object="User" label="{!$Label.c.State_Province}" filterField="IsActive" placeholder="{!$Label.c.Search_State_Province}"/>
+		<!--<c:MultiSelectPills aura:id="department" field="Department" object="User" label="{!$Label.c.Target_User_Department}" filterField="IsActive" placeholder="{!$Label.c.Target_User_Department_Placeholder}"/>
+		--><!--Checkbox Toggle-->
+          
+					  
+          <c:MultiSelectPills aura:id="Manager" field="Name" object="User" label="{!$Label.c.Filter_sales_structure}" filterField="IsActive" placeholder="{!$Label.c.Manager_Name}"/>
+          <div class="slds-grid slds-wrap">
+				<div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-bottom--medium">
+
+            	<label class="slds-checkbox_toggle">
+					<span class="slds-form-element__label slds-m-bottom_none">{!$Label.c.My_Team}</span>
+					<br/>
+					 <input type="checkbox" aura:id="myTeam" aria-describedby="toggle-myteam"  checked="{!v.mySalesTeam}" onchange="{!c.mySalesTeamToggle}"/>
+					<span id="toggle-terr" class="slds-checkbox_faux_container" aria-live="assertive">
+						<span class="slds-checkbox_faux"></span>
+						<span class="slds-checkbox_on">{!$Label.c.C360_Yes}</span>
+                        <span class="slds-checkbox_off">{!$Label.c.C360_NO}</span>
+					</span>
+				</label>
+              </div>
+            <div class="slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2  slds-p-bottom--medium objective-number ">
+             
+            	<span class="slds-form-element__label slds-m-bottom_none" style="padding-right: 60px;">{!$Label.c.No_of_Objective}</span>
+                <br/>
+                <span class="input-number-decrement" onclick="{!c.decrement}">–</span>
+                <input class="input-number" aura:id="objectiveNumberText" type="text" value="{!v.Number_Of_Objective}"   min="0" max="10" maxlength="2"/>
+               <!--  <lightning:input class="input-number"  type="text" value="{!v.Number_Of_Objective}" />-->
+                <span class="input-number-increment" onclick="{!c.increment}">+</span>
+              </div>
+        </div>
+		<lightning:spinner aura:id="spinner" class="slds-hide" alternativeText="{!$Label.c.C360_Please_Wait}" />
+		
+		<div class="slds-grid slds-wrap">
+			<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-bottom--medium">
+				<label class="slds-checkbox_toggle">
+					<span class="slds-form-element__label slds-m-bottom_none">{!$Label.c.TargetUserObj_ApplyUsers}</span>
+					<br/>
+					<input type="checkbox" aura:id="userToggle" aria-describedby="toggle-desc" onchange="{!c.toggleBoxClick}" checked="{!v.toggleApplyUsers}"/>
+					<span id="toggle-desc" class="slds-checkbox_faux_container" aria-live="assertive">
+						<span class="slds-checkbox_faux"></span>
+						<span class="slds-checkbox_on">{!$Label.c.Help_Text_All_User_On}</span>
+						<span class="slds-checkbox_off">{!$Label.c.Help_Text_All_User_Off}</span>
+					</span>
+				</label>
+			</div>
+            
+			<div class="slds-size--1-of-1 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-text-align--right slds-p-bottom--medium">
+                 
+				<label class="slds-form-element__label">{!$Label.c.Number_of_Users_Label}&nbsp;<ui:outputNumber value="{!v.numOfUsers}" /></label>
+			</div>
+		</div>
+           
+		<!--End Checkbox Toggle-->
+		<!--Users Data Table-->
+		<table class="slds-table slds-table--bordered slds-table--cell-buffer slds-table--fixed-layout" role="grid">
+			<thead>
+				<tr class="slds-text-title--caps">
+					<aura:if isTrue="{!v.toggleApplyUsers == false}">
+						<th scope="col" class="slds-cell-shrink" style="width:10px">
+
+						</th>
+					</aura:if>
+					<th scope="col" style="width:50px;">
+						<div class="slds-truncate" title="User Name">{!$Label.c.TargetUserObj_Name}</div>
+					</th>
+					<th scope="col" class="slds-cell-shrink">
+						<div class="slds-truncate" title="User Title">{!$Label.c.TargetUserObj_Title}</div>
+					</th>
+					<th scope="col" class="slds-cell-shrink">
+                        <div class="slds-truncate" title="User Department">{!$Label.c.State_Province}</div>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!--Enter Table Body-->
+				<aura:iteration items="{!v.currentUsers}" var="user" indexVar="idx">
+					<tr aura:id="userDataRow" class="slds-hint-parent">
+						<div class="{!v.toggleApplyUsers == false ? '' : 'slds-hide'}">
+							<td data-label="USER SELECT" class="slds-truncate slds-cell-shrink" >
+								<div class="slds-checkbox_add-button">
+									<input type="checkbox" id="{!user.Id}" class="slds-assistive-text userlist" value="on" onchange="{!c.updateNumOfUsersSelected}"/>
+									<label for="{!user.Id}" class="slds-checkbox_faux">
+										<span class="slds-assistive-text"></span>
+									</label>
+								</div>
+							</td>
+						</div>
+						<td data-label="NAME" class="slds-truncate">{!user.Name}</td>
+						<td data-label="TITLE" class="slds-truncate slds-text-align_left">{!user.Title}</td>
+						<td data-label="DEPARTMENT" class="slds-truncate">{!user.State}</td>
+					</tr>
+				</aura:iteration>
+				<!--Enter Table Body-->
+			</tbody>
+		</table>
+		<div align="center">
+			<br/>
+			<lightning:button aura:id="viewMoreButton" disabled="{!v.viewMoreDisabled}" class="slds-button" variant="brand" label="{!$Label.c.ViewMore}" onclick="{!c.getNextPage}" />
+	 		<!--End Users Data Table-->
+	 		<!--End Target User Content-->	
+	 	</div>
+ 	</div>
+</aura:if>
+	
+
+</aura:component>

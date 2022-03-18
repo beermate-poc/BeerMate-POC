@@ -1,0 +1,4 @@
+<aura:component controller="CallPlanController" implements="force:lightningQuickAction,force:hasRecordId">
+	<aura:handler name="init" action="{!c.init}" value="{!this}" />
+	<aura:attribute name="recordId" type="String" />
+</aura:component>

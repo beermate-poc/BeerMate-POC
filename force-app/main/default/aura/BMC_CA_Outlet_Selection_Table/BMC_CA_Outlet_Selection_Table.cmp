@@ -1,0 +1,365 @@
+<aura:component controller="BMC_ChainActivityController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:availableForFlowScreens,lightning:isUrlAddressable" >   
+    <aura:attribute type="Boolean" name="showTable" default="true" />
+    <aura:attribute name="outletsMasterObj" type="Object" description="all accounts within hierarchy by id"/>
+    <aura:attribute name="outletsFiltered" type="List" description="accounts filtered by attribute(s)"/>
+    <aura:attribute name="outletsToDisp" type="List" description="accounts filtered by attribute(s) and displayed by page"/>
+    
+    <aura:attribute name="outletsSelected" type="List" description="accounts selected by user"/>
+    <aura:attribute name="outletsUnselected" type="List" description="accounts not selected by user"/>
+    <aura:attribute name="allOutlets" type="List" description="all accounts"/>
+    
+    <aura:attribute name="allChainParentLevelForFilter" type="Object" description="all accounts within hierarchy by id"/>
+    
+    <aura:attribute name="favoritelist" type="List" />
+    <aura:attribute name="mycolumns" type="List"/>
+    <aura:attribute name="favoritecolumns" type="List"/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="states" type="list" />
+    <aura:attribute name="statesSelected" type="list" />
+    <aura:attribute name="statesSelectedCache" type="list" />
+    <aura:attribute name="statesSaved" type="list"/>
+    <aura:attribute name="chainLvls" type="list"/>
+    <aura:attribute name="chainLvlsSelected" type="list"/>
+    <aura:attribute name="chainLvlNumSelected" type="list"/>
+    <aura:attribute name="chainLvlsSelectedCache" type="list"/>
+    <aura:attribute name="filteredOutletId" type="string" default=""/>
+    <aura:attribute name="filteredOutletIdCache" type="string"/>
+    <aura:attribute name="filteredChainNumber" type="string" default=""/>
+    <aura:attribute name="filteredChainNumberCache" type="string"/>
+    <aura:attribute name="chainactivitystatus" type="String"/>
+    <aura:attribute name="views" type="list"/>
+    <aura:attribute name="selectedView" type="String" default="All Outlets"/>
+    <aura:attribute name="selectedViewIds" type="list" />
+    <aura:attribute name="selectedViewCache" type="string"/>
+    
+    <aura:attribute name="selectedWTH" type="String" />
+    <aura:attribute name="selectedwthname" type="String" />
+    <aura:attribute name="currentPageNumber" type="Integer" default="1"/>
+    <aura:attribute name="pageSize" type="Integer" default="10"/>
+    <aura:attribute name="totalPages" type="Integer" default="0"/>
+    <aura:attribute name="pageList" type="List"/>
+    <aura:attribute name="isAllSelected" type="Boolean" default="false" />
+    <aura:attribute name="manualSelect" type="Boolean" default="true" />
+    <aura:attribute name="showfavoritemodal" type="Boolean" />
+    <aura:attribute name="wthinputmodal" type="Boolean" default="false"/>   
+    <aura:attribute name="addproduct" type="Boolean" default="true" />
+    <aura:attribute name="loaded" type="Boolean" default="false" />
+    <aura:attribute name="displayToast" type="Boolean" />
+    <aura:attribute name="currentSelectionSize" type="Integer" default="0" />
+    <aura:attribute name="maxSelectionSize" type="Integer" default="3000" />
+    
+    <aura:handler name="init" value="{! this }" action="{! c.fetchOutlets }"/>
+    <aura:handler name="openModal" event="c:strike_evt" action="{!c.openModal}" />
+                 <lightning:spinner aura:id="spinner" class="slds-hide" alternativeText="Please wait..." size="medium" />
+
+    <div>
+        <aura:if isTrue="{! !v.loaded }">   
+            <lightning:spinner alternativeText="Loading" />
+        </aura:if>
+
+        <ui:scrollerWrapper class="scrollerSize">
+            <aura:if isTrue="{!v.addproduct}"> 
+                <div class="slds-grid slds-p-around_x-small">
+                    <div class="slds-col"> 
+                        <lightning:card variant="Narrow" >
+                            <span  >
+                                <ul class="slds-p-left_large">
+                                    <li style="list-style-type:none;">
+                                		Total outlets in chain parent: <b> {!v.outletsMasterObj.length} </b>
+                            		</li>
+                             		<li style="list-style-type:none;">
+                               			Total outlets selected: <b>{!v.currentSelectionSize}</b>
+                            		</li>
+                            		<li style="list-style-type:none;">
+                                		Maximum outlets available to select: <b>{!v.maxSelectionSize}</b>                               
+                            		</li>
+                                </ul>
+                             
+                        </span>                        
+                        </lightning:card>
+                    </div>
+                    <div class="slds-col"> </div>
+                    <div class="slds-col"/>
+                    
+                </div>
+            
+                <div class="slds-grid slds-p-around_x-small">
+                    <div class="slds-col">
+                        <span>
+                            <lightning:buttonMenu aura:id="menu" onselect="{! c.handleSave }" label="{!$Label.c.BMC_Save}" class="left-align">
+                                <lightning:menuItem value="saveAndContinue" label="Save" />
+                                <lightning:menuItem value="saveAndReturn" label="Save and Finish" />
+                                <lightning:menuItem value="saveAndFavorite" label="Save and Create Favorite List" />
+                            </lightning:buttonMenu>
+                            <lightning:button
+                                              label="Filter"
+                                              variant="brand"
+                                              onclick="{! c.openModal}" 
+                                              />
+                            <lightning:button
+                                              label="Apply Favorite List"
+                                              variant="neutral"
+                                              onclick="{! c.applyFavoritelist}" 
+                                              />
+                            <lightning:button
+                                              label="{!$Label.c.BMC_CancelButton}"
+                                              variant="neutral"
+                                              onclick="{! c.returnToRecord}"    
+                                              />
+                        </span>
+                    </div>
+                    <div class="slds-col"/>
+                    <div class="slds-col">  
+                    </div>
+                    <div class="slds-col"/>
+                    <div class="slds-col"/>
+                </div>
+                
+                <table aria-multiselectable="true" class="slds-table slds-table_bordered slds-container_x-large">
+                    <thead>
+                        <th scope="col">
+                            <ui:inputCheckbox name="selectOutlets" aura:id="selectAll" value="{!v.isAllSelected}" change="{!c.onSelectAllChange}"/>
+                        </th>
+                        <aura:iteration items="{!v.mycolumns}" var="cols">
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-wrap" title="">{!cols.label}</div>
+                            </th>
+                        </aura:iteration>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.outletsToDisp}" var="acct">
+                            <tr>
+                                <td>
+                                    <ui:inputCheckbox name="{!acct.theAccount.Id}" aura:id="checkOutlet" value="{!acct.selected}" change="{!c.onSelectChange}"/>
+                                </td>
+                                <td>
+                                    <div class="slds-truncate slds-cell-wrap" title="">{!acct.theAccount.Name}</div>
+                                </td>
+                                <td>
+                                    <div class="slds-truncate slds-cell-wrap" title="">{!acct.theAccount.BillingStreet}</div>
+                                </td>
+                                <td>
+                                    <div class="slds-truncate slds-cell-wrap " title="">{!acct.theAccount.BillingCity}</div>
+                                </td>
+                                <td>
+                                    <div class="slds-truncate slds-cell-wrap " title="">{!acct.theAccount.BillingState}</div>
+                                </td>
+                                <td>
+                                    <div class="slds-truncate slds-cell-wrap " title="">{!acct.theAccount.ChainStoreNbr__c}</div>
+                                </td>
+                                <td>
+                                    <div class="slds-truncate slds-cell-wrap " title="">{!acct.theAccount.OutletCd__c}</div>
+                                </td>  
+                                <td>
+                                	<div class="slds-truncate slds-cell-wrap " title="">{!acct.theAccount.Total_13_Wk_Volume__c}</div>
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+                
+                
+                <div class="slds-grid slds-p-around_x-small">            
+                    <div class="slds-col"/>
+                    <div class="slds-col"/>
+                    <div class="slds-col">
+                        <span>
+                            <lightning:button label="First" iconName="utility:left" iconPosition="left"
+                                              onclick="{!c.onFirst}" disabled="{! v.currentPageNumber == 1}"/>
+                            <lightning:button iconName="utility:chevronleft" iconPosition="left"
+                                              onclick="{!c.onPrev}" disabled="{! v.currentPageNumber == 1}"/>
+                            <span class="slds-p-horizontal_x-small">
+                                <a onclick="{!c.processMe}" name="1" 
+                                   class="{! (v.currentPageNumber == 1) ? 'selected' : ''}">1</a>
+                            </span>
+                            <span class="slds-p-horizontal_xxx-small">
+                                <a>...</a>
+                            </span>
+                            <aura:iteration items="{!v.pageList}" var="item">
+                                <span class="slds-p-horizontal_x-small">
+                                    <a onclick="{!c.processMe}" name="{!item}"
+                                       class="{! (v.currentPageNumber == item) ? 'selected' : ''}">{!item}</a>
+                                </span>
+                            </aura:iteration>  
+                            <span class="slds-p-horizontal_xxx-small">
+                                <a>...</a>
+                            </span>
+                            <span class="slds-p-horizontal_x-small">
+                                <a onclick="{!c.processMe}" name="{!v.totalPages}"
+                                   class="{! (v.currentPageNumber == v.totalPages) ? 'selected' : ''}">{!v.totalPages}</a>
+                            </span>
+                            <lightning:button iconName="utility:chevronright" iconPosition="right" 
+                                              disabled="{! v.currentPageNumber == v.totalPages}" onclick="{!c.onNext}"/>
+                            <lightning:button label="Last" iconName="utility:right" iconPosition="right" 
+                                              disabled="{! v.currentPageNumber == v.totalPages}" onclick="{!c.onLast}"/>
+                        </span>
+                    </div>
+                    <div class="slds-col" />
+                    <div class="slds-col" ></div>
+                    <div class="slds-col" />
+                </div>
+                <div>
+                     <c:strike_modal aura:id="favoriteList"
+                                title="Apply Favorite List"
+                                showHeader="false"
+                                showFooter="false"
+                                showClose="false"
+                                showModal="false"
+                                     size="small">
+                         <div class="slds-text-heading_large slds-text-align_center">Apply Favorite List</div>
+                     <div class="slds-table--header-fixed_container" style="height:450px;">
+   					 <div class="slds-scrollable_y" style="height:100%;">
+                    <table aria-multiselectable="true" class="slds-table slds-table_bordered slds-table--header-fixed">
+                    <thead>
+                        
+                        <aura:iteration items="{!v.favoritecolumns}" var="cols">
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-wrap slds-text-align_center" title="">{!cols.label}</div>
+                            </th>
+                        </aura:iteration>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.favoritelist}" var="fav" indexVar="idx">
+                            <tr>
+                                <td>
+                                    <input type="radio" data-set="{!idx}"  name="selectFavorite"  onchange="{!c.onSelectWTH}" />
+                                </td>
+                                <td>
+                                    <div class="slds-truncate slds-cell-wrap slds-text-align_center" title="">{!fav.favList.Name}</div>
+                                </td>
+                                <td>
+                                    <div class="slds-truncate slds-cell-wrap slds-text-align_center" title="">{!fav.favList.Count_Target_Accounts__c}</div>
+                                </td>
+                                
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+                         </div></div>
+                         <br></br>
+                          <br></br>
+                         <div class="slds-align_absolute-center">
+                         <lightning:button
+                                              label="Apply and Save"
+                                              variant="brand"
+                                              onclick="{! c.applyFavorite}"    
+                                              />
+                    <lightning:button
+                                              label="{!$Label.c.BMC_CancelButton}"
+                                              variant="neutral"
+                                              onclick="{! c.closeFavModal}"    
+                                              />
+                             </div>
+                    </c:strike_modal>
+                </div>
+                <c:strike_modal aura:id="Filter"
+                                title="Filter Outlet List"
+                                showHeader="true"
+                                showFooter="false"
+                                showClose="false"
+                                showModal="false"
+                                size="large">
+                    <aura:if isTrue="{! !v.loaded }">  
+            				<lightning:spinner alternativeText="Loading" />
+        			</aura:if>
+                    <div class="slds-grid slds-grid_horizontal slds-grid_vertical-align-center">
+                        <div class="slds-col">
+                            <span>
+                                <lightning:dualListBox name="states" label="States" value="{! v.statesSelected}" placeholder="Select State(s)" options="{! v.states }" onchange="{!c.handleStateUpdate}"/>
+                            </span>
+                        </div>
+                        <aura:if isTrue="{!not(empty(v.chainLvls))}">
+                            <div class="slds-col">
+                                <span>
+                                    <div class="slds-p-right_xxx-small">
+                                        <lightning:dualListBox name="chainLvls" label="Chain Level(s)" value="{! v.chainLvlsSelected}" placeholder="Select Chain Level(s)" options="{! v.chainLvls}" onchange="{!c.handleChainLvlUpdate}"/>
+                                    </div>
+                                </span>
+                            </div>
+                        </aura:if>
+                        <div class="slds-col">
+                            <div class="slds-grid slds-grid_vertical">
+                            <span>
+                                <lightning:input aura:id="searchOutlets" name="searchOutlets" value="{! v.filteredOutletId}" label="Retail Outlet ID" class="boldLabel" type="search"/>
+                            </span>
+                                <br></br>
+                            <span>
+                                <lightning:input aura:id="searchChainNumber" name="searchChainNumber" value="{! v.filteredChainNumber}" label="Account Store Number" class="boldLabel" type="search"/>
+                            </span>
+                                <br></br>
+                            <span>
+                                <lightning:radioGroup 	name="viewSelected"
+                          								label="View"
+                          								options="{! v.views}"
+                          								value="{! v.selectedView}"                                                      	
+                                                        type="radio"
+                                                      	onchange="{!c.handleViewChange}"/>                           
+                            </span> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-p-top_small">
+                        <lightning:button
+                                          label="Apply"
+                                          variant="brand"
+                                          onclick="{! c.applyFilters}"    
+                                          />
+                        <lightning:button
+                                          label="Clear Filters"
+                                          variant="neutral"
+                                          onclick="{! c.clearFilters}"    
+                                          />
+                        <lightning:button
+                                          label="Cancel"
+                                          variant="neutral"
+                                          onclick="{! c.cancelAndClose}"
+                                          />
+                    </div>    
+                </c:strike_modal> 
+                <aura:if isTrue="{!v.wthinputmodal}">      
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <header class="slds-modal__header slds-modal__header_empty">
+                                <lightning:buttonIcon iconName="utility:close"
+                                                      onclick="{! c.closeModal }"
+                                                      alternativeText="close"
+                                                      variant="bare-inverse"
+                                                      class="slds-modal__close"/>
+                            </header>
+                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                <lightning:input type="text" aura:id="wthName" label="WTH List Name" required="true"  />
+                            </div>
+                            <footer class="slds-modal__footer">
+                                <lightning:button variant="neutral" 
+                                                  label="Cancel"
+                                                  onclick="{! c.closeModal }"/>
+                                <lightning:button variant="brand" 
+                                                  label="Create"
+                                                  onclick="{! c.createList }"/>
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </aura:if>
+                <aura:set attribute="else">
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <header class="slds-modal__header slds-modal__header_empty">
+                                <lightning:buttonIcon iconName="utility:close"
+                                                      onclick="{! c.gobcktoRcrdpage }"
+                                                      alternativeText="close"
+                                                      variant="bare-inverse"
+                                                      class="slds-modal__close"/>
+                            </header>
+                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                <center> <div class="slds-text-heading_medium">{!$Label.c.BMC_CADisableOutlet}</div> 
+                                    <lightning:button class="slds-wrap" variant="brand" name="Ok"  label="Ok" onclick="{!c.gobcktoRcrdpage}"/> 
+                                </center> 
+                            </div>
+                        </div>
+                    </section>
+                </aura:set>
+            </aura:if>
+        </ui:scrollerWrapper>   
+    </div>
+</aura:component>

@@ -1,0 +1,9 @@
+.THIS .slds-no-space {
+    max-width:100% ;
+    overflow:hidden;
+    white-space: nowrap;
+}
+.THIS .slds-truncate{
+    white-space: nowrap;
+    -ms-text-overflow: ellipsis !important;
+}

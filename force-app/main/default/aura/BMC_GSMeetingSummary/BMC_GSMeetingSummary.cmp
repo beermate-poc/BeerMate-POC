@@ -1,0 +1,28 @@
+<aura:component controller="GuidedSellingController"  implements="force:appHostable,force:lightningQuickActionWithoutHeader,lightning:isUrlAddressable">
+    <aura:attribute name="callLogRec" type="Call_Log__c" />
+    <aura:attribute name="pageReference" type="Object"/>
+    <aura:attribute name="acctId" type="Id" />
+    <aura:attribute name="showToast" type="boolean" default="false"/>
+    <aura:attribute name="toastTitle" type="String" />
+    <aura:attribute name="toastMsg" type="String" />
+    <aura:attribute name="toastType" type="String" />
+    <aura:handler name="init" action="{!c.init}" value="{!this}" />
+        <div class="slds-text-align__center">
+        <aura:if isTrue="{!v.showToast}">
+            <c:Toast toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}"/>
+        </aura:if>
+    </div>
+	<lightning:card>
+            <div class="slds-text-heading_medium slds-text-align_center">{!$Label.c.Call_Log_Summary}</div>
+            <lightning:accordion aura:id="summary"> 
+                <lightning:layout horizontalAlign="center">
+                    <lightning:layoutItem size="8">
+                        <ui:outputDate class="" value="{!v.callLogRec.Call_Start_Date__c}" format="EEEE, MMM dd"/>&nbsp;{!v.callLogRec.Started_By__r.Name}
+                        <lightning:textarea disabled="true" value="{!v.callLogRec.Objective_History_Call_Summary__c}" label="Objective Summary"/>
+                        <lightning:textarea aura:id="userSummary" disabled="false" value="{!v.callLogRec.Call_Summary__c}" label="Call Log Summary"/>
+                        <lightning:button class="slds-button slds-align_absolute-center" variant="brand" label="{!$Label.c.Save_and_End}" onclick="{!c.saveCallSummary}" aura:id="saveButton" />    
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:accordion> 
+        </lightning:card>
+</aura:component>

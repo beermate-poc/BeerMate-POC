@@ -1,0 +1,93 @@
+.THIS {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    background: #FFFFFF;
+    height: 100%;
+    }
+.THIS .icon{
+    padding-left: 0.4rem !important;
+    padding-right: 0.1rem !important;
+}
+    
+/*Desktop Account Name Styling*/
+@media(min-device-width: 1026px){
+    .THIS .brandName{
+    color: #0070d2;
+    font-weight: 450;
+    font-size:18px;
+    text-transform: uppercase;
+    }   
+}
+.THIS .greyTextBackground{
+    background-color: lightgrey;
+    color:black;
+    border: 2px solid lightgrey;
+    border-radius: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.THIS .rightHandColumn
+{
+     text-align: right;
+}
+
+
+
+/* Iphone 7 */
+@media (max-device-width : 667px) and (min-device-width : 375px) {
+    .THIS.brandlist {
+
+    }
+    .THIS .brandName{
+        color: #0070d2;
+        font-weight: 450;
+        font-size: 16px;
+        text-transform: uppercase;
+    }
+}
+
+
+
+/* IPhone 7 plus */
+@media (max-device-width : 736px) and (min-device-width : 414px) {
+    .THIS.brandlist {
+
+    }
+}
+/* IPhone X */
+@media (max-device-width : 736px) and (min-device-width : 424px) {
+    .THIS.brandlist {
+
+    }
+}
+
+/* IPad landscape*/
+
+@media (max-device-width : 1024px)
+    and (min-device-width : 768px)
+    and (orientation: landscape)  {
+    .THIS .brandName
+    {
+        color: #0070d2;
+        font-weight: 450;
+        font-size: 16px;
+        text-transform: uppercase;
+    }
+
+}
+
+/* IPad portrait*/
+@media (max-device-width : 1024px)
+    and (min-device-width : 768px)
+    and (orientation: portrait){
+
+    .THIS .brandName
+    {
+        color: #0070d2;
+        font-weight: 450;
+        font-size: 16px;
+        text-transform: uppercase;
+    }
+    
+}

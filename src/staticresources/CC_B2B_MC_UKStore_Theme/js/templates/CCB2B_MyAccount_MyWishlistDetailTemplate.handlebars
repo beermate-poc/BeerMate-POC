@@ -1,0 +1,189 @@
+<div class="panel panel-default cc_panel cc_myaccount_mywishlists_container">
+        <div class="col-md-10">
+            <div class="panel-heading cc_heading">
+                <h3 class="panel-title cc_title">{{pageLabelMap 'MyAccount_MyWishlist'}}</h3>
+            </div>
+            <div class="panel-body cc_body">
+                <div class="cc_wishlist_heading">
+                    <h4 class="cc_wishlist_name">{{this.name}}</h4>
+                    {{#if this.note}}
+                    <span class="cc_wishlist_note_label">{{pageLabelMap 'Field_Notes'}}&#58;</span>
+                    <span class="cc_wishlist_note">{{this.note}}</span>
+                    {{/if}}
+                    <p class="cc_wishlist_active hidden-print">
+                        <span class="cc_wishlist_active_label">{{pageLabelMap 'Heading_Active'}}&#58;</span>
+                        <span class="cc_wishlist_active_value">{{#ifEquals isActive true}} <span class="glyphicon glyphicon-ok"></span> {{else}} <span class="glyphicon glyphicon-remove"></span>{{/ifEquals}}</span>
+                    </p>
+                </div>
+                {{#if this.itemData}}
+                <div class="row wishlist_controls hidden-print">
+                    <div class="col-xs-12 col-sm-2 col-lg-3 nameSection">
+                        {{this.itemData.length}}
+                        {{#ifEquals this.itemData.length 1}}
+                            {{pageLabelMap 'CCB2B_FavouritesDetails_Item'}}
+                        {{else}}
+                            {{pageLabelMap 'CCB2B_FavouritesDetails_Items'}}
+                        {{/ifEquals}}
+                        {{this.name}}
+                    </div>
+                    <div class="col-xs-12 col-sm-3 col-lg-3">
+                        <input id="ccb2b-favourites-select-all" class="selectAllCheckbox" type="checkbox">
+                        <label for="ccb2b-favourites-select-all">{{pageLabelMap 'CCB2B_FavouritesDetails_SelectAll'}}</label>
+                    </div>
+                    <div class="col-xs-12 col-sm-7 col-lg-6">
+                        <div class="selectWishButtons row"></div>
+                    </div>
+                </div>
+                    <div class="col-xs-12 printListSection hidden-print">
+                        <button id="ccb2b-favourites-print-list" class="btn btn-default btn-sm printList">{{pageLabelMap 'CCB2B_FavouritesDetails_PrintList'}}</button>
+                    </div>
+                <div class="col-xs-12 addAllSection hidden-print">
+                    {{#if (checkContactDisplayPermissions 'create_basket')}}
+                        <button id="ccb2b-favourites-add-all-to-basket" class="btn primary_button btn-default btn-sm addAllToBasket" disabled="disabled">{{pageLabelMap 'Component_MiniwishList_AddAllToCart'}}</button>
+                    {{/if}}
+                </div>
+                {{/if}}
+                <div class="col-xs-12 sortSection">
+                    <ul id="sortableFavourites">
+                    {{#each this.itemData}}
+                    <li class="ui-state-default" data-id="{{this.uid}}">
+                    <div class="row cc_wishlist_item itemSection">
+                        <div class="col-md-1 col-lg-1 iconSection hidden-print">
+                            <span class="fa fa-sort"></span>
+                        </div>
+                        <div class="col-md-3 col-lg-2">
+                            <div class="cc_wishlist_image">
+                                {{#if (isProductInPromo this.prodBean.sfid)}}
+                                    <div class="isPromoBadge goToOffer" data-category="{{promoCategory this.prodBean.sfid}}">{{pageLabelMap 'CCB2B_Product_ViewOffer_Badge'}}</div>
+                                {{/if}}
+                                <input id="{{generateId 'ccb2b-fav-add-to-' this.prodBean.sku '-checkbox'}}" data-wlid="{{this.uid}}" class="addToWishlistCheckbox hidden-print" type="checkbox" data-id="{{this.prodBean.sku}}">
+                                <label  class="prod_list_check_label" for="{{generateId 'ccb2b-fav-add-to-' this.prodBean.sku '-checkbox'}}"></label>
+                                {{#if mediaWrapper}}
+                                    {{productLink this.prodBean 'cc_prod_link' image=(displayImage this.mediaWrapper 'accountWish img-responsive' alt=this.prodBean.name dataId=this.prodBean.sku)}}
+                                {{else}}
+                                    {{productLink this.prodBean 'cc_product_name' image=(displayPlaceholderImage this)}}
+                                {{/if}}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-lg-6">
+                            <p class="item_title cc_wishlist_item_title">
+                                {{productLink this.prodBean 'cc_prod_link'}}
+                            </p>
+                            <div class="sku cc_sku">
+                                {{#ifDisplay 'WL.DsplAddtlSku'}}
+                                <span class="cc_label">{{pageLabelMap 'CCB2B_Basket_Product_Number_Label'}}</span>
+                                <span class="cc_value">{{this.prodBean.sku}}</span>
+                                {{/ifDisplay}}
+                            </div>
+                            {{#ifDisplay 'WL.DsplShortDesc' }}
+                            <p class="cc_short_desc">{{{this.prodBean.shortDesc}}}</p>
+                            {{/ifDisplay}}
+                        </div>
+                        <div class="col-md-4 col-lg-3 buttonsSection">
+                            <div class="cart_item wishFinder cc_wish_finder" data-sku="{{this.prodBean.sku}}">
+                                {{#if this.showPricing}}
+                                {{#ifDisplay 'WL.DsplPricing' }}
+                                {{#if this.price}}
+                                {{#if (checkContactDisplayPermissions 'pricing')}}
+                                <div class="price_block cc_price_block">
+                                    <p class="price cc_price price_line">
+                                        <span class="value cc_value">{{{price this.price}}}</span>
+                                        {{#if this.prodBean.CCB2BPricePerLiter}}
+                                            <span class="pricePerLiter"> {{price this.prodBean.CCB2BPricePerLiter}}{{pageLabelMap 'CCB2B_PricePerLiter'}}</span>
+                                        {{/if}}
+                                    </p>
+                                </div>
+                                {{/if}}
+                                {{/if}}
+                                {{#if this.isTierPriced}}
+                                <div class="cc_prt_tool_tip_div cc_prt_tool_tip_div_mywl" data-toggle="tooltip" title="{{pageLabelMap 'ProductPricingTiers_VolumeHover'}}">
+                                    <span class="cc_prt_tool_tip_text cc_prt_tool_tip_text_mywl">{{pageLabelMap 'ProductPricingTiers_VolumePricing'}}</span>
+                                </div>
+                                {{/if}}
+                                {{/ifDisplay}}
+                                {{#ifDisplay 'WL.DsplAvlb'}}
+                                {{#ifEquals this.inventory 0}}
+                                <div class="inventory cc_inventory">
+                                    <span class="cc_label">{{pageLabelMap 'ProductDetail_NotAvailable1'}}</span>
+                                    <span class="cc_value">{{pageLabelMap 'ProductDetail_NotAvailable2'}}</span>
+                                </div>
+                                {{/ifEquals}}
+                                {{/ifDisplay}}
+                                <input type="hidden" value="{{this.inventory}}" id="qtyAvail_{{this.prodBean.id}}" name="qtyAvail_{{this.prodBean.id}}" />
+                                {{#if this.canAddtoCart}}
+                                <div class="messagingSection-Warning-{{this.prodBean.sfid}} invalid_qty_msg" style="display: none"></div>
+                                <div class="messagingSection-Info-{{this.prodBean.sfid}}" style="display: none"></div>
+                                <div class="messagingSection-Error-{{this.prodBean.sfid}}" style="display: none"></div>
+                                {{#ifDisplay 'WL.DsplAddCart' }}
+                                {{#if (checkContactDisplayPermissions 'create_basket')}}
+                                <div class="changeQtySection hidden-print">
+                                    <div class="form-group">
+                                        <div class="input-group cc_input_group">
+                                    <span class="input-group-btn cc_input_group_btn">
+                                         <input data-id="{{this.prodBean.id}}" id="{{generateId 'ccb2b-favourites-minus-' this.prodBean.sku '-btn'}}" type="button" value="{{pageLabelMap 'Prod_QtyDecrSingle'}}" class="{{#ifEquals quantity 1}} readonlyBtn{{/ifEquals}} btn btn-default btn-sm minus cc_minus qty_btn">
+                                    </span>
+                                            <input data-id="{{this.prodBean.id}}" id="entry_{{this.prodBean.id}}" data-sku="{{this.prodBean.sku}}" type="text" name="qty" value="0" class="input-text entry plus_minus form-control input-sm cc_entry" maxlength="7" />
+                                            <span class="input-group-btn cc_input_group_btn">
+                                          <input data-id="{{this.prodBean.id}}" id="{{generateId 'ccb2b-favourites-plus-' this.prodBean.sku '-btn'}}" type="button" value="{{pageLabelMap 'Prod_QtyIncrSingle'}}" class="btn btn-default btn-sm plus cc_plus qty_btn">
+                                    </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {{/if}}
+                                    {{#if (checkContactDisplayPermissions 'create_basket')}}
+                                    <p class="cc_wishlist_action hidden-print">
+                                        {{#if (isProductInPromo this.prodBean.sfid)}}<button id="{{generateId 'ccb2b-favourites-offer-' SKU '-button'}}" data-category="{{promoCategory this.prodBean.sfid}}" class="btn btn-default goToOffer center-block" role="button"><span class="offer-arrow"></span>{{pageLabelMap 'CCB2B_Product_ViewOffer'}}</button>{{/if}}
+                                        <button id="{{generateId 'ccb2b-favourites-qty-' this.prodBean.sku '-input'}}" type="button" class="btn primary_button btn-default btn-sm addItemToBasket cc_add_item" data-id="{{this.prodBean.id}}" data-sku="{{this.prodBean.sku}}" data-name="{{this.prodBean.name}}">{{pageLabelMap 'Component_MiniwishList_AddToCart'}}</button>
+                                    </p>
+                                    {{/if}}
+                                {{/ifDisplay}}
+                                {{/if}}
+                                {{/if}}
+                                <div class="addToWishlist wishButtons cc_wish_buttons hidden-print"></div>
+                            </div>
+                            {{#if ../isRO}}
+                                &#160;
+                                {{else}}
+                                <div class="deleteItemSection hidden-print">
+                                    <span type="button" class="glyphicon glyphicon-trash deleteItem cc_delete" data-id="{{uid}}" data-pid="{{parentId}}"></span>
+                                </div>
+                             {{/if}}
+                        </div>
+                    </div>
+                    </li>
+                    {{/each}}
+                    </ul>
+                </div>
+                {{#if this.itemData}}
+                <div class="col-xs-12 addAllSection hidden-print">
+                {{#if (checkContactDisplayPermissions 'create_basket')}}
+                    <button id="ccb2b-favourites-add-all-to-basket" class="btn primary_button btn-default btn-sm addAllToBasket" disabled="disabled">{{pageLabelMap 'Component_MiniwishList_AddAllToCart'}}</button>
+                {{/if}}
+                </div>
+                {{/if}}
+            </div>
+        </div>
+        <div class="cartSummaryCol col-md-2 hidden-print">
+            <div class="CCB2B_CartSummaryStickyComponent"></div>
+        </div>
+</div>
+<div id="confirmLeavePage" class="modal fade cc_modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content cc_modal-content">
+            <div class="modal-body cc_modal_body text-center">
+                <h3>{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_Heading'}}</h3>
+                <p>{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_Content'}}</p>
+            </div>
+            <div class="modal-footer cc_modal_footer text-center">
+                <div>
+                    <input id="ccb2b-ma-favourites-confirm-leaving-page-no-button" type="button" class="btn closeModal" data-dismiss="modal" value="{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_GoBack'}}"/>
+                    <p>{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_GoBack_Info'}}</p>
+                </div>
+                <div>
+                    <input id="ccb2b-ma-favourites-confirm-leaving-page-yes-button" type="button" class="btn primary_button confirmLeaving" value="{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_Continue'}}"/>
+                    <p>{{pageLabelMap 'CCB2B_FavouritesDetails_ConfirmLeavePage_Modal_Continue_Info'}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

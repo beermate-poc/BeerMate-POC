@@ -1,0 +1,50 @@
+<aura:component >
+	<aura:attribute name="toastTitle" type="String" default=""/>
+	<aura:attribute name="toastMsg" type="String" default=""/>
+	<aura:attribute name="toastType" type="String" default=""/>
+
+	<div aura:id="toast" class="forceToastManager--default forceToastManager" aria-live="assertive" data-aura-class="forceToastManager--default forceToastManager">
+		<div class="forceVisualMessageQueue" data-aura-class="forceVisualMessageQueue">
+			<div class="toastContainer slds-notify_container slds-is-relative">
+				<div class="{!v.toastType + ' slds-notify--toast slds-notify slds-notify--toast forceToastMessage'}" role="alert" data-aura-class="forceToastMessage">
+					<aura:if isTrue="{!or(v.toastType == 'slds-theme_success',v.toastType == 'slds-theme_error')}">
+					    <span class="slds-icon_container toastIcon slds-m-right_small slds-no-flex slds-align-top">
+					    	<lightning:icon iconName="utility:success" size="small" variant="inverse" />
+					    </span>
+					</aura:if>
+					<aura:if isTrue="{!v.toastType == 'slds-theme_info'}">
+						<span class="slds-icon_container toastIcon slds-m-right_small slds-no-flex slds-align-top">
+					    	<lightning:icon iconName="utility:success" size="small" variant="inverse" />
+					    </span>
+					</aura:if>
+					<aura:if isTrue="{!v.toastType == 'slds-theme_warning'}">
+						<span class="slds-icon_container slds-icon-utility-warning toastIcon slds-m-right_small slds-no-flex slds-align-top">
+					    	<lightning:icon iconName="utility:warning" size="small" />
+						</span>
+					</aura:if>
+					<div class="toastContent slds-notify__content">
+						<div class="slds-align-middle slds-hyphenate">
+							<div class="toastTitle slds-text-heading--small">{!v.toastTitle}</div>
+							<span class="toastMessage forceActionsText" data-aura-class="forceActionsText">{!v.toastMsg}</span>
+						</div>
+					</div>
+					<aura:if isTrue="{!or(v.toastType == 'slds-theme_success', v.toastType == 'slds-theme_error')}">
+				      	<button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse toastClose" type="button" onclick="{!c.closeToast}">
+				        	<lightning:buttonIcon iconName="utility:close" size="medium" variant="bare-inverse" iconClass="slds-button_icon-inverse" />
+				      	</button>
+				    </aura:if>
+				    <aura:if isTrue="{!v.toastType == 'slds-theme_info'}">
+				    	<button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse toastClose" type="button" onclick="{!c.closeToast}">
+				        	<lightning:buttonIcon iconName="utility:close" size="medium" variant="bare-inverse" iconClass="slds-button_icon-inverse" />
+				      	</button>
+				    </aura:if>
+				    <aura:if isTrue="{!v.toastType == 'slds-theme_warning'}">
+				      	<button id="close" class="slds-button slds-button_icon slds-notify__close toastClose slds-button--icon-bare" type="button" onclick="{!c.closeToast}">
+				        	<lightning:buttonIcon iconName="utility:close" size="medium" />
+				      	</button>
+					</aura:if>
+				</div>
+			</div>
+		</div>
+	</div>
+</aura:component>

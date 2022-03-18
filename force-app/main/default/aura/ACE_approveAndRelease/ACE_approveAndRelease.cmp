@@ -1,0 +1,175 @@
+<aura:component implements="force:appHostable,flexipage:availableForRecordHome,force:hasRecordId" controller="ACE_approveAndReleaseClass">
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="fundRequests" type="ACE_approveAndReleaseClass.FundReqCustom[]" access="public" />
+    <aura:attribute name="appropriatedDollars" type="decimal" default="0.00" />
+    <aura:attribute name="remainingDollars" type="decimal" default="0.00"/>
+    <aura:attribute name="index" type="Integer"/>
+    <aura:attribute name="shipTo" type="List" />
+    <aura:attribute name="fundRequestCheck" type="Boolean" default="false"/>
+
+    <aura:attribute name="currentFieldSelected" type="String" />
+    <aura:attribute name="currentRowSelected" type="String" />
+
+    <aura:attribute name="stateOptions" type="String[]" />
+    <aura:attribute name="promoStatus" type="String" />
+    <aura:attribute name="spendTypeOptions" type="List" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.fetchStates}" />
+    <aura:handler name="selectRecord" event="c:strike_evt" action="{!c.updateRow}" />
+    <aura:handler name="openModal" event="c:strike_evt" action="{!c.openModal}" />
+
+    <lightning:card title="">
+        <aura:if isTrue="{!v.promoStatus != 'Closed'}" >
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-p-left_large">
+
+                </div>
+                <div class="slds-col">
+                    <span>
+                        
+                        <lightning:select aura:id="states" onchange="{!c.showTable}">
+                            <option>---Select a state---</option>
+                            <aura:iteration items="{!v.stateOptions}" var="state">
+                                <option value="{!state}" >{!state}</option>
+                            </aura:iteration>
+                        </lightning:select>
+                    </span>
+                </div>
+                <div class="slds-col">
+                </div>
+            </div>
+
+            <aura:if isTrue="{!v.fundRequests.length > 0}">
+                <div class="slds-card__body slds-card__body_inner">
+                    <div align="center" class="slds-p-around_medium">
+                        <lightning:button label="{!$Label.c.ACE_approveAndRelease}" onclick="{!c.createFundRequest}"/>
+                    </div>
+                    <p align="right" class="slds-text-heading_medium">{!$Label.c.ACE_remainingDollars}
+                        <strong class="slds-text-heading_medium" >
+                            <ui:outputCurrency value="{!v.remainingDollars}" /> </strong></p><br/>
+
+                    <div class="slds">
+                        <div class="slds-table--header-fixed_container" style="height:250px;">
+                            <div class="slds-scrollable_y" style="height:100%;">
+
+                                <table class="slds-table slds-table_bordered slds-table--header-fixed slds-table slds-table_bordered slds-table_col-bordered slds-table_resizable-cols" border="1" frame="void" rules="rows">
+                                    <thead>
+                                    <tr >
+                                        <th>
+                                            <div class="slds-truncate slds-cell-fixed slds-align_absolute-center">
+                                                <ui:inputCheckbox  name="fundRequestCheckAll" aura:id="fundRequestCheckAll" value="false" change="{!c.onCheckAll}"/></div></th>
+                                        <th style="width: 8rem" class="slds-text-body_regular"><div class="slds-cell-fixed slds-align_absolute-center">{!$Label.c.ACE_distributor}</div></th>
+                                        <th class="slds-text-body_regular"><div class="slds-cell-fixed slds-align_absolute-center">{!$Label.c.ACE_shipToNumber}</div></th>
+                                        <th style="width: 8rem" class="slds-text-body_regular"><div class="slds-cell-fixed slds-align_absolute-center">Name</div></th>
+										<th style="width: 7rem" class="slds-text-body_regular"><div class="slds-cell-fixed slds-align_absolute-center">{!$Label.c.ACE_Desc}</div></th>
+                                        <th style="width: 4rem" class="slds-text-body_regular"><div class="slds-cell-fixed slds-align_absolute-center">{!$Label.c.ACE_assignedDollars}</div></th>
+                                        <th  class="slds-text-body_regular"><div class="slds-cell-fixed slds-align_absolute-center">{!$Label.c.ACE_coOp}</div></th>
+                                        <th class="slds-text-body_regular"><div class="slds-cell-fixed slds-align_absolute-center">{!$Label.c.ACE_spendTypeHeading}</div></th>
+                                        <th class="slds-text-body_regular"><div class="slds-cell-fixed slds-align_absolute-center">{!$Label.c.ACE_internalOrderHeading}</div></th>
+                                        <th class="slds-text-body_regular"><div class="slds-cell-fixed slds-align_absolute-center">{!$Label.c.ACE_startDateHeading}</div></th>
+                                        <th class="slds-text-body_regular"><div class="slds-cell-fixed slds-align_absolute-center">{!$Label.c.ACE_endDateHeading}</div></th>
+                                        <!-- <th class="slds-text-body_regular"><div class="slds-cell-fixed slds-align_absolute-center">{!$Label.c.ACE_comments}</div></th> -->
+
+                                    </tr>
+                                    </thead>
+                                    <aura:iteration items="{!v.fundRequests}" var="newFR" indexVar="idx">
+                                        <tr >
+                                            <td>
+                                                <ui:inputCheckbox  name="fundRequestCheck" aura:id="fundRequestCheck" value="{!newFR.fundRequestCheck}" change="{!c.onCheckEach}"/>
+                                            </td>
+                                            <td  style="width: 7rem" role="gridcell" class="fieldCell" ><div class="slds-align_absolute-center">
+                                            {!newFR.name}
+
+                                                </div>
+                                            </td>
+                                            <td style="width: 7rem"  ><div class="slds-align_absolute-center">
+                                                    {!newFR.accountNumber}
+                                            </div></td>
+                                            <td class="slds-rich-text-area__content slds-grow slds-cell-wrap"><div class="slds-align_absolute-center">
+                                                   <ui:inputText value="{!newFR.fundRequestSF.Title}" /></div>
+                                            </td>
+											<td>
+                                                <div>
+                                                <lightning:textarea value="{!newFR.fundRequestSF.Description}"/>
+                                                </div>
+                                            </td>
+                                            <td  style="width: 5rem" ><div>
+
+                                                <input data-set="{!idx}" id="{!idx}" style="border: 0px solid #ccc; height: 2rem; width: 6rem" value="{!newFR.fundRequestSF.RequestedAmount}" name="qty" onkeyup
+                                                        ="{!c.calculateDollars}" /></div>
+                                            </td>
+
+                                            <td><div class="slds-align_absolute-center">
+                                                    {!newFR.fundRequestSF.ACE_Co_Op_Event__c}  </div>
+                                            </td>
+                                            <td>
+                                                <span style="width:250px">
+                                                    <lightning:select name="{!idx}" value="{!newFR.fundRequestSF.ACE_Spend_Type__c}" onchange="{!c.updateSpendType}">
+                                                        <option value="">--Select Spend Type--</option>
+                                                        <aura:iteration var="stOpt" items="{!v.spendTypeOptions}">
+                                                            <option text="{!stOpt.ACE_Spend_Type_Name__c}" value="{!stOpt.Id}" selected="{!newFR.fundRequestSF.ACE_Spend_Type__c == stOpt.Id}"/>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                </span>
+                                            </td>
+                                            <td style="width: 10rem" >
+                                                <c:LookupIcon index="{!idx}" lookupObj="ACE_Internal_Order__c"/>
+
+                                                <aura:if isTrue="{!newFR.fundRequestSF.ACE_Internal_Order__c != null}">
+                                                    <span class="slds-pill slds-pill_link">
+                                                      <a href="{!'/' + newFR.fundRequestSF.ACE_Internal_Order__c}" target="_blank" class="slds-pill__action" title="{!newFR.internalOrderNumber}">
+                                                        <span class="slds-pill__label">{!newFR.internalOrderNumber}</span>
+                                                      </a>
+                                                      <button id="{!idx}" class="slds-button slds-button_icon slds-button_icon slds-pill__remove" title="Remove" onclick="{! c.handleIORemove }">
+                                                          X
+                                                        <span class="slds-assistive-text">Remove</span>
+                                                      </button>
+                                                    </span>
+                                                </aura:if>
+                                            </td>
+                                            <td>
+                                                <lightning:input type="date" name="{!idx}"  value="{!newFR.fundRequestSF.ACE_Start_Date__c }"  />
+                                            </td>
+                                            <td><div >
+                                                <lightning:input type="date" name="{!idx}" value="{!newFR.fundRequestSF.ACE_End_Date__c}" />  </div>
+                                            </td>
+                                           <!--  <td>
+                                                <div>
+                                                <lightning:textarea value="{!newFR.fundRequestSF.ACE_Comments__c}"/>
+                                                </div>
+                                            </td> -->
+                                        </tr>
+                                    </aura:iteration>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aura:if>
+            <br/>
+            <c:strike_modal aura:id="ACE_Internal_Order__c-modal"
+                                             title="Select Value"
+                                             primaryButtonLabel="Ok"
+                                             secondaryButtonLabel="Cancel"
+                                             showHeader="true"
+                                             showFooter="false"
+                                             showClose="true"
+                                             showModal="false"
+                                             size="large">
+                <c:strike_lookup
+                        aura:id="ACE_Internal_Order__c"
+                        fieldToDisp="Internal Order Number"
+                        label="Internal Order"
+                        object="ACE_Internal_Order__c"
+                        searchField="ACE_Internal_Order_Nbr__c,ACE_Internal_Order_Desc__c,ACE_Applicant_IO_Owner__c"
+                        columnsToDisp="ACE_Internal_Order_Nbr__c,ACE_Internal_Order_Desc__c,ACE_Applicant_IO_Owner__c,ACE_MgmtUnitCd__c,ACE_Budget_Owner__c,ACE_Brand_Cd__c"
+                        dontDisp="ACE_Brand_Cd__c"
+                        placeholder="Search Internal Orders"
+                        order="ACE_Internal_Order_Nbr__c"
+                        limit="25"
+                        loadingMessage="Loading..."
+                        errorMessage="Invalid input" />
+            </c:strike_modal>
+        </aura:if>
+    </lightning:card>
+</aura:component>

@@ -1,0 +1,12 @@
+<aura:component >
+	<aura:attribute name="inputPlaceholder" type="String" />
+	<aura:attribute name="datePickerPosition" type="String" />
+	<div>
+		<div style="display:inline-block; width:88%; padding-right:5px;">
+			<lightning:textarea aura:id="subject" maxlength="255" label=" " name="todo" />
+		</div>
+		<div class="todoDate" style="display:inline-block; position:absolute; margin-top:7px">
+			 <c:DatePicker aura:id="datepicker" positionDate="{!v.datePickerPosition}" inputClass=" " inputHasIcon=" " inputHasIconRight=" " inputIcon=" "  />
+		</div>
+	</div >
+</aura:component>

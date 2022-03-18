@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Event template">
+<aura:attribute name="recordid" type="String" description="Record id to redirect to detail page" access="global" />
+   
+</aura:event>

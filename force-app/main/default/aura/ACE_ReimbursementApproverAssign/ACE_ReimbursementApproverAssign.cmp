@@ -1,0 +1,37 @@
+<!--
+ - Created by alexandria.sanborn on 4/23/2019.
+ -->
+
+<aura:component controller="ReimbursementLineItemController" description="ACE_ReimbursementApproverAssign" implements="force:hasRecordId,force:lightningQuickAction">
+    <aura:attribute name="recordId" type="id" />
+    <aura:attribute name="success" type="boolean" default="false" />
+    <aura:attribute name="error" type="boolean" default="false" />
+    <aura:attribute name="errorMessage" type="String" />
+
+    <aura:handler name="selectRecord" event="c:strike_evt" action="{!c.updateApprover}" />
+
+    <aura:if isTrue="{!v.success}">
+        <ui:message title="Success" severity="confirm" closable="false">
+            Reimbursement approver has been updated.
+        </ui:message>
+    </aura:if>
+
+    <aura:if isTrue="{!v.error}">
+        <ui:message title="Error" severity="error" closable="false" aura:id="errorMsg">
+            {!v.errorMessage}
+        </ui:message>
+    </aura:if>
+
+    <c:strike_lookup
+            aura:id="User"
+            fieldToDisp="Full Name"
+            label="Reimbursement Approver"
+            object="User"
+            searchField="Name,ACE_Approver__c"
+            columnsToDisp="Name,ACE_Approver__c"
+            placeholder="Search Approvers"
+            order="Name"
+            limit="25"
+            loadingMessage="Loading..."
+            errorMessage="Invalid input" />
+</aura:component>

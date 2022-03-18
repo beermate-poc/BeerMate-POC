@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Audience xmlns="http://soap.sforce.com/2006/04/metadata">
+    <audienceName>Distributor Admin Access</audienceName>
+    <container>Partner Portal</container>
+    <criteria>
+        <criterion>
+            <criteriaNumber>1</criteriaNumber>
+            <criterionValue>
+                <entityField>Contact.$Contact.PDE_Passport_Services__c</entityField>
+                <entityType>User</entityType>
+                <fieldValue>Distributor Site Admin</fieldValue>
+            </criterionValue>
+            <operator>Includes</operator>
+            <type>FieldBased</type>
+        </criterion>
+        <criterion>
+            <criteriaNumber>2</criteriaNumber>
+            <criterionValue>
+                <profile>admin</profile>
+            </criterionValue>
+            <operator>Equal</operator>
+            <type>Profile</type>
+        </criterion>
+    </criteria>
+    <formulaFilterType>AnyCriterionMatches</formulaFilterType>
+    <isDefaultAudience>false</isDefaultAudience>
+    <targets>
+        <target>
+            <groupName>f782d9e5-9ac5-43c5-97fe-8a891c0599da$#$6e4cea92-148c-4908-a8fc-156235552835</groupName>
+            <priority>1</priority>
+            <targetType>ExperienceVariation</targetType>
+            <targetValue>Contact_List_CMS_Single_Item_Component</targetValue>
+        </target>
+    </targets>
+</Audience>

@@ -1,0 +1,17 @@
+{{#if this.menus.data.menuList}}
+<div class="discover_container">
+    <div class="discover_title">{{pageLabelMap 'CCB2B_Discover_Component_Title'}}</div>
+    <div class="row">
+        {{#each this.menus.data.menuList}}
+            <div class="col-sm-3 col-xs-6">
+                <div class="discover_item">
+                    <a id="{{generateId 'ccb2b-home-grid-' this.menuId '-button'}}" href="{{this.linkURL}}" data-menuid="{{this.menuId}}" role="button" aria-haspopup="true" aria-expanded="false">
+                        <img class="img-responsive" src="{{image 'Attachment' this.attachmentsS.[0].sfid}}" alt="{{this.displayName}}">
+                        <p class="discover_item_title">{{this.displayName}}</p>
+                    </a>
+                </div>
+            </div>
+        {{/each}}
+    </div>
+</div>
+{{/if}}

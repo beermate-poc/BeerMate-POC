@@ -1,0 +1,14 @@
+{{#ifDisplay 'H.DisplSearch'}}
+    {{#if (ifNotPageDisplay 'ccrz__CCChangePassword')}}
+        <div class="navbar-form cc_navbar_form" role="search">
+            <div class="input-group cc_input-group">
+                <button id="doSearch" class="search_button" type="Submit"><span class="icon-search-new" aria-hidden="true"></span></button>
+                <input id="searchText" type="text" class="form-control search_input cc_search_input" placeholder="{{pageLabelMap 'ProductSearch'}}" title="{{pageLabelMap 'ProductSearch_Tooltip'}}" data-trigger="focus" autocomplete="off">
+                <span class="input-group-btn">
+                </span>
+            </div>
+        </div>
+        <span id="cc_search_error" data-trigger="manual" data-placement="bottom" data-content="{{pageLabelMap 'ProductSearch_Tooltip'}}"></span>
+        <div class="searchTopBarErrorMessage searchBoxWidgetError" ></div>
+    {{/if}}
+{{/ifDisplay}}

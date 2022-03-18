@@ -1,0 +1,68 @@
+
+<div class="panel panel-default cc_panel cc_myaccount_mywishlist">
+    <div class="panel-heading cc_heading">
+        <h3 id="ccb2b-ma-fav-title-label" class="panel-title cc_title">{{pageLabelMap 'MyAccount_MyWishlist'}}</h3>
+    </div>
+
+    <div class="panel-body cc_body cc_myaccount_content">
+        <p class="cc_create_wishlist">
+            <input type="button" id="ccb2b-ma-fav-createnew-button" class="btn primary_button btn-default btn-sm createTemplate cc_create_template" data-id="" value="{{pageLabelMap 'Action_CreateWishlist'}}"/>
+        </p>
+        {{#if this}}
+        <div class="orderPaginationSec" />
+        <div class="table-responsive collapsible_table">
+            <table id="cartTable" class="table cc_table cc_mywishlist_table">
+                <tr class="cc_table_header_row">
+                    <th class="cc_table_header">
+                        <span class="cc_table_header_name">{{pageLabelMap 'MyAccount_Name'}}</span>
+                    </th>
+                    <th class="cc_table_header">
+                        <span class="cc_table_header_date">{{pageLabelMap 'MyCartsInc_LastUpdate'}}</span>
+                    </th>
+                    <th class="cc_table_header">
+                        <span class="cc_table_header_active">{{pageLabelMap 'Heading_Active'}}</span>
+                    </th>
+                    <th class="cc_table_header text-right">
+                        <span class="cc_table_header_actions"></span>
+                    </th>
+                </tr>
+                {{#each this}}
+                <tr class="cc_table_row">
+                    <td class="cc_table_col" data-label="{{pageLabelMap 'MyAccount_Name'}}:">
+                        <a id="{{generateId 'ccb2b-ma-fav-name-' sfid '-link'}}" data-id="{{sfid}}" class="cc_col_name gotoDetails cc_goto_details">{{name}}</a>
+                    </td>
+                    <td class="cc_table_col" data-label="{{pageLabelMap 'MyCartsInc_LastUpdate'}}:">
+                        <span id="{{generateId 'ccb2b-ma-fav-modifieddate-' sfid '-field'}}" class="cc_col_date">{{lastModifiedDateStr}}</span>
+                    </td>
+                    <td class="cc_table_col text-left" data-label="{{pageLabelMap 'Heading_Active'}}:">
+                        <span id="{{generateId 'ccb2b-ma-fav-default-' sfid '-field'}}" class="cc_col_active">{{#ifEquals isActive true}} <span class="glyphicon glyphicon-ok"></span> {{else}} <span class="glyphicon glyphicon-remove"></span>{{/ifEquals}}</span>
+                    </td>
+                    <td class="cc_table_col text-right" nowrap="true">
+                        <div class="button-group cc_button_group">
+                            <input id="{{generateId 'ccb2b-ma-fav-clone-' sfid '-button'}}" type="button" class="clone btn btn-default btn-sm cc_clone" data-id="{{sfid}}" value="{{pageLabelMap 'Action_Clone'}}"/>
+                            {{#if isRO}}
+                            &#160;
+                            {{else}}
+                            <input id="{{generateId 'ccb2b-ma-fav-edit-' sfid '-button'}}" type="button" class="btn primary_button btn-default btn-sm openModal cc_edit" data-id="{{sfid}}" value="{{pageLabelMap 'Action_Edit'}}"/>
+                            {{/if}}
+                            {{#if isActive}}
+                            <input class="blank"/>
+                            {{else}}
+                            {{#if isRO}}
+                            <input class="blank"/>
+                            {{else}}
+                            <a id="{{generateId 'ccb2b-ma-fav-delete-' sfid '-button'}}" type="button" class="btn glyphicon glyphicon-trash btn-default btn-sm delete cc_delete" data-id="{{sfid}}" ></a>
+                            {{/if}}
+                            {{/if}}
+                        </div>
+                    </td>
+                </tr>
+                {{/each}}
+            </table>
+        </div>
+        {{else}}
+        <p id="ccb2b-ma-fav-noitem-label" class="noItemsInfo">{{pageLabelMap 'CCB2B_MyAccount_NoItems_MyWishlist_Label'}}</p>
+        {{/if}}
+        <div id="modalSec"></div>
+    </div>
+</div>

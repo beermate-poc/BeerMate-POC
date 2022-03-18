@@ -1,0 +1,3 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" >
+    <a class="slds-button slds-button--neutral slds-float_right" href="{!$Label.c.BMC_HomeLeadership_Sway_Link}" target="_blank">{!$Label.c.Help_Me}</a>
+</aura:component>

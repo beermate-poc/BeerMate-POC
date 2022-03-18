@@ -1,0 +1,99 @@
+<aura:component access="global" controller="CTS_Parts_Recommendation_Helper">
+    <aura:attribute name="oldtaskinfo" type="WorkOrderLineItem" />
+                     
+    <aura:attribute name="newtaskinfo" type="WorkOrderLineItem" default="{ 'sobjectType': 'WorkOrderLineItem'}" />
+    <aura:attribute name="workOrderId" type="String"/>
+    <aura:attribute name="errorMsg" type="String"/>
+    <aura:attribute name="displayMessage" type="String"/>
+    <aura:attribute name="isOnParts" type="boolean" default="true"/>
+    <aura:attribute name="Message" type="boolean" default="false" description="use for display no record found message"/>
+    <aura:attribute name="TotalNumberOfRecord" type="integer" default="0" description="use for display Number of records"/>
+    <aura:attribute name="displayResult" type="List"/>
+    <aura:attribute name="partsMap" type="Map"/>
+    <aura:registerEvent name="PartsSavedEvent" type="c:CTS_CloseBrandSelectionCmp" />
+    <aura:registerEvent name="ErrorOnPartsSavedEvent" type="c:CTS_ErrorOnPartRecommendation" />
+    <aura:handler name="init" value="{! this }" action="{! c.hideErrorOnLoad }"/>
+    <aura:method name="callInit" action="{!c.doInit}" 
+      description="To initiate Part Recommendation" access="public"> 
+        <aura:attribute name="oldtaskparam" type="WorkOrderLineItem"/>
+		<aura:attribute name="taskId" type="String"/>
+        <aura:attribute name="isOnPart" type="boolean"/>
+    </aura:method>
+    
+    <aura:method name="processResult" action="{!c.processResult}" 
+      description="To upsert Processed Parts" access="public"> 
+        	<aura:attribute name="isSaveAndNew" type="Boolean"/> 
+    </aura:method>
+    
+    <aura:method name="resetisOnPartsFlag" action="{!c.resetIsOnParts}" 
+      description="To reset isOnParts" access="public"> 
+        	 <aura:attribute name="onBackToTaskPage" type="Boolean"/> 
+    </aura:method>
+    
+    <!-- SHOW LOADING SPINNER--> 
+    <lightning:spinner variant="brand" size="large" aura:id="Id_spinner" class="slds-hide" />
+    <div class="slds-m-around_medium slds-scrollable slds-scrollable_x" style="overflow:scroll !important;overflow-y: scroll!important;">
+       <div class="error-Msg slds-hide" aura:id="ErrorMsg">
+                {!v.errorMsg}
+       </div>
+       <aura:renderIf isTrue="{!!v.Message}">
+           
+               <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-scrollable">
+                    <thead>
+                        <tr class="slds-text-title_caps">
+                            
+                            <th scope="col">
+                                <div class="slds-truncate" title="S.no">S.no</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Select">Select</div>
+                            </th>
+                            <th scope="col">
+                                Name
+                            </th>
+                             <th scope="col">
+                                <div class="slds-truncate" title="Quantity">Quantity</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Required">Required</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody> 
+                        <!--### display all records of searchResult attribute by aura:iteration ###-->
+                        <aura:iteration items="{!v.displayResult}" var="product" indexVar="count">
+                            <tr key="{!product.Product2Id}">
+                                <td scope="row">
+                                    <div class="slds-truncate">{!count + 1}</div>
+                                </td>
+                                
+                                <td scope="row" class="slds-text-align--right" style="width:3.25rem;">
+                                    <lightning:input type="checkbox" aura:id="selectedProduct" name="{!product.Product2Id}" checked="true"/>
+                                    
+                                </td>
+                                <td scope="row" class="slds-cell-wrap" style="word-break:break-all;" >
+                                    {!product.ProductName}
+                                </td>
+                                
+                                <td scope="row">
+                                    <div class="slds-truncate">
+                                    
+                                    <lightning:input aura:id="Quant" name="{!product.Product2Id}" type="number" min="1" value="{!product.QuantityRequired}"/>
+                                    </div>
+                                </td>
+                                <td scope="row" class="slds-text-align--right" style="width:3.25rem;">
+                                    <lightning:input type="checkbox" aura:id="requiredProduct" name="{!product.Product2Id}" checked="{!product.CTS_Required__c}"/>
+                                    
+                                </td>
+                             </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            
+            <aura:set attribute="else">
+              No Parts found for this task!
+            </aura:set>
+        </aura:renderIf>
+        
+    </div>
+</aura:component>

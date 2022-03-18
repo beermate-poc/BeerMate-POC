@@ -1,0 +1,30 @@
+@media (max-width: 414px){
+    .THIS .slds-modal__container{
+        width: 80%;
+    }
+}
+@media (max-width:414px){
+    .THIS .modalStyle{
+        width:86%;
+        padding-bottom: 25%;
+    }
+}
+@media (max-device-width : 1024px)
+    and (min-device-width : 768px)
+    and (orientation: landscape)  {
+    .THIS .modalStyle{
+        width:86%;
+        padding-bottom: 23%;
+    }
+}
+@media (max-device-width : 1024px)
+    and (min-device-width : 768px)
+    and (orientation: portrait){
+    .THIS .modalStyle{
+        width:86%;
+        padding-bottom: 50%;
+    }
+}
+.THIS .slds-rich-text-editor__toolbar{
+    display: none;
+}

@@ -1,0 +1,351 @@
+<aura:component controller="PlannedObjectivesAccountListController" implements="force:appHostable,flexipage:availableForAllPageTypes">
+
+	<aura:attribute name="selectedObjectiveId" type="Id" /> 
+	<aura:attribute name="currentObjective" type="Objective__c"/> 
+	<aura:attribute name="nonTargetAccIds" type="List" />
+	<aura:attribute name="targetAccIds" type="List" />
+	<aura:attribute name="selectAll" type="boolean" default="false"/>
+	<aura:attribute name="achievedList" type="List"/>
+	<aura:attribute name="targetedList" type="List"/>
+	<aura:attribute name="nonTargetedList" type="List"/>
+	<aura:attribute name="numAchieved" type="Integer" />
+	<aura:attribute name="numTargeted" type="Integer" />
+	<aura:attribute name="numNonTargeted" type="Integer" />
+	<aura:attribute name="sharedObjective" type="Boolean" />
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+	<lightning:spinner aura:id="spinner" class="slds-show" alternativeText="Please wait..." />
+ <!-- MC-1738 Registering RetainUserState_ObjectiveTab event that is used to requery the data for the tables  -->
+    <aura:registerEvent name="retainUserState_ObjectiveTab" type="c:RetainUserState_ObjectiveTab"/>
+    <aura:registerEvent name="ShowObjectiveListView" type="c:ShowObjectiveListView"/> 
+    
+    <div class="slds-container slds-show" aura:id="plannedObjectiveList">
+		<div id="targetTable">
+			<div class="slds-page-header">
+				<div class="slds-grid">
+					<div class="slds-col slds-has-flexi-truncate">
+						<div class="slds-media slds-no-space slds-grow">
+							<div class="slds-media__figure">
+								<lightning:icon iconName="custom:custom18" size="medium"/>
+							</div>
+							<div class="slds-media__body">
+								<p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.Objectives}</p>
+								<h1 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate">{!v.currentObjective.Planned_Objective__r.Planned_Objective_Type__c + ': ' + v.currentObjective.Planned_Objective__r.Name + ': ' + v.currentObjective.RecordType.Name}</h1>
+								<p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.Goal_Apply_Objectives}&nbsp;{!v.currentObjective.Objective_Goal__c} &bull; {!$Label.c.Deadline_Apply_Objectives}&nbsp;<ui:outputDate value="{!v.currentObjective.Planned_Objective__r.End_Date__c}" format="M/D/YYYY" /> &bull; {!$Label.c.Apply_Objectives_Brand}&nbsp;{!v.currentObjective.Brands__c}</p>
+							</div>
+						</div>
+					</div>
+					<div class="slds-col slds-no-flex slds-grid slds-align-top">
+						<button class="slds-button slds-button--brand" onclick="{!c.applyObjectiveToAccounts}">{!$Label.c.Apply}</button>
+						<button class="slds-button slds-button--neutral" onclick="{!c.goBack}">{!$Label.c.Cancel_Label}</button>
+					</div>
+				</div>
+			</div>
+			<aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+				<div class="slds-grid slds-p-top--large">
+						<table aura:id="achievedTable" class="slds-size--1-of-3 tableStyling">
+							<thead>
+								<tr class="slds-text-title--caps">
+									<th scope="col" class="slds-is-resizable slds-cell-shrink">
+										<div class="slds-p-around--small">
+											{!$Label.c.OBJECTIVE_ACHIEVED} ({!v.numAchieved})
+										</div>
+									</th>
+								</tr>
+							</thead>
+							<tbody id="achieveTarget">
+								<aura:iteration items="{!v.achievedList}" var="tar">
+									<tr class="slds-hint-parent">
+										<td role="gridcell" data-label="{!$Label.c.OBJECTIVE_ACHIEVED}">
+											<aura:if isTrue="{!tar.Name != null}">
+												<div data-record="{!tar.Id}" onclick="{!c.navigateToRecord}">
+													<a class="slds-truncate slds-text-heading--small slds-p-left_small" href="javascript:void(0);">{!tar.Name}</a>
+													<br />
+													<div class="slds-text-body_small slds-truncate slds-p-left_small">
+														{!tar.BillingStreet}{!tar.BillingCity != null ? ',' : ''}&nbsp;{!tar.BillingCity}{!tar.BillingState != null ? ',' : ''}&nbsp;
+														{!tar.BillingState}&nbsp;
+														{!tar.BillingPostalCode}
+													</div>
+												</div>
+												<aura:set attribute="else">
+													<div>
+														&nbsp;
+													</div>
+												</aura:set>
+											</aura:if>
+										</td>
+									</tr>
+								</aura:iteration>
+							</tbody>
+						</table>
+						<table aura:id="targetTable" class="slds-size--1-of-3 tableStyling">
+							<thead>
+								<tr class="slds-text-title--caps">
+									<th scope="col" class="slds-is-resizable slds-cell-shrink">
+										<div class="slds-p-around--small">
+											{!$Label.c.TARGETED} ({!v.numTargeted})
+										</div>
+									</th>
+								</tr>
+							</thead>
+							<tbody id="tarTarget">
+								<aura:iteration items="{!v.targetedList}" var="tar">
+									<tr class="slds-hint-parent">
+										<td role="gridcell" data-label="{!$Label.c.TARGETED}" class="slds-truncate">
+											<aura:if isTrue="{!tar.Name != null}">
+												<div class="slds-form-element">
+													<div class="slds-form-element__control">
+														<span class="slds-checkbox">
+															<input type="checkbox" id="{!'tar' + tar.Id}" class="slds-p-around--small target" checked="true"/>
+															<label class="slds-checkbox__label" for="{!'tar' + tar.Id}">
+																<span class="slds-checkbox--faux"></span>
+																<span class="slds-form-element__label" data-record="{!tar.Id}" onclick="{!c.navigateToRecord}"><a class="slds-truncate slds-text-heading--small" href="javascript:void(0);">{!tar.Name}</a></span>
+																<br />
+																<div class="slds-text-body_small address slds-truncate">
+																	{!tar.BillingStreet}{!tar.BillingCity != null ? ',' : ''}&nbsp;{!tar.BillingCity}{!tar.BillingState != null ? ',' : ''}&nbsp;
+																	{!tar.BillingState}&nbsp;
+																	{!tar.BillingPostalCode}
+																</div>
+															</label>
+														</span>
+													</div>
+												</div>
+												<aura:set attribute="else">
+													<div>
+														&nbsp;
+													</div>
+												</aura:set>
+											</aura:if>
+										</td>
+									</tr>
+								</aura:iteration>
+							</tbody>
+						</table>
+						<table aura:id="nonTargetTable" class="slds-size--1-of-3 tableStyling">
+							<thead>
+								<tr class="slds-text-title--caps">
+									<th scope="col" class="slds-is-resizable slds-cell-shrink slds-text-heading--small">
+										<aura:if isTrue="{!v.sharedObjective}">
+											<div class="slds-p-around--small">
+												{!$Label.c.NOT_TARGETED} ({!v.numNonTargeted})
+											</div>
+											<aura:set attribute="else">
+												<div>
+													<lightning:input type="checkbox" label="{!$Label.c.NOT_TARGETED + ' (' + v.numNonTargeted + ')'}" value="" onchange="{!c.selectAll}"/>
+												</div>
+											</aura:set>
+										</aura:if>
+									</th>
+								</tr>
+							</thead>
+							<tbody id="nonTarget">
+								<aura:iteration items="{!v.nonTargetedList}" var="tar">
+									<tr scope="row">
+										<td data-label="{!$Label.c.NOT_TARGETED}" class="slds-truncate">
+											<aura:if isTrue="{!tar.Name != null}">
+												<aura:if isTrue="{!v.sharedObjective}">
+													<div data-record="{!tar.Id}" onclick="{!c.navigateToRecord}">
+														<a class="slds-text-heading--small slds-truncate" href="javascript:void(0);">{!tar.Name}</a>
+														<br />
+														<div class="slds-text-body_small address slds-truncate">
+															{!tar.BillingStreet}{!tar.BillingCity != null ? ',' : ''}&nbsp;{!tar.BillingCity}{!tar.BillingState != null ? ',' : ''}&nbsp;
+															{!tar.BillingState}&nbsp;
+															{!tar.BillingPostalCode}
+														</div>
+													</div>
+												<aura:set attribute="else">
+													<div class="slds-form-element">
+														<div class="slds-form-element__control">
+															<span class="slds-checkbox">
+																<input type="checkbox" id="{!'nonTar' + tar.Id}" class="slds-p-around--small notTarget"/>
+																<label class="slds-checkbox__label" for="{!'nonTar' + tar.Id}">
+																	<span class="slds-checkbox--faux"></span>
+																	<span class="slds-form-element__label" data-record="{!tar.Id}" onclick="{!c.navigateToRecord}"><a class="slds-truncate slds-text-heading--small" href="javascript:void(0);">{!tar.Name}</a></span>
+																	<br />
+																	<div class="slds-text-body_small address slds-truncate">
+																		{!tar.BillingStreet}{!tar.BillingCity != null ? ',' : ''}&nbsp;{!tar.BillingCity}{!tar.BillingState != null ? ',' : ''}&nbsp;
+																		{!tar.BillingState}&nbsp;
+																		{!tar.BillingPostalCode}
+																	</div>
+																</label>
+															</span>
+														</div>
+													</div>
+												</aura:set>
+											</aura:if>
+												<aura:set attribute="else">
+													<div>
+														&nbsp;
+													</div>
+												</aura:set>
+											</aura:if>
+										</td>
+									</tr>
+								</aura:iteration>
+							</tbody>
+						</table>
+					</div>
+				<aura:set attribute="else">
+					<div class="slds-grid slds-p-top--large slds-truncate">
+						<table aura:id="achievedTable" class="slds-table slds-table--bordered slds-table--resizable-cols slds-size--1-of-3 tableStyling" role="grid">
+							<thead>
+								<tr class="slds-line-height--reset">
+									<th scope="col" class="slds-is-sortable slds-is-resizable slds-cell-shrink slds-text-title--caps">
+										<div class="slds-p-around--small">
+											{!$Label.c.OBJECTIVE_ACHIEVED} ({!v.numAchieved})
+										</div>
+									</th>
+								</tr>
+							</thead>
+							<tbody id="achieveTarget">
+								<aura:iteration items="{!v.achievedList}" var="tar">
+									<tr class="slds-hint-parent">
+										<td role="gridcell" data-label="{!$Label.c.OBJECTIVE_ACHIEVED}">
+											<aura:if isTrue="{!tar.Name != null}">
+												<div data-record="{!tar.Id}" onclick="{!c.navigateToRecord}">
+													<a class="slds-text-heading--small slds-truncate" href="javascript:void(0);">{!tar.Name}</a>
+													<br />
+													<div class="slds-text-body_small slds-truncate">
+														{!tar.BillingStreet}{!tar.BillingCity != null ? ',' : ''}&nbsp;{!tar.BillingCity}{!tar.BillingState != null ? ',' : ''}&nbsp;
+														{!tar.BillingState}&nbsp;
+														{!tar.BillingPostalCode}
+													</div>
+												</div>
+												<aura:set attribute="else">
+													<div>
+														&nbsp;
+													</div>
+												</aura:set>
+											</aura:if>
+										</td>
+									</tr>
+								</aura:iteration>
+							</tbody>
+						</table>
+						<table aura:id="targetTable" class="slds-table slds-table--bordered slds-table--resizable-cols slds-size--1-of-3 tableStyling" role="grid">
+							<thead>
+								<tr class="slds-line-height--reset">
+									<th scope="col" class="slds-is-sortable slds-is-resizable slds-cell-shrink slds-text-title--caps">
+										<div class="slds-p-around--small">
+											{!$Label.c.TARGETED} ({!v.numTargeted})
+										</div>
+									</th>
+								</tr>
+							</thead>
+							<tbody id="tarTarget">
+								<aura:iteration items="{!v.targetedList}" var="tar">
+									<tr class="slds-hint-parent">
+										<td role="gridcell" data-label="{!$Label.c.TARGETED}">
+											<aura:if isTrue="{!tar.Name != null}">
+												<div class="slds-form-element">
+													<div class="slds-form-element__control">
+														<span class="slds-checkbox">
+															<input type="checkbox" id="{!'tar' + tar.Id}" class="slds-p-around--small target" checked="true"/>
+															<label class="slds-checkbox__label" for="{!'tar' + tar.Id}">
+																<span class="slds-checkbox--faux"></span>
+																<span class="slds-form-element__label" data-record="{!tar.Id}" onclick="{!c.navigateToRecord}"><a class="slds-text-heading--small slds-truncate" href="javascript:void(0);">{!tar.Name}</a></span>
+																<br />
+																<div class="slds-text-body_small address slds-truncate">
+																	{!tar.BillingStreet}{!tar.BillingCity != null ? ',' : ''}&nbsp;{!tar.BillingCity}{!tar.BillingState != null ? ',' : ''}&nbsp;
+																	{!tar.BillingState}&nbsp;
+																	{!tar.BillingPostalCode}
+																</div>
+															</label>
+														</span>
+													</div>
+												</div>
+												<aura:set attribute="else">
+													<div>
+														&nbsp;
+													</div>
+												</aura:set>
+											</aura:if>
+										</td>
+									</tr>
+								</aura:iteration>
+							</tbody>
+						</table>
+						<table aura:id="nonTargetTable" class="slds-table slds-table--bordered slds-table--resizable-cols slds-size--1-of-3 tableStyling" role="grid">
+							<thead>
+								<tr class="slds-line-height--reset">
+									<th scope="col" class="slds-is-sortable slds-is-resizable slds-cell-shrink slds-text-title--caps slds-text-heading--small">
+										<aura:if isTrue="{!v.sharedObjective}">
+											<div class="slds-p-around--small">
+												{!$Label.c.NOT_TARGETED} ({!v.numNonTargeted})
+											</div>
+											<aura:set attribute="else">
+												<div style="padding:10px 10px 10px 8px;">
+													<lightning:input type="checkbox" label="{!$Label.c.NOT_TARGETED + ' (' + v.numNonTargeted + ')'}" value="" onchange="{!c.selectAll}"/>
+												</div>
+											</aura:set>
+										</aura:if>
+									</th>
+								</tr>
+							</thead>
+							<tbody id="nonTarget">
+								<aura:iteration items="{!v.nonTargetedList}" var="tar">
+									<tr class="slds-hint-parent">
+										<td role="gridcell" data-label="{!$Label.c.NOT_TARGETED}">
+											<aura:if isTrue="{!tar.Name != null}">
+												<aura:if isTrue="{!v.sharedObjective}">
+													<div data-record="{!tar.Id}" onclick="{!c.navigateToRecord}">
+														<a class="slds-text-heading--small slds-truncate" href="javascript:void(0);">{!tar.Name}</a>
+														<br />
+														<div class="slds-text-body_small slds-truncate">
+															{!tar.BillingStreet}{!tar.BillingCity != null ? ',' : ''}&nbsp;{!tar.BillingCity}{!tar.BillingState != null ? ',' : ''}&nbsp;
+															{!tar.BillingState}&nbsp;
+															{!tar.BillingPostalCode}
+														</div>
+													</div>
+												<aura:set attribute="else">
+													<div class="slds-form-element">
+														<div class="slds-form-element__control">
+															<span class="slds-checkbox">
+																<input type="checkbox" id="{!'nonTar' + tar.Id}" class="slds-p-around--small notTarget"/>
+																<label class="slds-checkbox__label" for="{!'nonTar' + tar.Id}">
+																	<span class="slds-checkbox--faux"></span>
+																	<span class="slds-form-element__label" data-record="{!tar.Id}" onclick="{!c.navigateToRecord}"><a class="slds-text-heading--small slds-truncate" href="javascript:void(0);">{!tar.Name}</a></span><br />
+																	<div class="slds-text-body_small slds-truncate address">{!tar.BillingStreet}{!tar.BillingCity != null ? ',' : ''}&nbsp;{!tar.BillingCity}{!tar.BillingState != null ? ',' : ''}&nbsp;
+																		{!tar.BillingState}&nbsp;
+																		{!tar.BillingPostalCode}
+																	</div>
+																</label>
+															</span>
+														</div>
+													</div>
+												</aura:set>
+											</aura:if>
+												<aura:set attribute="else">
+													<div>
+														&nbsp;
+													</div>
+												</aura:set>
+											</aura:if>
+										</td>
+									</tr>
+								</aura:iteration>
+							</tbody>
+						</table>
+					</div>
+				</aura:set>
+			</aura:if>
+		</div>
+		<div id="tableSizeMessage">
+				<div class="slds slds-p-around--medium">
+					<div>
+						<div>
+							<h2 class="slds-text-heading--medium">{!$Label.c.Access_from_Tablet}</h2>
+						</div>
+						<div>
+							<p>{!$Label.c.Accounts_Target_Table}</p>
+						</div>
+						<br />
+						<div class="slds-text-align--center">
+							<button class="slds-button slds-button--neutral" onclick="{!c.goBack}">{!$Label.c.Go_Back}</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		<div class="slds-p-bottom--xx-large"></div>
+	</div>
+</aura:component>

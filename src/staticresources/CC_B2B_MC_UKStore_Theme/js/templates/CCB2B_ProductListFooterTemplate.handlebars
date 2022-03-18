@@ -1,0 +1,23 @@
+<div class="messagingSection-Error" style="display: none"></div>
+<div class="messagingSection-Warning" style="display: none"></div>
+<div class="messagingSection-Info" style="display: none"></div>
+<div class="row cc_list_footer">
+    <div class="col-md-12">
+        {{#if bufferHasMore}}
+        <button type="button" class="btn btn-default center-block show_more_products cc_show_more_products">{{pageLabelMap 'ProductList_ShowMoreBtn' this.pageSize}} <span class="icon-arrow-down"></span></button>
+        {{/if}}
+        <br />
+    </div>
+    <div>
+        <div class="productListActionButtons" style="display:none">
+            {{#if (checkContactDisplayPermissions 'create_basket')}}
+                <button type="button" class="btn primary_button btn-sm addAllToBasket">{{pageLabelMap 'ProductList_AddToCart'}}<span class="caret"></span></button>
+            {{/if}}
+            <button type="button" class="addAllToFavourites">{{pageLabelMap 'AddtoWishlist'}}
+                <div>
+                    <span class="icon-arrow-down"></span>
+                </div>
+            </button>
+        </div>
+    </div>
+</div>

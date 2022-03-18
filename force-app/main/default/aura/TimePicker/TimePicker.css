@@ -1,0 +1,61 @@
+.THIS.outsideWrapper {
+    position: fixed;
+    z-index: 99;
+    width: 100%;
+    left: 0;
+    top: 0;
+    height: 100%;
+}
+
+.THIS .time-output .inputIcon svg {
+    padding-bottom: 3px !important;
+    margin-right: 0.5rem !important;
+}
+
+.THIS .clearIcon {
+    float: right;
+    line-height: 1.875rem;
+}
+
+.THIS .slds-box {
+    margin-top: 0.5rem;
+    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16);
+    display: flex;
+    flex-wrap: wrap;
+    position: absolute;
+    left: 0;
+    top: 30px;
+    padding: 0.25rem;
+    z-index: 100;
+}
+
+.THIS .slds-box > div {
+    flex-grow: 1;
+    min-width: 30px;
+    text-align: center;
+    line-height: 1.6rem;
+}
+
+.THIS .slds-box > p {
+    padding: 0.25rem 0.5rem;
+    color: rgba(50,50,50,0.7);
+}
+
+.THIS .slds-box > div:hover {
+    background: rgb(244, 246, 249);
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.THIS .slds-box > div.selected {
+    background: rgb(0, 95, 178);
+    color: #fff;
+    border-radius: 50%;
+}
+
+.THIS .slds-hide {
+    display: none;
+}
+.THIS .dtPickBkCol {
+    background-color: white;
+}

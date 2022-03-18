@@ -1,0 +1,47 @@
+.THIS .saveAndApplyButton {
+    background-color: #f5b324; 
+    border: none;
+    color: black;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    width: 180px;
+}
+.THIS .desktopCSS{
+    padding-top: 80px !important;
+}
+.THIS .scrollerSize{
+    height:425px;
+}
+.THIS .modalStyle{
+    justify-content:flex-start;     
+}
+.THIS .formContent{
+    padding-top: 50px;
+}
+@media (max-width: 1025px) and (min-width: 320px){
+   .THIS .mobileView {
+        display: block;
+        padding: 1rem;
+        border-bottom: 2px solid rgb(221, 219, 218);
+        text-align: center;
+        position: fixed;
+        background:white;
+        z-index: 1;
+        margin-top: -20px;
+        margin-left: -15px;
+        overflow: hidden;
+        width: 100%;
+    }
+    .THIS .modalStyle{
+        background: white;
+    }
+    .THIS .scrollerSize{
+        height:600px;
+    }
+}
+@media (max-width: 420px) and (min-width: 319px){
+    .THIS .formContent{
+        padding-top: 80px;
+    }
+}

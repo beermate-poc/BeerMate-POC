@@ -1,0 +1,161 @@
+<!--
+   @Author Accenture
+   @name BMC_RetailQualityBrandPacks
+   @CreateDate  9/13/2018
+   @Description Component for creating Retail Quality Brand Pack Items.
+   @Version <1.0>
+  -->
+<aura:component controller="BMC_RetailQualityController" implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasRecordId" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="brandFamilies" type="String[]"/>
+    <aura:attribute name="auditDate" type="DateTime"/>
+    <aura:attribute name="rqaObj" type="BMC_Retail_Quality_Audit__c"/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="brandPackId" type="Id" />
+    <aura:attribute name="brandPackname" type="String" />
+    <aura:attribute name="brandpackList" type="BMC_Retail_Quality_Audit_Brand_Pack__c[]"/> 
+    <aura:attribute name="auditItemList" type="BMC_Audit_Item__c[]"/> 
+    <aura:attribute name="showAudit" type="boolean" default="false"/>
+    <aura:attribute name="showAuditscreen" type="boolean" default="false"/>
+    <aura:attribute name="createPack" type="boolean" default="false"/>
+    <aura:attribute name="openAddPackage" type="boolean" default="false"/>
+    <aura:attribute name="refreshBrandPack" type="boolean" default="false"/>
+    <aura:attribute name="selectedBrandfamily" type="String"/>
+    <aura:attribute name="isOffPrem" type="boolean" default="false"/>
+    <aura:attribute name="reviewScreen" type="boolean" default="false"/>
+    <aura:attribute name="brandPackListscreen" type="boolean" default="false"/>
+    <aura:handler name="change" value="{!v.showAudit}" action="{!c.showAuditpage}" />
+    <aura:attribute name="showEditaudit" type="boolean" default="false"/> 
+    <aura:attribute name="editAuditObj" type="BMC_Audit_Item__c" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="editAuditId" type="Id" /> 
+    <aura:attribute name="location" type="List[]"/>
+    <aura:attribute name="uomlst" type="List[]"/>
+    <aura:attribute name="damagelst" type="List[]"/>
+    <aura:attribute name="repackList" type="List[]"/>
+    <aura:handler name="change" value="{!v.refreshBrandPack}" action="{!c.refreshBrndpck}" />
+    <aura:handler name="change" value="{!v.openAddPackage}" action="{!c.createPackage}" />
+    <aura:handler name="change" value="{!v.showEditaudit}" action="{!c.refrshcodeBrdpk}" />
+    <aura:handler name="change" value="{!v.auditDate}" action="{!c.onsetAuditDate}" />    
+    <aura:attribute name="showErrorToast" type="boolean" default="false"/>
+    <aura:attribute name="toastTitle" type="String" />
+    <aura:attribute name="toastMsg" type="String" />
+    <aura:attribute name="toastType" type="String" />
+    <aura:attribute name="scanPage" type="Boolean" default="true"/>
+    <aura:attribute name="selectedLookUpRecord" type="sObject" default="{}"/>
+    <aura:attribute name="searchKeyWord" type="string"/>
+    <aura:attribute name="scannedBrand" type="String"/>
+    <aura:attribute name="showPkg" type="boolean"/>
+    <aura:attribute name="isDisablePkg" type="boolean" default="true"/>
+    <aura:attribute name="packages" type="String[]" default=""/>
+    <aura:attribute name="selectedPkgId" type="id"/>
+    <aura:attribute name="addpackage" type="boolean" default="false"/>
+    <aura:attribute name="initUom" type="String" />
+    <aura:attribute name="fromRetail" type="boolean" default="true"/>
+    <aura:attribute name="fromButton" type="boolean" default="false"/>
+    
+    <div class="slds-text-align__center">
+        <aura:if isTrue="{!v.showErrorToast}">
+            <c:Toast toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}"/>
+        </aura:if>
+    </div>
+    
+    <div>
+        <aura:if isTrue="{!v.showSpinner}">
+            <lightning:spinner />
+        </aura:if>   
+        <aura:if isTrue="{!or($Browser.isIPad, $Browser.isPhone)}">
+            <aura:if isTrue="{! !v.showEditaudit}">
+                <aura:if isTrue="{! !v.reviewScreen}">
+                    <aura:if isTrue="{!v.showAuditscreen}">
+                        <div>
+                            <c:BMC_createAuditItem  fromButton="{!v.fromButton}" createPack="{!v.createPack}" recordId="{!v.recordId}" searchKeyWord="{!v.searchKeyWord}" refreshBrandPack="{!v.refreshBrandPack}" openAddPackage="{!v.openAddPackage}" showAudit="{!v.showAudit}" brandPackId="{!v.brandPackId}" brandPackname="{!v.brandPackname}" location="{!v.location}"
+                                          initUom="{!v.initUom}" uomlst="{!v.uomlst}" damagelst="{!v.damagelst}" repackList="{!v.repackList}"/> 
+                        </div>
+                        <aura:set attribute="else">                           
+                            <aura:if isTrue="{!or(v.addpackage, v.createPack)}">
+                                 <aura:if isTrue="{!v.addpackage}">
+                                <c:ProductSearch aura:id="brandSearch" object="Product__c" field="TrademarkBrandLongNme__c" showPkg="true" isOffPremise="{!v.isOffPrem}" />             
+                                <br/> <br/>
+                                <lightning:button  class="slds-float_left" variant="Neutral" type="{!$Label.c.BMC_CancelButton}" name="{!$Label.c.BMC_CancelButton}" label="{!$Label.c.BMC_CancelButton}" onclick="{!c.goBacktolist}"/>
+                                <lightning:button  class="slds-float_right" variant="brand" type="{!$Label.c.BMC_Save}"  label="{!$Label.c.BMC_Save}" onclick="{!c.saveBrand}"/>                    
+                                
+                            </aura:if>
+                                <aura:if isTrue="{!v.createPack}"> 
+                                <lightning:button  class="slds-float_left" variant="Neutral" type="{!$Label.c.BMC_CancelButton}" name="{!$Label.c.BMC_CancelButton}" label="{!$Label.c.BMC_CancelButton}" onclick="{!c.goBacktolist}"/>
+                                <lightning:button  class="slds-float_right" variant="brand" type="{!$Label.c.BMC_Save}"  label="{!$Label.c.BMC_Save}" onclick="{!c.saveBrand}"/>                    
+                                <br/> <br/> <br/>
+                                <div class="slds-text-body_small">
+                                    {!$Label.c.BMC_BRANDNAME}  
+                                    {!v.scannedBrand}
+                                </div>
+                                <br/>
+                                <div> 
+                                    <lightning:select name="select"  label="{!$Label.c.BMC_AuditPackage}" required="true" disabled="{!v.isDisablePkg}" aura:id="selectOptions" value="{!v.selectedPkgId}"  messageWhenValueMissing="{!$Label.c.Package_is_Required}">
+                                        <option  value="">{!$Label.c.Package_Select_Default_Value}</option>
+                                        <aura:iteration items="{!v.packages}" var="pkg">
+                                            <option value="{!pkg.id}" text="{!pkg.name}" selected="{!pkg.id == v.selectedPkgId}" ></option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>  
+                                </aura:if>
+                                <aura:set attribute="else">
+                                    <lightning:button  class="slds-float_left" variant="Neutral" type="Review" name="Review" label="Review" onclick="{!c.gotoReviewpage}"/>
+                                    <lightning:button  class="slds-float_right" variant="brand" type="{!$Label.c.BMC_Add_Package}"  label="{!$Label.c.BMC_Add_Package}" onclick="{!c.addPackage}"/>
+                                    <br/> <br/>
+                                     
+                                        <lightning:select aura:id="brandFamily" label="" onchange="{!c.initializeBrand}">
+                                        <option value="{!$Label.c.BMC_BrandFamilyFilter}">{!$Label.c.BMC_BrandFamilyFilter}</option>
+                                        <aura:iteration items="{!v.brandFamilies}" var="brandFamilyoption">
+                                            <option value="{!brandFamilyoption.name}" selected="{!brandFamilyoption.name == v.selectedBrandfamily}">{!brandFamilyoption.name}</option>
+                                        </aura:iteration>
+                                    </lightning:select> 
+                                    <br/>
+                                    <ui:scrollerWrapper class="wrapperClass">
+                                        <ul>
+                                            <aura:iteration items="{!v.brandpackList}" var="brandpack">
+                                                <c:BMC_RetailQualityBrandPackItem fromButton="{!v.fromButton}" brandPackListscreen="true" brandPackId="{!v.brandPackId}" brandPackname="{!v.brandPackname}" brandpack="{!brandpack}" showAudit="{!v.showAudit}" reviewScreen="{!v.reviewScreen}" showEditaudit="{!v.showEditaudit}"/>
+                                            </aura:iteration>
+                                        </ul>
+                                    </ui:scrollerWrapper> 
+                                  
+                                    <aura:if isTrue="{!v.fromRetail}">
+                                   <c:BMC_CustomLookup aura:id="{!v.whatever}" initUom="{!v.initUom}" recordId="{!v.recordId}" objectAPIName="BMC_Retail_Quality_Audit_Brand_Pack__c"  selectedRecord="{!v.selectedLookUpRecord}" 
+                                                      fromRetail="{!v.fromRetail}"   isOffPrem="{!v.isOffPrem}" searchKeyWord="{!v.searchKeyWord}" openAddPackage="{!v.openAddPackage}" scanPage="{!v.scanPage}" showAudit="{!v.showAudit}" brandPackId="{!v.brandPackId}" brandPackname="{!v.brandPackname}"/> 
+                                    </aura:if>
+                                </aura:set>
+                            </aura:if>                
+                        </aura:set>
+                    </aura:if>
+                                    
+                    <aura:set attribute="else">
+                        <lightning:button  class="slds-float_left" variant="Neutral" type="End Audit" name="End Audit" label="End Audit" onclick="{!c.gobcktoRcrdpage}"/>
+                        <lightning:button  class="slds-float_right" variant="brand" type="Continue" name="Continue" label="Continue" onclick="{!c.gotoBrandList}"/>
+                        <br/>
+                        <br/>
+                        <div class="slds-text-heading_small slds-text-align_center">{!$Label.c.BMC_Audit_Summary}</div>
+                        <br/>&nbsp;<b>{!$Label.c.BMC_TotalQunatityInCE}  </b>  {!v.rqaObj.BMC_RQA_QCE__c}<br/>
+                        &nbsp;<b>{!$Label.c.BMC_TotalOOCinCE}  </b> {!v.rqaObj.BMC_RQA_QOOC__c}<br/>
+                        &nbsp;<b>{!$Label.c.BMC_OOC}  </b> {!v.rqaObj.BMC_RQA_QOOC_percent__c}<br/>
+                        &nbsp;<b>{!$Label.c.BMC_OOR}  </b> {!v.rqaObj.BMC_RQA_QOOR_percent__c}<br/>
+                        <br/>
+                        <ui:scrollerWrapper class="editwrapperClass">
+                            <ul>
+                                <aura:iteration items="{!v.auditItemList}" var="auditItem">
+                                    <c:BMC_RetailQualityBrandPackItem auditItem="{!auditItem}" brandPackListscreen="false" reviewScreen="{!v.reviewScreen}" showAudit="{!v.showAudit}" showEditaudit="{!v.showEditaudit}" editAuditObj="{!v.editAuditObj}"/>
+                                </aura:iteration>
+                            </ul>                    
+                        </ui:scrollerWrapper> 
+                    </aura:set>
+                </aura:if>
+                <aura:set attribute="else">
+                    <c:BMC_EditAuditItem showEditaudit="{!v.showEditaudit}" editAuditObj="{!v.editAuditObj}"  location="{!v.location}"
+                                         uomlst="{!v.uomlst}" damagelst="{!v.damagelst}" repackList="{!v.repackList}"/>  
+                </aura:set>
+            </aura:if>
+            <aura:set attribute="else">
+                <center>{!$Label.c.BMC_AuditDesktop}</center>
+            </aura:set>
+        </aura:if>
+    </div>
+</aura:component>

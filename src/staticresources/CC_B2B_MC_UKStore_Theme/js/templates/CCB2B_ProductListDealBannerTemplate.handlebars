@@ -1,0 +1,8 @@
+{{#if (or (eq CCB2BPromoType "Deal") (eq CCB2BPromoType "Event Price"))}}
+    {{#if (or (ex CCB2BPromotionTitle) (ex CCB2BPromotionDescription))}}
+    <div class="section">
+        <div class="banner-title">{{#if CCB2BPromotionTitle}} {{{CCB2BPromotionTitle}}} {{/if}}</div>
+        <div class="banner-description">{{#if CCB2BPromotionDescription}} {{{CCB2BPromotionDescription}}} {{/if}}</div>
+    </div>
+    {{/if}}
+{{/if}}

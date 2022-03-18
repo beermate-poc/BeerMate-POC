@@ -1,0 +1,91 @@
+<aura:component controller="GuidedSellingController" implements="force:lightningQuickAction,force:appHostable">
+    <aura:attribute name="title" type="String"/>
+     <aura:attribute name="callogId" type="Id" />
+    <aura:attribute name="newObjective" type="Objective__c" default="{'sobjectType': 'Objective__c', 'Product_Quantity__c' : '1'}" />
+    <aura:attribute name="subType" type="String"/>
+    <aura:attribute name="subTypeValues" type="String[]" default="[]"/>
+    <aura:attribute name="selectedSubType" type="String" />
+    <aura:attribute name="showCreateObj" type="Boolean"/>
+    <aura:attribute name="showToast" type="boolean" />
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="ProductId" type="Id" />
+    <aura:attribute name="showErrorToast" type="boolean" default="false"/>
+    <aura:attribute name="toastTitle" type="String" />
+    <aura:attribute name="toastMsg" type="String" />
+    <aura:attribute name="toastType" type="String" />
+    <aura:attribute name="objectName" type="String"/>
+    <aura:attribute name="isOffPrem" type="Boolean" />
+    <aura:attribute name="refreshObj" type="Boolean" />
+    <aura:attribute name="searchValue" type="String"/>
+	<aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:attribute name="packageLabel" type="String" default="{!$Label.c.Select_a_Package}" />
+    <aura:attribute name="packages" type="Product__c[]"/>
+    <aura:attribute name="selectedPkg" type="string"/>
+    <aura:handler name="plannedObjChanged" event="c:PlannedObjectiveSelected"
+    action="{!c.plannedObjectiveChanged}"/>
+    <aura:attribute name="smartSkuOpp" type="SmartSKUs__c" default="{'sobjectType': 'SmartSKUs__c'}"/>
+    <aura:attribute name="chainMandate" type="Chain_Mandate__c" default="{'sobjectType': 'Chain_Mandate__c'}"/>
+    
+    <lightning:card>
+        <div class="slds-text-align__center">
+            <aura:if isTrue="{!v.showErrorToast}">
+                <c:Toast toastTitle="{!v.toastTitle}" toastMsg="{!v.toastMsg}" toastType="{!v.toastType}"/>
+            </aura:if>
+        </div>
+        <aura:set attribute="title">
+		<h2 class="slds-text-heading--medium slds-truncate slds-align_absolute-center" title="New Placement">New Placement</h2>
+        <h3 class="slds-section-title--divider">{!$Label.c.Placement_Information}</h3>
+        </aura:set>
+        <aura:set attribute="footer">
+            <lightning:button label="Cancel" title="Cancel" onclick="{! c.closeModal}"/>
+    		<lightning:button variant="brand" label="Save" title="Save" onclick="{! c.createPlacementObj}" />
+        </aura:set>
+         <lightning:input value="{!v.newObjective.Name}" aura:id="objectiveName" type="text" label="{!$Label.c.Create_Objectives_Name}" name="objectiveName" required="true"/>
+        <lightning:select name="selectItem" label="{!$Label.c.Status}" required="true" value="{!v.newObjective.Status__c}" aura:id="statusSelectOptions" onchange="{!c.statusChange}">
+            <option value="Not Started">{!$Label.c.Not_Started}</option>
+            <option value="In Progress">{!$Label.c.In_Progress}</option>
+            <option value="Committed">{!$Label.c.Committed}</option>
+            <option value="Executed">{!$Label.c.Executed}</option>
+            <option value="Declined">{!$Label.c.Declined}</option>
+            <option value="Not Applicable">{!$Label.c.Not_Applicable}</option>
+        </lightning:select>
+           
+           <lightning:select name="Premise" label="Premise Type" disabled="true" value="{!v.newObjective.Objectives_Premise_Type__c}">
+               <option value="">{!$Label.c.Package_Select_Default_Value}</option>
+               <option value="On-Premise">{!$Label.c.BMC_GSOnPremise}</option>
+               <option value="Off-Premise">{!$Label.c.BMC_GSOffPremise}</option>
+           </lightning:select>
+            <lightning:input aura:id="brandval"  disabled="true"  label="Brand" />
+            
+           <!-- <lightning:select name="select" label="{!v.packageLabel}" required="true"  aura:id="selectOptions"  messageWhenValueMissing="{!$Label.c.Package_is_Required}" onchange="{!c.onPackageChange}">
+           <option value="">{!$Label.c.Package_Select_Default_Value}</option>
+                <aura:if isTrue="{!v.isOffPrem}">
+                    <aura:iteration items="{!v.packages}" var="pkg">
+                       <option value="{!join(',', pkg.Id, pkg.PackageDesc__c)}" text="{!pkg.PackageDesc__c}"></option>
+                   </aura:iteration>
+               <aura:set attribute="else">
+                   <aura:iteration items="{!v.packages}" var="pkg">
+                <option value="{!join(',', pkg.Id, pkg.OnPremisePackageDesc__c)}" text="{!pkg.OnPremisePackageDesc__c}"></option>
+            </aura:iteration>
+               </aura:set>
+           </aura:if>
+        </lightning:select> -->
+         <lightning:select name="select" label="{!v.packageLabel}" required="true" aura:id="selectOptions" messageWhenValueMissing="{!$Label.c.Package_is_Required}" onchange="{!c.onPackageChange}">
+            <option value="">{!$Label.c.Package_Select_Default_Value}</option>
+            <aura:iteration items="{!v.packages}" var="pkg">
+                <option value="{!join(',', pkg.id, pkg.name)}" text="{!pkg.name}" ></option>
+            </aura:iteration>
+        </lightning:select>
+                <ui:inputNumber class="slds-input" labelClass="slds-form-element__label" aura:id="placeQty" label="{!$Label.c.Create_Objectives_Initial_Quantity}" value="{!v.newObjective.Product_Quantity__c}" required="true"/>
+           <div class="{!v.newObjective.Status__c != 'Committed' ? 'slds-hide': 'slds-show'}">
+                   <div class="slds-form-element">
+                       <c:DatePicker aura:id="dt" value="{!v.newObjective.Delivery_Date__c}" label="{!$Label.c.Suggested_Date_Label}"
+                                     inputClass="slds-input" requiredAstrik="*" positionDate="datePickerRight"/>
+                   </div>
+                   <div class="slds-form-element">
+                       <lightning:textarea name="myTextArea" label="{!$Label.c.Objectives_Placement_Detail}" maxlength="300" value="{!v.newObjective.Notes_for_Distributor__c}" aura:id="placeDetail"
+                        />
+                   </div>
+               </div>
+    </lightning:card>
+</aura:component>

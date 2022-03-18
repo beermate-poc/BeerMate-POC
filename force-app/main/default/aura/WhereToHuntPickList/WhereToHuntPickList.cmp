@@ -1,0 +1,14 @@
+<aura:component controller="WhereToHuntSelectController">
+<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="whereToHuntList" type="Where_to_Hunt__c[]" />
+    <div class="slds-form-element">
+        <div class="slds-form-element__control">
+            <lightning:select name="select" label="" aura:id="whereToHuntList" onchange="{!c.selectChanged}">
+                <option value="">{!$Label.c.WhereToHunt_Picklist_Select_Where_to_Hunt_List}</option>
+                <aura:iteration items="{!v.whereToHuntList}" var="option">
+                    <option value="{!option.Id}" text="{!option.Name}" selected="{!option.selected}"></option>
+                </aura:iteration>
+            </lightning:select>
+        </div>
+    </div>
+</aura:component>

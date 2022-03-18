@@ -1,0 +1,30 @@
+<aura:component description="ACE_ReimbursementDisqualify" controller="ACEReimbursementApproval" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:availableForFlowScreens">
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="success" type="boolean" default="false" />
+    <aura:attribute name="error" type="boolean" default="false" />
+    <aura:attribute name="reasoncode" type="String[]" />
+    <aura:attribute name="selectedCode" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+
+    <aura:if isTrue="{!v.success}">
+        <ui:message title="Success" severity="confirm" closable="false">
+            This Reimbursement Has Been Closed.
+        </ui:message>
+    </aura:if>
+
+    <aura:if isTrue="{!v.error}">
+        <ui:message title="Error" severity="error" closable="false" aura:id="errorMsg"/>
+    </aura:if>
+    
+    <aura:if isTrue="{! v.success == FALSE}">
+        <aura:if isTrue="{! v.error == FALSE}">
+ <lightning:select aura:id="code" name="code" label="{!$Label.c.ACE_ReasonCode_Discqualify}" value="{!v.selectedCode}">
+                <option value="">{!$Label.c.Default_Picklist_Select}</option>
+                <aura:iteration items="{!v.reasoncode}" var="code">
+                    <option value="{!code}" text="{!code}" ></option>
+                </aura:iteration>
+            </lightning:select>	        	<ui:button aura:id="button" buttonTitle="Submit" class="button" label="Submit" press="{!c.Disqualify}"/>
+        </aura:if>
+     </aura:if>
+</aura:component>
