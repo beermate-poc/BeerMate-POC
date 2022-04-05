@@ -9,9 +9,11 @@ on:
     branches: 
       - develop
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel  
+# A workflow which firstly runs the static resource builder, followed by the deployment itself  
 jobs:
   BuildStaticResources:
+  # The deploy_scripts/Compiler.xml and deploy_scripts/minimalize.bat files have to be updated
+  # with the new src path: e.g., D:\a\repositoryName\repositoryName\ instead of d:\a\1\s\ !
     runs-on: windows-latest
     steps:
     - name: Checkout the source branch
@@ -43,6 +45,10 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: SFDX Version
+        run: |
+          sfdx --version
+
       - name: Checkout the source branch
         uses: actions/checkout@v2.3.4
         with:
@@ -53,12 +59,6 @@ jobs:
 #         run: |
 #           npm install sfdx-cli --global
 #           echo 'y' | npx sfdx plugins:install sfpowerkit
-
-      - name: SFDX Version
-        run: |
-          sfdx --version
-          echo "${PWD##*/}"
-          ls -d $PWD/*
 
       - name: Delta package
         run: |
