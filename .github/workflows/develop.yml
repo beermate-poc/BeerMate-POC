@@ -30,8 +30,8 @@ jobs:
       run: |
           mkdir -p force-app/main/default/staticresources
           cp src/staticresources/*.resource* force-app/main/default/staticresources
-          git config user.email "adi.ioana91@gmail.com"
-          git config user.name "adrianioana"
+          git config user.email "automated@process"
+          git config user.name "Automated Process"
           git add force-app/main/default/staticresources
           git commit -m 'Commit the B2B built static resources'
           git push ${{secrets.repository}}
