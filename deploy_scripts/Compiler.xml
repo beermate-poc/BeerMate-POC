@@ -145,12 +145,12 @@
         <attribute name="resource"/>
  
         <sequential>
-            <concat destfile="d:\a\1\s\src\staticresources\@{resource}\${Handlebars.temp.tempStorefront.js}">
-                <filelist dir="d:\a\1\s\src\staticresources\@{resource}\js">
+            <concat destfile="D:\a\BeerMate-POC\BeerMate-POC\src\staticresources\@{resource}\${Handlebars.temp.tempStorefront.js}">
+                <filelist dir="D:\a\BeerMate-POC\BeerMate-POC\src\staticresources\@{resource}\js">
                     <file name="helpers.js"/>
                     <file name="custom.js"/>
                 </filelist>
-                <filelist files="d:\a\1\s\src\staticresources\@{resource}\${Handlebars.temp.templates.js}"/>
+                <filelist files="D:\a\BeerMate-POC\BeerMate-POC\src\staticresources\@{resource}\${Handlebars.temp.templates.js}"/>
                 <filelist files="${Handlebars.temp.models}"/>
                 <filelist files="${Handlebars.temp.views}"/>
             </concat>
@@ -212,19 +212,19 @@
             </fail>
 
             <!-- <setHandlebarsTemp resource="${staticResource}" temp="templates" fileExt="handlebars"/> -->
-            <setHandlebarsTemp resource="d:\a\1\s\src\staticresources\@{resource}" temp="templates" fileExt="handlebars"/>
+            <setHandlebarsTemp resource="D:\a\BeerMate-POC\BeerMate-POC\src\staticresources\@{resource}" temp="templates" fileExt="handlebars"/>
 
             <!-- <setHandlebarsTemp resource="${staticResource}" temp="models" fileExt="js" connector=","/> -->
-            <setHandlebarsTemp resource="d:\a\1\s\src\staticresources\@{resource}" temp="models" fileExt="js" connector=","/>
+            <setHandlebarsTemp resource="D:\a\BeerMate-POC\BeerMate-POC\src\staticresources\@{resource}" temp="models" fileExt="js" connector=","/>
 
             <!-- <setHandlebarsTemp resource="${staticResource}" temp="views" fileExt="js" connector=","/> -->
-            <setHandlebarsTemp resource="d:\a\1\s\src\staticresources\@{resource}" temp="views" fileExt="js" connector=","/>
+            <setHandlebarsTemp resource="D:\a\BeerMate-POC\BeerMate-POC\src\staticresources\@{resource}" temp="views" fileExt="js" connector=","/>
 
             <!-- <compressHandlebarsTemplates resource="${staticResource}"/> -->
             <concatAllJavascriptFiles resource="@{resource}"/>
 
-            <jscomp warning="verbose" compilationlevel="whitespace" debug="true" output="d:\a\1\s\src\staticresources\@{resource}\js\storefront.min.js">
-                <sources dir="d:\a\1\s\src\staticresources\@{resource}">
+            <jscomp warning="verbose" compilationlevel="whitespace" debug="true" output="D:\a\BeerMate-POC\BeerMate-POC\src\staticresources\@{resource}\js\storefront.min.js">
+                <sources dir="D:\a\BeerMate-POC\BeerMate-POC\src\staticresources\@{resource}">
                     <file name="${Handlebars.temp.tempStorefront.js}"/>
                 </sources>
             </jscomp>
