@@ -28,7 +28,7 @@
 		</exec>
 		<ant antfile="Compiler.xml" target="zipAndCompressECommerce"/>
 	</target>
-
+<!-- Testing PR request-->
 	<!-- <target name="deployCodeCheckOnly" depends="prepareStaticResourcesZip">
 		<echo>deployCodeCheckOnly_${sf.username}</echo>
 		<sf:deploy username="${sf.username}" password="${sf.password}"
