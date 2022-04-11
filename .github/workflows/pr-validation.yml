@@ -12,7 +12,7 @@ on:
 jobs:
   ValidatePR:
     runs-on: ubuntu-latest
-    container: dxatscale/sfpowerscripts:latest
+    container: dxatscale/sfpowerscripts:release-feb22
     steps:
       - uses: actions/checkout@v2
         with:
