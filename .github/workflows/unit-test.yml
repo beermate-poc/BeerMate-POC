@@ -1,0 +1,16 @@
+# This is a basic workflow to help you deploy to a Salesforce environment
+
+name: Run-unit-tests
+
+on: [workflow_dispatch]
+
+# A workflow which firstly runs the static resource builder, followed by the deployment itself  
+jobs:
+  UnitTest:
+    runs-on: ubuntu-latest
+    container: dxatscale/sfpowerscripts:latest
+    steps:
+      - name: Run unit tests
+        run: |
+          sfdx force:auth:jwt:grant --clientid ${{secrets.TESTsalesforceDevOrgClientId}} --jwtkeyfile ./.github/server.key --username ${{secrets.TESTsalesforceOrgUserName}} --instanceurl ${{secrets.testOrgInstanceURL}}
+          sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.TESTsalesforceOrgUserName}}
