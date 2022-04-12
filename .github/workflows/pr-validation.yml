@@ -7,7 +7,7 @@ name: Validate-PR
 on:
   workflow_dispatch:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, edited, synchronize, reopened]
     branches:
       - develop
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
