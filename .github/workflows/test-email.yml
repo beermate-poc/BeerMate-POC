@@ -1,6 +1,6 @@
 # This is a basic workflow to help you deploy to a Salesforce environment
 
-name: Run-unit-tests
+name: Test-email
 
 on: [workflow_dispatch]
 
