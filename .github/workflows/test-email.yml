@@ -28,13 +28,13 @@ jobs:
           # Required mail subject:
           subject: Unit Test Results Summary
           # Required recipients' addresses:
-          to: mamatha.dhanoji@molsoncoors.com,adrian.ioana@molsooncoors.com
+          to: mamatha.dhanoji@molsoncoors.com,adrian.ioana@molsoncoors.com
           # Required sender full name (address can be skipped):
           from: GITHUB Workflow # <user@example.com>
           # Optional whether this connection use TLS (default is true if server_port is 465)
           secure: true
           # Optional plain body:
-          body: Build job of ${{github.repository}} completed successfully!
+          body: The UAT unit test job from ${{github.repository}} completed successfully!
           # Optional HTML body read from file:
           #html_body: file://README.html
           # Optional carbon copy recipients:
