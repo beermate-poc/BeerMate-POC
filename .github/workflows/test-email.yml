@@ -18,13 +18,13 @@ jobs:
         uses: dawidd6/action-send-mail@v3
         with:
           # Required mail server address:
-          server_address: smtp.office365.com
+          server_address: smtp.gmail.com
           # Required mail server port:
-          server_port: 587
+          server_port: 465
           # Optional (recommended): mail server username:
-          username: ${{secrets.MAIL_USERNAME}}
+          username: ${{secrets.MAIL_USERNAME_ADR}}
           # Optional (recommended) mail server password:
-          password: ${{secrets.MAIL_PASSWORD}}
+          password: ${{secrets.MAIL_PASSWORD_ADR}}
           # Required mail subject:
           subject: Unit Test Results Summary
           # Required recipients' addresses:
