@@ -6,7 +6,7 @@ on: [workflow_dispatch]
 
 # A workflow which firstly runs the static resource builder, followed by the deployment itself  
 jobs:
-  UnitTest:
+  SendEmail:
     runs-on: ubuntu-latest
     steps:
       - name: Send mail
@@ -17,9 +17,9 @@ jobs:
           # Required mail server port:
           server_port: 587
           # Optional (recommended): mail server username:
-          username: ${{secrets.MAIL_USERNAME}}
+          username: ${{secrets.MAIL_USERNAME_ADRMCBC}}
           # Optional (recommended) mail server password:
-          password: ${{secrets.MAIL_PASSWORD}}
+          password: ${{secrets.MAIL_PASSWORD_ADRMCBC}}
           # Required mail subject:
           subject: UAT Unit Test Results Summary
           # Required recipients' addresses:
@@ -27,7 +27,7 @@ jobs:
           # Required sender full name (address can be skipped):
           from: GITHUB Workflow # <user@example.com>
           # Optional whether this connection use TLS (default is true if server_port is 465)
-          secure: true
+          secure: false
           # Optional plain body:
           body: The unit test job from ${{github.repository}} completed successfully!
           # Optional HTML body read from file:
