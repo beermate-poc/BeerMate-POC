@@ -27,7 +27,7 @@ jobs:
           # Required sender full name (address can be skipped):
           from: GITHUB Workflow # <user@example.com>
           # Optional whether this connection use TLS (default is true if server_port is 465)
-          secure: true
+          # secure: true
           # Optional plain body:
           body: The unit test job from ${{github.repository}} completed successfully!
           # Optional HTML body read from file:
