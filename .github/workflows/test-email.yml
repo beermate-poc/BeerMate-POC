@@ -9,24 +9,19 @@ jobs:
   UnitTest:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout the source branch
-        uses: actions/checkout@v2.3.4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.ref }}
       - name: Send mail
-        uses: dawidd6/action-send-mail@v3
+        uses: dawidd6/action-send-mail@v3.6.1
         with:
           # Required mail server address:
-          server_address: smtp.gmail.com
+          server_address: smtp.office365.com
           # Required mail server port:
-          server_port: 465
+          server_port: 587
           # Optional (recommended): mail server username:
-          username: ${{secrets.MAIL_USERNAME_ADR}}
+          username: ${{secrets.MAIL_USERNAME}}
           # Optional (recommended) mail server password:
-          password: ${{secrets.MAIL_PASSWORD_ADR}}
+          password: ${{secrets.MAIL_PASSWORD}}
           # Required mail subject:
-          subject: Unit Test Results Summary
+          subject: UAT Unit Test Results Summary
           # Required recipients' addresses:
           to: mamatha.dhanoji@molsoncoors.com,adrian.ioana@molsoncoors.com
           # Required sender full name (address can be skipped):
@@ -34,7 +29,7 @@ jobs:
           # Optional whether this connection use TLS (default is true if server_port is 465)
           secure: true
           # Optional plain body:
-          body: The UAT unit test job from ${{github.repository}} completed successfully!
+          body: The unit test job from ${{github.repository}} completed successfully!
           # Optional HTML body read from file:
           #html_body: file://README.html
           # Optional carbon copy recipients:
@@ -52,4 +47,4 @@ jobs:
           # Optional attachments:
           #attachments: attachments.zip,git.diff,./dist/static/*.js
           # Optional priority: 'high', 'normal' (default) or 'low'
-          priority: low
+          #priority: low
