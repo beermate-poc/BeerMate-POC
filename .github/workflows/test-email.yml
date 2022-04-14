@@ -23,7 +23,7 @@ jobs:
           # Required mail subject:
           subject: UAT Unit Test Results Summary
           # Required recipients' addresses:
-          to: mamatha.dhanoji@molsoncoors.com,adrian.ioana@molsoncoors.com
+          to: mamatha.dhanoji@molsoncoors.com,adrian.ioana@molsoncoors.com,adi.ioana91@gmail.com
           # Required sender full name (address can be skipped):
           from: GITHUB Workflow # <user@example.com>
           # Optional whether this connection use TLS (default is true if server_port is 465)
