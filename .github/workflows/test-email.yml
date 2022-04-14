@@ -17,9 +17,9 @@ jobs:
           # Required mail server port:
           server_port: 587
           # Optional (recommended): mail server username:
-          username: ${{secrets.MAIL_USERNAME_ADRMCBC}}
+          username: ${{secrets.MAIL_USERNAME}}
           # Optional (recommended) mail server password:
-          password: ${{secrets.MAIL_PASSWORD_ADRMCBC}}
+          password: ${{secrets.MAIL_PASSWORD}}
           # Required mail subject:
           subject: UAT Unit Test Results Summary
           # Required recipients' addresses:
