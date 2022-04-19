@@ -18,11 +18,17 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.ref }}
+      
+      
       - name: Run unit tests
         run: |
           npm install sfdx-cli --global
           sfdx force:auth:jwt:grant --clientid ${{secrets.BEERMATE_UAT_CLIENTID}} --jwtkeyfile ./.github/server.key --username ${{secrets.BEERMATE_UAT_USERNAME}} --instanceurl ${{secrets.testOrgInstanceURL}}
           SFDX_MAX_QUERY_LIMIT=30000 sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.BEERMATE_UAT_USERNAME}}
+          execution_id=`sfdx force:data:soql:query -q "SELECT AsyncApexJobId FROM ApexTestRunResult where Status='Completed' order by EndTime desc limit 1" -t -u ${{secrets.BEERMATE_UAT_USERNAME}}`
+          execution_report=`echo "$execution_id" | grep ^707*`
+          sfdx force:apex:test:report -i $execution_report -u ${{secrets.BEERMATE_UAT_USERNAME}} > report.txt
+      
       - name: Send mail
         uses: dawidd6/action-send-mail@v3.6.1
         with:
@@ -59,6 +65,6 @@ jobs:
           # Optional converting Markdown to HTML (set content_type to text/html too):
           # convert_markdown: true
           # Optional attachments:
-          # attachments: attachments.zip,git.diff,./dist/static/*.js
+          attachments: report.txt
           # Optional priority: 'high', 'normal' (default) or 'low'
           # priority: low
