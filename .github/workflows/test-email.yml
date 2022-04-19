@@ -2,7 +2,11 @@
 
 name: Test-email
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ft_test_email
 
 # A workflow which firstly runs the static resource builder, followed by the deployment itself  
 jobs:
