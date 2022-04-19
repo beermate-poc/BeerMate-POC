@@ -8,7 +8,7 @@ on: [workflow_dispatch]
 jobs:
   UnitTest:
     runs-on: ubuntu-latest
-    container: dxatscale/sfpowerscripts:latest
+#     container: dxatscale/sfpowerscripts:latest
     steps:
       - name: Checkout the source branch
         uses: actions/checkout@v2.3.4
@@ -17,7 +17,6 @@ jobs:
           ref: ${{ github.ref }}
       - name: Run unit tests
         run: |
-          ls
-          ls -d $PWD/*
+          npm install sfdx-cli --global
           sfdx force:auth:jwt:grant --clientid ${{secrets.TESTsalesforceDevOrgClientId}} --jwtkeyfile ./.github/server.key --username ${{secrets.TESTsalesforceOrgUserName}} --instanceurl ${{secrets.testOrgInstanceURL}}
-          sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.TESTsalesforceOrgUserName}}
+          SFDX_MAX_QUERY_LIMIT=30000 sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.TESTsalesforceOrgUserName}}
