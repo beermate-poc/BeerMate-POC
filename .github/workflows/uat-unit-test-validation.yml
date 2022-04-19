@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 # Triggers the workflow every 5 minutes
   schedule:
-    - cron: "20 14 * * *"
+    - cron: '28 14 * * *'
 
 # A workflow which firstly runs the static resource builder, followed by the deployment itself  
 jobs:
