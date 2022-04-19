@@ -1,8 +1,7 @@
 # This is a basic workflow to help you deploy to a Salesforce environment
-
-name: Run-uat-unit-tests
-
-on: [workflow_dispatch]
+name: UAT-unit-tests
+on: 
+  workflow_dispatch:
 # Triggers the workflow every 5 minutes
   schedule:
     - cron: "0 0 * * 5"
@@ -22,7 +21,7 @@ jobs:
         run: |
           npm install sfdx-cli --global
           sfdx force:auth:jwt:grant --clientid ${{secrets.BEERMATE_UAT_CLIENTID}} --jwtkeyfile ./.github/server.key --username ${{secrets.BEERMATE_UAT_USERNAME}} --instanceurl ${{secrets.testOrgInstanceURL}}
-          sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.BEERMATE_UAT_USERNAME}}
+          SFDX_MAX_QUERY_LIMIT=30000 sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.BEERMATE_UAT_USERNAME}}
       - name: Send mail
         uses: dawidd6/action-send-mail@v3.6.1
         with:
