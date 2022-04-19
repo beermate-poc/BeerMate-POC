@@ -5,6 +5,7 @@ Description:  Fetches all the Heirarchy Level Account.
 <Date>      <Author Name>     <Brief Description of Change>
 3/20/2019   Alexandria Sanborn
 1/16/2020   Rajeshwari Shetty
+Adding additinal comments
 ------------------------------------------------------------*/
     global Account[] start(Database.BatchableContext info) {
         return [select id, ParentId FROM Account WHERE RecordType.DeveloperName = 'Hierarchy' AND ParentId=NULL Limit :Limits.getLimitQueryRows() - Limits.getQueryRows()];
@@ -104,6 +105,7 @@ Description:  Deletes the Indirect Account Contact relationships[Manually Create
 			  based on Direct Account Heirarchy] from child Account,when parent Relationship is removed.
 Method Name:  deleteAccountContactRelationOutofDirectHeirarchy
 Parameters:   Set of AccountId and ContactIds,Map of Child Account To parent and Account and Existing Account Contact relationships
+
 ------------------------------------------------------------*/
     public static List<AccountContactRelation> deleteAccountContactRelationOutofDirectHeirarchy(Set<Id> AccountId,Set<Id> contactId,Map<Id,ID[]> childAccountToParentAcc,Map<Id,ID[]> ConToAccts)
     {
