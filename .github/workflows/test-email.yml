@@ -9,6 +9,10 @@ jobs:
   SendEmail:
     runs-on: ubuntu-latest
     steps:
+      - name: Folder structure
+        run: |
+          ls -d $PWD/*
+
       - name: Send mail
         uses: dawidd6/action-send-mail@v3.6.1
         with:
@@ -23,7 +27,7 @@ jobs:
           # Required mail subject:
           subject: UAT Unit Test Results Summary
           # Required recipients' addresses:
-          to: mamatha.dhanoji@molsoncoors.com,adrian.ioana@molsoncoors.com,adi.ioana91@gmail.com
+          to: adrian.ioana@molsoncoors.com
           # Required sender full name (address can be skipped):
           from: GITHUB Workflow # <user@example.com>
           # Optional whether this connection use TLS (default is true if server_port is 465)
@@ -45,6 +49,6 @@ jobs:
           # Optional converting Markdown to HTML (set content_type to text/html too):
           #convert_markdown: true
           # Optional attachments:
-          attachments: ./report.txt
+          attachments: report.txt
           # Optional priority: 'high', 'normal' (default) or 'low'
           #priority: low
