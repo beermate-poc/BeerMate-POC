@@ -2,10 +2,10 @@
 name: UAT-unit-tests
 
 on: 
-  workflow_dispatch:
+#   workflow_dispatch:
 # Triggers the workflow every 5 minutes
   schedule:
-    - cron: '34 14 * * *'
+    - cron: '35 14 * * *'
 
 # A workflow which firstly runs the static resource builder, followed by the deployment itself  
 jobs:
