@@ -11,7 +11,7 @@ on:
 jobs:
   UnitTest:
     runs-on: ubuntu-latest
-#     container: dxatscale/sfpowerscripts:latest
+    container: salesforce/salesforcedx:latest-rc-slim
     steps:
       - name: Checkout the source branch
         uses: actions/checkout@v2.3.4
@@ -19,10 +19,8 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.ref }}
       
-      
       - name: Run unit tests
         run: |
-          npm install sfdx-cli --global
           sfdx force:auth:jwt:grant --clientid ${{secrets.BEERMATE_UAT_CLIENTID}} --jwtkeyfile ./.github/server.key --username ${{secrets.BEERMATE_UAT_USERNAME}} --instanceurl ${{secrets.testOrgInstanceURL}}
           SFDX_MAX_QUERY_LIMIT=30000 sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.BEERMATE_UAT_USERNAME}}
           execution_id=`sfdx force:data:soql:query -q "SELECT AsyncApexJobId FROM ApexTestRunResult where Status='Completed' order by EndTime desc limit 1" -t -u ${{secrets.BEERMATE_UAT_USERNAME}}`
