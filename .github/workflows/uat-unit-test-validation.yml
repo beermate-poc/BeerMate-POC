@@ -1,9 +1,8 @@
 # This is a basic workflow to help you deploy to a Salesforce environment
 name: UAT-unit-tests
 
-on: 
+on:
   workflow_dispatch:
-# Triggers the workflow every 5 minutes
   schedule:
     - cron: '35 14 * * *'
 
