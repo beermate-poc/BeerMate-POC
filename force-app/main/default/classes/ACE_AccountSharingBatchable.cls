@@ -5,7 +5,7 @@ Description:  Fetches all the Heirarchy Level Account.
 <Date>      <Author Name>     <Brief Description of Change>
 3/20/2019   Alexandria Sanborn
 1/16/2020   Rajeshwari Shetty
-Adding additinal comments
+Adding additional comments
 ------------------------------------------------------------*/
     global Account[] start(Database.BatchableContext info) {
         return [select id, ParentId FROM Account WHERE RecordType.DeveloperName = 'Hierarchy' AND ParentId=NULL Limit :Limits.getLimitQueryRows() - Limits.getQueryRows()];
