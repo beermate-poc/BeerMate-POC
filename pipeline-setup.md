@@ -11,24 +11,24 @@ In this section we will talk about:
 # Create a connected app
   1. Create a System Administrator Deployment User in the target Salesforce Sandboxes & Production
   2. Create a DevOps connected app in Salesforce
-      a. Enable OAuth Settings
-      b. Callback URL: http://localhost:1717/OauthRedirect
-      c. Digital certificate – a .crt & .key certificate to be created. Upload the server.crt file in here.
-      d. Selected OAuth Scopes	
-        i. Manage user data via APIs (api)
-        ii.	Manage user data via Web browsers (web)
-        iii. Perform requests at any time (refresh_token, offline_access)
-      e. Save
-        i. Manage - Edit Policies - OAuth Policies - Permitted Users - Admin approved users are pre-authorized - Save
-        ii. Manage - Profiles - Manage profiles - Add System Administrator
+      - Enable OAuth Settings
+      - Callback URL: http://localhost:1717/OauthRedirect
+      - Digital certificate – a .crt & .key certificate to be created. Upload the server.crt file in here.
+      - Selected OAuth Scopes	
+        * Manage user data via APIs (api)
+        *	Manage user data via Web browsers (web)
+        * Perform requests at any time (refresh_token, offline_access)
+      - Save
+        * Manage - Edit Policies - OAuth Policies - Permitted Users - Admin approved users are pre-authorized - Save
+        * Manage - Profiles - Manage profiles - Add System Administrator
 
 
 # Update the GitHub secrets
 1. Github - Settings - Secrets - Actions - New repository secret
 2. Create or update the environment variables for:
-  a. Sandbox Consumer Key (Client ID)
-  b. Sandbox Username
-  c. Sandbox Test Level
+  - Sandbox Consumer Key (Client ID)
+  - Sandbox Username
+  - Sandbox Test Level
 
 
 # Create a GitHub workflow
