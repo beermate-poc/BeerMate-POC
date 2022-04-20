@@ -26,9 +26,9 @@ In this section we will talk about:
 # Update the GitHub secrets
 1. Github - Settings - Secrets - Actions - New repository secret
 2. Create or update the environment variables for:
-  - Sandbox Consumer Key (Client ID)
-  - Sandbox Username
-  - Sandbox Test Level
+    - Sandbox Consumer Key (Client ID)
+    - Sandbox Username
+    - Sandbox Test Level
 
 
 # Create a GitHub workflow
