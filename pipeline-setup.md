@@ -9,8 +9,9 @@ In this section we will talk about:
 4.	...
 
 # Create a connected app
-  1. Create a System Administrator Deployment User in the target Salesforce Sandboxes & Production
-  2. Create a DevOps connected app in Salesforce
+  1. Create a System Administrator Deployment User in the target Salesforce Sandboxes & Production. 
+  Alternatively, you can use your own user, if you have System Administrator rights (not recommended)
+  3. Create a DevOps connected app in Salesforce
       - Enable OAuth Settings
       - Callback URL: http://localhost:1717/OauthRedirect
       - Digital certificate – a .crt & .key certificate to be created. Upload the server.crt file in here.
