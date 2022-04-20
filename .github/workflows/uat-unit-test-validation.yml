@@ -20,9 +20,9 @@ jobs:
       
       - name: Run unit tests
         run: |
-          sfdx force:auth:jwt:grant --clientid ${{secrets.BEERMATE_UAT_CLIENTID}} --jwtkeyfile ./.github/server.key --username ${{secrets.BEERMATE_UAT_USERNAME}} --instanceurl ${{secrets.testOrgInstanceURL}}
           execution_id=`sfdx force:data:soql:query -q "SELECT AsyncApexJobId FROM ApexTestRunResult where Status='Completed' order by EndTime desc limit 1" -t -u ${{secrets.BEERMATE_UAT_USERNAME}}`
           execution_report=`echo "$execution_id" | grep ^707*`
+          gh run view --job job-id --log | grep Fail
           sfdx force:apex:test:report -i $execution_report -u ${{secrets.BEERMATE_UAT_USERNAME}} > report.txt
       
       - name: Send mail
@@ -65,5 +65,5 @@ jobs:
           # Optional priority: 'high', 'normal' (default) or 'low'
           # priority: low
 
-
+# sfdx force:auth:jwt:grant --clientid ${{secrets.BEERMATE_UAT_CLIENTID}} --jwtkeyfile ./.github/server.key --username ${{secrets.BEERMATE_UAT_USERNAME}} --instanceurl ${{secrets.testOrgInstanceURL}}
 # SFDX_MAX_QUERY_LIMIT=30000 sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.BEERMATE_UAT_USERNAME}}
