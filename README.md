@@ -35,12 +35,22 @@ To create the certificate follow the steps described in https://developer.salesf
 2. Create or update the environment variables for:
     - Sandbox Consumer Key (Client ID)
     - Sandbox Username
-    - Sandbox Test Level
-
+    - NoTestRun
+    - RunLocalTests
+    - RunSpecifiedTests -r testClass1,testClass2,etc
 
 # Create a GitHub workflow
-1. Create a new or clone an existing workflow from .github - workflows
-2. Make use of the new or updated secrets in your new pipeline
+1. Create a feature branch from develop and create a new or clone an existing workflow from .github/workflows
+2. Make use of the new or updated secrets in your new workflow
+3. Install and open GitHub Desktop - checkout your feature branch - History and add a new tag for your environment on the latest commit (eg. DEVINT/v1)
+4. Push the changes to GitHub
+
+# Test the GitHub workflow
+1. Create a new branch out of your feature branch, naming it as specified in the new workflow. In the example below, our new branch will be called **develop**
+![image](https://user-images.githubusercontent.com/48366727/164461682-d10cc756-399a-4eb0-b296-7a068d33cee5.png)
+
+
+
 
 ## Part 1: Choosing a Development Model
 
