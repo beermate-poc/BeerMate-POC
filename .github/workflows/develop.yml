@@ -6,6 +6,10 @@ name: Deploy-to-TEST
 # events but only for the specified branches
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: [Deploy-to-TEST]
+    types:
+      - completed
   push:
     branches: 
       - develop
