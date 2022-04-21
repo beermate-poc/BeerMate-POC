@@ -47,9 +47,11 @@ To create the certificate follow the steps described in https://developer.salesf
 
 # Test the GitHub workflow
 1. Create a new branch out of your feature branch, naming it as specified in the new workflow. In the example below, our new branch will be called **develop**
+
 ![image](https://user-images.githubusercontent.com/48366727/164461682-d10cc756-399a-4eb0-b296-7a068d33cee5.png)
 
-
+2. Create a dummy commit in force-app/main/default (you can add an extra line on one of the cls-meta.xml files)
+3. Monitor the workflow in GitHub - Actions tab
 
 
 ## Part 1: Choosing a Development Model
