@@ -12,7 +12,7 @@ In this section we will talk about:
 # Create a Private Key and Self-Signed Digital Certificate
 The OAuth 2.0 JWTbearer authorization flow requires a digital certificate and the private key used to sign the certificate. You upload the digital certificate to the custom connected app that is also required for the JWT bearer authorization flow. You can use your own private key and certificate issued by a certification authority. 
 
-To create the certificate follow the steps described in [https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_key_and_cert.htm]
+To create the certificate follow the steps described in https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_key_and_cert.htm
 
 # Create a connected app
   1. Create a System Administrator Deployment User in the target Salesforce Sandboxes & Production. 
