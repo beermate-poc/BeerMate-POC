@@ -101,8 +101,8 @@ jobs:
           echo ========================== Destructive Changes Post ============================= 
           echo =================================================================================
           cat delta/convertmdapi/destructiveChangesPost.xml
-          sfdx force:auth:jwt:grant --clientid ${{secrets.TESTsalesforceDevOrgClientId}} --jwtkeyfile ./.github/server.key --username ${{secrets.TESTsalesforceOrgUserName}} --instanceurl ${{secrets.testOrgInstanceURL}}
-          sfdx force:mdapi:deploy -d delta/convertmdapi -l ${{secrets.NOTESTRUN}} -u ${{secrets.TESTsalesforceOrgUserName}} --ignorewarnings -w 60
+          sfdx force:auth:jwt:grant --clientid ${{secrets.DEVINT_CLIENTID}} --jwtkeyfile ./.github/server.key --username ${{secrets.DEVINT_USERNAME}} --instanceurl ${{secrets.TEST_ORG_URL}}
+          sfdx force:mdapi:deploy -d delta/convertmdapi -l ${{secrets.NOTESTRUN}} -u ${{secrets.DEVINT_USERNAME}} --ignorewarnings -w 60
 
       - name: Add new tag
         run: |
@@ -117,7 +117,7 @@ jobs:
 
       # - name: Retrieve the code coverage
       #   run:
-      #     sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.TESTsalesforceOrgUserName}}
+      #     sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.DEVINT_USERNAME}}
       - name: Send mail
         uses: dawidd6/action-send-mail@v3
         with:

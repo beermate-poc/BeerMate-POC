@@ -33,7 +33,7 @@ jobs:
       - name: Delta package
         run: |
           git rev-parse --abbrev-ref HEAD
-          LATEST_STABLE_TAG=`git tag -l TEST/v*  --sort=creatordate | tail -n1`
+          LATEST_STABLE_TAG=`git tag -l DEVINT/v*  --sort=creatordate | tail -n1`
           echo The last stable tag is $LATEST_STABLE_TAG
           CURRENT_COMMIT_ID=`git rev-parse --verify HEAD`
           echo The current commit ID is $CURRENT_COMMIT_ID
@@ -69,8 +69,8 @@ jobs:
           echo ========================== Destructive Changes Post ============================= 
           echo =================================================================================
           cat delta/convertmdapi/destructiveChangesPost.xml
-          sfdx force:auth:jwt:grant --clientid ${{secrets.TESTsalesforceDevOrgClientId}} --jwtkeyfile ./.github/server.key --username ${{secrets.TESTsalesforceOrgUserName}} --instanceurl ${{secrets.testOrgInstanceURL}}
-          sfdx force:mdapi:deploy --checkonly -d delta/convertmdapi -l ${{secrets.TESTtestLevel}} -u ${{secrets.TESTsalesforceOrgUserName}} --ignorewarnings -w 60
+          sfdx force:auth:jwt:grant --clientid ${{secrets.DEVINT_CLIENTID}} --jwtkeyfile ./.github/server.key --username ${{secrets.DEVINT_USERNAME}} --instanceurl ${{secrets.TEST_ORG_URL}}
+          sfdx force:mdapi:deploy --checkonly -d delta/convertmdapi -l ${{secrets.NOTESTRUN}} -u ${{secrets.DEVINT_USERNAME}} --ignorewarnings -w 60
 
 
 
