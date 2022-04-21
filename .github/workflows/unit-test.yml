@@ -19,11 +19,11 @@ jobs:
       - name: Run unit tests
         run: |
           npm install sfdx-cli --global
-          sfdx force:auth:jwt:grant --clientid ${{secrets.TESTsalesforceDevOrgClientId}} --jwtkeyfile ./.github/server.key --username ${{secrets.TESTsalesforceOrgUserName}} --instanceurl ${{secrets.testOrgInstanceURL}}
-          SFDX_MAX_QUERY_LIMIT=30000 sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.TESTsalesforceOrgUserName}}
-          execution_id=`sfdx force:data:soql:query -q "SELECT AsyncApexJobId FROM ApexTestRunResult where Status='Completed' order by EndTime desc limit 1" -t -u ${{secrets.TESTsalesforceOrgUserName}}`
+          sfdx force:auth:jwt:grant --clientid ${{secrets.DEVINT_CLIENTID}} --jwtkeyfile ./.github/server.key --username ${{secrets.DEVINT_USERNAME}} --instanceurl ${{secrets.TEST_ORG_URL}}
+          SFDX_MAX_QUERY_LIMIT=30000 sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.DEVINT_USERNAME}}
+          execution_id=`sfdx force:data:soql:query -q "SELECT AsyncApexJobId FROM ApexTestRunResult where Status='Completed' order by EndTime desc limit 1" -t -u ${{secrets.DEVINT_USERNAME}}`
           execution_report=`echo "$execution_id" | grep ^707*`
-          sfdx force:apex:test:report -i $execution_report -u ${{secrets.TESTsalesforceOrgUserName}} > report.txt
+          sfdx force:apex:test:report -i $execution_report -u ${{secrets.DEVINT_USERNAME}} > report.txt
       
       - name: Send mail
         uses: dawidd6/action-send-mail@v3.6.1
