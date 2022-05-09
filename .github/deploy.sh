@@ -15,12 +15,10 @@ echo The current commit ID is $CURRENT_COMMIT_ID
 sfdx sfpowerkit:project:diff -t $CURRENT_COMMIT_ID -r $LATEST_STABLE_TAG -d delta -x
 echo  
 
-# Authorize the target org
+# Authorize the target org & abort the pipeline if auth is failing 
 echo "$SERVER_KEY" > serverr.key
 sfdx force:auth:jwt:grant --clientid $CLIENTID --jwtkeyfile=server.key --username $USERNAME --instanceurl $URL > auth.txt
-
-# Abort the pipeline if Auth is failing 
-if grep -R "Error" auth.txt
+if grep -R "ERROR" auth.txt
 then
     exit 1
 else
