@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Created by Adrian Ioana using bash scripting, sfdx-cli, sfpowerscripts, Node, Bitbucket actions
 # Last modified date 9th May 2022
