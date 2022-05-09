@@ -2,10 +2,11 @@
 # Created by Adrian Ioana using bash scripting, sfdx-cli, sfpowerscripts, Node, GitHub Actions
 # Last modified date 9th May 2022
 
+# Prerequisites:
+  # Add the environment variables defined below, in GitHub - Settings - Secrets - Actions - Repository secrets
+
 name: Validate-PR
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the specified branches
 on:
   workflow_dispatch:
   pull_request:
@@ -25,6 +26,7 @@ env:
 
 jobs:
   validate:
+  # Skipping the Static Resource stage during the Pull request validation.
     runs-on: ubuntu-latest
     container: dxatscale/sfpowerscripts:release-feb22
     steps:
