@@ -1,4 +1,6 @@
-# This is a basic workflow to help you deploy to a Salesforce environment
+# This is a basic workflow to help you validate against a Salesforce environment
+# Created by Adrian Ioana using bash scripting, sfdx-cli, sfpowerscripts, Node, GitHub Actions
+# Last modified date 9th May 2022
 
 name: Validate-PR
 
@@ -10,9 +12,19 @@ on:
     types: [opened, edited, synchronize, reopened]
     branches:
       - develop
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+
+env:
+# Sets environment variable 
+  TAG:        DEVINT/v                     # Environment specific; To be updated for each environment;
+  CLIENTID:   ${{secrets.DEVINT_CLIENTID}} # Environment specific; To be updated for each environment;
+  USERNAME:   ${{secrets.DEVINT_USERNAME}} # Environment specific; To be updated for each environment;
+  TESTLEVEL:  ${{secrets.NOTESTRUN}}       # Environment specific; To be updated for each environment;
+  URL:        ${{secrets.TEST_ORG_URL}}    # Environment specific; To be updated for each environment;
+  SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required
+  REPOSITORY: ${{secrets.REPOSITORY}}      # No update required
+
 jobs:
-  ValidatePR:
+  validate:
     runs-on: ubuntu-latest
     container: dxatscale/sfpowerscripts:release-feb22
     steps:
@@ -21,56 +33,7 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.head_ref }}
 
-      # - name: 'Install sfdx-cli & delta plugins'
-      #   run: |
-      #     npm install sfdx-cli --global
-      #     echo 'y' | npx sfdx plugins:install sfpowerkit
-
-      - name: SFDX Version
+      - name: Validate
         run: |
-          sfdx --version
-
-      - name: Delta package
-        run: |
-          git rev-parse --abbrev-ref HEAD
-          LATEST_STABLE_TAG=`git tag -l DEVINT/v*  --sort=creatordate | tail -n1`
-          echo The last stable tag is $LATEST_STABLE_TAG
-          CURRENT_COMMIT_ID=`git rev-parse --verify HEAD`
-          echo The current commit ID is $CURRENT_COMMIT_ID
-          npx sfdx sfpowerkit:project:diff -t $CURRENT_COMMIT_ID -r $LATEST_STABLE_TAG -d delta -x
-
-          mkdir -p delta/convertmdapi
-          mkdir -p delta/force-app
-          cp destructiveChanges/destructiveChangesPre.xml destructiveChanges/destructiveChangesPost.xml destructiveChanges/package.xml delta/convertmdapi/
-          cd delta/
-          sfdx force:source:convert -r force-app -d convertmdapi
-          cd ..
-          cd delta/convertmdapi
-          echo =================================================================================
-          echo =================== The structure of convertmdapi folder ========================  
-          echo =================================================================================    
-          ls -d $PWD/*
-          cd ..
-          cd ..
-
-      - name: Validate against target org
-        run: |
-          echo 
-          echo =================================================================================
-          echo ========================== Destructive Changes Pre ============================== 
-          echo =================================================================================
-          cat delta/convertmdapi/destructiveChangesPre.xml
-          echo
-          echo =================================================================================
-          echo ========================== Main Deployment Package ============================== 
-          echo =================================================================================
-          cat delta/convertmdapi/package.xml
-          echo =================================================================================
-          echo ========================== Destructive Changes Post ============================= 
-          echo =================================================================================
-          cat delta/convertmdapi/destructiveChangesPost.xml
-          sfdx force:auth:jwt:grant --clientid ${{secrets.DEVINT_CLIENTID}} --jwtkeyfile ./.github/server.key --username ${{secrets.DEVINT_USERNAME}} --instanceurl ${{secrets.TEST_ORG_URL}}
-          sfdx force:mdapi:deploy --checkonly -d delta/convertmdapi -l ${{secrets.NOTESTRUN}} -u ${{secrets.DEVINT_USERNAME}} --ignorewarnings -w 60
-
-
-
+          chmod +x "${GITHUB_WORKSPACE}/.github/validate.sh"
+          "${GITHUB_WORKSPACE}/.github/validate.sh"
