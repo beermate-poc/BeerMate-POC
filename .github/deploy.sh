@@ -62,13 +62,13 @@ echo ===========================================================================
 echo 
 
 # Deploy the package
-sfdx force:mdapi:deploy -d delta/convertmdapi -l $TESTLEVEL -u $USERNAME --ignorewarnings -w 60 --json > deploy.txt
+sfdx force:mdapi:deploy -d delta/convertmdapi -l $TESTLEVEL -u $USERNAME --ignorewarnings -w 60 > deploy.txt
 if grep -R "Error" deploy.txt
 then
     echo The Deploy step has failed! The errors might require your attention.
     exit 1
 else
-    echo Successfully validated/deployed your package! 
+    echo Successfully deployed your package! 
 fi
 echo
 
