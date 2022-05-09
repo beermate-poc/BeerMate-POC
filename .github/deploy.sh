@@ -20,8 +20,8 @@ echo "$SERVER_KEY" > serverr.key
 sfdx force:auth:jwt:grant --clientid $CLIENTID --jwtkeyfile=server.key --username $USERNAME --instanceurl $URL --json > auth.txt
 if grep -R "Error" auth.txt
 then
-    exit 1
     echo The Authorize Org step has failed! Please contact the release manager.
+    exit 1
 else
     echo Successfully authorized the target org!
 fi
