@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Created by Adrian Ioana using bash scripting, sfdx-cli, sfpowerscripts, Node, Bitbucket actions
+# Created by Adrian Ioana using bash scripting, sfdx-cli, sfpowerscripts, Node, GitHub Actions
 # Last modified date 9th May 2022
 
 # Install sfpowerkit - not required if a dxatscale image is being used in the yml file
@@ -69,6 +69,5 @@ then
     exit 1
 else
     cat deploy.txt
-    echo Successfully validated your package! 
 fi
 echo
