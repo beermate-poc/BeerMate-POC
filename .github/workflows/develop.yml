@@ -1,14 +1,27 @@
 # This is a basic workflow to help you deploy to a Salesforce environment
+# Created by Adrian Ioana using bash scripting, sfdx-cli, sfpowerscripts, Node, GitHub Actions
+# Last modified date 9th May 2022
+
+# Prerequisites:
+  # Add deployment tags in your repository and update the "env.TAG=" variable below
+  # Add the environment variables defined below, in GitHub - Settings - Secrets - Actions - Repository secrets
 
 name: Deploy-to-DEVINT
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the specified branches
 on:
   workflow_dispatch:
   push:
     branches: 
       - develop
+
+env:
+# Sets environment variable
+  TAG:        DEVINT/v
+  CLIENTID:   ${{secrets.DEVINT_CLIENTID}}
+  USERNAME:   ${{secrets.DEVINT_USERNAME}}
+  TESTLEVEL:  ${{secrets.NOTESTRUN}} 
+  URL:        ${{secrets.PROD_ORG_URL}}
+  REPOSITORY: ${{secrets.REPOSITORY}}
 
 # A workflow which firstly runs the static resource builder, followed by the deployment itself  
 jobs:
@@ -25,111 +38,75 @@ jobs:
 
     - name: Build static resources
       run: |
-        "${GITHUB_WORKSPACE}/.github/staticresource.sh"
+          echo "${PWD##*/}"
+          ls
+          cd deploy_scripts
+          ant prepareStaticResourcesZip
+          echo
 
-  # deploy:
-  #   needs: staticResources
-  #   runs-on: ubuntu-latest
-  #   container: salesforce/salesforcedx:latest-rc-slim
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v2.3.4
-  #       with:
-  #         fetch-depth: 0
-  #         ref: ${{ github.ref }}
+        # Commit static resources
+          mkdir -force force-app/main/default/staticresources # Adding -force in mkdir to avoid errors in the folder already exists 
+          cp src/staticresources/*.resource* force-app/main/default/staticresources
+          git config user.email "automated@process"
+          git config user.name "Automated Process"
+          git add force-app/main/default/staticresources
+          git commit -m 'Commit the B2B built static resources'
+          git push ${{env.REPOSITORY}}
 
-  #     - name: Delta package
-  #       run: |
-  #         git rev-parse --abbrev-ref HEAD
-  #         LATEST_STABLE_TAG=`git tag -l DEVINT/v*  --sort=creatordate | tail -n1`
-  #         echo The last stable tag is $LATEST_STABLE_TAG
-  #         CURRENT_COMMIT_ID=`git rev-parse --verify HEAD`
-  #         echo The current commit ID is $CURRENT_COMMIT_ID
-  #         npx sfdx sfpowerkit:project:diff -t $CURRENT_COMMIT_ID -r $LATEST_STABLE_TAG -d delta -x
+  deploy:
+    needs: staticResources
+    runs-on: ubuntu-latest
+    container: salesforce/salesforcedx:latest-rc-slim
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
 
-  #         mkdir -p delta/convertmdapi
-  #         mkdir -p delta/force-app
-  #         cp destructiveChanges/destructiveChangesPre.xml destructiveChanges/destructiveChangesPost.xml destructiveChanges/package.xml delta/convertmdapi/
-  #         cd delta/
-  #         sfdx force:source:convert -r force-app -d convertmdapi
-  #         cd ..
-  #         cd delta/convertmdapi
-  #         echo =================================================================================
-  #         echo ===================== The structure of convertmdapi folder ====================== 
-  #         echo =================================================================================    
-  #         ls -d $PWD/*
-  #         cd ..
-  #         cd ..
+      - name: Deploy
+        run: |
+          "${{ format('{0}/.github/deploy.sh', github.workspace) }}"
 
-  #     - name: Deploy to target org
-  #       run: |
-  #         echo 
-  #         echo =================================================================================
-  #         echo ========================== Destructive Changes Pre ============================== 
-  #         echo =================================================================================
-  #         cat delta/convertmdapi/destructiveChangesPre.xml
-  #         echo
-  #         echo =================================================================================
-  #         echo ========================== Main Deployment Package ============================== 
-  #         echo =================================================================================
-  #         cat delta/convertmdapi/package.xml
-  #         echo =================================================================================
-  #         echo ========================== Destructive Changes Post ============================= 
-  #         echo =================================================================================
-  #         cat delta/convertmdapi/destructiveChangesPost.xml
-  #         sfdx force:auth:jwt:grant --clientid ${{secrets.DEVINT_CLIENTID}} --jwtkeyfile ./.github/server.key --username ${{secrets.DEVINT_USERNAME}} --instanceurl ${{secrets.TEST_ORG_URL}}
-  #         sfdx force:mdapi:deploy -d delta/convertmdapi -l ${{secrets.NOTESTRUN}} -u ${{secrets.DEVINT_USERNAME}} --ignorewarnings -w 60
-
-  #     - name: Add new tag
-  #       run: |
-  #         current_version=`git tag -l DEVINT/v* --sort=creatordate | tail -n1 | awk -F'v' '{print $NF}'`
-  #         echo CURRENT VERSION: DEVINT/v$current_version
-  #         major=`echo $current_version | cut -d'.' -f 1`
-  #         major=`expr $major + 1`
-  #         next_version=`echo $major`
-  #         echo NEXT VERSION: DEVINT/v$next_version
-  #         git tag `echo DEVINT/v$next_version`
-  #         git push ${{secrets.repository}} --tags
-
-  #     # - name: Retrieve the code coverage
-  #     #   run:
-  #     #     sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.DEVINT_USERNAME}}
-  #     - name: Send mail
-  #       uses: dawidd6/action-send-mail@v3
-  #       with:
-  #         # Required mail server address:
-  #         server_address: smtp.office365.com
-  #         # Required mail server port:
-  #         server_port: 587
-  #         # Optional (recommended): mail server username:
-  #         username: ${{secrets.MAIL_USERNAME}}
-  #         # Optional (recommended) mail server password:
-  #         password: ${{secrets.MAIL_PASSWORD}}
-  #         # Required mail subject:
-  #         subject: ${{ github.ref }} pipeline status
-  #         # Required recipients' addresses:
-  #         to: mamatha.dhanoji@molsoncoors.com,adrian.ioana@molsoncoors.com
-  #         # Required sender full name (address can be skipped):
-  #         from: GITHUB Workflow # <user@example.com>
-  #         # Optional whether this connection use TLS (default is true if server_port is 465)
-  #         # secure: true
-  #         # Optional plain body:
-  #         body: Build job of ${{ github.ref }} pipeline completed successfully!
-  #         # Optional HTML body read from file:
-  #         # html_body: file://README.html
-  #         # Optional carbon copy recipients:
-  #         # cc: kyloren@example.com,leia@example.com
-  #         # Optional blind carbon copy recipients:
-  #         # bcc: r2d2@example.com,hansolo@example.com
-  #         # Optional recipient of the email response:
-  #         # reply_to: luke@example.com
-  #         # Optional Message ID this message is replying to:
-  #         # in_reply_to: <random-luke@example.com>
-  #         # Optional unsigned/invalid certificates allowance:
-  #         # ignore_cert: true
-  #         # Optional converting Markdown to HTML (set content_type to text/html too):
-  #         # convert_markdown: true
-  #         # Optional attachments:
-  #         # attachments: attachments.zip,git.diff,./dist/static/*.js
-  #         # Optional priority: 'high', 'normal' (default) or 'low'
-  #         # priority: low
+      # # - name: Retrieve the code coverage
+      # #   run:
+      # #     sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.DEVINT_USERNAME}}
+      # - name: Send mail
+      #   uses: dawidd6/action-send-mail@v3
+      #   with:
+      #     # Required mail server address:
+      #     server_address: smtp.office365.com
+      #     # Required mail server port:
+      #     server_port: 587
+      #     # Optional (recommended): mail server username:
+      #     username: ${{secrets.MAIL_USERNAME}}
+      #     # Optional (recommended) mail server password:
+      #     password: ${{secrets.MAIL_PASSWORD}}
+      #     # Required mail subject:
+      #     subject: ${{ github.ref }} pipeline status
+      #     # Required recipients' addresses:
+      #     to: mamatha.dhanoji@molsoncoors.com,adrian.ioana@molsoncoors.com
+      #     # Required sender full name (address can be skipped):
+      #     from: GITHUB Workflow # <user@example.com>
+      #     # Optional whether this connection use TLS (default is true if server_port is 465)
+      #     # secure: true
+      #     # Optional plain body:
+      #     body: Build job of ${{ github.ref }} pipeline completed successfully!
+      #     # Optional HTML body read from file:
+      #     # html_body: file://README.html
+      #     # Optional carbon copy recipients:
+      #     # cc: kyloren@example.com,leia@example.com
+      #     # Optional blind carbon copy recipients:
+      #     # bcc: r2d2@example.com,hansolo@example.com
+      #     # Optional recipient of the email response:
+      #     # reply_to: luke@example.com
+      #     # Optional Message ID this message is replying to:
+      #     # in_reply_to: <random-luke@example.com>
+      #     # Optional unsigned/invalid certificates allowance:
+      #     # ignore_cert: true
+      #     # Optional converting Markdown to HTML (set content_type to text/html too):
+      #     # convert_markdown: true
+      #     # Optional attachments:
+      #     # attachments: attachments.zip,git.diff,./dist/static/*.js
+      #     # Optional priority: 'high', 'normal' (default) or 'low'
+      #     # priority: low
