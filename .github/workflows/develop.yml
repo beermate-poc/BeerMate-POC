@@ -44,7 +44,6 @@ jobs:
           ant prepareStaticResourcesZip
           echo
 
-        # Commit static resources
           mkdir -force force-app/main/default/staticresources # Adding -force in mkdir to avoid errors in the folder already exists 
           cp src/staticresources/*.resource* force-app/main/default/staticresources
           git config user.email "automated@process"
