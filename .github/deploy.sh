@@ -68,6 +68,7 @@ then
     echo The Deploy step has failed! The errors might require your attention.
     exit 1
 else
+    cat deploy.txt
     echo Successfully deployed your package! 
 fi
 echo

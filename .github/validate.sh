@@ -68,6 +68,7 @@ then
     echo The Validation step has failed! The errors might require your attention.
     exit 1
 else
+    cat deploy.txt
     echo Successfully validated your package! 
 fi
 echo
