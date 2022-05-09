@@ -21,6 +21,7 @@ env:
   USERNAME:   ${{secrets.DEVINT_USERNAME}}
   TESTLEVEL:  ${{secrets.NOTESTRUN}} 
   URL:        ${{secrets.PROD_ORG_URL}}
+  SERVER_KEY:        ${{secrets.SERVER_KEY}}
 
 # A workflow which firstly runs the static resource builder, followed by the deployment itself  
 jobs:
@@ -64,7 +65,6 @@ jobs:
 
       - name: Deploy
         run: |
-          echo "${{secrets.SERVER_KEY}}" > server.key
           chmod +x "${GITHUB_WORKSPACE}/.github/deploy.sh"
           "${GITHUB_WORKSPACE}/.github/deploy.sh"
 
