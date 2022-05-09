@@ -42,9 +42,8 @@ jobs:
           ls
           cd deploy_scripts
           ant prepareStaticResourcesZip
-          echo
 
-          mkdir -force force-app/main/default/staticresources # Adding -force in mkdir to avoid errors in the folder already exists 
+          mkdir -force force-app/main/default/staticresources
           cp src/staticresources/*.resource* force-app/main/default/staticresources
           git config user.email "automated@process"
           git config user.name "Automated Process"
