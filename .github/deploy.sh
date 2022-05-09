@@ -6,11 +6,6 @@
 # Install sfpowerkit - not required if a dxatscale image is being used in the yml file
 # echo 'y' | sfdx plugins:install sfpowerkit
 
-# Authorize the target org
-echo "$SERVER_KEY" > server.key
-sfdx force:auth:jwt:grant --clientid $CLIENTID --jwtkeyfile=server.key --username $USERNAME --instanceurl $URL        
-echo  
-
 # Identify the delta changes
 git rev-parse --abbrev-ref HEAD
 LATEST_STABLE_TAG=`git tag -l $TAG*  --sort=creatordate | tail -n1`
@@ -21,7 +16,17 @@ sfdx sfpowerkit:project:diff -t $CURRENT_COMMIT_ID -r $LATEST_STABLE_TAG -d delt
 echo  
 
 # Authorize the target org
-sfdx force:auth:jwt:grant --clientid $CLIENTID --jwtkeyfile ./.github/server.key --username $USERNAME --instanceurl $URL        
+echo "$SERVER_KEY" > serverr.key
+sfdx force:auth:jwt:grant --clientid $CLIENTID --jwtkeyfile=server.key --username $USERNAME --instanceurl $URL > auth.txt
+
+# Abort the pipeline if Auth is failing 
+if grep -R "Error" auth.txt
+then
+    exit 1
+else
+    echo Successfully authorized the target org
+fi
+echo    
 echo  
 
 # Prepare the deployment package
@@ -57,6 +62,16 @@ echo ================================= Post-destructive changes ================
 cat delta/convertmdapi/destructiveChangesPost.xml
 echo ===============================================================================================
 echo 
+
+# Deploy the package
+sfdx force:mdapi:deploy -d delta/convertmdapi -l $TESTLEVEL -u $USERNAME --ignorewarnings -w 60 > deploy.txt
+if grep -R "Error" deploy.txt
+then
+    exit 1
+else
+    echo No errors encountered during the deployment
+fi
+echo
 
 # Add a new tag
 echo ================================= Adding a new deployment tag ==================================

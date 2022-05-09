@@ -22,34 +22,35 @@ env:
   TESTLEVEL:  ${{secrets.NOTESTRUN}}       # Environment specific; To be updated for each environment;
   URL:        ${{secrets.TEST_ORG_URL}}    # Environment specific; To be updated for each environment;
   SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required
+  REPOSITORY: ${{secrets.REPOSITORY}}      # No update required
 
 # A workflow which firstly runs the static resource builder, followed by the deployment itself  
 jobs:
-  # staticResources:
-  # # The deploy_scripts/Compiler.xml and deploy_scripts/minimalize.bat have to be updated
-  # # with the new src path: e.g., D:\a\repositoryName\repositoryName\ instead of d:\a\1\s\ !
-  #   runs-on: windows-latest
-  #   steps:
-  #   - name: Checkout
-  #     uses: actions/checkout@v2.3.4
-  #     with:
-  #       fetch-depth: 0
-  #       ref: ${{ github.ref }}
+  staticResources:
+  # The deploy_scripts/Compiler.xml and deploy_scripts/minimalize.bat have to be updated
+  # with the new src path: e.g., D:\a\repositoryName\repositoryName\ instead of d:\a\1\s\ !
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2.3.4
+      with:
+        fetch-depth: 0
+        ref: ${{ github.ref }}
 
-  #   - name: Build static resources
-  #     run: |
-  #         echo "${PWD##*/}"
-  #         ls
-  #         cd deploy_scripts
-  #         ant prepareStaticResourcesZip
-  #         cd ..
-  #         mkdir -force force-app/main/default/staticresources
-  #         cp src/staticresources/*.resource* force-app/main/default/staticresources
-  #         git config user.email "automated@process"
-  #         git config user.name "Automated Process"
-  #         git add force-app/main/default/staticresources
-  #         git commit -m 'Commit the B2B built static resources'
-  #         git push ${{secrets.REPOSITORY}}
+    - name: Build static resources
+      run: |
+          echo "${PWD##*/}"
+          ls
+          cd deploy_scripts
+          ant prepareStaticResourcesZip
+          cd ..
+          mkdir -force force-app/main/default/staticresources
+          cp src/staticresources/*.resource* force-app/main/default/staticresources
+          git config user.email "automated@process"
+          git config user.name "Automated Process"
+          git add force-app/main/default/staticresources
+          git commit -m 'Commit the B2B built static resources'
+          git push ${{env.REPOSITORY}}
 
   deploy:
     # needs: staticResources
