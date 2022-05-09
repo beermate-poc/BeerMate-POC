@@ -6,8 +6,7 @@
 # Install sfpowerkit - not required if a dxatscale image is being used in the yml file
 # echo 'y' | sfdx plugins:install sfpowerkit
 
-# Authorize the target org - to be removed
-echo ${{secrets.SERVER_KEY}} > .github/server.key
+# Authorize the target org
 sfdx force:auth:jwt:grant --clientid $CLIENTID --jwtkeyfile ./.github/server.key --username $USERNAME --instanceurl $URL        
 echo  
 
@@ -21,7 +20,6 @@ sfdx sfpowerkit:project:diff -t $CURRENT_COMMIT_ID -r $LATEST_STABLE_TAG -d delt
 echo  
 
 # Authorize the target org
-echo ${{secrets.SERVER_KEY}} > .github/server.key
 sfdx force:auth:jwt:grant --clientid $CLIENTID --jwtkeyfile ./.github/server.key --username $USERNAME --instanceurl $URL        
 echo  
 
