@@ -7,7 +7,7 @@
 # echo 'y' | sfdx plugins:install sfpowerkit
 
 # Authorize the target org
-sfdx force:auth:jwt:grant --clientid $CLIENTID --jwtkeyfile ./.github/server.key --username $USERNAME --instanceurl $URL        
+sfdx force:auth:jwt:grant --clientid $CLIENTID --jwtkeyfile=server.key --username $USERNAME --instanceurl $URL        
 echo  
 
 # Identify the delta changes
