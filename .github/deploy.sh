@@ -16,7 +16,7 @@ sfdx sfpowerkit:project:diff -t $CURRENT_COMMIT_ID -r $LATEST_STABLE_TAG -d delt
 echo  
 
 # Authorize the target org & abort the pipeline if auth is failing 
-echo "$SERVER_KEY" > serverr.key
+echo "$SERVER_KEY" > server.key
 sfdx force:auth:jwt:grant --clientid $CLIENTID --jwtkeyfile=server.key --username $USERNAME --instanceurl $URL --json > auth.txt
 if grep -R "Error" auth.txt
 then
@@ -25,8 +25,7 @@ then
 else
     echo Successfully authorized the target org!
 fi
-echo    
-echo  
+echo      
 
 # Prepare the deployment package
 cd delta
@@ -66,8 +65,8 @@ echo
 sfdx force:mdapi:deploy -d delta/convertmdapi -l $TESTLEVEL -u $USERNAME --ignorewarnings -w 60 --json > deploy.txt
 if grep -R "Error" deploy.txt
 then
+    echo The Deploy step has failed! The errors might require your attention.
     exit 1
-    echo The Deploy step has failed! The metadata errors might require your attention.
 else
     echo Successfully validated/deployed your package! 
 fi
