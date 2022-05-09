@@ -50,7 +50,7 @@ jobs:
           git config user.name "Automated Process"
           git add force-app/main/default/staticresources
           git commit -m 'Commit the B2B built static resources'
-          git push ${{env.REPOSITORY}}
+          git push ${{secrets.REPOSITORY}}
 
   deploy:
     needs: staticResources
