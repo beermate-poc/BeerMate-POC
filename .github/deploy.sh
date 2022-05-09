@@ -21,8 +21,9 @@ sfdx force:auth:jwt:grant --clientid $CLIENTID --jwtkeyfile=server.key --usernam
 if grep -R "Error" auth.txt
 then
     exit 1
+    echo The Authorize Org step has failed! Please contact the release manager.
 else
-    echo Successfully authorized the target org
+    echo Successfully authorized the target org!
 fi
 echo    
 echo  
@@ -62,12 +63,13 @@ echo ===========================================================================
 echo 
 
 # Deploy the package
-sfdx force:mdapi:deploy -d delta/convertmdapi -l $TESTLEVEL -u $USERNAME --ignorewarnings -w 60 > deploy.txt
+sfdx force:mdapi:deploy -d delta/convertmdapi -l $TESTLEVEL -u $USERNAME --ignorewarnings -w 60 --json > deploy.txt
 if grep -R "Error" deploy.txt
 then
     exit 1
+    echo The Deploy step has failed! The metadata errors might require your attention.
 else
-    echo No errors encountered during the deployment
+    echo Successfully validated/deployed your package! 
 fi
 echo
 
