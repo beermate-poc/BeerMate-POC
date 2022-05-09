@@ -15,13 +15,13 @@ on:
       - develop
 
 env:
-# Sets environment variable
-  TAG: DEVINT/v
-  CLIENTID:   ${{secrets.DEVINT_CLIENTID}}
-  USERNAME:   ${{secrets.DEVINT_USERNAME}}
-  TESTLEVEL:  ${{secrets.NOTESTRUN}} 
-  URL:        ${{secrets.PROD_ORG_URL}}
-  SERVER_KEY:        ${{secrets.SERVER_KEY}}
+# Sets environment variable 
+  TAG:        DEVINT/v                     # Environment specific; To be updated for each environment;
+  CLIENTID:   ${{secrets.DEVINT_CLIENTID}} # Environment specific; To be updated for each environment;
+  USERNAME:   ${{secrets.DEVINT_USERNAME}} # Environment specific; To be updated for each environment;
+  TESTLEVEL:  ${{secrets.NOTESTRUN}}       # Environment specific; To be updated for each environment;
+  URL:        ${{secrets.TEST_ORG_URL}}    # Environment specific; To be updated for each environment;
+  SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required
 
 # A workflow which firstly runs the static resource builder, followed by the deployment itself  
 jobs:
