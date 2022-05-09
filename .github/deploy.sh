@@ -4,7 +4,7 @@
 # Last modified date 9th May 2022
 
 # Install sfpowerkit - not required if a dxatscale image is being used in the yml file
-echo 'y' | sfdx plugins:install sfpowerkit
+# echo 'y' | sfdx plugins:install sfpowerkit
 
 # Identify the delta changes
 git rev-parse --abbrev-ref HEAD
