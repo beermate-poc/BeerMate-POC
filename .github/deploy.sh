@@ -17,8 +17,8 @@ echo
 
 # Authorize the target org & abort the pipeline if auth is failing 
 echo "$SERVER_KEY" > serverr.key
-sfdx force:auth:jwt:grant --clientid $CLIENTID --jwtkeyfile=server.key --username $USERNAME --instanceurl $URL > auth.txt
-if grep -R "ERROR" auth.txt
+sfdx force:auth:jwt:grant --clientid $CLIENTID --jwtkeyfile=server.key --username $USERNAME --instanceurl $URL --json > auth.txt
+if grep -R "Error" auth.txt
 then
     exit 1
 else
