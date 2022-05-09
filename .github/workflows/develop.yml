@@ -25,7 +25,8 @@ jobs:
 
     - name: Build static resources
       run: |
-        chmod u+r+x staticresource.sh; ./staticresource.sh
+        chmod +x "${GITHUB_WORKSPACE}/.github/staticresource.sh"
+        "${GITHUB_WORKSPACE}/.github/staticresource.sh"
 
   # deploy:
   #   needs: staticResources
