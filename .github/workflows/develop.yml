@@ -16,7 +16,7 @@ on:
 
 env:
 # Sets environment variable
-  TAG:        DEVINT/v
+  TAG: DEVINT/v
   CLIENTID:   ${{secrets.DEVINT_CLIENTID}}
   USERNAME:   ${{secrets.DEVINT_USERNAME}}
   TESTLEVEL:  ${{secrets.NOTESTRUN}} 
