@@ -8,7 +8,7 @@
 
 # Authorize the target org
 echo "$SERVER_KEY" > server.key
-sfdx force:auth:jwt:grant --clientid $CLIENTID --jwtkeyfile=server.key --username $USERNAME --instanceurl $URL        
+sfdx force:auth:jwt:grant --clientid $CLIENTID --jwtkeyfile=./server.key --username $USERNAME --instanceurl $URL        
 echo  
 
 # Identify the delta changes
