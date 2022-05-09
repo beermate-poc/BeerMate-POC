@@ -38,7 +38,6 @@ jobs:
 
     - name: Build static resources
       run: |
-          chmod +x "${GITHUB_WORKSPACE}/.github/staticresource.sh"
           "${GITHUB_WORKSPACE}/.github/staticresource.sh"
 
   deploy:
