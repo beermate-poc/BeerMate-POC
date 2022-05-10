@@ -1,9 +1,31 @@
+# ============================================================================================================
+# ============================================================================================================
 # This is a basic workflow to help you deploy to a Salesforce environment
 # Created by Adrian Ioana using bash scripting, sfdx-cli, sfpowerscripts, Node, GitHub Actions
-# Last modified date 9th May 2022
+# Last modified date 10th May 2022
 
-# Prerequisites:
-  # Add the environment variables defined below, in GitHub - Settings - Secrets - Actions - Repository secrets
+### Prerequisites:
+ ## Add the environment variables defined below, in GitHub - Settings - Secrets - Actions - Repository secrets
+ ## The deploy_scripts/Compiler.xml and deploy_scripts/minimalize.bat have to be updated
+  # with the new src path: e.g., D:\a\repositoryName\repositoryName\ instead of d:\a\1\s\ !
+
+### Variables
+ ## TAG - Deployment tag attached to a commit
+ ## CLIENTID - DevOps conneected app consumer key
+ ## USERNAME - Target org username
+ ## TESTLEVEL - Can have one of the following values
+  # NOTESTRUN
+  # RUNLOCALTESTS
+  # RUNSPECIFIEDTESTS -r class1.method1,class1.method2,class2.method1,etc
+ ## URL - Target org login URL; test.salesforce.com, login.salesforce.com or custom domain
+  # TEST_ORG_URL - https://test.salesforce.com
+  # PROD_ORG_URL - https://login.salesforce.com
+  # CUSTOM_ORG_URL - to be defined based on your needs
+ ## SERVER_KEY - Certificate value that identifies with the DevOps app digital certificate server.crt
+ ## REPOSITORY - A combination of username, personal access token and repository URL
+# ============================================================================================================
+# ============================================================================================================
+
 
 name: Deploy-to-DEVINT
 
@@ -13,21 +35,18 @@ on:
     branches: 
       - develop
 
-env:
-# Sets environment variable 
+env: # Sets environment variables 
   TAG:        DEVINT/v                     # Environment specific; To be updated for each environment;
   CLIENTID:   ${{secrets.DEVINT_CLIENTID}} # Environment specific; To be updated for each environment;
   USERNAME:   ${{secrets.DEVINT_USERNAME}} # Environment specific; To be updated for each environment;
   TESTLEVEL:  ${{secrets.NOTESTRUN}}       # Environment specific; To be updated for each environment;
-  URL:        ${{secrets.TEST_ORG_URL}}    # Environment specific; To be updated for each environment;
+  URL:        ${{secrets.TEST_ORG_URL}}    # Environment specific; To be updated for Production;
   SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required
   REPOSITORY: ${{secrets.REPOSITORY}}      # No update required
 
 # A workflow which firstly runs the static resource builder, followed by the deployment itself  
 jobs:
   staticResources:
-  # The deploy_scripts/Compiler.xml and deploy_scripts/minimalize.bat have to be updated
-  # with the new src path: e.g., D:\a\repositoryName\repositoryName\ instead of d:\a\1\s\ !
     runs-on: windows-latest
     steps:
     - name: Checkout
@@ -111,3 +130,31 @@ jobs:
           # attachments: attachments.zip,git.diff,./dist/static/*.js
           # Optional priority: 'high', 'normal' (default) or 'low'
           # priority: low
+
+
+# ================================================================================
+# ================================================================================
+# sfpowerscripts  
+# MIT License
+
+# Copyright (c) 2020 Accenture
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+# ================================================================================
+# ================================================================================
