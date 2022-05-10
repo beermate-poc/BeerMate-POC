@@ -39,15 +39,6 @@ on:
     branches:
       - develop
 
-# env: # Sets environment variables 
-#   TAG:        DEVINT/v                     # Environment specific; To be updated for each environment;
-#   CLIENTID:   ${{secrets.DEVINT_CLIENTID}} # Environment specific; To be updated for each environment;
-#   USERNAME:   ${{secrets.DEVINT_USERNAME}} # Environment specific; To be updated for each environment;
-#   TESTLEVEL:  ${{secrets.NOTESTRUN}}       # Environment specific; To be updated for each environment;
-#   URL:        ${{secrets.TEST_ORG_URL}}    # Environment specific; To be updated for each environment;
-#   SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required
-#   REPOSITORY: ${{secrets.REPOSITORY}}      # No update required
-
 jobs:
   validate:
   # Skipping the Static Resource stage during the Pull request validation.
@@ -57,6 +48,30 @@ jobs:
       TAG:        DEVINT/v                     # Environment specific; To be updated for each environment;
       CLIENTID:   ${{secrets.DEVINT_CLIENTID}} # Environment specific; To be updated for each environment;
       USERNAME:   ${{secrets.DEVINT_USERNAME}} # Environment specific; To be updated for each environment;
+      TESTLEVEL:  ${{secrets.NOTESTRUN}}       # Environment specific; To be updated for each environment;
+      URL:        ${{secrets.TEST_ORG_URL}}    # Environment specific; To be updated for each environment;
+      SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required
+      REPOSITORY: ${{secrets.REPOSITORY}}      # No update required
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+
+      - name: Validate
+        run: |
+          chmod +x "${GITHUB_WORKSPACE}/.github/validate.sh"
+          "${GITHUB_WORKSPACE}/.github/validate.sh"
+  
+  validate1:
+  # Skipping the Static Resource stage during the Pull request validation.
+    needs: validate
+    runs-on: ubuntu-latest
+    container: dxatscale/sfpowerscripts:release-feb22
+    env: # Sets environment variables 
+      TAG:        TEST/v                     # Environment specific; To be updated for each environment;
+      CLIENTID:   ${{secrets.TEST_CLIENTID}} # Environment specific; To be updated for each environment;
+      USERNAME:   ${{secrets.TEST_USERNAME}} # Environment specific; To be updated for each environment;
       TESTLEVEL:  ${{secrets.NOTESTRUN}}       # Environment specific; To be updated for each environment;
       URL:        ${{secrets.TEST_ORG_URL}}    # Environment specific; To be updated for each environment;
       SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required
