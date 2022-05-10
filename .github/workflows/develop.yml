@@ -36,7 +36,7 @@ on:
         - 'force-app/**'
         - 'destructiveChanges/**'
         - 'src/**'
-        - '!.github/**'
+        # - '!.github/**'
         - '!deploy_scripts/**'
     branches: 
       - develop
