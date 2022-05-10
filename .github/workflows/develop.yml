@@ -32,6 +32,12 @@ name: Deploy-to-DEVINT
 on:
   workflow_dispatch:
   push:
+    paths:
+        - 'force-app/**'
+        - 'destructiveChanges/**'
+        - 'src/**'
+        - '!.github/**'
+        - '!deploy_scripts/**'
     branches: 
       - develop
 
