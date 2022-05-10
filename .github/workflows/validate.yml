@@ -39,18 +39,18 @@ on:
     branches:
       - develop
 
-env: # Sets environment variables 
-  TAG:        DEVINT/v                     # Environment specific; To be updated for each environment;
-  CLIENTID:   ${{secrets.DEVINT_CLIENTID}} # Environment specific; To be updated for each environment;
-  USERNAME:   ${{secrets.DEVINT_USERNAME}} # Environment specific; To be updated for each environment;
-  TESTLEVEL:  ${{secrets.NOTESTRUN}}       # Environment specific; To be updated for each environment;
-  URL:        ${{secrets.TEST_ORG_URL}}    # Environment specific; To be updated for each environment;
-  SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required
-  REPOSITORY: ${{secrets.REPOSITORY}}      # No update required
-
 jobs:
   validate:
   # Skipping the Static Resource stage during the Pull request validation.
+    env: # Sets environment variables 
+      TAG:        DEVINT/v                     # Environment specific; To be updated for each environment;
+      CLIENTID:   ${{secrets.DEVINT_CLIENTID}} # Environment specific; To be updated for each environment;
+      USERNAME:   ${{secrets.DEVINT_USERNAME}} # Environment specific; To be updated for each environment;
+      TESTLEVEL:  ${{secrets.NOTESTRUN}}       # Environment specific; To be updated for each environment;
+      URL:        ${{secrets.TEST_ORG_URL}}    # Environment specific; To be updated for each environment;
+      SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required
+      REPOSITORY: ${{secrets.REPOSITORY}}      # No update required
+    
     runs-on: ubuntu-latest
     container: dxatscale/sfpowerscripts:release-feb22
     steps:

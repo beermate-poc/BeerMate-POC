@@ -41,15 +41,6 @@ on:
     branches: 
       - develop
 
-env: # Sets environment variables 
-  TAG:        DEVINT/v                     # Environment specific; To be updated for each environment;
-  CLIENTID:   ${{secrets.DEVINT_CLIENTID}} # Environment specific; To be updated for each environment;
-  USERNAME:   ${{secrets.DEVINT_USERNAME}} # Environment specific; To be updated for each environment;
-  TESTLEVEL:  ${{secrets.NOTESTRUN}}       # Environment specific; To be updated for each environment;
-  URL:        ${{secrets.TEST_ORG_URL}}    # Environment specific; To be updated for Production;
-  SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required
-  REPOSITORY: ${{secrets.REPOSITORY}}      # No update required
-
 # A workflow which firstly runs the static resource builder, followed by the deployment itself  
 jobs:
   staticResources:
@@ -77,6 +68,15 @@ jobs:
           git push $REPOSITORY
 
   deploy:
+    env: # Sets environment variables 
+      TAG:        DEVINT/v                     # Environment specific; To be updated for each environment;
+      CLIENTID:   ${{secrets.DEVINT_CLIENTID}} # Environment specific; To be updated for each environment;
+      USERNAME:   ${{secrets.DEVINT_USERNAME}} # Environment specific; To be updated for each environment;
+      TESTLEVEL:  ${{secrets.NOTESTRUN}}       # Environment specific; To be updated for each environment;
+      URL:        ${{secrets.TEST_ORG_URL}}    # Environment specific; To be updated for Production;
+      SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required
+      REPOSITORY: ${{secrets.REPOSITORY}}      # No update required
+    
     needs: staticResources
     runs-on: ubuntu-latest
     # container: salesforce/salesforcedx:latest-rc-slim
@@ -92,10 +92,6 @@ jobs:
         run: |
           chmod +x "${GITHUB_WORKSPACE}/.github/deploy.sh"
           "${GITHUB_WORKSPACE}/.github/deploy.sh"
-
-      # - name: Retrieve the code coverage
-      #   run:
-      #     sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.DEVINT_USERNAME}}
       
       - name: Send mail
         uses: dawidd6/action-send-mail@v3
