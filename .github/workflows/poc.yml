@@ -36,37 +36,13 @@ on:
         - 'force-app/**'
         - 'destructiveChanges/**'
         - 'src/**'
-        - '!.github/**'
+        # - '!.github/**'
         - '!deploy_scripts/**'
     branches: 
       - develop
 
 # A workflow which firstly runs the static resource builder, followed by the deployment itself  
 jobs:
-  staticResources:
-    runs-on: windows-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2.3.4
-      with:
-        fetch-depth: 0
-        ref: ${{ github.ref }}
-
-    - name: Build static resources
-      run: |
-          echo "${PWD##*/}"
-          ls
-          cd deploy_scripts
-          ant prepareStaticResourcesZip
-          cd ..
-          mkdir -force force-app/main/default/staticresources
-          cp src/staticresources/*.resource* force-app/main/default/staticresources
-          git config user.email "automated@process"
-          git config user.name "Automated Process"
-          git add force-app/main/default/staticresources
-          git commit -m 'Commit the B2B built static resources'
-          git push $REPOSITORY
-
   deploy:
     env: # Sets environment variables 
       TAG:        DEVINT/v                     # Environment specific; To be updated for each environment;
@@ -77,63 +53,34 @@ jobs:
       SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required
       REPOSITORY: ${{secrets.REPOSITORY}}      # No update required
     
-    needs: staticResources
     runs-on: ubuntu-latest
-    # container: salesforce/salesforcedx:latest-rc-slim
-    container: dxatscale/sfpowerscripts:release-feb22
     steps:
       - name: Checkout
         uses: actions/checkout@v2.3.4
         with:
           fetch-depth: 0
           ref: ${{ github.ref }}
-
-      - name: Deploy
-        run: |
-          chmod +x "${GITHUB_WORKSPACE}/.github/deploy.sh"
-          "${GITHUB_WORKSPACE}/.github/deploy.sh"
-      
-      - name: Send mail
-        uses: dawidd6/action-send-mail@v3
-        with:
-          # Required mail server address:
-          server_address: smtp.office365.com
-          # Required mail server port:
-          server_port: 587
-          # Optional (recommended): mail server username:
-          username: ${{secrets.MAIL_USERNAME}}
-          # Optional (recommended) mail server password:
-          password: ${{secrets.MAIL_PASSWORD}}
-          # Required mail subject:
-          subject: ${{ github.ref }} pipeline status
-          # Required recipients' addresses:
-          to: mamatha.dhanoji@molsoncoors.com,adrian.ioana@molsoncoors.com
-          # Required sender full name (address can be skipped):
-          from: GITHUB Workflow # <user@example.com>
-          # Optional whether this connection use TLS (default is true if server_port is 465)
-          # secure: true
-          # Optional plain body:
-          body: Build job of ${{ github.ref }} pipeline completed successfully!
-          # Optional HTML body read from file:
-          # html_body: file://README.html
-          # Optional carbon copy recipients:
-          # cc: kyloren@example.com,leia@example.com
-          # Optional blind carbon copy recipients:
-          # bcc: r2d2@example.com,hansolo@example.com
-          # Optional recipient of the email response:
-          # reply_to: luke@example.com
-          # Optional Message ID this message is replying to:
-          # in_reply_to: <random-luke@example.com>
-          # Optional unsigned/invalid certificates allowance:
-          # ignore_cert: true
-          # Optional converting Markdown to HTML (set content_type to text/html too):
-          # convert_markdown: true
-          # Optional attachments:
-          # attachments: attachments.zip,git.diff,./dist/static/*.js
-          # Optional priority: 'high', 'normal' (default) or 'low'
-          # priority: low
-
-
+  
+  pull-request: 
+    runs-on: ubuntu-latest
+    environment: 'UAT'
+    steps:
+    - uses: actions/checkout@v2
+    - name: pull-request
+      uses: repo-sync/pull-request@v2
+      with:
+        source_branch: ""                                 # If blank, default: triggered branch
+        destination_branch: "feature/ft_poc_pr_creation"  # If blank, default: master
+        pr_title: "Pulling ${{ github.ref }} into feature/ft_poc_pr_creation" # Title of pull request
+        pr_body: ":crown: *An automated PR*"              # Full markdown support, requires pr_title to be set
+        # pr_template: ".github/PULL_REQUEST_TEMPLATE.md"   # Path to pull request template, requires pr_title to be set, excludes pr_body
+        pr_reviewer: "adrianioana,dhanojimamatha"                         # Comma-separated list (no spaces)
+        # pr_assignee: "wei,worker"                         # Comma-separated list (no spaces)
+        # pr_label: "auto-pr"                               # Comma-separated list (no spaces)
+        # pr_milestone: "Milestone 1"                       # Milestone name
+        # pr_draft: true                                    # Creates pull request as draft
+        pr_allow_empty: true                              # Creates pull request even if there are no changes
+        github_token: ${{ secrets.GITHUB_TOKEN }}         # Not required to be defined - automatically created
 # ================================================================================
 # ================================================================================
 # sfpowerscripts  
