@@ -108,7 +108,7 @@ jobs:
   merge-branch:
     timeout-minutes: 5   # Timeout the job if no action has been taken within 5 minutes
     runs-on: ubuntu-latest
-    needs: deploy
+    needs: deploy        # Dependend on a successful deploy
     environment: 'MERGE' # Requires a Public repository or GitHub Enterprise license
     steps:
       - uses: actions/checkout@v3
@@ -118,7 +118,7 @@ jobs:
         with:
           type: now
           target_branch: feature/ft_poc_pr_creation
-          github_token: ${{ github.token }}
+          github_token: ${{ github.token }} # Not required to be defined as it is being created automatically
 
 # ================================================================================
 # ================================================================================
