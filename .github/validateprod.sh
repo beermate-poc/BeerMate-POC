@@ -61,11 +61,11 @@ cat delta/convertmdapi/destructiveChangesPost.xml
 echo ===============================================================================================
 echo 
 
-# Deploy the package
+# Validate the Production package
 sfdx force:mdapi:deploy --checkonly -d delta/convertmdapi -l $TESTLEVEL -u $USERNAME --ignorewarnings -w 60 --json > deploy.txt
 if grep -R "Error" deploy.txt
 then
-    echo The Deploy step has failed! The errors might require your attention.
+    echo The Production Validation step has failed! The errors might require your attention.
     exit 1
 else
     cat deploy.txt
