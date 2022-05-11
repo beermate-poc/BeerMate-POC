@@ -108,7 +108,7 @@ jobs:
   merge-branch:
     timeout-minutes: 5   # Timeout the job if no action has been taken within 5 minutes
     runs-on: ubuntu-latest
-    needs: checkout
+    needs: deploy
     environment: 'MERGE' # Requires a Public repository or GitHub Enterprise license
     steps:
       - uses: actions/checkout@v3
