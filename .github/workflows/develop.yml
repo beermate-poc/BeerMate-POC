@@ -47,7 +47,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v2.3.4
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ github.ref }}
@@ -83,7 +83,7 @@ jobs:
     container: dxatscale/sfpowerscripts:release-feb22
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           ref: ${{ github.ref }}
@@ -105,23 +105,20 @@ jobs:
           from: GITHUB Workflow
           body: Build job of ${{ github.ref }} pipeline completed successfully!
 
-  pull-request: # Enable "Allow GitHub Actions to create and approve pull requests" in Settings - Actions
+  merge-branch:
+    timeout-minutes: 5   # Timeout the job if no action has been taken within 5 minutes
     runs-on: ubuntu-latest
-    needs: deploy
-    environment: 'UAT' # Requires a Public repository or GitHub Enterprise license
+    needs: checkout
+    environment: 'MERGE' # Requires a Public repository or GitHub Enterprise license
     steps:
-    - uses: actions/checkout@v2
-    - name: pull-request
-      uses: repo-sync/pull-request@v2
-      with:
-        source_branch: ""                                                     # If blank, default: triggered branch
-        destination_branch: "feature/ft_poc_pr_creation"                      # If blank, default: master
-        pr_title: "Merging ${{ github.ref }} into feature/ft_poc_pr_creation" # Title of pull request
-        pr_body: ":crown: *An automated PR*"                                  # Full markdown support, requires pr_title to be set
-        pr_reviewer: "adrianioana,dhanojimamatha"                             # Comma-separated list (no spaces)
-        pr_allow_empty: true                                                  # Creates pull request even if there are no changes
-        github_token: ${{ secrets.GITHUB_TOKEN }}                             # Not required to be defined - automatically created
+      - uses: actions/checkout@v3
 
+      - name: "Automated merge"
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          target_branch: feature/ft_poc_pr_creation
+          github_token: ${{ github.token }}
 
 # ================================================================================
 # ================================================================================
