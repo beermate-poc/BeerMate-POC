@@ -31,13 +31,13 @@ name: POC-PR-Creation
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-        - 'force-app/**'
-        - 'destructiveChanges/**'
-        - 'src/**'
-        - '!.github/**'
-        - '!deploy_scripts/**'
+  # push:
+  #   paths:
+  #       - 'force-app/**'
+  #       - 'destructiveChanges/**'
+  #       - 'src/**'
+  #       - '!.github/**'
+  #       - '!deploy_scripts/**'
 
 
 # A workflow which firstly runs the static resource builder, followed by the deployment itself  
