@@ -8,7 +8,13 @@ on:
 
 # A workflow which firstly runs the static resource builder, followed by the deployment itself  
 jobs:
-  UnitTest:
+  unitTest:
+    env: # Sets environment variables 
+      CLIENTID:   ${{secrets.BEERMATE_UAT_CLIENTID}} # Environment specific; To be updated for each environment;
+      USERNAME:   ${{secrets.BEERMATE_UAT_USERNAME}} # Environment specific; To be updated for each environment;
+      TESTLEVEL:  ${{secrets.NOTESTRUN}}       # Environment specific; To be updated for each environment;
+      SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required
+
     runs-on: ubuntu-latest
     container: salesforce/salesforcedx:latest-rc-slim
     steps:
@@ -18,15 +24,10 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.ref }}
       
-      - name: Run unit tests
+      - name: Run tests
         run: |
-          sfdx force:auth:jwt:grant --clientid ${{secrets.BEERMATE_UAT_CLIENTID}} --jwtkeyfile ./.github/server.key --username ${{secrets.BEERMATE_UAT_USERNAME}} --instanceurl ${{secrets.TEST_ORG_URL}}
-          SFDX_MAX_QUERY_LIMIT=30000 sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.BEERMATE_UAT_USERNAME}}
-          execution_id=`sfdx force:data:soql:query -q "SELECT AsyncApexJobId FROM ApexTestRunResult where Status='Completed' order by EndTime desc limit 1" -t -u ${{secrets.BEERMATE_UAT_USERNAME}}`
-          execution_report=`echo "$execution_id" | grep ^707*`
-          sfdx force:apex:test:report -i $execution_report -u ${{secrets.BEERMATE_UAT_USERNAME}} > tempreport1.txt
-          sed '/ Pass /d' tempreport1.txt > tempreport2.txt
-          sed 's/Test Results/Failed Tests/' tempreport2.txt > report.txt
+          chmod +x "${GITHUB_WORKSPACE}/.github/unit-test.sh"
+          "${GITHUB_WORKSPACE}/.github/unit-test.sh"
       
       - name: Send mail
         uses: dawidd6/action-send-mail@v3.6.1
