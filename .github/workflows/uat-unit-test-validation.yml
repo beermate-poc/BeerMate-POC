@@ -31,10 +31,11 @@ jobs:
           sfdx force:auth:jwt:grant --clientid $CLIENTID --jwtkeyfile=server.key --username $USERNAME --instanceurl $URL --json > auth.txt
           execution_id=`sfdx force:data:soql:query -q "SELECT AsyncApexJobId FROM ApexTestRunResult where Status='Completed' order by EndTime desc limit 1" -t -u $USERNAME`
           execution_report=`echo "$execution_id" | grep ^707*`
+          echo $execution_report
           sfdx force:apex:test:report -i $execution_report --username $USERNAME > tempreport1.txt
           sed '/ Pass /d' tempreport1.txt > tempreport2.txt
           sed 's/Test Results/Failed Tests/' tempreport2.txt > report.txt
-          
+
       - name: Send mail
         uses: dawidd6/action-send-mail@v3.6.1
         with:
