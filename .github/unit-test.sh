@@ -19,7 +19,8 @@ echo
 # SFDX_MAX_QUERY_LIMIT=30000 sfdx force:apex:test:run --codecoverage --resultformat human -u $USERNAME
 execution_id=`sfdx force:data:soql:query -q "SELECT AsyncApexJobId FROM ApexTestRunResult where Status='Completed' order by EndTime desc limit 1" -t -u $USERNAME`
 execution_report=`echo "$execution_id" | grep ^707*`
-sfdx force:apex:test:report -i $execution_report > tempreport1.txt
+echo $execution_report
+sfdx force:apex:test:report --testrunid $execution_report > tempreport1.txt
 sed '/ Pass /d' tempreport1.txt > tempreport2.txt
 sed 's/Test Results/Failed Tests/' tempreport2.txt > report.txt
 
