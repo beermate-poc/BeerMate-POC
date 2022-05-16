@@ -29,7 +29,6 @@ jobs:
         run: |
           chmod +x "${GITHUB_WORKSPACE}/.github/unit-test.sh"
           "${GITHUB_WORKSPACE}/.github/unit-test.sh"
-          echo "$execution_report";
       
       - name: Send mail
         uses: dawidd6/action-send-mail@v3.6.1
