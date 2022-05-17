@@ -19,18 +19,14 @@ jobs:
       URL:        ${{secrets.TEST_ORG_URL}}    # Environment specific; To be updated for Production;
       SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required
 
-    runs-on: windows-latest
-    # container: salesforce/salesforcedx:latest-rc-slim
+    runs-on: ubuntu-latest
+    container: salesforce/salesforcedx:latest-rc-slim
     steps:
       - name: Checkout the source branch
         uses: actions/checkout@v2.3.4
         with:
           fetch-depth: 0
           ref: ${{ github.ref }}
-
-      - name: 'Install sfdx-cli & delta plugins'
-        run: |
-          npm install sfdx-cli --global
       
       - name: Run tests
         run: |
