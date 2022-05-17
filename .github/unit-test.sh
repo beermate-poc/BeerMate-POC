@@ -20,8 +20,8 @@ echo The execution final ID is "$execution_report"
 (sfdx force:apex:test:report -i "$execution_report" -u "$USERNAME" | sed '/ Pass /d' | sed 's/Test Results/Failed Tests/') &> report.txt
 
 
-# execution_id=$(sfdx force:data:soql:query -q "SELECT AsyncApexJobId FROM ApexTestRunResult where Status='Completed' order by EndTime desc limit 1" -t)
-# echo The execution initial ID is "$execution_id"
+execution_id=$(sfdx force:data:soql:query -q "SELECT AsyncApexJobId FROM ApexTestRunResult where Status='Completed' order by EndTime desc limit 1" -t)
+echo The execution initial ID is "$execution_id"
 # execution_report=$(echo "$execution_id" | grep ^707*)
 # echo The execution final ID is "$execution_report"
 # (sfdx force:apex:test:report -i "$execution_report" -u | sed '/ Pass /d' | sed 's/Test Results/Failed Tests/') &> report.txt
