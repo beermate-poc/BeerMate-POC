@@ -6,8 +6,8 @@ on:
   # schedule:
   #   - cron: '35 14 * * *'
   push:
-  branches: 
-    - develop
+    branches: 
+      - develop
 
 # A workflow which firstly runs the static resource builder, followed by the deployment itself  
 jobs:
