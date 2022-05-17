@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 # Authorize the target org
 echo "$SERVER_KEY" > server.key
