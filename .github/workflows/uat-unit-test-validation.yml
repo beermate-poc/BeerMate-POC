@@ -32,8 +32,6 @@ jobs:
         run: |
           chmod +x "${GITHUB_WORKSPACE}/.github/unit-test.sh"
           "${GITHUB_WORKSPACE}/.github/unit-test.sh"
-          execution_report=$(echo "$execution_id" | grep ^707*)
-          echo The execution final ID is "$execution_report"
       
       # - name: Send mail
       #   uses: dawidd6/action-send-mail@v3.6.1
