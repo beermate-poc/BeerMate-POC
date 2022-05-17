@@ -19,7 +19,7 @@ jobs:
       URL:        ${{secrets.TEST_ORG_URL}}    # Environment specific; To be updated for Production;
       SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     container: salesforce/salesforcedx:latest-rc-slim
     steps:
       - name: Checkout the source branch
