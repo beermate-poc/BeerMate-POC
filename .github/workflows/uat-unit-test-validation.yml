@@ -28,18 +28,18 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.ref }}
       
-      - name: Var
-        run: |
-          echo $[failed_tests - num] a
-          echo "$[failed_tests - num]" b
-          echo $(failed_tests - num) c
-          echo "$(failed_tests - num)" d
-          echo ${{github.failed_tests}} e
+      # - name: Var
+      #   run: |
+      #     echo $[failed_tests - num] a
+      #     echo "$[failed_tests - num]" b
+      #     echo $(failed_tests - num) c
+      #     echo "$(failed_tests - num)" d
+      #     echo ${{github.failed_tests}} e
 
-      - name: Run tests
-        run: |
-          chmod +x "${GITHUB_WORKSPACE}/.github/unit-test.sh"
-          "${GITHUB_WORKSPACE}/.github/unit-test.sh"
+      # - name: Run tests
+      #   run: |
+      #     chmod +x "${GITHUB_WORKSPACE}/.github/unit-test.sh"
+      #     "${GITHUB_WORKSPACE}/.github/unit-test.sh"
       
       - name: Send mail
         uses: dawidd6/action-send-mail@v3.6.1
@@ -51,7 +51,7 @@ jobs:
           subject: Unit Test Results Summary
           to: mamatha.dhanoji@molsoncoors.com,adrian.ioana@molsoncoors.com
           from: GITHUB Workflow # <user@example.com>
-          body: Build job of ${{github.repository}} completed successfully! 
+          body: You have a total of "$[failed_tests - num]" failed tests!
           attachments: report.txt
 
 
