@@ -25,14 +25,23 @@ echo
 sfdx force:data:soql:query -q "SELECT AsyncApexJobId FROM ApexTestRunResult where Status='Completed' order by EndTime desc limit 1" -t -u "$USERNAME" > execution.txt
 cat execution.txt
 execution_report="`grep 707* execution.txt`"
-execution_report=`echo "$execution_report" | xargs`
+execution_report=`echo "$execution_report" | xargs` # xargs used to remove the ID's leading and trailing whitespaces
 echo The execution final ID is "$execution_report"
 (sfdx force:apex:test:report -i "$execution_report" -u "$USERNAME" | sed '/ Pass /d' | sed 's/Test Results/Failed Tests/') &> report.txt
+failed_tests="`grep -c -ow "\bFail\b" report.txt`" # Search for the work "Fail" in report.txt
+num=1 # Variable used as the word "Fail" is also present in the "Fail Rate" metrics; Subtract 1 from the total nr of occurences 
+echo 
+echo You have a total of $[failed_tests - num] failed tests.
 
-# sfdx force:data:soql:query -q "SELECT AsyncApexJobId FROM ApexTestRunResult where Status='Completed' order by EndTime desc limit 1" -t > execution.txt
-# cat execution.txt
+
+# # Used for the local POC
+# # sfdx force:data:soql:query -q "SELECT AsyncApexJobId FROM ApexTestRunResult where Status='Completed' order by EndTime desc limit 1" -t > execution.txt
+# # cat execution.txt
 # execution_report="`grep 707* execution.txt`"
-# execution_report=`echo "$execution_report" | xargs`
+# execution_report=`echo "$execution_report" | xargs` # xargs used to remove the ID's leading and trailing whitespaces
 # echo The execution final ID is "$execution_report"
 # (sfdx force:apex:test:report -i "$execution_report" | sed '/ Pass /d' | sed 's/Test Results/Failed Tests/') &> report.txt
-
+# failed_tests="`grep -c -ow "\bFail\b" report.txt`" # Search for the work "Fail" in report.txt
+# num=1 # Variable used as the word "Fail" is also present in the "Fail Rate" metrics; Subtract 1 from the total nr of occurences 
+# echo 
+# echo You have a total of $[failed_tests - num] failed tests.
