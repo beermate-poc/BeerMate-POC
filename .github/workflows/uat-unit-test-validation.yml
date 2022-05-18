@@ -51,7 +51,7 @@ jobs:
           subject: Unit Test Results Summary
           to: mamatha.dhanoji@molsoncoors.com,adrian.ioana@molsoncoors.com
           from: GITHUB Workflow # <user@example.com>
-          body: You have a total of "$[failed_tests - num]" failed tests!
+          body: You have a total of "${{github.[failed_tests - num]}}" failed tests!
           attachments: report.txt
 
 
