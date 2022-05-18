@@ -13,20 +13,11 @@ fi
 echo
 
 # Run the tests and export the result
-
-# Old version
-# execution_id=$(sfdx force:data:soql:query -q "SELECT AsyncApexJobId FROM ApexTestRunResult where Status='Completed' order by EndTime desc limit 1" -t -u "$USERNAME")
-# echo The execution initial ID is "$execution_id"
-# execution_report=`echo "$execution_id" | "grep ^707*"`
-# echo The execution final ID is "$execution_report"
-# (sfdx force:apex:test:report -i "$execution_report" -u "$USERNAME" | sed '/ Pass /d' | sed 's/Test Results/Failed Tests/') &> report.txt
-
-# New version
+SFDX_MAX_QUERY_LIMIT=30000 sfdx force:apex:test:run --codecoverage --resultformat human -u "$USERNAME"
 sfdx force:data:soql:query -q "SELECT AsyncApexJobId FROM ApexTestRunResult where Status='Completed' order by EndTime desc limit 1" -t -u "$USERNAME" > execution.txt
-cat execution.txt
 execution_report="`grep 707* execution.txt`"
 execution_report=`echo "$execution_report" | xargs` # xargs used to remove the ID's leading and trailing whitespaces
-echo The execution final ID is "$execution_report"
+echo The execution ID is "$execution_report"
 (sfdx force:apex:test:report -i "$execution_report" -u "$USERNAME" | sed '/ Pass /d' | sed 's/Test Results/Failed Tests/') &> report.txt
 failed_tests="`grep -c -ow "\bFail\b" report.txt`" # Search for the work "Fail" in report.txt
 num=1 # Variable used as the word "Fail" is also present in the "Fail Rate" metrics; Subtract 1 from the total nr of occurences 
