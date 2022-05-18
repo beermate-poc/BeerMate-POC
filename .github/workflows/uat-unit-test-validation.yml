@@ -44,7 +44,7 @@ jobs:
           to: mamatha.dhanoji@molsoncoors.com,adrian.ioana@molsoncoors.com
           from: GITHUB Workflow # <user@example.com>
           body:
-          The "${{github.GITHUB_WORKFLOW}}" nightly run has finished! 
+          The ${{github.GITHUB_WORKFLOW}} nightly run has finished! 
           Please find the Unit Test Summary report attached.
           attachments: report.txt
 
