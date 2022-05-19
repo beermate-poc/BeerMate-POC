@@ -29,6 +29,32 @@ To create the certificate follow the steps described in https://developer.salesf
         * Manage - Edit Policies - OAuth Policies - Permitted Users - Admin approved users are pre-authorized - Save
         * Manage - Profiles - Manage profiles - Add System Administrator
 
+# Branch management
+1. GitHub - Repository - Settings - Branches - Rename the "main" branch to "master"
+2. Export the full Production configuration in sfdx format and commit to master
+3. Remove any unwanted metadata types from the force-app package (E.g., reports, dashboards, etc)
+4. Copy-Paste the following files & folders from the POC repository to the Enterprise one:
+  - .github folder
+  - deploy_scripts
+  - destructiveChanges
+  - src (before the Salesforce-GitHub Go-Live, the static resources present in the subfolder have to be updated with the Azure version)
+  - .gitignore
+  - README.md
+  - sfdx-project.json
+5. Commit the above changes to master and tag the latest commit as in the below example:
+  - DEVINT/v1 
+  - TEST/v1
+  - PROD/v1
+  - BUILDCHK/v1
+  - HOTFIXDEV/v1
+  - HOTFIXTEST/v1
+ Note: 
+ If any of the tags already exist, try to increment the number. 
+6. Push all changes to GitHub
+7. Create a develop branch from master
+
+Note:
+For committing and tagging, SourceTree or GitHub Desktop apps can be used on both Windows and Mac.
 
 # Additional actions (Release Manager only)
 1. Create a GitHub Personal Access Token
@@ -47,28 +73,31 @@ To create the certificate follow the steps described in https://developer.salesf
 4. The deploy_scripts/Compiler.xml have to be updated with the new repository details. E.g., D:\a\newRepository\newRepository\.
 5. Similarly, deploy_scripts/minimalize.bat have to be updated. E.g., D:\a\newRepository\newRepository\.
 6. GitHub - Repository - Settings - Actions - General
-  - Workflow permissions: Enable Read and write permissions
-  - Workflow permissions: Enable Allow GitHub Actions to create and approve pull requests
+  - Workflow permissions: Enable Read and write permissions, if possible
+  - Workflow permissions: Enable Allow GitHub Actions to create and approve pull requests, if possible
 
-Note: Action nr 6 required as the Static Resources feature will have to commit the built resources to the branch.
-
-
-# Update an existing GitHub workflow (Release Manager only)
-1. Create a feature branch from develop
-2. Ideally, only update the variables mentioned in the "Update the GitHub secrets" step.
-3. Create a Pull-request from feature to develop
-4. Request a Pull-request review before merging
-5. Test the workflow after your update
+Note: 
+Action nr 6 required as the Static Resources feature will have to commit the built resources to the branch. 
+However, if the last actions are not possible, the "permissions: write-all" property has been added in the workflows.
 
 
 # Create a GitHub workflow (Release Manager only)
 1. Create a feature branch from develop and create a new or clone an existing workflow from .github/workflows
 2. Make use of the new or updated secrets in your new workflow
-3. Install and open GitHub Desktop - checkout your feature branch - History and add a new tag for your environment on the latest commit (eg. DEVINT/v1)
+3. Checkout your feature branch and add a new tag for your environment on the latest commit (eg. DEVINT/v1)
 4. Push the changes to GitHub
 
+
+# Update an existing GitHub workflow (Release Manager only)
+1. Create a feature branch from develop
+2. Ideally, the variables mentioned in the "Update the GitHub secrets" step will be the only change you will perform.
+3. Create a Pull-request from feature to develop
+4. Request a Pull-request review before merging
+5. Test the workflow after your update
+
+
 # Test the GitHub workflow
-1. Create a new branch out of your feature branch, naming it as specified in the new workflow. In the example below, our new branch will be called **develop**
+1. Create a new branch out of your feature branch, naming it as specified in the new workflow. In the example below, our new branch will be called **develop** - in your case the "develop" branch might have been created already by the Release Manager. In this case a new feature branch can be created.
 
 ![image](https://user-images.githubusercontent.com/48366727/164461682-d10cc756-399a-4eb0-b296-7a068d33cee5.png)
 
