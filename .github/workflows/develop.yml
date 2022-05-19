@@ -50,29 +50,29 @@ permissions: write-all
 
 # A workflow which firstly runs the static resource builder, followed by the deployment itself  
 jobs:
-  staticResources:
-    runs-on: windows-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-        ref: ${{ github.ref }}
+  # staticResources:
+  #   runs-on: windows-latest
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v3
+  #     with:
+  #       fetch-depth: 0
+  #       ref: ${{ github.ref }}
 
-    - name: Build static resources
-      run: |
-          echo "${PWD##*/}"
-          ls
-          cd deploy_scripts
-          ant prepareStaticResourcesZip
-          cd ..
-          mkdir -force force-app/main/default/staticresources
-          cp src/staticresources/*.resource* force-app/main/default/staticresources
-          git config user.email "automated@process"
-          git config user.name "Automated Process"
-          git add force-app/main/default/staticresources
-          git commit -m 'Commit the B2B built static resources'
-          git push $REPOSITORY
+  #   - name: Build static resources
+  #     run: |
+  #         echo "${PWD##*/}"
+  #         ls
+  #         cd deploy_scripts
+  #         ant prepareStaticResourcesZip
+  #         cd ..
+  #         mkdir -force force-app/main/default/staticresources
+  #         cp src/staticresources/*.resource* force-app/main/default/staticresources
+  #         git config user.email "automated@process"
+  #         git config user.name "Automated Process"
+  #         git add force-app/main/default/staticresources
+  #         git commit -m 'Commit the B2B built static resources'
+  #         git push $REPOSITORY
 
   deploy:
     environment: DEVINT
@@ -86,7 +86,7 @@ jobs:
       REPOSITORY: ${{secrets.REPOSITORY}}      # No update required
     
     runs-on: ubuntu-latest
-    needs: staticResources
+    # needs: staticResources
     # container: salesforce/salesforcedx:latest-rc-slim
     container: dxatscale/sfpowerscripts:release-feb22
     steps:

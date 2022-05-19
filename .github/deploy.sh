@@ -70,7 +70,7 @@ echo
     # Skip the suffix update for the test classes already present in the package.
     # Find a similar solution for all classes flagged as className_Test, className_TEST, classNameTEST, etc.
 
-ls delta/classes/ > specifiedtests.txt
+ls delta/force-app/main/default/classes/ > specifiedtests.txt
 echo $(sed -ne 's/.cls/Test&/p' specifiedtests.txt) > specifiedtests.txt
 SPECIFIEDTESTS=`sed -e "s/ /,/g" < specifiedtests.txt`
 echo Outputing the test classes to be run as part of RunSpecifiedTests feature, depending on the classes present in the delta package: echo $SPECIFIEDTESTS. Work in progress...
