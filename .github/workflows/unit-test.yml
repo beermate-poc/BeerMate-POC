@@ -33,10 +33,10 @@ on:
 jobs:
   unitTest:
     env: # Sets environment variables 
-      CLIENTID:   ${{secrets.UAT_CLIENTID}}    # Environment specific; To be updated for each environment;
-      USERNAME:   ${{secrets.UAT_USERNAME}}    # Environment specific; To be updated for each environment;
-      URL:        ${{secrets.TEST_ORG_URL}}    # Environment specific; To be updated for Production;
-      SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required
+      CLIENTID:   ${{secrets.BEERMATE_UAT_CLIENTID}} # Environment specific; To be updated for each environment;
+      USERNAME:   ${{secrets.BEERMATE_UAT_USERNAME}} # Environment specific; To be updated for each environment;
+      URL:        ${{secrets.TEST_ORG_URL}}          # Environment specific; To be updated for Production;
+      SERVER_KEY: ${{secrets.SERVER_KEY}}            # No update required
 
     runs-on: ubuntu-latest
     container: salesforce/salesforcedx:latest-rc-slim
