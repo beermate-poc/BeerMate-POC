@@ -61,6 +61,21 @@ cat delta/convertmdapi/destructiveChangesPost.xml
 echo ===============================================================================================
 echo 
 
+# Run specified tests
+# The pipeline will output all the classes part of the delta package in a text file.
+# Going forward, the .cls suffix of the classes will be replaced with Test.cls and stored in a variable.
+# The variable $SPECIFIEDTESTS will be used as a --testlevel parameter during the deployment.
+# Example: A.cls,B.cls are part of the package. The pipeline will store ATest.cls and BTest.cls in $SPECIFIEDTESTS
+# TODO:
+    # Skip the suffix update for the test classes already present in the package.
+    # Find a similar solution for all classes flagged as className_Test, className_TEST, classNameTEST, etc.
+
+ls delta/classes/ > specifiedtests.txt
+echo $(sed -ne 's/.cls/Test&/p' specifiedtests.txt) > specifiedtests.txt
+SPECIFIEDTESTS=`sed -e "s/ /,/g" < specifiedtests.txt`
+echo Outputing the test classes to be run as part of RunSpecifiedTests feature, depending on the classes present in the delta package: echo $SPECIFIEDTESTS. Work in progress...
+echo
+
 # Deploy the package
 sfdx force:mdapi:deploy -d delta/convertmdapi -l $TESTLEVEL -u $USERNAME --ignorewarnings -w 60 > deploy.txt
 if grep -R "Error" deploy.txt
