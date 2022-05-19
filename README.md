@@ -17,7 +17,7 @@ To create the certificate follow the steps described in https://developer.salesf
 # Create a connected app 
   1. Create a System Administrator Deployment User in the target Salesforce Sandboxes & Production. 
   Alternatively, you can use your own user, if you have System Administrator rights (not recommended)
-  3. Create a DevOps connected app in Salesforce
+  2. Create a DevOps connected app in Salesforce
       - Enable OAuth Settings
       - Callback URL: http://localhost:1717/OauthRedirect
       - Use digital signatures - Upload the server.crt file in here.
@@ -31,9 +31,16 @@ To create the certificate follow the steps described in https://developer.salesf
 
 # Branch management
 1. GitHub - Repository - Settings - Branches - Rename the "main" branch to "master"
-2. Export the full Production configuration in sfdx format and commit to master
-3. Remove any unwanted metadata types from the force-app package (E.g., reports, dashboards, etc)
-4. Copy-Paste the following files & folders from the POC repository to the Enterprise one:
+2. Clone the repository on your local machine using IDE tools (Visual Studio Code, IntelliJ etc), SourceTree, GitHub Desktop or command line.
+In case challenges are faced at this point, follow the next steps:
+  - Create a GitHub Personal Access Token: Your Profile (top right) - Settings - Developer Settings - Personal Access Token - Generate new token
+  - Open Terminal on your local and execute the following command: 
+    git clone https://PAT@github.com/organization/repository.git
+  - Authorize the connection opened in your browser
+  - The repository should have been now cloned
+4. Export the full Production configuration in sfdx format and commit to master
+5. Remove any unwanted metadata types from the force-app package (E.g., reports, dashboards, etc)
+6. Copy-Paste the following files & folders from the POC repository to the Enterprise one:
   - .github folder
   - deploy_scripts
   - destructiveChanges
@@ -41,7 +48,7 @@ To create the certificate follow the steps described in https://developer.salesf
   - .gitignore
   - README.md
   - sfdx-project.json
-5. Commit the above changes to master and tag the latest commit as in the below example:
+7. Commit the above changes to master and tag the latest commit as in the below example:
   - DEVINT/v1 
   - TEST/v1
   - PROD/v1
@@ -50,17 +57,16 @@ To create the certificate follow the steps described in https://developer.salesf
   - HOTFIXTEST/v1
  Note: 
  If any of the tags already exist, try to increment the number. 
-6. Push all changes to GitHub
-7. Create a develop branch from master
 
+8. Push all changes to GitHub
+9. Create a develop branch from master
 Note:
 For committing and tagging, SourceTree or GitHub Desktop apps can be used on both Windows and Mac.
 
+
 # Additional actions (Release Manager only)
-1. Create a GitHub Personal Access Token
-    - Your Profile (top right) - Settings - Developer Settings - Personal Access Token - Generate new token
-2. Github - Settings - Secrets - Actions - New repository secret
-3. Create or update the following environment variables:
+1. Github - Settings - Secrets - Actions - New repository secret
+2. Create or update the following environment variables:
     - ORG_CLIENTID, where ORG will take the name of the environment you are currently setting up. E.g., UAT_CLIENTID
     - ORG_USERNAME, where ORG will take the name of the environment you are currently setting up. E.g., UAT_USERNAME
     - NOTESTRUN will take the value NoTestRun
@@ -70,14 +76,14 @@ For committing and tagging, SourceTree or GitHub Desktop apps can be used on bot
     - PROD_ORG_URL will take the value https://login.salesforce.com
     - SERVER_KEY will be the certificate value that identifies with the DevOps app digital certificate server.crt
     - REPOSITORY will take the value https://github.com/organization/repository.git or https://PAT@github.com/organization/repository.git
-4. The deploy_scripts/Compiler.xml have to be updated with the new repository details. E.g., D:\a\newRepository\newRepository\.
-5. Similarly, deploy_scripts/minimalize.bat have to be updated. E.g., D:\a\newRepository\newRepository\.
-6. GitHub - Repository - Settings - Actions - General
+3. The deploy_scripts/Compiler.xml have to be updated with the new repository details. E.g., D:\a\newRepository\newRepository\.
+4. Similarly, deploy_scripts/minimalize.bat have to be updated. E.g., D:\a\newRepository\newRepository\.
+5. GitHub - Repository - Settings - Actions - General
   - Workflow permissions: Enable Read and write permissions, if possible
   - Workflow permissions: Enable Allow GitHub Actions to create and approve pull requests, if possible
 
 Note: 
-Action nr 6 required as the Static Resources feature will have to commit the built resources to the branch. 
+Action nr 5 required as the Static Resources feature will have to commit the built resources to the branch. 
 However, if the last actions are not possible, the "permissions: write-all" property has been added in the workflows.
 
 
