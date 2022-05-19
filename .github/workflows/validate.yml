@@ -2,7 +2,7 @@
 # ============================================================================================================
 # This is a basic workflow to help you validate to a Salesforce environment
 # Created by Adrian Ioana using bash scripting, sfdx-cli, sfpowerscripts, Node, GitHub Actions
-# Last modified date 10th May 2022
+# Last modified date 19th May 2022
 
 ### Prerequisites:
  ## Add the environment variables defined below, in GitHub - Settings - Secrets - Actions - Repository secrets
@@ -38,6 +38,10 @@ on:
       - '!deploy_scripts/**'
     branches:
       - develop
+
+# Granting write permission to the pipeline. 
+# Required for pushing tags or committing.
+permissions: write-all
 
 jobs:
   validate:

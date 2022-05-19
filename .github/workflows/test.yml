@@ -10,6 +10,10 @@ on:
     branches: 
       - TEST
 
+# Granting write permission to the pipeline. 
+# Required for pushing tags or committing.
+permissions: write-all
+
 # A workflow which firstly runs the static resource builder, followed by the deployment itself  
 jobs:
   BuildStaticResources:

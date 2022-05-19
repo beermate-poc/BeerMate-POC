@@ -1,66 +1,94 @@
-# This is a basic workflow to help you deploy to a Salesforce environment
+# ============================================================================================================
+# ============================================================================================================
+# This is a basic workflow to help you run unit tests in a Salesforce environment
+# Created by Adrian Ioana using bash scripting, sfdx-cli, sfpowerscripts, Node, GitHub Actions
+# Last modified date 18th May 2022
 
-name: SPRING21-unit-tests
+### Prerequisites:
+ ## Add the environment variables defined below, in GitHub - Settings - Secrets - Actions - Repository secrets
+
+### Variables
+ ## CLIENTID - DevOps conneected app consumer key
+ ## USERNAME - Target org username
+ ## URL - Target org login URL; test.salesforce.com, login.salesforce.com or custom domain
+  # TEST_ORG_URL - https://test.salesforce.com
+  # PROD_ORG_URL - https://login.salesforce.com
+  # CUSTOM_ORG_URL - to be defined based on your needs
+ ## SERVER_KEY - Certificate value that identifies with the DevOps app digital certificate server.crt
+ ## MAIL_USERNAME - Email address; used for pipeline reporting
+ ## MAIL_PASSWORD - Email password; used for pipeline reporting
+# ============================================================================================================
+# ============================================================================================================
+
+name: UAT-unit-tests
 
 on:
   workflow_dispatch:
+  # schedule:
+  #   - cron: '35 14 * * *'
+  # push:
+  #   branches: 
+  #     - develop
 
-# A workflow which firstly runs the static resource builder, followed by the deployment itself  
 jobs:
-  UnitTest:
+  unitTest:
+    env: # Sets environment variables 
+      CLIENTID:   ${{secrets.UAT_CLIENTID}}    # Environment specific; To be updated for each environment;
+      USERNAME:   ${{secrets.UAT_USERNAME}}    # Environment specific; To be updated for each environment;
+      URL:        ${{secrets.TEST_ORG_URL}}    # Environment specific; To be updated for Production;
+      SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required
+
     runs-on: ubuntu-latest
-#     container: dxatscale/sfpowerscripts:latest
+    container: salesforce/salesforcedx:latest-rc-slim
     steps:
       - name: Checkout the source branch
         uses: actions/checkout@v2.3.4
         with:
           fetch-depth: 0
           ref: ${{ github.ref }}
-      - name: Run unit tests
+
+      - name: Run tests
         run: |
-          npm install sfdx-cli --global
-          sfdx force:auth:jwt:grant --clientid ${{secrets.DEVINT_CLIENTID}} --jwtkeyfile ./.github/server.key --username ${{secrets.DEVINT_USERNAME}} --instanceurl ${{secrets.TEST_ORG_URL}}
-          SFDX_MAX_QUERY_LIMIT=30000 sfdx force:apex:test:run --codecoverage --resultformat human -u ${{secrets.DEVINT_USERNAME}}
-          execution_id=`sfdx force:data:soql:query -q "SELECT AsyncApexJobId FROM ApexTestRunResult where Status='Completed' order by EndTime desc limit 1" -t -u ${{secrets.DEVINT_USERNAME}}`
-          execution_report=`echo "$execution_id" | grep ^707*`
-          sfdx force:apex:test:report -i $execution_report -u ${{secrets.DEVINT_USERNAME}} > report.txt
+          chmod +x "${GITHUB_WORKSPACE}/.github/unit-test.sh"
+          "${GITHUB_WORKSPACE}/.github/unit-test.sh"
       
       - name: Send mail
         uses: dawidd6/action-send-mail@v3.6.1
         with:
-          # Required mail server address:
           server_address: smtp.office365.com
-          # Required mail server port:
           server_port: 587
-          # Optional (recommended): mail server username:
           username: ${{secrets.MAIL_USERNAME}}
-          # Optional (recommended) mail server password:
           password: ${{secrets.MAIL_PASSWORD}}
-          # Required mail subject:
           subject: Unit Test Results Summary
-          # Required recipients' addresses:
-          to: mamatha.dhanoji@molsoncoors.com,adrian.ioana@molsooncoors.com
-          # Required sender full name (address can be skipped):
+          to: mamatha.dhanoji@molsoncoors.com,adrian.ioana@molsoncoors.com
           from: GITHUB Workflow # <user@example.com>
-          # Optional whether this connection use TLS (default is true if server_port is 465)
-          #secure: true
-          # Optional plain body:
-          body: Build job of ${{github.repository}} completed successfully!
-          # Optional HTML body read from file:
-          # html_body: file://README.html
-          # Optional carbon copy recipients:
-          # cc: kyloren@example.com,leia@example.com
-          # Optional blind carbon copy recipients:
-          # bcc: r2d2@example.com,hansolo@example.com
-          # Optional recipient of the email response:
-          # reply_to: luke@example.com
-          # Optional Message ID this message is replying to:
-          # in_reply_to: <random-luke@example.com>
-          # Optional unsigned/invalid certificates allowance:
-          # ignore_cert: true
-          # Optional converting Markdown to HTML (set content_type to text/html too):
-          # convert_markdown: true
-          # Optional attachments:
+          body: The ${{github.workflow}} nightly run has finished! Please find the Unit Test Summary report attached.
           attachments: report.txt
-          # Optional priority: 'high', 'normal' (default) or 'low'
-          # priority: low
+
+
+# ================================================================================
+# ================================================================================
+# sfpowerscripts  
+# MIT License
+
+# Copyright (c) 2020 Accenture
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+# ================================================================================
+# ================================================================================

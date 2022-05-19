@@ -37,13 +37,13 @@ To create the certificate follow the steps described in https://developer.salesf
 3. Create or update the following environment variables:
     - ORG_CLIENTID, where ORG will take the name of the environment you are currently setting up. E.g., UAT_CLIENTID
     - ORG_USERNAME, where ORG will take the name of the environment you are currently setting up. E.g., UAT_USERNAME
-    - NOTESTRUN will take the value NOTESTRUN
-    - RUNLOCALTESTS will take the value RUNLOCALTESTS
-    - RUNSPECIFIEDTESTS will take the value RUNSPECIFIEDTESTS -r testClass1,testClass2,etc, based on your needs
+    - NOTESTRUN will take the value NoTestRun
+    - RUNLOCALTESTS will take the value RunLocalTests
+    - RUNSPECIFIEDTESTS will take the value RunSpecifiedTests -r testClass1,testClass2,etc, based on your needs
     - TEST_ORG_URL will take the value https://test.salesforce.com
     - PROD_ORG_URL will take the value https://login.salesforce.com
     - SERVER_KEY will be the certificate value that identifies with the DevOps app digital certificate server.crt
-    - REPOSITORY will take the value https://github.com/organization/repository.git
+    - REPOSITORY will take the value https://github.com/organization/repository.git or https://PAT@github.com/organization/repository.git
 4. The deploy_scripts/Compiler.xml have to be updated with the new repository details. E.g., D:\a\newRepository\newRepository\.
 5. Similarly, deploy_scripts/minimalize.bat have to be updated. E.g., D:\a\newRepository\newRepository\.
 6. GitHub - Repository - Settings - Actions - General
@@ -74,3 +74,5 @@ Note: Action nr 6 required as the Static Resources feature will have to commit t
 
 2. Create a dummy commit in force-app/main/default (you can add an extra line on one of the cls-meta.xml files)
 3. Monitor the workflow in GitHub - Actions tab
+
+
