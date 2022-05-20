@@ -70,11 +70,41 @@ echo
     # Skip the suffix update for the test classes already present in the package.
     # Find a similar solution for all classes flagged as className_Test, className_TEST, classNameTEST, etc.
 
-ls delta/force-app/main/default/classes/ > specifiedtests.txt
-echo $(sed -ne 's/.cls/Test&/p' specifiedtests.txt) > specifiedtests.txt
-SPECIFIEDTESTS=`sed -e "s/ /,/g" < specifiedtests.txt`
-echo Outputing the test classes to be run as part of RunSpecifiedTests feature, depending on the classes present in the delta package: echo $SPECIFIEDTESTS. Work in progress...
-echo
+# # Open the delta classes folder. To be replaced with delta/force-app/main/default/classes
+# cd force-app/main/default/classes
+# # Find all the classes that DO NOT contain the word "Test" in different forms and print them in a text file
+# find . ! \( -name '*Test*' -o -name '*TEST*' -o -name '*test*' -o -name '*.cls-meta.xml' \) -print > classes.txt
+# # Remove the ./ characters from the text file
+# CLASSES=`sed 's,\./, ,g' < classes.txt`
+# echo $CLASSES > classes.txt
+# # Remove the .(followed by space) characters from the text file
+# CLASSES=`sed 's,\. ,,g' < classes.txt`
+# echo $CLASSES > classes.txt
+# # Replace the spacing between classes with comma
+# CLASSES=`sed -e "s/ /,/g" < classes.txt`
+# echo $CLASSES > classes.txt
+# # Replace .cls with Test.cls
+# CLASSES=`sed -e "s/.cls/Test.cls/g" < classes.txt`
+# echo $CLASSES > classes.txt
+# # TODO:
+#     # A FOR loop to go through all the test classes from the text file and check if they exist in force-app/main/default/classes
+
+
+# # Create a folder to store all the test classes to be run later
+# mkdir -p runspecifiedtests/ 
+# # Copy the test classes part of the delta package in the new folder. To be replaced with delta/force-app/main/default/classes
+# cp force-app/main/default/classes/*Test*.cls force-app/main/default/classes/*TEST*.cls force-app/main/default/classes/*test*.cls runspecifiedtests/ > abc.txt
+# # Output the list of test classes from the new folder, in a text file
+# ls runspecifiedtests/ > specifiedtests.txt
+# # Move all class names on one line
+# SPECIFIEDTESTS=`sed -e "s/ /,/g" < specifiedtests.txt`
+# echo $SPECIFIEDTESTS > specifiedtests.txt
+# # Replace the spacing between classes with comma
+# SPECIFIEDTESTS=`sed -e "s/ /,/g" < specifiedtests.txt`
+# echo $SPECIFIEDTESTS > specifiedtests.txt
+
+# echo Outputing the test classes to be run as part of RunSpecifiedTests feature, depending on the classes present in the delta package: echo $SPECIFIEDTESTS. Work in progress...
+# echo
 
 # Deploy the package
 sfdx force:mdapi:deploy -d delta/convertmdapi -l $TESTLEVEL -u $USERNAME --ignorewarnings -w 60 > deploy.txt
