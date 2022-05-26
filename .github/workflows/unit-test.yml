@@ -33,11 +33,11 @@ on:
 jobs:
   unitTest:
     runs-on: ubuntu-latest
-    environment: ADRIANDEV
+    environment: UAT
     env: # Sets environment variables 
       CLIENTID:   ${{secrets.CLIENTID}}              # Environment specific; To be updated for each environment;
       USERNAME:   ${{secrets.USERNAME}}              # Environment specific; To be updated for each environment;
-      URL:        ${{secrets.PROD_ORG_URL}}          # Environment specific; To be updated for Production;
+      URL:        ${{secrets.TEST_ORG_URL}}          # Environment specific; To be updated for Production;
       SERVER_KEY: ${{secrets.SERVER_KEY}}            # No update required
     container: salesforce/salesforcedx:latest-rc-slim
     steps:
@@ -60,7 +60,7 @@ jobs:
           username: ${{secrets.MAIL_USERNAME}}
           password: ${{secrets.MAIL_PASSWORD}}
           subject: Unit Test Results Summary
-          to: adrian.ioana@molsoncoors.com
+          to: mamatha.dhanoji@molsoncoors.com,adrian.ioana@molsoncoors.com
           from: GitHub Workflow # <user@example.com>
           body: |
             Hi there,
