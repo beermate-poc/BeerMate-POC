@@ -20,6 +20,7 @@ then
     execution_id=`grep "Test Run Id" exec.txt | cut -d ' ' -f 13`
     echo $execution_id
 else
+    echo
     echo I am failing in getting the test execution ID. Please contact the release manager.
     exit 1
 fi
