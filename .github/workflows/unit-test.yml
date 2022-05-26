@@ -65,9 +65,9 @@ jobs:
           body: |
             Hi there,
 
-            The ${{github.workflow}} has finished! 
+            The ${{github.workflow}} job has finished! 
             
-            Please find the Unit Test Summary report attached.
+            Please find the Unit Tests Summary report attached.
 
             Regards,
             Exito!

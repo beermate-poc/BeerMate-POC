@@ -22,7 +22,7 @@ then
     echo
 else
     echo
-    echo I am failing in getting the test execution ID. Please contact the release manager.
+    echo I am failing getting the test execution ID. Please contact the release manager.
     exit 1
 fi
 
@@ -33,7 +33,7 @@ fi
 #     echo $org_coverage
 #     echo
 # else
-#     echo I am failing in getting the org wide coverage. Please contact the release manager.
+#     echo I am failing getting the org wide coverage. Please contact the release manager.
 #     echo 
 # fi
 
@@ -44,5 +44,5 @@ sed '/ Pass /d' exec.txt &> report.txt
 failed_tests="`grep -c -ow "\bFail\b" report.txt`"
 num=1 # Variable used as the word "Fail" is also present in the "Fail Rate" metrics; Subtract 1 from the total nr of occurences 
 echo 
-echo You have a total of $[failed_tests - num] failed tests.
+echo You have a total of $[failed_tests - num] failed tests. >> report.txt
 echo
