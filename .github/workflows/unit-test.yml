@@ -47,10 +47,10 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.ref }}
 
-      # - name: Run tests
-      #   run: |
-      #     chmod +x "${GITHUB_WORKSPACE}/.github/unit-test.sh"
-      #     "${GITHUB_WORKSPACE}/.github/unit-test.sh"
+      - name: Run tests
+        run: |
+          chmod +x "${GITHUB_WORKSPACE}/.github/unit-test.sh"
+          "${GITHUB_WORKSPACE}/.github/unit-test.sh"
       
       - name: Send mail
         uses: dawidd6/action-send-mail@v3.6.1
