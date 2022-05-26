@@ -62,17 +62,16 @@ jobs:
           subject: ${{github.environment}}Unit Test Results Summary
           to: adrian.ioana@molsoncoors.com
           from: GitHub Workflow # <user@example.com>
-          attachments: report.txt
           body: |
-          Hi,
+            Hi,
 
-          The ${{github.workflow}} nightly run has finished! 
-          
-          Please find the Unit Test Summary report attached.
+            The ${{github.workflow}} nightly run has finished! 
+            
+            Please find the Unit Test Summary report attached.
 
-          Regards,
-          Exito!
-
+            Regards,
+            Exito!
+          attachments: report.txt
 
 # ================================================================================
 # ================================================================================
