@@ -78,8 +78,8 @@ jobs:
     environment: DEVINT
     env:
       TAG:        DEVINT/v                     # Environment specific; To be updated for each environment;
-      CLIENTID:   ${{secrets.DEVINT_CLIENTID}} # Environment specific; To be updated for each environment;
-      USERNAME:   ${{secrets.DEVINT_USERNAME}} # Environment specific; To be updated for each environment;
+      CLIENTID:   ${{secrets.CLIENTID}}        # Environment specific; To be defined under each environment in GitHub - Settings - Environments;
+      USERNAME:   ${{secrets.USERNAME}}        # Environment specific; To be defined under each environment in GitHub - Settings - Environments;
       TESTLEVEL:  ${{secrets.NOTESTRUN}}       # Environment specific; To be updated for each environment;
       URL:        ${{secrets.TEST_ORG_URL}}    # Environment specific; To be updated for Production;
       SERVER_KEY: ${{secrets.SERVER_KEY}}      # No update required

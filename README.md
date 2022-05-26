@@ -72,8 +72,8 @@ For committing and tagging, SourceTree or GitHub Desktop apps can be used on bot
 # Additional actions (Release Manager only)
 1. GitHub - Settings - Environments - Create an environment for each Salesforce Sandbox & Production; E.g., BUILDCHK, DEVINT, TEST, PROD
 2. For each environment created earlier, add the Environment secrets, usually the ones mentioned below:
-    - **ORG_CLIENTID**, where ORG will take the name of the environment you are currently setting up. E.g., UAT_CLIENTID;
-    - **ORG_USERNAME**, where ORG will take the name of the environment you are currently setting up. E.g., UAT_USERNAME;
+    - **CLIENTID**, where ORG will take the name of the environment you are currently setting up.
+    - **USERNAME**, where ORG will take the name of the environment you are currently setting up.
 4. Now, add the global repository secrets in Github - Settings - Secrets - Actions - New repository secret
 5. Create or update the following Repository secrets:
     - **NOTESTRUN** will take the value NoTestRun (Case Sensitive);
