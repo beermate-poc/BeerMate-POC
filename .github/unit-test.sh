@@ -13,26 +13,26 @@ fi
 echo
 
 # Run apex tests
-# SFDX_MAX_QUERY_LIMIT=30000 sfdx force:apex:test:run --codecoverage --resultformat human -u $USERNAME > exec.txt
-# if grep -R -i "Test Run Id" exec.txt
-# then
-#     execution_id=`grep "Test Run Id" exec.txt | cut -d ' ' -f 13`
-#     echo $execution_id
-# else
-#     echo I am failing in getting the test execution ID. Please contact the release manager.
-#     exit 1
-# fi
-# sfdx force:apex:test:report -i $execution_id -u $USERNAME > report.txt
+SFDX_MAX_QUERY_LIMIT=30000 sfdx force:apex:test:run --codecoverage --resultformat human -u $USERNAME > exec.txt
+# If condition required to get the Test Run Id of the current test execution
+if grep -R -i "Test Run Id" exec.txt
+then
+    execution_id=`grep "Test Run Id" exec.txt | cut -d ' ' -f 13`
+    echo $execution_id
+else
+    echo I am failing in getting the test execution ID. Please contact the release manager.
+    exit 1
+fi
 
-sfdx force:apex:test:report -i 7077500000MjnNaAAJ -u $USERNAME > report.txt
+# Export the test execution results in a temporary report
+sfdx force:apex:test:report -i $execution_id -u $USERNAME > tempreport.txt
 
-failed_tests="`grep -c -ow "\bFail\b" report.txt`" # Search for the work "Fail" in report.txt
+# Remove the passed tests from the report
+sed '/ Pass /d' tempreport.txt > report.txt
+
+# Search for the work "Fail" in report.txt
+failed_tests="`grep -c -ow "\bFail\b" report.txt`"
 num=1 # Variable used as the word "Fail" is also present in the "Fail Rate" metrics; Subtract 1 from the total nr of occurences 
 echo 
 echo You have a total of $[failed_tests - num] failed tests.
-
-# Uncomment if only the Failed Tests are required in the report.
-# sfdx force:apex:test:report -i $execution_report -u $USERNAME > tempreport1.txt
-# sed '/ Pass /d' tempreport1.txt > tempreport2.txt
-# sed 's/Test Results/Failed Tests/' tempreport2.txt > report.txt
 echo
