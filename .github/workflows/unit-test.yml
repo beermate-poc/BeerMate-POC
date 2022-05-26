@@ -65,7 +65,7 @@ jobs:
           body: |
             Hi,
 
-            The ${{github.workflow}} nightly run has finished! 
+            The ${{github.workflow}} has finished! 
             
             Please find the Unit Test Summary report attached.
 
