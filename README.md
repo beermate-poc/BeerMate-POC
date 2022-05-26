@@ -74,8 +74,10 @@ For committing and tagging, SourceTree or GitHub Desktop apps can be used on bot
 2. For each environment created earlier, add the Environment secrets, usually the ones mentioned below:
     - **CLIENTID**, where ORG will take the name of the environment you are currently setting up.
     - **USERNAME**, where ORG will take the name of the environment you are currently setting up.
-4. Now, add the global repository secrets in Github - Settings - Secrets - Actions - New repository secret
-5. Create or update the following Repository secrets:
+    <img width="1138" alt="image" src="https://user-images.githubusercontent.com/48366727/170464749-50e63bfe-73be-4815-bd1e-88a05895ef07.png">
+
+3. Now, add the global repository secrets in Github - Settings - Secrets - Actions - New repository secret
+4. Create or update the following Repository secrets:
     - **NOTESTRUN** will take the value NoTestRun (Case Sensitive);
     - **RUNLOCALTESTS** will take the value RunLocalTests (Case Sensitive);
     - **RUNSPECIFIEDTESTS** will take the value RunSpecifiedTests -r testClass1,testClass2,etc, based on your needs (Case Sensitive);
@@ -83,14 +85,14 @@ For committing and tagging, SourceTree or GitHub Desktop apps can be used on bot
     - **PROD_ORG_URL** will take the value https://login.salesforce.com;
     - **SERVER_KEY** will be the certificate value that identifies with the DevOps app digital certificate server.crt;
     - **REPOSITORY** will take the value https://github.com/organization/repository.git or https://PAT@github.com/organization/repository.git;
-6. The deploy_scripts/Compiler.xml have to be updated with the new repository details. E.g., D:\a\newRepository\newRepository\;
-7. Similarly, deploy_scripts/minimalize.bat have to be updated. E.g., D:\a\newRepository\newRepository\;
-8. GitHub - Repository - Settings - Actions - General
+5. The deploy_scripts/Compiler.xml have to be updated with the new repository details. E.g., D:\a\newRepository\newRepository\;
+6. Similarly, deploy_scripts/minimalize.bat have to be updated. E.g., D:\a\newRepository\newRepository\;
+7. GitHub - Repository - Settings - Actions - General
   - Workflow permissions: Enable Read and write permissions, if possible;
   - Workflow permissions: Enable Allow GitHub Actions to create and approve pull requests, if possible;
 
 Note: 
-Action nr 5 required as the Static Resources feature will have to commit the built resources to the branch. 
+Action nr 7 required as the Static Resources feature will have to commit the built resources to the branch. 
 However, if the last actions are not possible, the "permissions: write-all" property has been added in the workflows.
 
 
