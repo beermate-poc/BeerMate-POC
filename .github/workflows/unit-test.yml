@@ -33,7 +33,7 @@ on:
 jobs:
   unitTest:
     runs-on: ubuntu-latest
-    environment: UAT
+    environment: ADRIANDEV
     env: # Sets environment variables 
       CLIENTID:   ${{secrets.CLIENTID}}              # Environment specific; To be updated for each environment;
       USERNAME:   ${{secrets.USERNAME}}              # Environment specific; To be updated for each environment;
@@ -59,11 +59,19 @@ jobs:
           server_port: 587
           username: ${{secrets.MAIL_USERNAME}}
           password: ${{secrets.MAIL_PASSWORD}}
-          subject: Unit Test Results Summary
-          to: mamatha.dhanoji@molsoncoors.com,adrian.ioana@molsoncoors.com
-          from: GITHUB Workflow # <user@example.com>
-          body: The ${{github.workflow}} nightly run has finished! Please find the Unit Test Summary report attached.
+          subject: ${{github.environment}}Unit Test Results Summary
+          to: adrian.ioana@molsoncoors.com
+          from: GitHub Workflow # <user@example.com>
           attachments: report.txt
+          body: |
+          Hi,
+
+          The ${{github.workflow}} nightly run has finished! 
+          
+          Please find the Unit Test Summary report attached.
+
+          Regards,
+          Exito!
 
 
 # ================================================================================
