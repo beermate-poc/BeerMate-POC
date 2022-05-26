@@ -59,7 +59,7 @@ jobs:
           server_port: 587
           username: ${{secrets.MAIL_USERNAME}}
           password: ${{secrets.MAIL_PASSWORD}}
-          subject: ${{GITHUB_WORKFLOW.ENVIRONMENT}} a ${{GITHUB_ENVIRONMENT}} b ${{github.workflow.environment}} c Unit Test Results Summary
+          subject: ${{GITHUB_ENVIRONMENT}} b ${{github.workflow.environment}} c Unit Test Results Summary
           to: adrian.ioana@molsoncoors.com
           from: GitHub Workflow # <user@example.com>
           body: |
