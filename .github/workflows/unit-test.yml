@@ -33,7 +33,7 @@ on:
 jobs:
   unitTest:
     runs-on: ubuntu-latest
-    environment: DEVINT
+    environment: UAT
     env: # Sets environment variables 
       CLIENTID:   ${{secrets.CLIENTID}}              # Environment specific; To be updated for each environment;
       USERNAME:   ${{secrets.USERNAME}}              # Environment specific; To be updated for each environment;
