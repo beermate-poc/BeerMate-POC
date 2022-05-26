@@ -19,17 +19,26 @@ if grep -R -i "Test Run Id" exec.txt
 then
     execution_id=`grep "Test Run Id" exec.txt | cut -d ' ' -f 13`
     echo $execution_id
+    echo
 else
     echo
     echo I am failing in getting the test execution ID. Please contact the release manager.
     exit 1
 fi
 
-# Export the test execution results in a temporary report
-sfdx force:apex:test:report -i $execution_id -u $USERNAME > tempreport.txt
+# # If condition required to get the Org Wide Coverage of the current test execution
+# if grep -R -i "Org Wide Coverage" exec.txt
+# then
+#     execution_id=`grep "Org Wide Coverage" exec.txt | cut -d ' ' -f 13`
+#     echo $org_coverage
+#     echo
+# else
+#     echo I am failing in getting the org wide coverage. Please contact the release manager.
+#     echo 
+# fi
 
 # Remove the passed tests from the report
-sed '/ Pass /d' tempreport.txt > report.txt
+sed '/ Pass /d' exec.txt &> report.txt
 
 # Search for the work "Fail" in report.txt
 failed_tests="`grep -c -ow "\bFail\b" report.txt`"
