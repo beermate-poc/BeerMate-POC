@@ -63,7 +63,7 @@ jobs:
           to: adrian.ioana@molsoncoors.com
           from: GitHub Workflow # <user@example.com>
           body: |
-            Hi,
+            Hi there,
 
             The ${{github.workflow}} has finished! 
             
