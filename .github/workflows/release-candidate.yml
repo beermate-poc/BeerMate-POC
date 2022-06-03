@@ -20,6 +20,12 @@ jobs:
     env:
       BRANCH: ${{github.ref_name}}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+          
       - name: Creating release candidate
         run: |
           chmod +x "${GITHUB_WORKSPACE}/.github/release-candidate.sh"
