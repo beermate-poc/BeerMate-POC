@@ -6,9 +6,11 @@
 
 echo ================================= Creating a release candidate ==================================
 echo $BRANCH > feature.txt
-sed 's/feature/release/' feature.txts
+sed 's/feature/release/' feature.txt
 cat feature.txt
 # echo $BRANCH
 # # git checkout origin/master
-# # git checkout -b 
 
+
+# git checkout -b $BRANCH
+# git push $REPOSITORY
