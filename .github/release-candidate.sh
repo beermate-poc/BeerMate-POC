@@ -6,10 +6,9 @@
 
 echo ================================= Creating a release candidate ==================================
 echo $BRANCH > feature.txt
-sed 's/feature/release/' feature.txt
-cat feature.txt
-# echo $BRANCH
-# # git checkout origin/master
+RCBRANCH = $(sed 's/feature/release/' feature.txt)
+echo The release candidate branch $RCBRANCH will be created from master...
+# git checkout origin/master
 
 
 # git checkout -b $BRANCH
