@@ -9,11 +9,11 @@ echo $BRANCH > feature.txt
 sed 's/feature/release/' feature.txt > rc.txt
 RCBRANCH=`cat rc.txt | grep ^release`
 echo Creating $RCBRANCH from master...
-git checkout origin/master
+git checkout -f origin/master
 echo I am currently checked-out on:
 git rev-parse --abbrev-ref HEAD
 echo
-git checkout -f $RCBRANCH
+git checkout -b $RCBRANCH
 echo I am currently checked-out on:
 git rev-parse --abbrev-ref HEAD
 echo
