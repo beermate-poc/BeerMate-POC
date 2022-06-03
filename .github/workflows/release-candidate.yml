@@ -7,7 +7,7 @@ on:
         - 'force-app/**'
         - 'destructiveChanges/**'
         - 'src/**'
-        - '!.github/**'
+        - '.github/**'
         - '!deploy_scripts/**'
     branches: 
       - feature-rc/*
@@ -25,7 +25,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.ref }}
-          
+
       - name: Creating release candidate
         run: |
           chmod +x "${GITHUB_WORKSPACE}/.github/release-candidate.sh"
