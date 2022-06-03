@@ -5,8 +5,7 @@
 
 
 echo ================================= Creating a release candidate ==================================
-echo $BRANCH | echo $SQL | sed -e "s/\feature/release/g" > $RCBRANCH
-echo $RCBRANCH
+echo $BRANCH | echo $SQL | sed -e "s/\feature/release/g"
 
 # git checkout origin/master
 # git checkout -b 
