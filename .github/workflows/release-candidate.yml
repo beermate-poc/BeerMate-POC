@@ -1,0 +1,26 @@
+name: Create release candidate
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+        - 'force-app/**'
+        - 'destructiveChanges/**'
+        - 'src/**'
+        - '!.github/**'
+        - '!deploy_scripts/**'
+    branches: 
+      - feature-rc/*
+
+permissions: write-all
+
+jobs:
+  create-rc:
+    runs-on: ubuntu-latest
+    env:
+      BRANCH: ${{github.ref_name}}
+    steps:
+      - name: Creating release candidate
+        run: |
+          chmod +x "${GITHUB_WORKSPACE}/.github/release-candidate.sh"
+          "${GITHUB_WORKSPACE}/.github/release-candidate.sh"
