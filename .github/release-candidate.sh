@@ -6,7 +6,8 @@
 
 echo ================================= Creating a release candidate ==================================
 echo $BRANCH > feature.txt
-RCBRANCH = $(sed 's/feature/release/' feature.txt)
+sed 's/feature/release/' feature.txt > rc.txt
+RCBRANCH="`grep -c -ow "\brelease\b" rc.txt`"
 echo The release candidate branch $RCBRANCH will be created from master...
 # git checkout origin/master
 
