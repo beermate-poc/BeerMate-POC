@@ -13,7 +13,7 @@ git checkout origin/master
 echo I am currently checked-out on:
 git rev-parse --abbrev-ref HEAD
 echo
-git checkout -b $RCBRANCH
+git checkout -f $RCBRANCH
 echo I am currently checked-out on:
 git rev-parse --abbrev-ref HEAD
 echo
