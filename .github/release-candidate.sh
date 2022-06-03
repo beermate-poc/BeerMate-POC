@@ -11,7 +11,7 @@ RCBRANCH=`cat rc.txt | grep ^release`
 echo Creating $RCBRANCH from master...
 git checkout origin/master
 git checkout -b $RCBRANCH
-git push $REPOSITORY
+git push $REPOSITORY --set-upstream origin $RCBRANCH
 echo I am currently checked-out on:
 git rev-parse --abbrev-ref HEAD
 echo
