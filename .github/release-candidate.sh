@@ -5,8 +5,9 @@
 
 
 echo ================================= Creating a release candidate ==================================
-echo $BRANCH 
-sed -e "s/\feature/release/g" $BRANCH
+echo $BRANCH > feature.txt
+sed -e "s/\feature/release/g" feature.txt
+cat feature.txt
 echo $BRANCH
 # git checkout origin/master
 # git checkout -b 
