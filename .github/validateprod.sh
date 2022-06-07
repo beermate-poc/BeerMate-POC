@@ -79,6 +79,20 @@ echo CURRENT VERSION $TAG$current_version
 major=`echo $current_version | cut -d'.' -f 1`
 major=`expr $major + 1`
 next_version=`echo $major`
-echo NEXT VERSION $TAG$next_version
-git tag `echo $TAG$next_version`
-git push $REPOSITORY --tags
+echo Adding the next version of the tag: $TAG$next_version
+git tag `echo $TAG$next_version` &> tag.txt
+
+# Check if the tag exists
+if grep -R -i "already" tag.txt
+then
+    echo The new tag $TAG$next_version exists already. Incrementing it by one...
+    major=`expr $major + 1`
+    next_version=`echo $major`
+    echo Generating a newer tag: $TAG$next_version
+    git tag `echo $TAG$next_version`
+    git push $REPOSITORY --tags
+else
+    git push $REPOSITORY --tags
+    echo The new tag has been successfully pushed to remote.
+fi
+echo
